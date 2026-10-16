@@ -182,10 +182,10 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
           {/* Active Card Container with 3D Flip */}
           <div
             onClick={() => setIsFlipped(!isFlipped)}
-            className="group relative h-96 w-full cursor-pointer perspective-1000 select-none"
+            className="group relative h-80 sm:h-96 w-full cursor-pointer perspective-1000 select-none"
           >
             <div
-              className={`relative h-full w-full rounded-3xl border border-slate-700/80 bg-gradient-to-br transition-all duration-500 transform-style-preserve-3d shadow-2xl ${
+              className={`relative h-full w-full rounded-2xl sm:rounded-3xl border border-slate-700/80 bg-gradient-to-br transition-all duration-500 transform-style-preserve-3d shadow-2xl ${
                 isFlipped ? 'rotate-y-180' : ''
               } ${
                 currentCard?.mastered
@@ -194,14 +194,14 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
               }`}
             >
               {/* FRONT SIDE */}
-              <div className="absolute inset-0 flex flex-col justify-between p-7 backface-hidden">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="rounded-md bg-indigo-500/20 px-2 py-0.5 text-xs font-bold text-indigo-300">
+              <div className="absolute inset-0 flex flex-col justify-between p-4 sm:p-7 backface-hidden">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-2 sm:pb-3">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <span className="rounded-md bg-indigo-500/20 px-2 py-0.5 text-[10px] sm:text-xs font-bold text-indigo-300">
                       {currentCard?.topic}
                     </span>
-                    <span className="rounded-md bg-slate-800 px-2 py-0.5 text-[10px] font-semibold text-slate-400">
-                      {currentCard?.difficulty} Syllabus
+                    <span className="rounded-md bg-slate-800 px-2 py-0.5 text-[9px] sm:text-[10px] font-semibold text-slate-400">
+                      {currentCard?.difficulty}
                     </span>
                   </div>
 

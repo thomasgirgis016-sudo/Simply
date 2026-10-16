@@ -158,7 +158,7 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
               <button
                 type="button"
                 onClick={() => cameraInputRef.current?.click()}
-                className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition"
+                className="flex flex-1 sm:flex-none items-center justify-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2 sm:py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition active:scale-95"
               >
                 <Camera className="h-4 w-4 text-emerald-400" />
                 <span>Take Photo</span>
@@ -167,7 +167,7 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition"
+                className="flex flex-1 sm:flex-none items-center justify-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2 sm:py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition active:scale-95"
               >
                 <Upload className="h-4 w-4 text-cyan-400" />
                 <span>Upload Image</span>
@@ -181,12 +181,12 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
               <img
                 src={selectedImage}
                 alt="Selected past paper problem"
-                className="max-h-56 rounded-lg object-contain"
+                className="max-h-56 rounded-lg object-contain w-full"
               />
               <button
                 type="button"
                 onClick={clearImage}
-                className="absolute right-3 top-3 rounded-full bg-slate-900/90 p-1.5 text-slate-300 hover:bg-rose-600 hover:text-white transition shadow-md"
+                className="absolute right-3 top-3 rounded-full bg-slate-900/90 p-2 text-slate-300 hover:bg-rose-600 hover:text-white transition shadow-md"
                 title="Remove image"
               >
                 <X className="h-4 w-4" />
@@ -197,29 +197,27 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
           {/* Text Area */}
           <div>
             <textarea
-              rows={4}
+              rows={3}
               value={questionText}
               onChange={(e) => setQuestionText(e.target.value)}
-              placeholder="Type or paste the question text here (e.g. 'Solve 3x² - 5x + 1 = 0 giving your answer to 2 decimal places [3 marks]', or paste a physics problem)..."
-              className="w-full rounded-xl border border-slate-700/80 bg-slate-950/70 p-4 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              placeholder="Type or paste the question text here (e.g. 'Explain why 2Fe²⁺ + Cl₂ -> 2Fe³⁺ + 2Cl⁻ is a redox reaction [3 marks]')..."
+              className="w-full rounded-xl border border-slate-700/80 bg-slate-950/70 p-3.5 sm:p-4 text-xs sm:text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
             />
           </div>
 
           {/* Action Row */}
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-            <p className="text-xs text-slate-400">
-              {!profile.geminiApiKey && (
-                <span className="text-amber-400 font-medium">
-                  ✦ Running in Demo Mode (Try sample questions above or add API key in settings for custom photos)
-                </span>
-              )}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
+            <p className="text-[11px] sm:text-xs text-slate-400">
+              <span className="text-emerald-400 font-medium">
+                ✦ AI-Powered Examiner Engine Active
+              </span>
             </p>
 
             <button
               type="button"
               onClick={handleSolve}
               disabled={loading || (!questionText.trim() && !selectedImage)}
-              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-indigo-500/25 hover:from-indigo-400 hover:to-pink-400 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 px-6 py-3 sm:py-2.5 text-xs sm:text-sm font-bold text-white shadow-lg shadow-indigo-500/25 hover:from-indigo-400 hover:to-pink-400 transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               {loading ? (
                 <>

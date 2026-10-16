@@ -117,14 +117,14 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
   };
 
   const quickQuestions = [
+    `Explain Redox reactions (OIL RIG & mark scheme criteria)`,
     `How do I get an A* / Grade 9 in ${subject.name}?`,
-    `Give me a challenging IGCSE question on ${subject.topics[0] || 'core concepts'}`,
     `What are the most common mistakes candidates make in this exam?`,
-    `Explain the marking difference between [M1], [A1], and [B1] marks`
+    `Give me a challenging past paper question on ${subject.topics[0] || 'core concepts'}`
   ];
 
   return (
-    <div className="mx-auto flex h-[calc(100vh-180px)] min-h-[600px] max-w-4xl flex-col rounded-3xl border border-slate-800 bg-slate-900/90 shadow-2xl backdrop-blur-md overflow-hidden">
+    <div className="mx-auto flex h-[calc(100dvh-170px)] sm:h-[calc(100vh-180px)] max-w-4xl flex-col rounded-2xl sm:rounded-3xl border border-slate-800 bg-slate-900/90 shadow-2xl backdrop-blur-md overflow-hidden">
       {/* Chat Header */}
       <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950/70 px-6 py-4">
         <div className="flex items-center gap-3">
@@ -217,7 +217,7 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
       </div>
 
       {/* Input Bar */}
-      <div className="border-t border-slate-800 bg-slate-950 p-4">
+      <div className="border-t border-slate-800 bg-slate-950 p-2.5 sm:p-4">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -229,13 +229,13 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={`Ask anything about ${subject.name} past papers, formulas or mark schemes...`}
-            className="flex-1 rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-xs sm:text-sm text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none"
+            placeholder={`Ask anything about ${subject.name} (e.g. explain redox, formula)...`}
+            className="flex-1 rounded-xl sm:rounded-2xl border border-slate-700 bg-slate-900 px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none"
           />
           <button
             type="submit"
             disabled={!input.trim() || loading}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/25 hover:from-purple-500 hover:to-indigo-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/25 hover:from-purple-500 hover:to-indigo-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Send className="h-4 w-4" />
           </button>

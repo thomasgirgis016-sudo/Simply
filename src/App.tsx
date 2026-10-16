@@ -26,6 +26,14 @@ import { SettingsModal } from './components/SettingsModal';
 import { ProfileModal } from './components/ProfileModal';
 import { AuthModal } from './components/AuthModal';
 import { getActiveUser, setActiveUser } from './services/auth';
+import {
+  Camera,
+  Layers,
+  GraduationCap,
+  BookOpen,
+  BookmarkCheck,
+  MessageSquare
+} from 'lucide-react';
 
 const DEFAULT_PROFILE: UserProfile = {
   name: 'Student',
@@ -227,7 +235,7 @@ export function App() {
       />
 
       {/* Main Container */}
-      <main className="flex-1 px-4 py-6 sm:px-6 md:py-8 max-w-7xl mx-auto w-full">
+      <main className="flex-1 px-3 py-4 sm:px-6 sm:py-8 max-w-7xl mx-auto w-full pb-24 md:pb-8">
         {activeTab === 'solver' && (
           <QuestionSolver
             subject={activeSubject}
@@ -280,6 +288,40 @@ export function App() {
           />
         )}
       </main>
+
+      {/* Mobile Phone Bottom Navigation Bar */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-slate-800/90 bg-slate-950/95 backdrop-blur-xl px-2 pt-1.5 pb-[max(0.6rem,env(safe-area-inset-bottom))] shadow-2xl flex items-center justify-around">
+        {[
+          { id: 'solver', label: 'Solver', icon: Camera, color: 'text-pink-400' },
+          { id: 'flashcards', label: 'Cards', icon: Layers, color: 'text-indigo-400' },
+          { id: 'quiz', label: 'Quizzes', icon: GraduationCap, color: 'text-emerald-400' },
+          { id: 'revision', label: 'Notes', icon: BookOpen, color: 'text-cyan-400' },
+          { id: 'formulas', label: 'Formulas', icon: BookmarkCheck, color: 'text-amber-400' },
+          { id: 'chat', label: 'AI Tutor', icon: MessageSquare, color: 'text-purple-400' },
+        ].map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as ActiveTab)}
+              className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl transition-all active:scale-90 cursor-pointer ${
+                isActive ? 'text-white' : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <div className="relative">
+                <Icon className={`h-5 w-5 ${isActive ? tab.color : 'text-slate-400'}`} />
+                {isActive && (
+                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-1 w-3 rounded-full bg-indigo-500 shadow-sm shadow-indigo-500" />
+                )}
+              </div>
+              <span className={`text-[10px] mt-1 font-semibold tracking-tight ${isActive ? 'text-white font-bold' : 'text-slate-400'}`}>
+                {tab.label}
+              </span>
+            </button>
+          );
+        })}
+      </nav>
 
       {/* Footer */}
       <footer className="mt-auto border-t border-slate-800/80 bg-slate-950/90 py-8 px-4 text-xs text-slate-400">

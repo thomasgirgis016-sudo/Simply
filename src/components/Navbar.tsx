@@ -168,8 +168,8 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       </div>
 
-      {/* Navigation tabs bar */}
-      <div className="mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-4 pb-2 pt-1 sm:px-6 no-scrollbar">
+      {/* Navigation tabs bar (Desktop / Tablet) */}
+      <div className="hidden md:flex mx-auto max-w-7xl items-center gap-1 overflow-x-auto px-4 pb-2 pt-1 sm:px-6 no-scrollbar">
         {[
           { id: 'solver', label: 'AI Question & Photo Solver', icon: Camera, color: 'text-pink-400' },
           { id: 'flashcards', label: 'Smart Flashcards', icon: Layers, color: 'text-indigo-400' },
