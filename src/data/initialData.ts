@@ -25,6 +25,21 @@ export const SAMPLE_SOLVER_QUESTIONS = [
     title: 'CIE 0478 CS: Two\'s Complement & Logic Gates',
     subjectId: 'cie-cs-0478',
     text: '(a) Convert the denary number -38 into an 8-bit two\'s complement binary integer. [3 marks]\n(b) Draw or write the Boolean expression for an XOR gate using inputs A and B, and write its truth table. [3 marks]',
+  },
+  {
+    title: 'CIE 0510 ESL: Exercise 4 Summary Writing & Linkers',
+    subjectId: 'cie-esl-0510',
+    text: 'Read the passage about the benefits and drawbacks of urban vertical farming.\nWrite a summary of:\n• The environmental benefits of vertical farms\n• The economic and operational challenges faced by operators.\nWrite between 100 and 120 words. Use your own words as far as possible. [16 marks: 10 marks for Content, 6 marks for Language]',
+  },
+  {
+    title: 'CIE 0510 ESL: Exercise 5 Informal Email to a Friend',
+    subjectId: 'cie-esl-0510',
+    text: 'You recently attended an exciting science and technology fair at your school.\nWrite an email to a friend telling them about it. In your email, you should:\n• describe the most interesting exhibition you saw\n• explain why you enjoyed the day\n• invite your friend to come with you to the next event.\nWrite about 120-160 words. [16 marks: 8 marks Content, 8 marks Language]',
+  },
+  {
+    title: 'CIE 0452 Accounting: Depreciation & Net Book Value',
+    subjectId: 'cie-accounting-0452',
+    text: 'A business purchases a delivery van on 1 January 2023 for $36,000. It is estimated to have a useful life of 4 years and an estimated residual scrap value of $4,000.\n(a) Calculate the annual depreciation charge using the straight-line method. [2 marks]\n(b) Calculate the net book value of the van at 31 December 2024. [2 marks]\n(c) State the accounting principle that requires depreciation to be provided for each financial year. [1 mark]',
   }
 ];
 
@@ -153,6 +168,38 @@ export const INITIAL_FLASHCARDS: Flashcard[] = [
     examinerTip: 'CIE 0478 mark schemes award 1 mark per register mentioned correctly (PC, MAR, MDR, CIR).',
     difficulty: 'Extended',
     mastered: false,
+  },
+
+  // English as a Second Language (CIE 0510 / 0511)
+  {
+    id: 'fc-esl-1',
+    subjectId: 'cie-esl-0510',
+    topic: 'Exercise 4: Summary Writing (100-120 words, Own Words & Linkers)',
+    question: 'What are the two Golden Rules of IGCSE ESL Exercise 4 Summary Writing?',
+    answer: '1. Stay strictly within the word count (100-120 words). If you write over 120 words, examiners stop reading and deduct language marks!\n2. Use your OWN words (paraphrase). Do not lift whole sentences directly from the passage, or you will score 0/6 for language.',
+    examinerTip: 'Aim for 6-8 distinct content points linked smoothly using transition words (e.g., Furthermore, In addition to this, However).',
+    difficulty: 'Core',
+    mastered: false,
+  },
+  {
+    id: 'fc-esl-2',
+    subjectId: 'cie-esl-0510',
+    topic: 'Exercise 5: Informal Email / Letter Writing (Friendly Register)',
+    question: 'How should you open and sign off an informal email to a friend in IGCSE ESL?',
+    answer: '• Openings: "Dear [Name], / Hi [Name]! It was fantastic to hear from you. Sorry for not writing sooner, but I have been snowed under with exam revision!"\n• Closings: "Drop me a line soon! / Can\'t wait to catch up! Warm regards, / Best wishes, [Your name]".',
+    examinerTip: 'Always use informal contractions (I\'m, didn\'t, you\'ll) and conversational idioms to demonstrate a genuine informal register to the examiner!',
+    difficulty: 'Core',
+    mastered: false,
+  },
+  {
+    id: 'fc-esl-3',
+    subjectId: 'cie-esl-0510',
+    topic: 'Exercise 6: Formal School Magazine Article Writing',
+    question: 'What tone, structure, and techniques must you use for a formal school magazine article or report?',
+    answer: '1. Catchy headline/title.\n2. Engaging introduction using a rhetorical question ("Have you ever wondered...?").\n3. Balanced paragraphs with topic sentences.\n4. Formal register: NO slang or abbreviations (write "do not", not "don\'t").\n5. Strong conclusion summarizing recommendations.',
+    examinerTip: 'Use a range of complex sentences and advanced vocabulary (e.g. "paramount", "detrimental", "exacerbate", "indispensable").',
+    difficulty: 'Extended',
+    mastered: false,
   }
 ];
 
@@ -255,6 +302,26 @@ export const INITIAL_QUIZZES: QuizQuestion[] = [
       '[A1] 1011 = 11 = B; 1100 = 12 = C -> Result is BC'
     ],
     markSchemeExplanation: 'Split 10111100 into 4-bit nibbles: First nibble 1011 = 8+2+1 = 11, which is "B" in hex. Second nibble 1100 = 8+4 = 12, which is "C" in hex. Combining gives BC.'
+  },
+  {
+    id: 'q-esl-1',
+    subjectId: 'cie-esl-0510',
+    topic: 'Exercise 4: Summary Writing (100-120 words, Own Words & Linkers)',
+    paperReference: 'CIE 0510/21 May/June 2023',
+    questionText: 'In IGCSE ESL Exercise 4 (Summary Writing), which sentence shows the best paraphrasing technique to earn high language marks (avoiding lifting)?',
+    options: [
+      { id: 'opt-a', text: 'Original: "Heavy rainfall caused severe flooding in the downtown area." -> Paraphrase: "Torrential downpours led to widespread inundation across the city centre."' },
+      { id: 'opt-b', text: 'Original: "Heavy rainfall caused severe flooding in the downtown area." -> Paraphrase: "Heavy rainfall caused bad flooding in the downtown area."' },
+      { id: 'opt-c', text: 'Original: "Heavy rainfall caused severe flooding in the downtown area." -> Paraphrase: "Because of heavy rainfall, severe flooding happened in the downtown area."' },
+      { id: 'opt-d', text: 'Original: "Heavy rainfall caused severe flooding in the downtown area." -> Paraphrase: "Heavy rainfall caused severe flooding in the downtown area."' }
+    ],
+    correctOptionId: 'opt-a',
+    marks: 2,
+    markingBreakdown: [
+      '[B1] Complete lexical variation (downpours for rainfall, inundation for flooding, city centre for downtown)',
+      '[B1] Structural transformation without losing the factual content point'
+    ],
+    markSchemeExplanation: 'Option A replaces key words with precise synonyms and alters the phrasing, demonstrating a wide range of vocabulary and sentence structures required for the top 5-6 mark language band.'
   }
 ];
 
@@ -410,6 +477,45 @@ export const INITIAL_REVISION_NOTES: RevisionTopic[] = [
     examinerWarnings: [
       'In reacting mass questions, always write the molar ratio from the balanced equation before calculating final mass.',
       'Do not round intermediate decimal numbers on your calculator; round only at the final step to 3 significant figures.'
+    ]
+  },
+  {
+    id: 'rev-esl-mastery',
+    subjectId: 'cie-esl-0510',
+    chapter: 'IGCSE ESL Writing & Reading Skills',
+    title: 'Top-Band Writing Guide: Summary, Email & Formal Article',
+    keyConcepts: [
+      {
+        heading: 'Exercise 4: Summary Writing Master Strategy',
+        points: [
+          'Underline the two specific aspects demanded by the question (e.g. positive impacts AND challenges).',
+          'Find and number 4 points for the first aspect and 4 points for the second aspect in the reading text.',
+          'Group similar points together and rephrase using synonyms and passive voice transformations.',
+          'Use formal cohesive linkers: "Not only does it...", "Furthermore...", "Conversely...", "As a consequence...".',
+          'Strictly count words: 100 to 120 words. Writing 121+ words incurs an immediate penalty!'
+        ]
+      },
+      {
+        heading: 'Exercise 5 vs Exercise 6: Register Comparison',
+        points: [
+          'Exercise 5 (Informal Email): Use informal greeting ("Hi Sarah!"), conversational idioms ("to be honest", "I was over the moon"), contracted verbs ("I\'ve", "didn\'t"), and an exclamation mark or two.',
+          'Exercise 6 (Formal Article/Report): Catchy title, NO contractions ("do not" instead of "don\'t"), rhetorical question ("Is modern technology truly beneficial?"), passive constructions ("It is widely recognized that..."), and an assertive recommendation.'
+        ]
+      }
+    ],
+    mustKnowDefinitions: [
+      {
+        term: 'Paraphrasing',
+        definition: 'Restating information from a passage in your own words with different vocabulary and sentence structures while preserving the precise original meaning.'
+      },
+      {
+        term: 'Register',
+        definition: 'The tone, level of formality, and style of language chosen to suit a specific audience and purpose (informal for friends vs formal for school magazines/examiners).'
+      }
+    ],
+    examinerWarnings: [
+      'Do NOT copy entire clauses verbatim from the reading text in Exercise 4, or you will receive zero marks for language.',
+      'Make sure you address all three bullet points in Exercise 5 email, giving each point balanced development.'
     ]
   }
 ];

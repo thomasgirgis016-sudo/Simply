@@ -9,31 +9,40 @@ import {
   MessageSquare,
   Settings,
   UserCheck,
-  ChevronDown
+  ChevronDown,
+  LogIn,
+  LogOut,
+  User
 } from 'lucide-react';
-import { UserProfile, Subject } from '../types';
+import { UserProfile, Subject, UserAccount } from '../types';
 
 export type ActiveTab = 'solver' | 'flashcards' | 'quiz' | 'revision' | 'formulas' | 'chat';
 
 interface NavbarProps {
   profile: UserProfile;
+  currentUser: UserAccount | null;
   subjects: Subject[];
   activeSubject: Subject;
   onSelectSubject: (sub: Subject) => void;
   activeTab: ActiveTab;
   onSelectTab: (tab: ActiveTab) => void;
   onOpenProfile: () => void;
+  onOpenAuth: (mode?: 'signin' | 'signup') => void;
+  onLogout: () => void;
   onOpenSettings: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   profile,
+  currentUser,
   subjects,
   activeSubject,
   onSelectSubject,
   activeTab,
   onSelectTab,
   onOpenProfile,
+  onOpenAuth,
+  onLogout,
   onOpenSettings,
 }) => {
   return (
@@ -49,12 +58,12 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span className="text-lg font-black tracking-tight text-white">
                 SIMPLY <span className="bg-gradient-to-r from-indigo-400 to-pink-400 bg-clip-text text-transparent">IGCSE</span>
               </span>
-              <span className="hidden sm:inline-flex items-center rounded-full bg-indigo-500/10 px-2 py-0.5 text-[10px] font-semibold text-indigo-400 border border-indigo-500/20">
-                AI Co-Pilot
+              <span className="hidden sm:inline-flex items-center rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-400 border border-emerald-500/20">
+                Grade 9 AI
               </span>
             </div>
             <p className="hidden md:block text-[11px] text-slate-400">
-              Cambridge & Edexcel Exam Prep System
+              Cambridge & Pearson Edexcel Study Platform
             </p>
           </div>
         </div>
@@ -69,7 +78,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 const found = subjects.find(s => s.id === e.target.value);
                 if (found) onSelectSubject(found);
               }}
-              className="appearance-none rounded-xl border border-slate-700 bg-slate-900/90 py-2 pl-3.5 pr-8 text-xs font-semibold text-white shadow-sm hover:border-slate-600 focus:border-indigo-500 focus:outline-none cursor-pointer"
+              className="appearance-none rounded-xl border border-slate-700 bg-slate-900/90 py-2 pl-3.5 pr-8 text-xs font-semibold text-white shadow-sm hover:border-slate-600 focus:border-indigo-500 focus:outline-none cursor-pointer max-w-[200px] sm:max-w-[240px] truncate"
             >
               {subjects.map(s => (
                 <option key={s.id} value={s.id} className="bg-slate-900 text-white">
@@ -83,8 +92,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Student Profile Pill */}
           <button
             onClick={onOpenProfile}
-            className="hidden lg:flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900/60 px-3 py-1.5 text-xs text-slate-300 hover:border-slate-700 hover:text-white transition"
-            title="Edit student profile"
+            className="hidden lg:flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900/60 px-3 py-1.5 text-xs text-slate-300 hover:border-slate-700 hover:text-white transition cursor-pointer"
+            title="Edit student profile & subjects"
           >
             <UserCheck className="h-3.5 w-3.5 text-emerald-400" />
             <span className="font-semibold text-white">{profile.name}</span>
@@ -96,8 +105,50 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
         </div>
 
-        {/* Right side actions */}
+        {/* Right side actions: User Account & Settings */}
         <div className="flex items-center gap-2">
+          {currentUser ? (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={onOpenProfile}
+                className="flex items-center gap-2 rounded-xl border border-indigo-500/30 bg-indigo-950/40 px-3 py-1.5 text-xs font-semibold text-indigo-200 hover:bg-indigo-900/50 transition cursor-pointer"
+                title="Account Settings"
+              >
+                <div className="h-5 w-5 rounded-full bg-indigo-600 flex items-center justify-center text-[10px] font-bold text-white uppercase">
+                  {currentUser.name.charAt(0)}
+                </div>
+                <span className="hidden sm:inline">{currentUser.name}</span>
+              </button>
+
+              <button
+                onClick={onLogout}
+                className="rounded-xl border border-slate-800 bg-slate-900/80 p-2 text-slate-400 hover:bg-rose-500/20 hover:text-rose-300 hover:border-rose-500/30 transition cursor-pointer"
+                title="Sign Out"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => onOpenAuth('signin')}
+                className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800/80 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition cursor-pointer"
+              >
+                <LogIn className="h-3.5 w-3.5 text-indigo-400" />
+                <span>Sign In</span>
+              </button>
+
+              <button
+                onClick={() => onOpenAuth('signup')}
+                className="hidden sm:flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-md shadow-indigo-500/20 hover:from-indigo-400 hover:to-purple-500 transition cursor-pointer"
+              >
+                <User className="h-3.5 w-3.5" />
+                <span>Sign Up</span>
+              </button>
+            </div>
+          )}
+
+          {/* Quick curriculum editor for mobile */}
           <button
             onClick={onOpenProfile}
             className="lg:hidden rounded-xl border border-slate-800 bg-slate-900/80 p-2 text-slate-300 hover:text-white hover:border-slate-700"
@@ -106,19 +157,13 @@ export const Navbar: React.FC<NavbarProps> = ({
             <GraduationCap className="h-4 w-4 text-emerald-400" />
           </button>
 
+          {/* Subtle admin/system settings gear */}
           <button
             onClick={onOpenSettings}
-            className={`flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-medium transition ${
-              profile.geminiApiKey
-                ? 'border-slate-800 bg-slate-900/80 text-slate-300 hover:border-slate-700 hover:text-white'
-                : 'border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 animate-pulse'
-            }`}
-            title="Configure Gemini AI Key"
+            className="rounded-xl border border-slate-800/80 bg-slate-900/60 p-2 text-slate-400 hover:bg-slate-800 hover:text-white transition cursor-pointer"
+            title="AI Model & Admin Settings"
           >
             <Settings className="h-4 w-4" />
-            <span className="hidden sm:inline">
-              {profile.geminiApiKey ? 'AI Active' : 'API Key'}
-            </span>
           </button>
         </div>
       </div>
@@ -139,7 +184,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               key={tab.id}
               onClick={() => onSelectTab(tab.id as ActiveTab)}
-              className={`flex shrink-0 items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold transition ${
+              className={`flex shrink-0 items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold transition cursor-pointer ${
                 isActive
                   ? 'bg-slate-800 text-white shadow-sm ring-1 ring-slate-700 border-b-2 border-indigo-500'
                   : 'text-slate-400 hover:bg-slate-900/60 hover:text-slate-200'

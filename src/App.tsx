@@ -5,7 +5,8 @@ import {
   Flashcard,
   QuizQuestion,
   RevisionTopic,
-  FormulaItem
+  FormulaItem,
+  UserAccount
 } from './types';
 import { IGCSE_SUBJECTS } from './data/subjects';
 import {
@@ -23,7 +24,8 @@ import { FormulaDictionary } from './components/FormulaDictionary';
 import { AiTutorChat } from './components/AiTutorChat';
 import { SettingsModal } from './components/SettingsModal';
 import { ProfileModal } from './components/ProfileModal';
-import { Sparkles, GraduationCap, ShieldCheck, Heart } from 'lucide-react';
+import { AuthModal } from './components/AuthModal';
+import { getActiveUser, setActiveUser } from './services/auth';
 
 const DEFAULT_PROFILE: UserProfile = {
   name: 'Student',
@@ -32,19 +34,38 @@ const DEFAULT_PROFILE: UserProfile = {
   targetGrade: '9 / A*',
   selectedSubjectIds: [
     'cie-math-0580',
+    'cie-esl-0510',
     'cie-physics-0625',
     'cie-chem-0620',
     'cie-bio-0610',
     'cie-cs-0478',
-    'cie-econ-0455'
+    'cie-econ-0455',
+    'cie-history-0470'
   ],
   geminiApiKey: '',
   selectedModel: 'gemini-2.5-flash',
 };
 
 export function App() {
-  // 1. Profile State
+  // 1. Current Logged-In User Account
+  const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => getActiveUser());
+
+  // 2. Profile State (Synced with active user if logged in)
   const [profile, setProfile] = useState<UserProfile>(() => {
+    const active = getActiveUser();
+    if (active) {
+      return {
+        id: active.id,
+        name: active.name,
+        email: active.email,
+        grade: active.grade,
+        board: active.board,
+        targetGrade: active.targetGrade,
+        selectedSubjectIds: active.selectedSubjectIds,
+        geminiApiKey: '',
+        selectedModel: 'gemini-2.5-flash',
+      };
+    }
     try {
       const saved = localStorage.getItem('simply_igcse_profile');
       if (saved) return { ...DEFAULT_PROFILE, ...JSON.parse(saved) };
@@ -54,14 +75,16 @@ export function App() {
     return DEFAULT_PROFILE;
   });
 
-  // 2. Active Tab State
+  // 3. Active Tab State
   const [activeTab, setActiveTab] = useState<ActiveTab>('solver');
 
-  // 3. Modals State
+  // 4. Modals State
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
 
-  // 4. Content Data State (Flashcards, Quizzes, Notes, Formulas)
+  // 5. Content Data State
   const [flashcards, setFlashcards] = useState<Flashcard[]>(() => {
     try {
       const saved = localStorage.getItem('simply_igcse_flashcards');
@@ -94,7 +117,7 @@ export function App() {
 
   const [formulas] = useState<FormulaItem[]>(INITIAL_FORMULAS);
 
-  // 5. Active Subject
+  // 6. Active Subject
   const enrolledSubjects = IGCSE_SUBJECTS.filter(s =>
     profile.selectedSubjectIds.includes(s.id)
   );
@@ -122,13 +145,38 @@ export function App() {
     localStorage.setItem('simply_igcse_revision', JSON.stringify(revisionNotes));
   }, [revisionNotes]);
 
-  // Handlers
+  // Auth Handlers
+  const handleAuthSuccess = (user: UserAccount) => {
+    setCurrentUser(user);
+    setProfile(prev => ({
+      ...prev,
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      grade: user.grade,
+      board: user.board,
+      targetGrade: user.targetGrade,
+      selectedSubjectIds: user.selectedSubjectIds
+    }));
+
+    // Find first enrolled subject for this user
+    const firstSubject = IGCSE_SUBJECTS.find(s => user.selectedSubjectIds.includes(s.id));
+    if (firstSubject) setActiveSubject(firstSubject);
+  };
+
+  const handleLogout = () => {
+    setActiveUser(null);
+    setCurrentUser(null);
+    setProfile(DEFAULT_PROFILE);
+    const first = IGCSE_SUBJECTS.find(s => DEFAULT_PROFILE.selectedSubjectIds.includes(s.id));
+    if (first) setActiveSubject(first);
+  };
+
   const handleUpdateProfile = (updated: Partial<UserProfile>) => {
     setProfile(prev => {
       const next = { ...prev, ...updated };
-      // Check if current active subject is still in enrolled
       if (next.selectedSubjectIds.length > 0 && !next.selectedSubjectIds.includes(activeSubject.id)) {
-        const first = IGCSE_SUBJECTS.find(s => s.id === next.selectedSubjectIds[0]);
+        const first = IGCSE_SUBJECTS.find(s => next.selectedSubjectIds.includes(s.id));
         if (first) setActiveSubject(first);
       }
       return next;
@@ -163,12 +211,18 @@ export function App() {
       {/* Top Navbar */}
       <Navbar
         profile={profile}
+        currentUser={currentUser}
         subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
         activeSubject={activeSubject}
         onSelectSubject={setActiveSubject}
         activeTab={activeTab}
         onSelectTab={setActiveTab}
         onOpenProfile={() => setIsProfileOpen(true)}
+        onOpenAuth={(mode) => {
+          setAuthMode(mode || 'signin');
+          setIsAuthOpen(true);
+        }}
+        onLogout={handleLogout}
         onOpenSettings={() => setIsSettingsOpen(true)}
       />
 
@@ -236,32 +290,44 @@ export function App() {
             </div>
             <span className="font-bold text-slate-200">Simply IGCSE AI Co-Pilot</span>
             <span className="text-slate-600">|</span>
-            <span>Crafted for Cambridge (CIE) & Pearson Edexcel Students</span>
+            <span>Cambridge (CIE) & Pearson Edexcel IGCSE Curriculum</span>
           </div>
 
           <div className="flex items-center gap-4 text-slate-400">
+            {currentUser ? (
+              <span className="text-emerald-400 font-medium">Signed in as {currentUser.name}</span>
+            ) : (
+              <button
+                onClick={() => { setAuthMode('signup'); setIsAuthOpen(true); }}
+                className="text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer"
+              >
+                Create Student Account
+              </button>
+            )}
+            <span>•</span>
             <button
               onClick={() => setIsProfileOpen(true)}
               className="hover:text-white transition cursor-pointer"
             >
-              Grade & Subjects
-            </button>
-            <span>•</span>
-            <button
-              onClick={() => setIsSettingsOpen(true)}
-              className="hover:text-white transition cursor-pointer"
-            >
-              AI Key Settings
+              Curriculum & Subjects
             </button>
             <span>•</span>
             <span className="text-slate-500 flex items-center gap-1">
-              Targeting <span className="font-bold text-amber-400">{profile.targetGrade}</span>
+              Target Goal: <span className="font-bold text-amber-400">{profile.targetGrade}</span>
             </span>
           </div>
         </div>
       </footer>
 
-      {/* Settings Modal */}
+      {/* Auth Modal (Sign in, Sign up, Forgot password) */}
+      <AuthModal
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+        onAuthSuccess={handleAuthSuccess}
+        initialMode={authMode}
+      />
+
+      {/* Settings Modal (Optional Admin / Developer override) */}
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}

@@ -1,6 +1,62 @@
 import { Subject, CommandWord } from '../types';
 
 export const IGCSE_SUBJECTS: Subject[] = [
+  // Languages (including English as a Second Language!)
+  {
+    id: 'cie-esl-0510',
+    name: 'English as a Second Language',
+    code: 'CIE 0510 / 0511',
+    board: 'CIE',
+    category: 'Languages',
+    icon: 'Languages',
+    color: '#06b6d4', // cyan
+    topics: [
+      'Exercise 1: Reading Comprehension & Factual Scan',
+      'Exercise 2: Multiple Matching (Opinions & Attitudes)',
+      'Exercise 3: Note-Taking Skills & Subheadings',
+      'Exercise 4: Summary Writing (100-120 words, Own Words & Linkers)',
+      'Exercise 5: Informal Email / Letter Writing (Friendly Register)',
+      'Exercise 6: Formal School Magazine Article Writing',
+      'Exercise 6: Formal Report & Review Writing',
+      'Listening Comprehension (Conversations, Interviews & Talks)',
+      'Key Connectives, Transition Words & Advanced Vocabulary'
+    ]
+  },
+  {
+    id: 'edx-esl-4es1',
+    name: 'English as a Second Language',
+    code: 'Edexcel 4ES1',
+    board: 'Edexcel',
+    category: 'Languages',
+    icon: 'Languages',
+    color: '#0891b2',
+    topics: [
+      'Paper 1 Part 1: Factual Text Comprehension',
+      'Paper 1 Part 2: Multiple Matching and Synthesis',
+      'Paper 1 Part 3: Note-taking & Form Filling',
+      'Paper 1 Part 4: Summary Writing with Paraphrasing',
+      'Paper 1 Part 5: Extended Writing (Article, Report, Email)',
+      'Paper 2: Listening Comprehension Skills'
+    ]
+  },
+  {
+    id: 'cie-eng-0500',
+    name: 'English First Language',
+    code: 'CIE 0500',
+    board: 'CIE',
+    category: 'Languages',
+    icon: 'BookOpen',
+    color: '#14b8a6', // teal
+    topics: [
+      'Paper 1 Reading: Comprehension & Summary Skills',
+      'Paper 1 Reading: Writer’s Effect & Language Analysis',
+      'Paper 1 Reading: Extended Response to Reading',
+      'Paper 2 Directed Writing: Speech, Letter, Article',
+      'Paper 2 Composition: Descriptive Writing Techniques',
+      'Paper 2 Composition: Narrative Writing & Structure'
+    ]
+  },
+
   // Mathematics
   {
     id: 'cie-math-0580',
@@ -72,7 +128,7 @@ export const IGCSE_SUBJECTS: Subject[] = [
     board: 'CIE',
     category: 'Sciences',
     icon: 'Zap',
-    color: '#eab308', // amber/yellow
+    color: '#eab308', // amber
     topics: [
       'Motion, Forces & Energy (Kinematics & Newton Laws)',
       'Thermal Physics (States of Matter & Heat Transfer)',
@@ -108,7 +164,7 @@ export const IGCSE_SUBJECTS: Subject[] = [
     board: 'CIE',
     category: 'Sciences',
     icon: 'FlaskConical',
-    color: '#06b6d4', // cyan
+    color: '#0284c7', // light blue
     topics: [
       'States of Matter & Diffusion',
       'Atoms, Elements and Compounds (Bonding & Lattice)',
@@ -159,6 +215,20 @@ export const IGCSE_SUBJECTS: Subject[] = [
       'Ecology, Biotechnology & Genetic Modification'
     ]
   },
+  {
+    id: 'cie-combined-sci-0653',
+    name: 'Combined Science',
+    code: 'CIE 0653 / 0654',
+    board: 'CIE',
+    category: 'Sciences',
+    icon: 'Atom',
+    color: '#059669',
+    topics: [
+      'Biology: Cells, Nutrition, Circulation, Respiration',
+      'Chemistry: Atoms, Stoichiometry, Acids, Organic',
+      'Physics: Forces, Energy, Thermal, Waves, Electricity'
+    ]
+  },
 
   // Tech & CS
   {
@@ -183,13 +253,86 @@ export const IGCSE_SUBJECTS: Subject[] = [
     ]
   },
 
-  // Humanities & Business
+  // Humanities & Social Sciences
+  {
+    id: 'cie-history-0470',
+    name: 'History',
+    code: 'CIE 0470',
+    board: 'CIE',
+    category: 'Humanities',
+    icon: 'Landmark',
+    color: '#b45309', // amber/brown
+    topics: [
+      'Were the peace treaties of 1919-23 fair? (Versailles)',
+      'To what extent was the League of Nations a success?',
+      'How far was Hitler’s foreign policy to blame for war in 1939?',
+      'Who was to blame for the Cold War? (1945-1949)',
+      'How effectively did the USA contain communism? (Korea, Cuba, Vietnam)',
+      'Depth Study: Germany 1918-1945 (Weimar & Nazi Rule)',
+      'Source Analysis & Historical Interpretation Skills'
+    ]
+  },
+  {
+    id: 'cie-geography-0460',
+    name: 'Geography',
+    code: 'CIE 0460',
+    board: 'CIE',
+    category: 'Humanities',
+    icon: 'Globe',
+    color: '#0d9488', // teal
+    topics: [
+      'Theme 1: Population Dynamics & Overpopulation',
+      'Theme 1: Migration Patterns & Urban Settlement',
+      'Theme 2: Earthquakes and Volcanoes (Plate Tectonics)',
+      'Theme 2: Rivers (Erosion, Deposition & Flooding)',
+      'Theme 2: Coasts (Waves, Landforms & Management)',
+      'Theme 2: Weather & Climate (Tropical Rainforests & Deserts)',
+      'Theme 3: Development Indicators & Global Tourism',
+      'Paper 2 & 4: Geographical Skills & Fieldwork Analysis'
+    ]
+  },
+  {
+    id: 'cie-sociology-0495',
+    name: 'Sociology',
+    code: 'CIE 0495',
+    board: 'CIE',
+    category: 'Humanities',
+    icon: 'Users',
+    color: '#d97706',
+    topics: [
+      'Unit 1: Theory and Methods (Positivism vs Interpretivism)',
+      'Unit 2: Culture, Identity and Socialisation',
+      'Unit 3: Social Stratification and Inequality (Class, Gender, Ethnicity)',
+      'Unit 4: Family and Household Diversity',
+      'Unit 5: Education and Achievement',
+      'Unit 6: Crime, Deviance and Social Control'
+    ]
+  },
+  {
+    id: 'cie-environ-0680',
+    name: 'Environmental Management',
+    code: 'CIE 0680',
+    board: 'CIE',
+    category: 'Humanities',
+    icon: 'Trees',
+    color: '#15803d',
+    topics: [
+      'Rocks, Minerals and Their Exploitation',
+      'Energy Resources (Fossil Fuels, Renewables & Nuclear)',
+      'Agriculture and the Environment (Soil erosion, Food supply)',
+      'Water Management (Hydrological cycle, Pollution, Treatment)',
+      'Oceans and Fisheries Management',
+      'Managing Natural Hazards (Cyclones, Earthquakes, Drought)'
+    ]
+  },
+
+  // Business & Commercial
   {
     id: 'cie-econ-0455',
     name: 'Economics',
     code: 'CIE 0455',
     board: 'CIE',
-    category: 'Humanities',
+    category: 'Commercial',
     icon: 'TrendingUp',
     color: '#f97316', // orange
     topics: [
@@ -206,7 +349,7 @@ export const IGCSE_SUBJECTS: Subject[] = [
     name: 'Business Studies',
     code: 'CIE 0450',
     board: 'CIE',
-    category: 'Humanities',
+    category: 'Commercial',
     icon: 'Briefcase',
     color: '#ec4899', // pink
     topics: [
@@ -219,20 +362,20 @@ export const IGCSE_SUBJECTS: Subject[] = [
     ]
   },
   {
-    id: 'cie-eng-0500',
-    name: 'English First Language',
-    code: 'CIE 0500',
+    id: 'cie-accounting-0452',
+    name: 'Accounting',
+    code: 'CIE 0452',
     board: 'CIE',
-    category: 'Languages',
-    icon: 'BookOpen',
-    color: '#14b8a6', // teal
+    category: 'Commercial',
+    icon: 'Receipt',
+    color: '#84cc16', // lime
     topics: [
-      'Paper 1 Reading: Comprehension & Summary Skills',
-      'Paper 1 Reading: Writer’s Effect & Language Analysis',
-      'Paper 1 Reading: Extended Response to Reading',
-      'Paper 2 Directed Writing: Speech, Letter, Article',
-      'Paper 2 Composition: Descriptive Writing Techniques',
-      'Paper 2 Composition: Narrative Writing & Structure'
+      'The Fundamentals of Accounting & Double Entry System',
+      'Sources and Recording of Business Transactions (Journals & Ledgers)',
+      'Verification of Accounting Records (Trial Balance & Error Correction)',
+      'Accounting Procedures (Depreciation & Accruals/Prepayments)',
+      'Financial Statements (Income Statement & Statement of Financial Position)',
+      'Interpretation and Ratio Analysis (Liquidity, Profitability, ROE)'
     ]
   }
 ];
@@ -279,5 +422,11 @@ export const IGCSE_COMMAND_WORDS: CommandWord[] = [
     definition: 'Discuss advantages and disadvantages and reach a reasoned conclusion.',
     whatExaminersExpect: 'Essential in Economics and Business 6-8 mark questions. Give 2 balanced sides (pros and cons) + a justified final recommendation with evaluative criteria.',
     example: 'Evaluate whether a country should implement tariffs on imported steel. -> Answer: Tariffs protect domestic jobs and tax revenue, but increase costs for local car manufacturers and risk retaliatory tariffs.'
+  },
+  {
+    word: 'Summarise (ESL)',
+    definition: 'Express the relevant points from a text concisely in your own words within the word limit (100-120 words).',
+    whatExaminersExpect: 'Include 6-8 distinct content points from the passage. Paraphrase vocabulary and change grammatical structures. Do NOT exceed the word limit!',
+    example: 'Write a summary explaining the benefits and challenges of remote learning. -> Use linking words: "Firstly...", "Moreover...", "On the other hand...", "Consequently...".'
   }
 ];

@@ -4,24 +4,44 @@ export type GradeLevel = 'Year 9 / Grade 8' | 'Year 10 / Grade 9 (IGCSE Yr 1)' |
 
 export type TargetGrade = '9 / A*' | '8 / A*' | '7 / A' | '6 / B' | '5 / C';
 
+export interface UserAccount {
+  id: string;
+  name: string;
+  email: string;
+  passwordHash: string; // Stored securely in account store
+  grade: GradeLevel;
+  board: ExamBoard;
+  targetGrade: TargetGrade;
+  selectedSubjectIds: string[];
+  createdAt: string;
+}
+
+export interface PasswordResetCode {
+  email: string;
+  code: string;
+  expiresAt: number;
+}
+
 export interface Subject {
   id: string;
   name: string;
-  code: string; // e.g. "0580" or "4MA1"
+  code: string; // e.g. "0580", "0510", "4ES1"
   board: 'CIE' | 'Edexcel' | 'Both';
-  category: 'Sciences' | 'Mathematics' | 'Humanities' | 'Languages' | 'Tech';
+  category: 'Sciences' | 'Mathematics' | 'Humanities' | 'Languages' | 'Tech' | 'Commercial';
   icon: string;
   color: string;
   topics: string[];
 }
 
 export interface UserProfile {
+  id?: string;
   name: string;
+  email?: string;
   grade: GradeLevel;
   board: ExamBoard;
   targetGrade: TargetGrade;
   selectedSubjectIds: string[];
-  geminiApiKey: string;
+  geminiApiKey?: string; // Optional admin override
   selectedModel: string;
 }
 
@@ -46,13 +66,13 @@ export interface QuizQuestion {
   id: string;
   subjectId: string;
   topic: string;
-  paperReference?: string; // e.g. "CIE 0580/42 May/June 2023"
+  paperReference?: string; // e.g. "CIE 0580/42 May/June 2023", "CIE 0510/22"
   questionText: string;
   options: QuizOption[];
   correctOptionId: string;
   markSchemeExplanation: string;
   marks: number;
-  markingBreakdown: string[]; // e.g. ["[M1] For applying Pythagoras theorem", "[A1] For x = 5.24cm"]
+  markingBreakdown: string[]; // e.g. ["[M1] For applying formula", "[A1] For accurate value"]
 }
 
 export interface RevisionTopic {
