@@ -25,6 +25,7 @@ import { AiTutorChat } from './components/AiTutorChat';
 import { SettingsModal } from './components/SettingsModal';
 import { ProfileModal } from './components/ProfileModal';
 import { AuthModal } from './components/AuthModal';
+import { ScientificCalculator } from './components/ScientificCalculator';
 import { getActiveUser, setActiveUser } from './services/auth';
 import {
   Camera,
@@ -32,7 +33,8 @@ import {
   GraduationCap,
   BookOpen,
   BookmarkCheck,
-  MessageSquare
+  MessageSquare,
+  Calculator
 } from 'lucide-react';
 
 const DEFAULT_PROFILE: UserProfile = {
@@ -91,6 +93,7 @@ export function App() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
+  const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
 
   // 5. Content Data State (Merge with INITIAL data so new cards/quizzes/notes automatically appear)
   const [flashcards, setFlashcards] = useState<Flashcard[]>(() => {
@@ -398,6 +401,22 @@ export function App() {
         onClose={() => setIsProfileOpen(false)}
         profile={profile}
         onUpdateProfile={handleUpdateProfile}
+      />
+
+      {/* Floating Scientific Calculator Toggle (Permitted in Exam Papers 4 & 2) */}
+      <button
+        onClick={() => setIsCalculatorOpen(!isCalculatorOpen)}
+        className="fixed bottom-20 right-3.5 md:bottom-6 md:right-6 z-30 flex items-center gap-1.5 sm:gap-2 rounded-2xl border border-amber-500/40 bg-gradient-to-r from-amber-500 to-amber-600 px-3 sm:px-4 py-2 sm:py-2.5 text-xs font-extrabold text-slate-950 shadow-xl shadow-amber-500/25 hover:from-amber-400 hover:to-amber-500 transition active:scale-95 cursor-pointer"
+        title="Open IGCSE Scientific Calculator (DEG/RAD)"
+      >
+        <Calculator className="h-4 w-4" />
+        <span className="hidden sm:inline">Scientific Calc</span>
+      </button>
+
+      {/* Embedded Scientific Calculator */}
+      <ScientificCalculator
+        isOpen={isCalculatorOpen}
+        onClose={() => setIsCalculatorOpen(false)}
       />
     </div>
   );

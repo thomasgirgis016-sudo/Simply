@@ -144,9 +144,11 @@ export const FormulaDictionary: React.FC<FormulaDictionaryProps> = ({
                   </div>
                 </div>
 
-                {/* Big Formula Box */}
-                <div className="rounded-xl border border-slate-700/60 bg-slate-950 p-4 text-center">
-                  <MathRenderer content={`$$${f.formula}$$`} className="text-base text-amber-300 font-bold" />
+                {/* Big Formula Box with responsive scroll and scaling */}
+                <div className="rounded-xl border border-slate-700/60 bg-slate-950 p-3 sm:p-4 text-center overflow-x-auto max-w-full scrollbar-thin scrollbar-thumb-slate-800">
+                  <div className="inline-block min-w-full">
+                    <MathRenderer content={`$$${f.formula}$$`} className="text-xs sm:text-sm md:text-base text-amber-300 font-bold" />
+                  </div>
                 </div>
 
                 <div className="space-y-1.5 text-xs">

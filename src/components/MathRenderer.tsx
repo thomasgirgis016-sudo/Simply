@@ -25,12 +25,12 @@ export const MathRenderer: React.FC<MathRendererProps> = ({ content, className =
           return (
             <div
               key={`block-${bIdx}`}
-              className="my-3 overflow-x-auto py-1 text-center"
+              className="my-2 overflow-x-auto py-1 text-center max-w-full scrollbar-thin scrollbar-thumb-slate-700 text-[13px] sm:text-base [word-break:break-word]"
               dangerouslySetInnerHTML={{ __html: html }}
             />
           );
         } catch {
-          return <div key={`block-${bIdx}`} className="font-mono text-amber-400">{blockPart}</div>;
+          return <div key={`block-${bIdx}`} className="font-mono text-xs sm:text-sm text-amber-400 overflow-x-auto">{blockPart}</div>;
         }
       }
 

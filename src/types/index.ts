@@ -73,6 +73,21 @@ export interface QuizQuestion {
   markSchemeExplanation: string;
   marks: number;
   markingBreakdown: string[]; // e.g. ["[M1] For applying formula", "[A1] For accurate value"]
+  tier?: 'Core' | 'Extended';
+}
+
+export interface QuizHistoryEntry {
+  id: string;
+  date: string;
+  subjectId: string;
+  subjectName: string;
+  topic: string;
+  score: number;
+  totalQuestions: number;
+  marksEarned: number;
+  totalMarks: number;
+  percentage: number;
+  timeSpentSeconds: number;
 }
 
 export interface RevisionTopic {

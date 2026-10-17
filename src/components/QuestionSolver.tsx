@@ -33,6 +33,7 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [imageMimeType, setImageMimeType] = useState<string>('image/jpeg');
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [result, setResult] = useState<SolverResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -59,6 +60,7 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
     if (!questionText.trim() && !selectedImage) return;
 
     setLoading(true);
+    setErrorMessage(null);
     try {
       const res = await solveQuestionWithGemini({
         apiKey: profile.geminiApiKey,
@@ -71,8 +73,13 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
         gradeLevel: profile.grade,
       });
       setResult(res);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Solve error:', err);
+      setErrorMessage(
+        err?.message?.includes('network') || err?.message?.includes('fetch')
+          ? 'Network connectivity interruption. Please verify your connection and tap Retry.'
+          : 'AI service busy or rate limit reached. Tap "Retry Solution" to re-attempt with fallback engine.'
+      );
     } finally {
       setLoading(false);
     }
@@ -82,6 +89,37 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
     setQuestionText(sample.text);
     setSelectedImage(null);
     setResult(null);
+    setErrorMessage(null);
+  };
+
+  const getMarkBadge = (mark: string) => {
+    const upper = mark.toUpperCase();
+    if (upper.includes('[M') || upper.includes('M1') || upper.includes('M2')) {
+      return {
+        label: mark,
+        type: 'Method Mark',
+        badgeClass: 'bg-blue-500/15 text-blue-300 border-blue-500/30',
+      };
+    }
+    if (upper.includes('[A') || upper.includes('A1') || upper.includes('A2')) {
+      return {
+        label: mark,
+        type: 'Accuracy Mark',
+        badgeClass: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+      };
+    }
+    if (upper.includes('[B') || upper.includes('B1') || upper.includes('B2')) {
+      return {
+        label: mark,
+        type: 'Independent Mark',
+        badgeClass: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+      };
+    }
+    return {
+      label: mark,
+      type: 'Mark Scheme',
+      badgeClass: 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30',
+    };
   };
 
   return (
@@ -120,6 +158,26 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
                 {s.title}
               </button>
             ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Free Student AI Pass Card */}
+      <div className="rounded-2xl border border-indigo-500/30 bg-gradient-to-r from-indigo-950/40 via-purple-950/20 to-slate-900/60 p-4 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="h-9 w-9 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center shrink-0">
+            <Sparkles className="h-5 w-5 text-emerald-400" />
+          </div>
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-bold text-white">Student Free AI Pass Active</span>
+              <span className="inline-block rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-400 border border-emerald-500/20">
+                Zero-Config • No API Key Needed
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-400 mt-0.5">
+              Instant access to Cambridge & Edexcel mark schemes, photo solving, and examiner advice. No personal keys or logins required.
+            </p>
           </div>
         </div>
       </div>
@@ -232,6 +290,27 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
               )}
             </button>
           </div>
+
+          {/* Error Message & Retry Fallback */}
+          {errorMessage && (
+            <div className="rounded-xl border border-rose-500/40 bg-rose-950/40 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in fade-in">
+              <div className="flex items-center gap-3">
+                <AlertTriangle className="h-5 w-5 text-rose-400 shrink-0" />
+                <div>
+                  <p className="text-xs font-bold text-rose-300">Analysis Notice</p>
+                  <p className="text-xs text-rose-200/90 leading-relaxed">{errorMessage}</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleSolve}
+                className="flex items-center gap-1.5 rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white hover:bg-rose-500 transition active:scale-95 shrink-0 shadow-md cursor-pointer"
+              >
+                <RefreshCw className="h-3.5 w-3.5" />
+                <span>Retry Solution</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -268,38 +347,44 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
           <div className="space-y-4">
             <h4 className="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
               <Target className="h-4 w-4 text-indigo-400" />
-              Step-by-Step Mark Awarding
+              Step-by-Step Mark Awarding ([M] Method, [A] Accuracy, [B] Independent)
             </h4>
 
-            {result.stepByStepSolution.map((step, sIdx) => (
-              <div
-                key={sIdx}
-                className="rounded-xl border border-slate-800 bg-slate-900/90 p-5 shadow-md hover:border-slate-700 transition"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-indigo-600/30 text-xs font-bold text-indigo-300 border border-indigo-500/30">
-                      {step.stepNumber}
-                    </span>
-                    <h5 className="font-bold text-white text-sm">{step.title}</h5>
-                  </div>
-                  {step.markAwarded && (
-                    <span className="shrink-0 rounded-md bg-emerald-500/10 px-2.5 py-1 text-xs font-extrabold text-emerald-400 border border-emerald-500/20">
-                      {step.markAwarded}
-                    </span>
-                  )}
-                </div>
-
-                <div className="mt-3 pl-10">
-                  <MathRenderer content={step.explanation} className="text-sm text-slate-300" />
-                  {step.mathOrCode && (
-                    <div className="mt-3 rounded-lg bg-slate-950 p-3 border border-slate-800 font-mono text-xs text-indigo-300 overflow-x-auto">
-                      <MathRenderer content={`$$${step.mathOrCode}$$`} />
+            {result.stepByStepSolution.map((step, sIdx) => {
+              const badge = step.markAwarded ? getMarkBadge(step.markAwarded) : null;
+              return (
+                <div
+                  key={sIdx}
+                  className="rounded-xl border border-slate-800 bg-slate-900/90 p-5 shadow-md hover:border-slate-700 transition"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-indigo-600/30 text-xs font-bold text-indigo-300 border border-indigo-500/30">
+                        {step.stepNumber}
+                      </span>
+                      <h5 className="font-bold text-white text-sm">{step.title}</h5>
                     </div>
-                  )}
+                    {badge && (
+                      <span
+                        className={`shrink-0 rounded-lg px-2.5 py-1 text-xs font-extrabold border ${badge.badgeClass}`}
+                        title={badge.type}
+                      >
+                        {badge.label}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="mt-3 pl-10">
+                    <MathRenderer content={step.explanation} className="text-sm text-slate-300" />
+                    {step.mathOrCode && (
+                      <div className="mt-3 rounded-xl bg-slate-950 p-3 border border-slate-800/80 font-mono text-xs text-indigo-300 overflow-x-auto max-w-full scrollbar-thin scrollbar-thumb-slate-700">
+                        <MathRenderer content={`$$${step.mathOrCode}$$`} />
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Final Answer Banner */}

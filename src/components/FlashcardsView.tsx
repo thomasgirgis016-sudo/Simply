@@ -10,7 +10,8 @@ import {
   Award,
   Lightbulb,
   Layers,
-  X
+  X,
+  Download
 } from 'lucide-react';
 import { Subject, Flashcard, UserProfile } from '../types';
 import { MathRenderer } from './MathRenderer';
@@ -33,6 +34,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
   onUpdateFlashcardMastery,
 }) => {
   const [selectedTopic, setSelectedTopic] = useState<string>('All');
+  const [selectedTier, setSelectedTier] = useState<'All' | 'Core' | 'Extended'>('All');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
 
@@ -41,13 +43,40 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
   const [aiTopicInput, setAiTopicInput] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // Filter flashcards for this subject and topic
+  // Filter flashcards for this subject, topic, and tier
   const subjectCards = flashcards.filter(c => isSubjectMatch(c.subjectId, subject));
-  const filteredCards = selectedTopic === 'All'
-    ? subjectCards
-    : subjectCards.filter(c => c.topic === selectedTopic);
+  const filteredCards = subjectCards.filter(c => {
+    const matchesTopic = selectedTopic === 'All' || c.topic === selectedTopic;
+    const matchesTier = selectedTier === 'All' || c.difficulty === selectedTier;
+    return matchesTopic && matchesTier;
+  });
 
   const currentCard = filteredCards[currentIndex];
+
+  const handleExportAnkiCsv = () => {
+    if (subjectCards.length === 0) return;
+
+    const escapeCsv = (str: string) => `"${(str || '').replace(/"/g, '""')}"`;
+    let csvContent = 'Front,Back,Topic,ExaminerTip,Tags\n';
+    
+    subjectCards.forEach((c) => {
+      const front = escapeCsv(c.question);
+      const back = escapeCsv(`${c.answer}${c.keyFormula ? `\n\nKey Formula: ${c.keyFormula}` : ''}`);
+      const topic = escapeCsv(c.topic);
+      const tip = escapeCsv(c.examinerTip || '');
+      const tags = escapeCsv(`IGCSE ${subject.name.replace(/\s+/g, '_')} ${c.difficulty}`);
+      csvContent += `${front},${back},${topic},${tip},${tags}\n`;
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${subject.code.replace(/[^a-zA-Z0-9]/g, '_')}_Flashcards_Anki.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const handleNext = () => {
     setIsFlipped(false);
@@ -105,19 +134,29 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
             <p className="text-xs text-slate-400">Master definitions, formulas and mark scheme keywords</p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="text-right">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <div className="text-right hidden sm:block">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Mastery Progress</p>
               <p className="text-sm font-extrabold text-emerald-400">
-                {masteredCount} / {subjectCards.length} Cards ({masteryPercentage}%)
+                {masteredCount} / {subjectCards.length} ({masteryPercentage}%)
               </p>
             </div>
+
+            <button
+              onClick={handleExportAnkiCsv}
+              className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition cursor-pointer shadow-sm"
+              title="Download flashcards in Anki-compatible CSV format"
+            >
+              <Download className="h-3.5 w-3.5 text-cyan-400" />
+              <span>Export Deck (Anki)</span>
+            </button>
+
             <button
               onClick={() => setIsAiModalOpen(true)}
-              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-indigo-500/20 hover:from-indigo-400 hover:to-purple-500 transition"
+              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-indigo-500/20 hover:from-indigo-400 hover:to-purple-500 transition cursor-pointer"
             >
               <Sparkles className="h-4 w-4" />
-              <span>Generate AI Deck</span>
+              <span>AI Generate More Cards</span>
             </button>
           </div>
         </div>
@@ -130,11 +169,36 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
           />
         </div>
 
+        {/* Tier & Topic Filter Bar */}
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-slate-800/80 pt-3">
+          {/* Core vs Extended filter */}
+          <div className="flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
+            <span className="px-2 text-[11px] font-bold text-slate-400">Tier:</span>
+            {(['All', 'Core', 'Extended'] as const).map((tier) => (
+              <button
+                key={tier}
+                onClick={() => { setSelectedTier(tier); setCurrentIndex(0); setIsFlipped(false); }}
+                className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
+                  selectedTier === tier
+                    ? 'bg-indigo-600 text-white shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                {tier}
+              </button>
+            ))}
+          </div>
+
+          <span className="text-xs text-slate-400">
+            Showing {filteredCards.length} cards
+          </span>
+        </div>
+
         {/* Topic filter pill bar */}
-        <div className="mt-4 flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+        <div className="mt-3 flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
           <button
             onClick={() => { setSelectedTopic('All'); setCurrentIndex(0); setIsFlipped(false); }}
-            className={`rounded-lg px-3 py-1 text-xs font-semibold transition shrink-0 ${
+            className={`rounded-lg px-3 py-1 text-xs font-semibold transition shrink-0 cursor-pointer ${
               selectedTopic === 'All'
                 ? 'bg-indigo-600 text-white'
                 : 'bg-slate-800 text-slate-400 hover:text-white'
