@@ -11,6 +11,7 @@ import {
 import { Subject, FormulaItem, CommandWord } from '../types';
 import { IGCSE_COMMAND_WORDS } from '../data/subjects';
 import { MathRenderer } from './MathRenderer';
+import { isSubjectMatch } from '../utils/subjectMatcher';
 
 interface FormulaDictionaryProps {
   subject: Subject;
@@ -27,7 +28,7 @@ export const FormulaDictionary: React.FC<FormulaDictionaryProps> = ({
 
   // Filter formulas
   const filteredFormulas = formulas.filter((f) => {
-    const matchesSubject = showAllSubjects || f.subjectId === subject.id || f.subjectId === subject.name;
+    const matchesSubject = showAllSubjects || isSubjectMatch(f.subjectId, subject);
     const matchesSearch =
       f.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       f.topic.toLowerCase().includes(searchQuery.toLowerCase()) ||

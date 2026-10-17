@@ -13,6 +13,8 @@ import {
 } from 'lucide-react';
 import { Subject, RevisionTopic, UserProfile } from '../types';
 import { MathRenderer } from './MathRenderer';
+import { generateRevisionNotesWithGemini } from '../services/gemini';
+import { isSubjectMatch } from '../utils/subjectMatcher';
 
 interface RevisionNotesViewProps {
   subject: Subject;
@@ -33,7 +35,7 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
   const [isGenerating, setIsGenerating] = useState(false);
 
   const subjectNotes = revisionNotes.filter(
-    r => r.subjectId === subject.id || r.subjectId === subject.name
+    r => isSubjectMatch(r.subjectId, subject)
   );
 
   const activeTopic = subjectNotes.find(r => r.id === selectedTopicId) || subjectNotes[0];
@@ -43,86 +45,15 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
     setIsGenerating(true);
 
     try {
-      if (!profile.geminiApiKey) {
-        // High quality offline fallback
-        const newNote: RevisionTopic = {
-          id: `rev-${Date.now()}`,
-          subjectId: subject.id,
-          title: `${aiTopicInput} Comprehensive Summary`,
-          chapter: 'Syllabus Core & Extended Focus',
-          keyConcepts: [
-            {
-              heading: 'Fundamental Principles',
-              points: [
-                'Ensure accurate recall of basic equations and SI units before solving application questions.',
-                'Draw clear, labelled diagrams showing forces, rays, circuit components, or biological pathways.',
-                'Link each effect to its root cause using scientific vocabulary.'
-              ],
-              formula: '\\text{Formula: } X = \\frac{Y}{Z}'
-            }
-          ],
-          mustKnowDefinitions: [
-            {
-              term: aiTopicInput,
-              definition: 'The standard syllabus definition that must be reproduced verbatim in Cambridge/Edexcel papers.'
-            }
-          ],
-          examinerWarnings: [
-            'Avoid generic terms like "it changes" without specifying if it increases or decreases.',
-            'Include relevant units in final answers.'
-          ]
-        };
-        onAddRevisionNote(newNote);
-        setSelectedTopicId(newNote.id);
-        setIsAiModalOpen(false);
-        setAiTopicInput('');
-        return;
-      }
-
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${profile.selectedModel}:generateContent?key=${profile.geminiApiKey}`;
-      const prompt = `
-Generate a comprehensive, syllabus-accurate IGCSE Revision Guide for subject "${subject.name}" on the topic "${aiTopicInput}".
-Output strictly JSON matching this structure:
-{
-  "id": "rev-ai-${Date.now()}",
-  "subjectId": "${subject.id}",
-  "title": "${aiTopicInput} High-Yield Guide",
-  "chapter": "IGCSE Syllabus",
-  "keyConcepts": [
-    {
-      "heading": "Core concept title",
-      "points": ["Key syllabus bullet point 1", "Key syllabus bullet point 2"],
-      "formula": "LaTeX formula if applicable"
-    }
-  ],
-  "mustKnowDefinitions": [
-    {
-      "term": "Key term",
-      "definition": "Exact mark-scheme definition"
-    }
-  ],
-  "examinerWarnings": [
-    "Common student mistake from examiner reports"
-  ]
-}
-`;
-
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { responseMimeType: "application/json" }
-        })
-      });
-
-      const data = await res.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      const cleaned = text.replace(/```json/g, '').replace(/```/g, '').trim();
-      const parsed: RevisionTopic = JSON.parse(cleaned);
-
-      onAddRevisionNote(parsed);
-      setSelectedTopicId(parsed.id);
+      const generated = await generateRevisionNotesWithGemini(
+        subject.name,
+        subject.id,
+        aiTopicInput,
+        profile.geminiApiKey,
+        profile.selectedModel
+      );
+      onAddRevisionNote(generated);
+      setSelectedTopicId(generated.id);
       setIsAiModalOpen(false);
       setAiTopicInput('');
     } catch (err) {

@@ -92,11 +92,16 @@ export function App() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
 
-  // 5. Content Data State
+  // 5. Content Data State (Merge with INITIAL data so new cards/quizzes/notes automatically appear)
   const [flashcards, setFlashcards] = useState<Flashcard[]>(() => {
     try {
       const saved = localStorage.getItem('simply_igcse_flashcards');
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed: Flashcard[] = JSON.parse(saved);
+        const existingIds = new Set(parsed.map(c => c.id));
+        const missing = INITIAL_FLASHCARDS.filter(c => !existingIds.has(c.id));
+        return [...parsed, ...missing];
+      }
     } catch (e) {
       console.error(e);
     }
@@ -106,7 +111,12 @@ export function App() {
   const [quizzes, setQuizzes] = useState<QuizQuestion[]>(() => {
     try {
       const saved = localStorage.getItem('simply_igcse_quizzes');
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed: QuizQuestion[] = JSON.parse(saved);
+        const existingIds = new Set(parsed.map(q => q.id));
+        const missing = INITIAL_QUIZZES.filter(q => !existingIds.has(q.id));
+        return [...parsed, ...missing];
+      }
     } catch (e) {
       console.error(e);
     }
@@ -116,7 +126,12 @@ export function App() {
   const [revisionNotes, setRevisionNotes] = useState<RevisionTopic[]>(() => {
     try {
       const saved = localStorage.getItem('simply_igcse_revision');
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed: RevisionTopic[] = JSON.parse(saved);
+        const existingIds = new Set(parsed.map(r => r.id));
+        const missing = INITIAL_REVISION_NOTES.filter(r => !existingIds.has(r.id));
+        return [...parsed, ...missing];
+      }
     } catch (e) {
       console.error(e);
     }

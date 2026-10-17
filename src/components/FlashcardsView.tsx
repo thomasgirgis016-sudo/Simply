@@ -15,6 +15,7 @@ import {
 import { Subject, Flashcard, UserProfile } from '../types';
 import { MathRenderer } from './MathRenderer';
 import { generateFlashcardsWithGemini } from '../services/gemini';
+import { isSubjectMatch } from '../utils/subjectMatcher';
 
 interface FlashcardsViewProps {
   subject: Subject;
@@ -41,7 +42,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
   const [isGenerating, setIsGenerating] = useState(false);
 
   // Filter flashcards for this subject and topic
-  const subjectCards = flashcards.filter(c => c.subjectId === subject.id || c.subjectId === subject.name);
+  const subjectCards = flashcards.filter(c => isSubjectMatch(c.subjectId, subject));
   const filteredCards = selectedTopic === 'All'
     ? subjectCards
     : subjectCards.filter(c => c.topic === selectedTopic);

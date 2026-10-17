@@ -17,6 +17,7 @@ import {
 import { Subject, QuizQuestion, UserProfile } from '../types';
 import { MathRenderer } from './MathRenderer';
 import { generateQuizWithGemini } from '../services/gemini';
+import { isSubjectMatch } from '../utils/subjectMatcher';
 
 interface QuizViewProps {
   subject: Subject;
@@ -44,7 +45,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
   const [aiTopic, setAiTopic] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const subjectQuizzes = quizzes.filter(q => q.subjectId === subject.id || q.subjectId === subject.name);
+  const subjectQuizzes = quizzes.filter(q => isSubjectMatch(q.subjectId, subject));
   const filteredQuizzes = selectedTopic === 'All'
     ? subjectQuizzes
     : subjectQuizzes.filter(q => q.topic === selectedTopic);

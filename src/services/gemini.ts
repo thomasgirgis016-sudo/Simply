@@ -1,4 +1,4 @@
-import { SolverResult, Flashcard, QuizQuestion } from '../types';
+import { SolverResult, Flashcard, QuizQuestion, RevisionTopic } from '../types';
 import { searchUniversalKnowledge } from './knowledgeEngine';
 
 export interface GeminiSolveParams {
@@ -325,6 +325,96 @@ Output STRICTLY a JSON array of objects with the schema:
         markSchemeExplanation: `According to IGCSE standards, this principle is tested regularly to verify conceptual clarity.`
       }
     ];
+  }
+}
+
+export async function generateRevisionNotesWithGemini(
+  subjectName: string,
+  subjectId: string,
+  topic: string,
+  apiKey?: string,
+  model: string = 'gemini-1.5-flash'
+): Promise<RevisionTopic> {
+  const prompt = `
+Generate a comprehensive, syllabus-accurate IGCSE Revision Guide for subject "${subjectName}" on the topic "${topic}".
+Output strictly valid JSON matching this schema:
+{
+  "id": "rev-ai-${Date.now()}",
+  "subjectId": "${subjectId}",
+  "title": "${topic} Comprehensive Revision Guide",
+  "chapter": "IGCSE Core & Extended Syllabus",
+  "keyConcepts": [
+    {
+      "heading": "Core concept title",
+      "points": [
+        "Syllabus key point 1 explaining mechanism and cause-effect",
+        "Syllabus key point 2 with technical terminology"
+      ],
+      "formula": "LaTeX formula if applicable (e.g. E = mc^2 or n = m/Mr)"
+    }
+  ],
+  "mustKnowDefinitions": [
+    {
+      "term": "Key Term",
+      "definition": "Verbatim Cambridge / Edexcel mark scheme definition"
+    }
+  ],
+  "examinerWarnings": [
+    "Common student mistake identified in examiner reports"
+  ]
+}
+`;
+
+  // 1. Try Puter.js Zero-Key AI
+  try {
+    const liveJson = await callZeroKeyAi(prompt);
+    const cleaned = liveJson.replace(/```json/g, '').replace(/```/g, '').trim();
+    const parsed = JSON.parse(cleaned);
+    if (parsed && parsed.title && parsed.keyConcepts) return parsed;
+  } catch {
+    // continue
+  }
+
+  // 2. Try Gemini API
+  try {
+    const data = await callGeminiApi({
+      model,
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { responseMimeType: "application/json" },
+      userApiKey: apiKey
+    });
+
+    const candidate = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const cleaned = candidate.replace(/```json/g, '').replace(/```/g, '').trim();
+    return JSON.parse(cleaned);
+  } catch {
+    return {
+      id: `rev-ai-${Date.now()}`,
+      subjectId: subjectId,
+      title: `${topic} Comprehensive Summary`,
+      chapter: 'Syllabus Core & Extended Focus',
+      keyConcepts: [
+        {
+          heading: `${topic} - Core Principles & Mechanisms`,
+          points: [
+            `Understand the underlying scientific / theoretical principles governing ${topic}.`,
+            'Ensure accurate recall of standard definitions, units, and conditions required by the examination board.',
+            'Structure extended responses with clear cause-and-effect logical steps using official command words.'
+          ],
+          formula: '\\text{Mark Scheme Standard: Precision & Technical Terminology}'
+        }
+      ],
+      mustKnowDefinitions: [
+        {
+          term: topic,
+          definition: `The fundamental syllabus concept in ${subjectName} requiring exact recall in Paper 2/4 examinations.`
+        }
+      ],
+      examinerWarnings: [
+        'Avoid vague statements like "it affects the reaction" without stating whether it increases or decreases.',
+        'Always check the marks allocation (e.g. 3 marks requires 3 distinct points).'
+      ]
+    };
   }
 }
 
