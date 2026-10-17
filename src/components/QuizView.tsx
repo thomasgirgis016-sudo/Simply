@@ -232,11 +232,11 @@ export const QuizView: React.FC<QuizViewProps> = ({
             <p className="text-xs text-slate-400">Authentic past paper questions with [M], [A], [B] mark scheme breakdowns</p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
             {/* Pacing Timer Toggle */}
             <button
               onClick={() => setIsTimerEnabled(!isTimerEnabled)}
-              className={`flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold transition cursor-pointer ${
+              className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold transition cursor-pointer active:scale-95 ${
                 isTimerEnabled
                   ? 'border-amber-500 bg-amber-500/15 text-amber-300'
                   : 'border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
@@ -244,13 +244,13 @@ export const QuizView: React.FC<QuizViewProps> = ({
               title="Toggle timed exam simulation (1.5 min per mark standard pacing)"
             >
               <Timer className="h-4 w-4 text-amber-400" />
-              <span>{isTimerEnabled ? 'Exam Timer: ON' : 'Pacing Timer'}</span>
+              <span>{isTimerEnabled ? 'Timer: ON' : 'Pacing Timer'}</span>
             </button>
 
             {/* Score History */}
             <button
               onClick={() => setIsHistoryModalOpen(true)}
-              className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-700 hover:text-white transition cursor-pointer"
+              className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-700 hover:text-white transition cursor-pointer active:scale-95"
               title="View past quiz attempts & score history"
             >
               <History className="h-4 w-4 text-cyan-400" />
@@ -260,10 +260,10 @@ export const QuizView: React.FC<QuizViewProps> = ({
             {/* AI Generate Questions */}
             <button
               onClick={() => setIsAiModalOpen(true)}
-              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-3.5 py-2 text-xs font-bold text-white shadow-md hover:from-emerald-500 hover:to-teal-500 transition cursor-pointer"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-3.5 py-2 text-xs font-bold text-white shadow-md hover:from-emerald-500 hover:to-teal-500 transition cursor-pointer active:scale-95"
             >
               <Sparkles className="h-4 w-4" />
-              <span>AI Generate More</span>
+              <span>AI More</span>
             </button>
           </div>
         </div>
@@ -515,8 +515,8 @@ export const QuizView: React.FC<QuizViewProps> = ({
             </div>
 
             {/* Submission / Navigation Bar */}
-            <div className="mt-6 flex items-center justify-between border-t border-slate-800 pt-5">
-              <div className="text-xs text-slate-400">
+            <div className="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-t border-slate-800 pt-5">
+              <div className="text-xs text-slate-400 text-center sm:text-left">
                 Score: <span className="font-bold text-emerald-400">{userScore} correct</span>
               </div>
 
@@ -525,7 +525,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
                   type="button"
                   onClick={handleSubmitAnswer}
                   disabled={!selectedOptionId}
-                  className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-2.5 text-xs font-bold text-white shadow-md hover:from-emerald-400 hover:to-teal-400 transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-3 sm:py-2.5 text-xs sm:text-sm font-bold text-white shadow-md hover:from-emerald-400 hover:to-teal-400 transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                 >
                   <Target className="h-4 w-4" />
                   <span>Submit Answer</span>
@@ -534,7 +534,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
                 <button
                   type="button"
                   onClick={handleNextQuestion}
-                  className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-2.5 text-xs font-bold text-white shadow-md hover:from-indigo-400 hover:to-purple-500 transition active:scale-95 cursor-pointer"
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-3 sm:py-2.5 text-xs sm:text-sm font-bold text-white shadow-md hover:from-indigo-400 hover:to-purple-500 transition active:scale-95 cursor-pointer"
                 >
                   <span>{currentIdx + 1 === filteredQuizzes.length ? 'Finish Quiz' : 'Next Question'}</span>
                   <ArrowRight className="h-4 w-4" />

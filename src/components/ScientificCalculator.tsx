@@ -82,7 +82,7 @@ export const ScientificCalculator: React.FC<ScientificCalculatorProps> = ({
   };
 
   return (
-    <div className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50 w-[320px] sm:w-[350px] rounded-3xl border border-slate-700/80 bg-slate-900/95 shadow-2xl backdrop-blur-xl overflow-hidden animate-in fade-in zoom-in-95">
+    <div className="fixed left-3 right-3 sm:left-auto sm:right-6 bottom-20 md:bottom-6 z-50 w-auto sm:w-[350px] max-w-full rounded-3xl border border-slate-700/80 bg-slate-900/95 shadow-2xl backdrop-blur-xl overflow-hidden animate-in fade-in zoom-in-95">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950/80 px-4 py-2.5">
         <div className="flex items-center gap-2">
@@ -92,7 +92,7 @@ export const ScientificCalculator: React.FC<ScientificCalculatorProps> = ({
           </span>
           <button
             onClick={() => setIsDegree(!isDegree)}
-            className={`rounded-md px-1.5 py-0.5 text-[10px] font-bold border transition ${
+            className={`rounded-md px-1.5 py-0.5 text-[10px] font-bold border transition cursor-pointer ${
               isDegree
                 ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
                 : 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30'
@@ -105,14 +105,14 @@ export const ScientificCalculator: React.FC<ScientificCalculatorProps> = ({
         <div className="flex items-center gap-1">
           <button
             onClick={() => setIsMinimized(!isMinimized)}
-            className="rounded-lg p-1 text-slate-400 hover:bg-slate-800 hover:text-white"
+            className="rounded-lg p-1 text-slate-400 hover:bg-slate-800 hover:text-white cursor-pointer"
             title={isMinimized ? 'Expand' : 'Minimize'}
           >
             {isMinimized ? <Maximize2 className="h-3.5 w-3.5" /> : <Minimize2 className="h-3.5 w-3.5" />}
           </button>
           <button
             onClick={onClose}
-            className="rounded-lg p-1 text-slate-400 hover:bg-rose-500/20 hover:text-rose-300"
+            className="rounded-lg p-1 text-slate-400 hover:bg-rose-500/20 hover:text-rose-300 cursor-pointer"
             title="Close"
           >
             <X className="h-3.5 w-3.5" />
@@ -137,7 +137,7 @@ export const ScientificCalculator: React.FC<ScientificCalculatorProps> = ({
             {/* Row 1: Trig & Modes */}
             <button
               onClick={() => append('sin(')}
-              className="rounded-xl bg-slate-800/80 p-2 text-slate-300 hover:bg-slate-700 active:scale-95"
+              className="rounded-xl bg-slate-800/80 p-2.5 sm:p-2 text-slate-300 hover:bg-slate-700 active:scale-95 cursor-pointer"
             >
               sin
             </button>

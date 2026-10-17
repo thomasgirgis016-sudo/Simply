@@ -177,135 +177,135 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
           </p>
         </div>
 
-        {/* Quick Sample Selector */}
-        <div className="mt-6 border-t border-slate-800/80 pt-4">
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2.5 flex items-center gap-1.5">
-            <FileQuestion className="h-3.5 w-3.5 text-indigo-400" />
-            Try an IGCSE Past Paper Question:
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {SAMPLE_SOLVER_QUESTIONS.map((s, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => loadSampleQuestion(s)}
-                className="rounded-lg border border-slate-700/70 bg-slate-800/60 px-3 py-1.5 text-xs text-slate-200 hover:border-indigo-500 hover:bg-indigo-950/40 hover:text-white transition"
-              >
-                {s.title}
-              </button>
-            ))}
+          {/* Quick Sample Selector */}
+          <div className="mt-6 border-t border-slate-800/80 pt-4">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2.5 flex items-center gap-1.5">
+              <FileQuestion className="h-3.5 w-3.5 text-indigo-400" />
+              Try an IGCSE Past Paper Question:
+            </p>
+            <div className="flex flex-nowrap sm:flex-wrap gap-2 overflow-x-auto pb-1 no-scrollbar">
+              {SAMPLE_SOLVER_QUESTIONS.map((s, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => loadSampleQuestion(s)}
+                  className="shrink-0 rounded-lg border border-slate-700/70 bg-slate-800/60 px-3 py-1.5 text-xs text-slate-200 hover:border-indigo-500 hover:bg-indigo-950/40 hover:text-white transition cursor-pointer"
+                >
+                  {s.title}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Free Student AI Pass Card */}
-      <div className="rounded-2xl border border-indigo-500/30 bg-gradient-to-r from-indigo-950/40 via-purple-950/20 to-slate-900/60 p-4 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center shrink-0">
-            <Sparkles className="h-5 w-5 text-emerald-400" />
-          </div>
-          <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-bold text-white">Student Free AI Pass Active</span>
-              <span className="inline-block rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-400 border border-emerald-500/20">
-                Zero-Config • No API Key Needed
-              </span>
+        {/* Free Student AI Pass Card */}
+        <div className="rounded-2xl border border-indigo-500/30 bg-gradient-to-r from-indigo-950/40 via-purple-950/20 to-slate-900/60 p-4 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center shrink-0">
+              <Sparkles className="h-5 w-5 text-emerald-400" />
             </div>
-            <p className="text-[11px] text-slate-400 mt-0.5">
-              Instant access to Cambridge & Edexcel mark schemes, photo solving, and examiner advice. No personal keys or logins required.
-            </p>
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs font-bold text-white">Student Free AI Pass Active</span>
+                <span className="inline-block rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-400 border border-emerald-500/20">
+                  Zero-Config • No API Key Needed
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-400 mt-0.5">
+                Instant access to Cambridge & Edexcel mark schemes, photo solving, and examiner advice. No personal keys or logins required.
+              </p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Input Section */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-        <div className="md:col-span-12 rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg backdrop-blur-sm space-y-4">
-          {/* Image Upload Guidelines Helper */}
-          <div className="flex items-center gap-2.5 rounded-xl bg-indigo-950/50 border border-indigo-500/25 px-3.5 py-2.5 text-xs text-indigo-200">
-            <Camera className="h-4 w-4 text-indigo-400 shrink-0" />
-            <p className="leading-snug">
-              <span className="font-bold text-indigo-300">Tip:</span> Crop tightly around the diagram, keep text upright, and ensure the mark allocation (e.g. [3]) in the margin is visible.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                Subject Context:
-              </span>
-              <span className="inline-flex items-center rounded-lg bg-indigo-500/20 px-2.5 py-1 text-xs font-bold text-indigo-300 border border-indigo-500/30">
-                {subject.code} • {subject.name}
-              </span>
+        {/* Input Section */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+          <div className="md:col-span-12 rounded-2xl border border-slate-800 bg-slate-900/80 p-4 sm:p-5 shadow-lg backdrop-blur-sm space-y-4">
+            {/* Image Upload Guidelines Helper */}
+            <div className="flex items-center gap-2.5 rounded-xl bg-indigo-950/50 border border-indigo-500/25 px-3.5 py-2.5 text-xs text-indigo-200">
+              <Camera className="h-4 w-4 text-indigo-400 shrink-0" />
+              <p className="leading-snug">
+                <span className="font-bold text-indigo-300">Tip:</span> Crop tightly around the diagram, keep text upright, and ensure the mark allocation (e.g. [3]) in the margin is visible.
+              </p>
             </div>
 
-            <div className="flex items-center gap-2">
-              {/* Hidden file & camera inputs */}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-              />
-              <input
-                ref={cameraInputRef}
-                type="file"
-                accept="image/*"
-                capture="environment"
-                onChange={handleImageUpload}
-                className="hidden"
-              />
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                  Subject Context:
+                </span>
+                <span className="inline-flex items-center rounded-lg bg-indigo-500/20 px-2.5 py-1 text-xs font-bold text-indigo-300 border border-indigo-500/30">
+                  {subject.code} • {subject.name}
+                </span>
+              </div>
 
-              <button
-                type="button"
-                onClick={() => cameraInputRef.current?.click()}
-                className="flex flex-1 sm:flex-none items-center justify-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2 sm:py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition active:scale-95 cursor-pointer"
-              >
-                <Camera className="h-4 w-4 text-emerald-400" />
-                <span>Take Photo</span>
-              </button>
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                {/* Hidden file & camera inputs */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+                <input
+                  ref={cameraInputRef}
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
 
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="flex flex-1 sm:flex-none items-center justify-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2 sm:py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition active:scale-95 cursor-pointer"
-              >
-                <Upload className="h-4 w-4 text-cyan-400" />
-                <span>Upload Image</span>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => cameraInputRef.current?.click()}
+                  className="flex flex-1 sm:flex-none items-center justify-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2.5 sm:py-2 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition active:scale-95 cursor-pointer"
+                >
+                  <Camera className="h-4 w-4 text-emerald-400" />
+                  <span>Take Photo</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex flex-1 sm:flex-none items-center justify-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2.5 sm:py-2 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition active:scale-95 cursor-pointer"
+                >
+                  <Upload className="h-4 w-4 text-cyan-400" />
+                  <span>Upload Image</span>
+                </button>
+              </div>
             </div>
-          </div>
 
-          {/* Image Preview if selected */}
-          {selectedImage && (
-            <div className="relative inline-block rounded-xl border border-indigo-500/40 bg-slate-950 p-2 shadow-inner">
-              <img
-                src={selectedImage}
-                alt="Selected past paper problem"
-                className="max-h-56 rounded-lg object-contain w-full"
+            {/* Image Preview if selected */}
+            {selectedImage && (
+              <div className="relative inline-block rounded-xl border border-indigo-500/40 bg-slate-950 p-2 shadow-inner">
+                <img
+                  src={selectedImage}
+                  alt="Selected past paper problem"
+                  className="max-h-56 rounded-lg object-contain w-full"
+                />
+                <button
+                  type="button"
+                  onClick={clearImage}
+                  className="absolute right-3 top-3 rounded-full bg-slate-900/90 p-2 text-slate-300 hover:bg-rose-600 hover:text-white transition shadow-md cursor-pointer"
+                  title="Remove image"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+
+            {/* Text Area */}
+            <div>
+              <textarea
+                rows={3}
+                value={questionText}
+                onChange={(e) => setQuestionText(e.target.value)}
+                placeholder="Type or paste the question text here (e.g. 'Explain why 2Fe²⁺ + Cl₂ -> 2Fe³⁺ + 2Cl⁻ is a redox reaction [3 marks]')..."
+                className="w-full rounded-xl border border-slate-700/80 bg-slate-950/70 p-3.5 sm:p-4 text-base sm:text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
               />
-              <button
-                type="button"
-                onClick={clearImage}
-                className="absolute right-3 top-3 rounded-full bg-slate-900/90 p-2 text-slate-300 hover:bg-rose-600 hover:text-white transition shadow-md"
-                title="Remove image"
-              >
-                <X className="h-4 w-4" />
-              </button>
             </div>
-          )}
-
-          {/* Text Area */}
-          <div>
-            <textarea
-              rows={3}
-              value={questionText}
-              onChange={(e) => setQuestionText(e.target.value)}
-              placeholder="Type or paste the question text here (e.g. 'Explain why 2Fe²⁺ + Cl₂ -> 2Fe³⁺ + 2Cl⁻ is a redox reaction [3 marks]')..."
-              className="w-full rounded-xl border border-slate-700/80 bg-slate-950/70 p-3.5 sm:p-4 text-xs sm:text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-            />
-          </div>
 
           {/* Action Row */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
@@ -584,8 +584,8 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
 
       {/* Flag / Report Issue Modal */}
       {isReportModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
-          <div className="relative w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
+          <div className="relative w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-5 sm:p-6 shadow-2xl space-y-4 max-h-[90dvh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div className="flex items-center gap-2 text-rose-400">
                 <Flag className="h-5 w-5" />
@@ -594,7 +594,7 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
               <button
                 type="button"
                 onClick={() => setIsReportModalOpen(false)}
-                className="text-slate-400 hover:text-white transition"
+                className="text-slate-400 hover:text-white transition cursor-pointer"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -654,7 +654,7 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
                     value={reportDetails}
                     onChange={(e) => setReportDetails(e.target.value)}
                     placeholder="e.g. In step 2, the division should be 12 / 3 = 4, not 3..."
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
+                    className="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-base sm:text-xs text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
                   />
                 </div>
 

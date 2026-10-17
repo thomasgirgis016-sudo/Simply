@@ -124,11 +124,11 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
   ];
 
   return (
-    <div className="mx-auto flex h-[calc(100dvh-170px)] sm:h-[calc(100vh-180px)] max-w-4xl flex-col rounded-2xl sm:rounded-3xl border border-slate-800 bg-slate-900/90 shadow-2xl backdrop-blur-md overflow-hidden">
+    <div className="mx-auto flex h-[calc(100dvh-135px)] sm:h-[calc(100vh-180px)] max-w-4xl flex-col rounded-2xl sm:rounded-3xl border border-slate-800 bg-slate-900/90 shadow-2xl backdrop-blur-md overflow-hidden">
       {/* Chat Header */}
-      <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950/70 px-6 py-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-500/20">
+      <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950/70 px-4 py-3 sm:px-6 sm:py-4">
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-500/20">
             <Bot className="h-5 w-5" />
           </div>
           <div>
@@ -230,12 +230,12 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={`Ask anything about ${subject.name} (e.g. explain redox, formula)...`}
-            className="flex-1 rounded-xl sm:rounded-2xl border border-slate-700 bg-slate-900 px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none"
+            className="flex-1 rounded-xl sm:rounded-2xl border border-slate-700 bg-slate-900 px-3.5 sm:px-4 py-2.5 sm:py-3 text-base sm:text-sm text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none"
           />
           <button
             type="submit"
             disabled={!input.trim() || loading}
-            className="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/25 hover:from-purple-500 hover:to-indigo-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex h-11 w-11 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/25 hover:from-purple-500 hover:to-indigo-500 transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             <Send className="h-4 w-4" />
           </button>

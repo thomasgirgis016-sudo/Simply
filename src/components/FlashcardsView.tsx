@@ -38,6 +38,10 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
 
+  // Mobile Touch Swipe State
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [touchEndX, setTouchEndX] = useState<number | null>(null);
+
   // AI Modal
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [aiTopicInput, setAiTopicInput] = useState('');
@@ -86,6 +90,30 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
   const handlePrev = () => {
     setIsFlipped(false);
     setCurrentIndex((prev) => (prev - 1 + filteredCards.length) % (filteredCards.length || 1));
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEndX(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStartX === null || touchEndX === null) return;
+    const distance = touchStartX - touchEndX;
+    const minSwipeDistance = 45; // 45px swipe threshold
+
+    if (distance > minSwipeDistance) {
+      // Swiped left -> next card
+      handleNext();
+    } else if (distance < -minSwipeDistance) {
+      // Swiped right -> previous card
+      handlePrev();
+    }
+    setTouchStartX(null);
+    setTouchEndX(null);
   };
 
   const handleToggleMastery = (mastered: boolean) => {
@@ -244,10 +272,13 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
         </div>
       ) : (
         <div className="space-y-4">
-          {/* Active Card Container with 3D Flip */}
+          {/* Active Card Container with 3D Flip & Mobile Touch Swipes */}
           <div
             onClick={() => setIsFlipped(!isFlipped)}
-            className="group relative h-80 sm:h-96 w-full cursor-pointer perspective-1000 select-none"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            className="group relative h-80 sm:h-96 w-full cursor-pointer perspective-1000 select-none touch-pan-y"
           >
             <div
               className={`relative h-full w-full rounded-2xl sm:rounded-3xl border border-slate-700/80 bg-gradient-to-br transition-all duration-500 transform-style-preserve-3d shadow-2xl ${
@@ -283,29 +314,29 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                 </div>
 
                 {/* Question Content */}
-                <div className="my-auto text-center px-4">
+                <div className="my-auto text-center px-2 sm:px-4">
                   <p className="text-xs font-bold uppercase tracking-wider text-indigo-400 mb-2">
                     Question / Prompt
                   </p>
                   <MathRenderer
                     content={currentCard?.question || ''}
-                    className="text-lg md:text-xl font-bold text-white"
+                    className="text-base sm:text-lg md:text-xl font-bold text-white leading-relaxed"
                   />
                 </div>
 
                 <div className="flex items-center justify-between border-t border-slate-800/80 pt-3 text-xs text-slate-400">
-                  <span className="flex items-center gap-1.5 text-slate-500">
+                  <span className="flex items-center gap-1.5 text-slate-400 text-[11px] sm:text-xs">
                     <RotateCw className="h-3.5 w-3.5 group-hover:rotate-180 transition duration-500" />
-                    Click anywhere to reveal answer & mark scheme
+                    Tap anywhere to flip card
                   </span>
                   <span className="font-semibold text-indigo-400">FLIP ↺</span>
                 </div>
               </div>
 
               {/* BACK SIDE */}
-              <div className="absolute inset-0 flex flex-col justify-between p-7 backface-hidden rotate-y-180 bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950/70 rounded-3xl">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                  <span className="rounded-md bg-emerald-500/20 px-2.5 py-0.5 text-xs font-bold text-emerald-300">
+              <div className="absolute inset-0 flex flex-col justify-between p-4 sm:p-7 backface-hidden rotate-y-180 bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950/70 rounded-2xl sm:rounded-3xl">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-2 sm:pb-3">
+                  <span className="rounded-md bg-emerald-500/20 px-2.5 py-0.5 text-[11px] sm:text-xs font-bold text-emerald-300">
                     Syllabus Mark Scheme Answer
                   </span>
                   <span className="text-xs font-medium text-slate-500">
@@ -314,14 +345,14 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                 </div>
 
                 {/* Answer Content */}
-                <div className="my-auto overflow-y-auto px-2 max-h-56">
+                <div className="my-auto overflow-y-auto px-1 sm:px-2 max-h-56">
                   <MathRenderer
                     content={currentCard?.answer || ''}
-                    className="text-sm md:text-base text-slate-100 font-medium leading-relaxed"
+                    className="text-xs sm:text-sm md:text-base text-slate-100 font-medium leading-relaxed"
                   />
 
                   {currentCard?.examinerTip && (
-                    <div className="mt-4 rounded-xl border border-amber-500/30 bg-amber-950/30 p-3 text-left">
+                    <div className="mt-3 sm:mt-4 rounded-xl border border-amber-500/30 bg-amber-950/30 p-2.5 sm:p-3 text-left">
                       <div className="flex items-center gap-1.5 text-amber-300 text-xs font-bold mb-1">
                         <Lightbulb className="h-3.5 w-3.5" />
                         Examiner Pro-Tip:
@@ -332,48 +363,55 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                 </div>
 
                 <div className="flex items-center justify-between border-t border-slate-800/80 pt-3 text-xs text-slate-400">
-                  <span className="text-slate-500">Click to flip back</span>
+                  <span className="text-slate-400 text-[11px] sm:text-xs">Tap anywhere to flip back</span>
                   <span className="font-semibold text-indigo-400">FLIP ↺</span>
                 </div>
               </div>
             </div>
           </div>
 
+          {/* Mobile Swipe Guidance */}
+          <div className="sm:hidden flex items-center justify-center gap-1.5 text-[11px] font-medium text-slate-400">
+            <span>👈 Swipe left for next card • Swipe right for previous 👉</span>
+          </div>
+
           {/* Bottom Review Controls */}
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
-            <button
-              onClick={handlePrev}
-              className="flex items-center gap-1 rounded-xl border border-slate-700 bg-slate-800/80 px-3.5 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-700 transition"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              <span>Previous</span>
-            </button>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 rounded-2xl border border-slate-800 bg-slate-900/60 p-3 sm:p-4 shadow-md">
+            {/* Prev / Next buttons */}
+            <div className="flex items-center justify-between sm:justify-start gap-2 order-2 sm:order-1">
+              <button
+                onClick={handlePrev}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-4 py-2.5 sm:py-2 text-xs font-bold text-slate-200 hover:bg-slate-700 active:scale-95 transition cursor-pointer"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                <span>Previous</span>
+              </button>
+              <button
+                onClick={handleNext}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-4 py-2.5 sm:py-2 text-xs font-bold text-slate-200 hover:bg-slate-700 active:scale-95 transition cursor-pointer"
+              >
+                <span>Next</span>
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
 
             {/* Confidence Ratings */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 order-1 sm:order-2">
               <button
                 onClick={() => handleToggleMastery(false)}
-                className="flex items-center gap-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-2 text-xs font-bold text-rose-300 hover:bg-rose-500/20 transition"
+                className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-2.5 sm:py-2 text-xs font-bold text-rose-300 hover:bg-rose-500/20 active:scale-95 transition cursor-pointer"
               >
                 <HelpCircle className="h-4 w-4" />
                 <span>Still Learning</span>
               </button>
               <button
                 onClick={() => handleToggleMastery(true)}
-                className="flex items-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20 transition"
+                className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5 sm:py-2 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20 active:scale-95 transition cursor-pointer"
               >
                 <CheckCircle className="h-4 w-4" />
                 <span>Mastered (+1)</span>
               </button>
             </div>
-
-            <button
-              onClick={handleNext}
-              className="flex items-center gap-1 rounded-xl border border-slate-700 bg-slate-800/80 px-3.5 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-700 transition"
-            >
-              <span>Next</span>
-              <ChevronRight className="h-4 w-4" />
-            </button>
           </div>
         </div>
       )}
