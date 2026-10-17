@@ -1,4 +1,5 @@
 import { SolverResult, Flashcard, QuizQuestion } from '../types';
+import { searchUniversalKnowledge } from './knowledgeEngine';
 
 export interface GeminiSolveParams {
   apiKey?: string;
@@ -9,6 +10,22 @@ export interface GeminiSolveParams {
   subjectName: string;
   examBoard: string;
   gradeLevel: string;
+}
+
+// Zero-Key Client-Side AI caller (Uses Puter.js in browser with no API key required!)
+async function callZeroKeyAi(prompt: string, systemPrompt?: string): Promise<string> {
+  if (typeof window !== 'undefined' && (window as any).puter?.ai?.chat) {
+    try {
+      const puter = (window as any).puter;
+      const fullPrompt = systemPrompt ? `${systemPrompt}\n\nStudent Question:\n${prompt}` : prompt;
+      const res = await puter.ai.chat(fullPrompt, { model: 'gpt-4o-mini' });
+      const text = typeof res === 'string' ? res : res?.message?.content || res?.text || '';
+      if (text && text.trim() !== '') return text;
+    } catch (e) {
+      console.warn('Puter AI attempt bypassed:', e);
+    }
+  }
+  throw new Error('ZERO_KEY_AI_UNAVAILABLE');
 }
 
 // Unified call helper: tries /api/gemini (Vercel serverless proxy) first,
@@ -108,6 +125,21 @@ Ensure standard IGCSE marking criteria: [M] method, [A] accuracy, [B] independen
 DO NOT wrap your output in markdown code blocks like \`\`\`json. Return only raw parseable JSON.
 `;
 
+  // 1. Try zero-key browser Puter AI if text question
+  if (questionText && !imageBase64) {
+    try {
+      const liveJsonStr = await callZeroKeyAi(
+        `${questionText}\n\nInstructions: Return ONLY raw JSON matching the IGCSE solver schema with stepByStepSolution, finalAnswer, markSchemeBreakdown, examinerTips. No markdown backticks.`
+      );
+      const cleaned = liveJsonStr.replace(/```json/g, '').replace(/```/g, '').trim();
+      const parsed = JSON.parse(cleaned);
+      if (parsed.stepByStepSolution && parsed.finalAnswer) return parsed;
+    } catch {
+      // continue to next provider
+    }
+  }
+
+  // 2. Try Vercel Serverless / Gemini API
   const parts: any[] = [];
   if (questionText) {
     parts.push({ text: `Question:\n${questionText}\n\nInstructions:\n${prompt}` });
@@ -170,6 +202,17 @@ Output STRICTLY a JSON array of objects with the following schema:
 ]
 `;
 
+  // Try Zero-Key Puter AI
+  try {
+    const liveJson = await callZeroKeyAi(prompt);
+    const cleaned = liveJson.replace(/```json/g, '').replace(/```/g, '').trim();
+    const parsed = JSON.parse(cleaned);
+    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+  } catch {
+    // continue
+  }
+
+  // Try Gemini API
   try {
     const data = await callGeminiApi({
       model,
@@ -237,6 +280,17 @@ Output STRICTLY a JSON array of objects with the schema:
 ]
 `;
 
+  // Try Zero-Key Puter AI
+  try {
+    const liveJson = await callZeroKeyAi(prompt);
+    const cleaned = liveJson.replace(/```json/g, '').replace(/```/g, '').trim();
+    const parsed = JSON.parse(cleaned);
+    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+  } catch {
+    // continue
+  }
+
+  // Try Gemini API
   try {
     const data = await callGeminiApi({
       model,
@@ -281,17 +335,33 @@ export async function askAiTutor(
   apiKey?: string,
   model: string = 'gemini-1.5-flash'
 ): Promise<string> {
+  const lastUserMessage = messages[messages.length - 1]?.content || '';
   const systemInstruction = `You are "Simply IGCSE Co-Pilot", an elite Cambridge & Edexcel IGCSE examiner and private tutor.
 The student is studying: ${examBoard} ${subjectName}.
 Tone: Encouraging, rigorous, mark-scheme focused. Always point out where [M] method marks, [A] accuracy marks, and [B] independent marks are awarded.
 Use LaTeX ($...$ or $$...$$) for any mathematical equations or chemical reactions.`;
 
-  const formattedContents = messages.map(m => ({
-    role: m.role === 'assistant' ? 'model' : 'user',
-    parts: [{ text: m.content }]
-  }));
+  // 1. Check Universal Syllabus Knowledge Engine for Instant High-Yield Mark-Scheme Breakdown
+  const instantMatch = searchUniversalKnowledge(lastUserMessage, subjectName, examBoard);
+  if (instantMatch) {
+    return instantMatch;
+  }
 
+  // 2. Try Zero-Key Puter AI (Live GPT-4o-mini / Claude in browser without any API key!)
   try {
+    const liveReply = await callZeroKeyAi(lastUserMessage, systemInstruction);
+    if (liveReply && liveReply.trim() !== '') return liveReply;
+  } catch {
+    // continue
+  }
+
+  // 3. Try Vercel Serverless / Gemini API
+  try {
+    const formattedContents = messages.map(m => ({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content }]
+    }));
+
     const data = await callGeminiApi({
       model,
       contents: formattedContents,
@@ -301,12 +371,12 @@ Use LaTeX ($...$ or $$...$$) for any mathematical equations or chemical reaction
 
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
     if (text && text.trim() !== '') return text;
-    throw new Error('EMPTY_TEXT');
   } catch {
-    // Comprehensive high-yield IGCSE knowledge engine
-    const lastUserMessage = messages[messages.length - 1]?.content.toLowerCase() || '';
-    return generateComprehensiveTutorReply(lastUserMessage, subjectName, examBoard);
+    // continue
   }
+
+  // 4. Dynamic Subject Knowledge Synthesizer
+  return generateComprehensiveTutorReply(lastUserMessage, subjectName, examBoard);
 }
 
 // Built-in intelligent subject response generator for the AI Tutor
@@ -317,7 +387,7 @@ function generateComprehensiveTutorReply(
 ): string {
   const lower = query.toLowerCase();
 
-  // 1. REDOX REACTIONS
+  // Redox
   if (lower.includes('redox') || lower.includes('oxidation') || lower.includes('reduction')) {
     return `### ⚡ Redox Reactions: Master Guide for IGCSE Chemistry
 
@@ -373,7 +443,7 @@ When asked *"Explain why this is a redox reaction in terms of electron transfer 
 *(Do not just write "OIL RIG" — identify the exact species!)*`;
   }
 
-  // 2. SUMMARY WRITING (ESL 0510 / 4ES1)
+  // Summary Writing ESL
   if (lower.includes('summary') || lower.includes('esl') || lower.includes('paraphras') || lower.includes('0510')) {
     return `### 📝 IGCSE ESL Exercise 4: Summary Writing Master Strategy
 
@@ -393,7 +463,7 @@ To score full **16/16 marks (10 Content + 6 Language)**:
    - Write as **one cohesive continuous paragraph** (no bullet points!).`;
   }
 
-  // 3. GRADE 9 ADVICE
+  // Grade 9 Advice
   if (lower.includes('grade') || lower.includes('a*') || lower.includes('9') || lower.includes('tips')) {
     return `### 🏆 How to Secure a Grade 9 / A* in ${examBoard} ${subjectName}
 
@@ -410,68 +480,32 @@ To score full **16/16 marks (10 Content + 6 Language)**:
    - Always write SI units ($m/s^2$, $J$, $dm^3$, $\\Omega$).`;
   }
 
-  // 4. PHOTOSYNTHESIS & PLANT BIOLOGY
-  if (lower.includes('photosynthesis') || lower.includes('chlorophyll') || lower.includes('stomata')) {
-    return `### 🌿 Photosynthesis: IGCSE Biology Master Notes
+  // Dynamic Syllabus Deep-Dive
+  return `### 📖 ${subjectName}: Mark Scheme Breakdown for "${query}"
 
-- **Word Equation**:
-  $$\\text{Carbon dioxide} + \\text{Water} \\xrightarrow{\\text{Light & Chlorophyll}} \\text{Glucose} + \\text{Oxygen}$$
-- **Balanced Chemical Equation**:
-  $$6CO_2 + 6H_2O \\xrightarrow{\\text{Light & Chlorophyll}} C_6H_{12}O_6 + 6O_2$$
-- **Limiting Factors**:
-  1. Light Intensity (graph plateaus when another factor becomes limiting).
-  2. Carbon Dioxide Concentration.
-  3. Temperature (rate increases up to optimum ~35-40°C, then drops sharply to zero because enzymes **denature**).
-- **Examiner Trap**: Never say enzymes "die". Enzymes are proteins, not living organisms — say they **denature** as active site shape changes permanently.`;
-  }
+Here is the syllabus tutorial for this topic under **${examBoard} ${subjectName}**:
 
-  // 5. ENZYMES
-  if (lower.includes('enzyme') || lower.includes('denatur') || lower.includes('active site')) {
-    return `### 🧬 Enzymes: IGCSE Marking Scheme Keywords
+---
 
-- **Definition**: Biological catalysts made of proteins that speed up metabolic reactions without being changed or used up.
-- **Lock and Key Model**: The active site has a specific complementary shape to its substrate.
-- **Effect of Temperature**:
-  - Low temp: Low kinetic energy $\\rightarrow$ few successful collisions.
-  - Optimum: Maximum rate of enzyme-substrate complex formation.
-  - Above optimum: High thermal vibrations break hydrogen and ionic bonds $\\rightarrow$ active site changes shape permanently $\\rightarrow$ enzyme is **denatured** $\\rightarrow$ substrate no longer fits.`;
-  }
+#### 1. Fundamental Principle & Syllabus Definition
+- In ${subjectName}, questions on this topic test whether candidates can recall exact scientific terminology and apply principles to novel experimental contexts.
+- Ensure your definitions use technical vocabulary (e.g. state symbols, standard conditions, formula rearrangement).
 
-  // 6. ELECTRICITY & CIRCUITS
-  if (lower.includes('circuit') || lower.includes('ohm') || lower.includes('resistan') || lower.includes('voltage') || lower.includes('current')) {
-    return `### ⚡ Electricity & Ohm's Law (CIE 0625 & Edexcel 4PH1)
+---
 
-- **Ohm's Law**: $V = I \\times R$ (at constant temperature).
-- **Current ($I$)**: Rate of flow of electrical charge:
-  $$I = \\frac{Q}{t} \\quad [\\text{Amperes}]$$
-- **Series Circuits**:
-  - Current is identical at all points.
-  - Total Resistance: $R_{total} = R_1 + R_2$.
-- **Parallel Circuits**:
-  - Voltage is identical across each parallel branch.
-  - Total Resistance: $\\frac{1}{R_p} = \\frac{1}{R_1} + \\frac{1}{R_2}$ (Total resistance is always *less* than the smallest resistor).
-- **LDR & Thermistor**:
-  - LDR: Light up $\\rightarrow$ Resistance DOWN.
-  - Thermistor: Temp up $\\rightarrow$ Resistance DOWN (**TURD**: Temperature Up, Resistance Down).`;
-  }
+#### 2. Core Concepts & Step-by-Step Mechanism
+- **Cause $\\rightarrow$ Effect**: In 3–4 mark explanation questions, examiners allocate marks for establishing cause-and-effect links:
+  1. Identify the independent variable or primary trigger.
+  2. Explain the physical, chemical, or biological mechanism.
+  3. Deduce the observed result or mathematical conclusion.
 
-  // 7. GENERIC INTELLIGENT SYLLABUS BREAKDOWN
-  return `### 📚 Syllabus Guidance: "${query}"
+---
 
-Under **${examBoard} ${subjectName}**, here is the structured mark-scheme breakdown for this topic:
+#### 3. Essential Examiner Advice & Trap Warnings
+- **Common Mistakes**: Candidates frequently lose marks by writing vague statements like *"it changes"* or *"it reacts"* without specifying whether the value increases, decreases, or naming the specific products.
+- **Accuracy**: Always maintain 3 significant figures in numerical answers and include SI units ($m/s^2$, $J$, $dm^3$, $\\Omega$).
 
-1. **Fundamental Definition**:
-   Ensure you quote the exact syllabus terminology. Examiners award marks for key technical words rather than descriptive phrases.
-2. **Key Relationship / Formula**:
-   Identify the core variables and how they interact (e.g. directly proportional vs inversely proportional).
-3. **Step-by-Step Mark Scheme Reasoning**:
-   - State the initial conditions or cause.
-   - Explain the mechanism or working out.
-   - State the resulting effect with relevant standard units.
-4. **Common Exam Trap**:
-   Examiners frequently report candidates losing easy marks by omitting units or confusing similar terms.
-
-*(Would you like me to give you a past paper style question or drill problem on this topic?)*`;
+*(Tip: You can ask me to give you a specific past paper question or step-by-step calculation on this topic!)*`;
 }
 
 // Built-in intelligent fallback for sample questions
