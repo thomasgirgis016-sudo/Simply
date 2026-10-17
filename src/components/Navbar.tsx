@@ -21,18 +21,20 @@ import {
   Calculator,
   Search,
   ListChecks,
-  Mic
+  Mic,
+  Home
 } from 'lucide-react';
 import { UserProfile, Subject, UserAccount } from '../types';
 
 export type ActiveTab =
-  | 'solver'
+  | 'home'
   | 'finder'
+  | 'revision'
+  | 'quiz'
+  | 'solver'
   | 'checklist'
   | 'esl-speaking'
   | 'flashcards'
-  | 'quiz'
-  | 'revision'
   | 'formulas'
   | 'chat'
   | 'boundaries'
@@ -70,13 +72,14 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
   const navTabs = [
+    { id: 'home', label: 'Home', icon: Home, color: 'text-indigo-400' },
+    { id: 'finder', label: 'Past Papers', icon: Search, color: 'text-amber-400' },
+    { id: 'revision', label: 'Revision Notes', icon: BookOpen, color: 'text-cyan-400' },
+    { id: 'quiz', label: 'Past Paper Quizzes', icon: GraduationCap, color: 'text-emerald-400' },
     { id: 'solver', label: 'AI Solver & Grading', icon: Camera, color: 'text-pink-400' },
-    { id: 'finder', label: 'Paper Finder', icon: Search, color: 'text-amber-400' },
     { id: 'checklist', label: 'Syllabus Tracker', icon: ListChecks, color: 'text-emerald-400' },
     { id: 'esl-speaking', label: 'ESL Speaking Oral', icon: Mic, color: 'text-violet-400' },
     { id: 'flashcards', label: 'Flashcards', icon: Layers, color: 'text-indigo-400' },
-    { id: 'quiz', label: 'Past Paper Quizzes', icon: GraduationCap, color: 'text-emerald-400' },
-    { id: 'revision', label: 'Revision Notes', icon: BookOpen, color: 'text-cyan-400' },
     { id: 'formulas', label: 'Formulas & Commands', icon: BookmarkCheck, color: 'text-amber-400' },
     { id: 'chat', label: 'AI Examiner Chat', icon: MessageSquare, color: 'text-purple-400' },
     { id: 'boundaries', label: 'Grade Boundaries', icon: TrendingUp, color: 'text-teal-400' },
@@ -93,13 +96,17 @@ export const Navbar: React.FC<NavbarProps> = ({
       <header className="sticky top-0 z-40 w-full border-b border-slate-800/80 bg-slate-950/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-3.5 py-2.5 sm:px-6 sm:py-3">
           {/* Brand / Logo */}
-          <div className="flex items-center gap-2.5 sm:gap-3">
-            <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 text-white shadow-lg shadow-indigo-500/25">
+          <button
+            onClick={() => onSelectTab('home')}
+            className="flex items-center gap-2.5 sm:gap-3 text-left cursor-pointer group focus:outline-none"
+            title="Go to Homepage"
+          >
+            <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 text-white shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition">
               <Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />
             </div>
             <div>
               <div className="flex items-center gap-1.5 sm:gap-2">
-                <span className="text-base sm:text-lg font-black tracking-tight text-white">
+                <span className="text-base sm:text-lg font-black tracking-tight text-white group-hover:text-indigo-200 transition">
                   SIMPLY <span className="bg-gradient-to-r from-indigo-400 to-pink-400 bg-clip-text text-transparent">IGCSE</span>
                 </span>
                 <span className="hidden sm:inline-flex items-center rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-400 border border-emerald-500/20">
@@ -110,7 +117,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 Cambridge & Pearson Edexcel Study Platform
               </p>
             </div>
-          </div>
+          </button>
 
           {/* Center: Subject Switcher & Grade Badge (Desktop / Tablet) */}
           <div className="hidden sm:flex items-center gap-2 sm:gap-3">

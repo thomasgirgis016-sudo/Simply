@@ -45,6 +45,17 @@ export interface UserProfile {
   selectedModel: string;
 }
 
+export interface BookmarkItem {
+  id: string;
+  type: 'past-paper' | 'revision-topic' | 'formula' | 'checklist';
+  title: string;
+  subtitle: string;
+  subjectId: string;
+  subjectCode: string;
+  tab: string;
+  savedAt: string;
+}
+
 export interface Flashcard {
   id: string;
   subjectId: string;

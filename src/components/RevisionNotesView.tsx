@@ -9,9 +9,10 @@ import {
   ChevronDown,
   ChevronUp,
   Layers,
-  X
+  X,
+  Bookmark
 } from 'lucide-react';
-import { Subject, RevisionTopic, UserProfile } from '../types';
+import { Subject, RevisionTopic, UserProfile, BookmarkItem } from '../types';
 import { MathRenderer } from './MathRenderer';
 import { generateRevisionNotesWithGemini } from '../services/gemini';
 import { isSubjectMatch } from '../utils/subjectMatcher';
@@ -33,6 +34,42 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [aiTopicInput, setAiTopicInput] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [bookmarks, setBookmarks] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('simply_igcse_bookmarks');
+      if (saved) {
+        const parsed: BookmarkItem[] = JSON.parse(saved);
+        return parsed.map((b) => b.id);
+      }
+    } catch {}
+    return [];
+  });
+
+  const toggleBookmark = (topic: RevisionTopic) => {
+    try {
+      const saved = localStorage.getItem('simply_igcse_bookmarks');
+      let current: BookmarkItem[] = saved ? JSON.parse(saved) : [];
+      const exists = current.some((b) => b.id === topic.id);
+      if (exists) {
+        current = current.filter((b) => b.id !== topic.id);
+      } else {
+        current.push({
+          id: topic.id,
+          type: 'revision-topic',
+          title: topic.title,
+          subtitle: `${subject.code} • ${topic.chapter}`,
+          subjectId: subject.id,
+          subjectCode: subject.code,
+          tab: 'revision',
+          savedAt: new Date().toISOString(),
+        });
+      }
+      localStorage.setItem('simply_igcse_bookmarks', JSON.stringify(current));
+      setBookmarks(current.map((b) => b.id));
+    } catch (err) {
+      console.warn(err);
+    }
+  };
 
   const subjectNotes = revisionNotes.filter(
     r => isSubjectMatch(r.subjectId, subject)
@@ -129,9 +166,22 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
                 </span>
                 <h3 className="text-2xl font-black text-white mt-0.5">{activeTopic.title}</h3>
               </div>
-              <span className="rounded-lg bg-slate-800 px-3 py-1 text-xs font-bold text-slate-300">
-                IGCSE Syllabus Aligned
-              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => toggleBookmark(activeTopic)}
+                  className={`p-2 rounded-xl border transition cursor-pointer ${
+                    bookmarks.includes(activeTopic.id)
+                      ? 'border-amber-500/40 bg-amber-500/15 text-amber-300'
+                      : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
+                  }`}
+                  title={bookmarks.includes(activeTopic.id) ? 'Saved to Bookmarks' : 'Bookmark this revision note'}
+                >
+                  <Bookmark className="h-4 w-4" fill={bookmarks.includes(activeTopic.id) ? 'currentColor' : 'none'} />
+                </button>
+                <span className="rounded-lg bg-slate-800 px-3 py-1 text-xs font-bold text-slate-300">
+                  IGCSE Syllabus Aligned
+                </span>
+              </div>
             </div>
 
             {/* Must-Know Definitions Callout */}

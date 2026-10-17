@@ -100,6 +100,13 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
       setMessages(prev => [...prev, aiMsg]);
     } catch (err) {
       console.error(err);
+      const errorMsg: Message = {
+        id: `msg-${Date.now()}-err`,
+        role: 'assistant',
+        content: `⚠️ **Connection Notice**: The Examiner AI encountered a temporary network delay. Please retry your question or check your connection.`,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      setMessages(prev => [...prev, errorMsg]);
     } finally {
       setLoading(false);
     }
@@ -291,6 +298,12 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
                     : 'border border-slate-800 bg-slate-950/70 text-slate-200'
                 }`}
               >
+                {!isUser && (
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-purple-400 mb-1.5">
+                    <Sparkles className="h-3 w-3" />
+                    <span>AI Examiner Guidance</span>
+                  </div>
+                )}
                 <MathRenderer content={m.content} className="text-xs sm:text-sm leading-relaxed" />
                 <p className={`mt-2 text-[10px] text-right ${isUser ? 'text-indigo-200' : 'text-slate-500'}`}>
                   {m.timestamp}

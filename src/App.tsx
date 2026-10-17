@@ -27,6 +27,7 @@ import { SplitScreenPaperViewer } from './components/SplitScreenPaperViewer';
 import { PastPaperFinder } from './components/PastPaperFinder';
 import { SyllabusChecklist } from './components/SyllabusChecklist';
 import { EslSpeakingSimulator } from './components/EslSpeakingSimulator';
+import { HomeView } from './components/HomeView';
 import { SettingsModal } from './components/SettingsModal';
 import { ProfileModal } from './components/ProfileModal';
 import { AuthModal } from './components/AuthModal';
@@ -39,7 +40,9 @@ import {
   BookOpen,
   BookmarkCheck,
   MessageSquare,
-  Calculator
+  Calculator,
+  Home,
+  FileText
 } from 'lucide-react';
 
 const DEFAULT_PROFILE: UserProfile = {
@@ -91,7 +94,7 @@ export function App() {
   });
 
   // 3. Active Tab State
-  const [activeTab, setActiveTab] = useState<ActiveTab>('solver');
+  const [activeTab, setActiveTab] = useState<ActiveTab>('home');
 
   // 4. Modals State
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -185,6 +188,7 @@ export function App() {
       const subjectParam = params.get('subject');
 
       const validTabs: ActiveTab[] = [
+        'home',
         'solver',
         'finder',
         'checklist',
@@ -334,6 +338,16 @@ export function App() {
 
       {/* Main Container */}
       <main className={`flex-1 px-3 py-3 sm:px-6 sm:py-8 max-w-7xl mx-auto w-full ${activeTab === 'chat' ? 'pb-20 md:pb-8' : 'pb-24 md:pb-8'}`}>
+        {activeTab === 'home' && (
+          <HomeView
+            subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
+            activeSubject={activeSubject}
+            onSelectSubject={setActiveSubject}
+            onNavigateTab={setActiveTab}
+            profile={profile}
+          />
+        )}
+
         {activeTab === 'solver' && (
           <QuestionSolver
             subject={activeSubject}
@@ -345,6 +359,7 @@ export function App() {
         {activeTab === 'finder' && (
           <PastPaperFinder
             activeSubject={activeSubject}
+            subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
             profile={profile}
             onOpenChatWithQuestion={handleOpenChatWithQuestion}
             onOpenSolverWithQuestion={() => setActiveTab('solver')}
@@ -433,12 +448,11 @@ export function App() {
       {/* Mobile Phone Bottom Navigation Bar */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-slate-800/90 bg-slate-950/95 backdrop-blur-xl px-1.5 pt-1.5 pb-[max(0.6rem,env(safe-area-inset-bottom))] shadow-2xl flex items-center justify-around">
         {[
-          { id: 'solver', label: 'Solver', icon: Camera, color: 'text-pink-400' },
-          { id: 'flashcards', label: 'Cards', icon: Layers, color: 'text-indigo-400' },
-          { id: 'quiz', label: 'Quizzes', icon: GraduationCap, color: 'text-emerald-400' },
+          { id: 'home', label: 'Home', icon: Home, color: 'text-indigo-400' },
+          { id: 'finder', label: 'Papers', icon: FileText, color: 'text-amber-400' },
           { id: 'revision', label: 'Notes', icon: BookOpen, color: 'text-cyan-400' },
-          { id: 'formulas', label: 'Formulas', icon: BookmarkCheck, color: 'text-amber-400' },
-          { id: 'chat', label: 'AI Tutor', icon: MessageSquare, color: 'text-purple-400' },
+          { id: 'quiz', label: 'Quizzes', icon: GraduationCap, color: 'text-emerald-400' },
+          { id: 'solver', label: 'AI Solver', icon: Camera, color: 'text-pink-400' },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
