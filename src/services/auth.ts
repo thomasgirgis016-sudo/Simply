@@ -1,4 +1,4 @@
-import { UserAccount, GradeLevel, ExamBoard, TargetGrade } from '../types';
+import { UserAccount, GradeLevel, ExamBoard, TargetGrade, UserRole, AccountStatus } from '../types';
 
 const STORAGE_USERS_KEY = 'simply_igcse_users';
 const STORAGE_ACTIVE_USER_ID = 'simply_igcse_active_user_id';
@@ -12,19 +12,73 @@ export async function hashPassword(password: string): Promise<string> {
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
+// Seed default administrator if not present
+async function seedAdminIfNone(users: UserAccount[]): Promise<UserAccount[]> {
+  const hasAdmin = users.some(u => u.role === 'admin' || u.email.toLowerCase() === 'admin@simplyigcse.com');
+  if (!hasAdmin) {
+    const adminHash = await hashPassword('AdminPassword123!');
+    const defaultAdmin: UserAccount = {
+      id: 'admin_root',
+      name: 'Simply IGCSE Admin',
+      email: 'admin@simplyigcse.com',
+      passwordHash: adminHash,
+      grade: 'Year 11 / Grade 10 (IGCSE Exam Yr)',
+      board: 'Both',
+      targetGrade: '9 / A*',
+      selectedSubjectIds: ['cie-math-0580', 'cie-esl-0510', 'cie-physics-0625', 'cie-chem-0620'],
+      role: 'admin',
+      status: 'approved',
+      approvedAt: new Date().toISOString(),
+      approvedBy: 'system',
+      createdAt: new Date().toISOString(),
+    };
+    users.unshift(defaultAdmin);
+    saveAllUsers(users);
+  }
+  return users;
+}
+
 // Get all registered accounts
 export function getAllUsers(): UserAccount[] {
   try {
     const raw = localStorage.getItem(STORAGE_USERS_KEY);
-    return raw ? JSON.parse(raw) : [];
+    const users: UserAccount[] = raw ? JSON.parse(raw) : [];
+
+    // Ensure backwards compatibility with older user models
+    let modified = false;
+    for (const u of users) {
+      if (!u.role) {
+        u.role = u.email.toLowerCase().includes('admin') ? 'admin' : 'student';
+        modified = true;
+      }
+      if (!u.status) {
+        u.status = 'approved';
+        modified = true;
+      }
+    }
+
+    if (modified) {
+      saveAllUsers(users);
+    }
+
+    // Auto-seed admin if completely empty or missing admin
+    if (!users.some(u => u.role === 'admin')) {
+      seedAdminIfNone(users);
+    }
+
+    return users;
   } catch {
     return [];
   }
 }
 
 // Save accounts
-function saveAllUsers(users: UserAccount[]) {
-  localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(users));
+export function saveAllUsers(users: UserAccount[]) {
+  try {
+    localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(users));
+  } catch (err) {
+    console.error('Failed to save users:', err);
+  }
 }
 
 // Get currently active logged-in user
@@ -48,7 +102,7 @@ export function setActiveUser(user: UserAccount | null) {
   }
 }
 
-// Sign up new student
+// Sign up new student (Requires Admin Approval)
 export async function registerStudent(params: {
   name: string;
   email: string;
@@ -57,7 +111,7 @@ export async function registerStudent(params: {
   board: ExamBoard;
   targetGrade: TargetGrade;
   selectedSubjectIds: string[];
-}): Promise<{ success: boolean; user?: UserAccount; error?: string }> {
+}): Promise<{ success: boolean; user?: UserAccount; error?: string; isPendingApproval?: boolean }> {
   const users = getAllUsers();
   const normalizedEmail = params.email.trim().toLowerCase();
 
@@ -76,6 +130,11 @@ export async function registerStudent(params: {
 
   const passwordHash = await hashPassword(params.password);
 
+  // New students start with 'pending' status unless it's the admin email
+  const isAdminEmail = normalizedEmail === 'admin@simplyigcse.com';
+  const role: UserRole = isAdminEmail ? 'admin' : 'student';
+  const status: AccountStatus = isAdminEmail ? 'approved' : 'pending';
+
   const newUser: UserAccount = {
     id: `student_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
     name: params.name.trim() || 'IGCSE Student',
@@ -85,6 +144,8 @@ export async function registerStudent(params: {
     board: params.board,
     targetGrade: params.targetGrade,
     selectedSubjectIds: params.selectedSubjectIds.length > 0 ? params.selectedSubjectIds : ['cie-math-0580', 'cie-esl-0510'],
+    role,
+    status,
     createdAt: new Date().toISOString(),
   };
 
@@ -92,17 +153,21 @@ export async function registerStudent(params: {
   saveAllUsers(users);
   setActiveUser(newUser);
 
-  return { success: true, user: newUser };
+  return {
+    success: true,
+    user: newUser,
+    isPendingApproval: status === 'pending'
+  };
 }
 
-// Sign in existing student
+// Sign in existing student or admin
 export async function loginStudent(email: string, password: string): Promise<{ success: boolean; user?: UserAccount; error?: string }> {
   const users = getAllUsers();
   const normalizedEmail = email.trim().toLowerCase();
 
   const user = users.find(u => u.email.toLowerCase() === normalizedEmail);
   if (!user) {
-    return { success: false, error: 'No student account found with this email. Please check your spelling or sign up.' };
+    return { success: false, error: 'No account found with this email. Please check your spelling or sign up.' };
   }
 
   const passwordHash = await hashPassword(password);
@@ -165,7 +230,7 @@ export async function completePasswordReset(
   const users = getAllUsers();
   const userIdx = users.findIndex(u => u.email.toLowerCase() === normalizedEmail);
   if (userIdx === -1) {
-    return { success: false, error: 'Student account not found.' };
+    return { success: false, error: 'Account not found.' };
   }
 
   const newHash = await hashPassword(newPassword);
@@ -186,4 +251,148 @@ function getResetCodes(): Record<string, { code: string; expiresAt: number }> {
   } catch {
     return {};
   }
+}
+
+// ================= ADMIN DASHBOARD FUNCTIONS =================
+
+// Approve account
+export function approveUser(userId: string, adminEmail?: string): boolean {
+  const users = getAllUsers();
+  const user = users.find(u => u.id === userId);
+  if (!user) return false;
+
+  user.status = 'approved';
+  user.approvedAt = new Date().toISOString();
+  user.approvedBy = adminEmail || 'Admin';
+  saveAllUsers(users);
+
+  // If approving currently active user, update active user
+  const active = getActiveUser();
+  if (active && active.id === userId) {
+    setActiveUser(user);
+  }
+
+  return true;
+}
+
+// Reject / Suspend account
+export function rejectUser(userId: string): boolean {
+  const users = getAllUsers();
+  const user = users.find(u => u.id === userId);
+  if (!user) return false;
+
+  user.status = 'rejected';
+  saveAllUsers(users);
+
+  const active = getActiveUser();
+  if (active && active.id === userId) {
+    setActiveUser(user);
+  }
+
+  return true;
+}
+
+// Toggle admin privilege
+export function toggleUserRole(userId: string): boolean {
+  const users = getAllUsers();
+  const user = users.find(u => u.id === userId);
+  if (!user) return false;
+
+  user.role = user.role === 'admin' ? 'student' : 'admin';
+  saveAllUsers(users);
+
+  const active = getActiveUser();
+  if (active && active.id === userId) {
+    setActiveUser(user);
+  }
+
+  return true;
+}
+
+// Delete account
+export function deleteUser(userId: string): boolean {
+  let users = getAllUsers();
+  const initialLen = users.length;
+  users = users.filter(u => u.id !== userId);
+
+  if (users.length !== initialLen) {
+    saveAllUsers(users);
+
+    const active = getActiveUser();
+    if (active && active.id === userId) {
+      setActiveUser(null);
+    }
+    return true;
+  }
+  return false;
+}
+
+// Batch approve all pending users
+export function approveAllPendingUsers(adminEmail?: string): number {
+  const users = getAllUsers();
+  let count = 0;
+  for (const u of users) {
+    if (u.status === 'pending') {
+      u.status = 'approved';
+      u.approvedAt = new Date().toISOString();
+      u.approvedBy = adminEmail || 'Admin';
+      count++;
+    }
+  }
+  if (count > 0) {
+    saveAllUsers(users);
+  }
+  return count;
+}
+
+// Create pre-approved account from admin console
+export async function createPreApprovedUser(params: {
+  name: string;
+  email: string;
+  password: string;
+  role: UserRole;
+  grade?: GradeLevel;
+  board?: ExamBoard;
+  targetGrade?: TargetGrade;
+  selectedSubjectIds?: string[];
+  adminEmail?: string;
+}): Promise<{ success: boolean; user?: UserAccount; error?: string }> {
+  const users = getAllUsers();
+  const normalizedEmail = params.email.trim().toLowerCase();
+
+  if (!normalizedEmail || !normalizedEmail.includes('@')) {
+    return { success: false, error: 'Please provide a valid email.' };
+  }
+
+  if (params.password.length < 6) {
+    return { success: false, error: 'Password must be at least 6 characters.' };
+  }
+
+  if (users.some(u => u.email.toLowerCase() === normalizedEmail)) {
+    return { success: false, error: 'An account with this email already exists.' };
+  }
+
+  const passwordHash = await hashPassword(params.password);
+  const newUser: UserAccount = {
+    id: `admin_created_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+    name: params.name.trim() || 'Student',
+    email: normalizedEmail,
+    passwordHash,
+    grade: params.grade || 'Year 11 / Grade 10 (IGCSE Exam Yr)',
+    board: params.board || 'Both',
+    targetGrade: params.targetGrade || '9 / A*',
+    selectedSubjectIds: params.selectedSubjectIds && params.selectedSubjectIds.length > 0
+      ? params.selectedSubjectIds
+      : ['cie-math-0580', 'cie-esl-0510'],
+    role: params.role,
+    status: 'approved',
+    approvedAt: new Date().toISOString(),
+    approvedBy: params.adminEmail || 'Admin',
+    createdAt: new Date().toISOString(),
+  };
+
+  users.push(newUser);
+  saveAllUsers(users);
+
+  return { success: true, user: newUser };
 }

@@ -28,6 +28,8 @@ import { PastPaperFinder } from './components/PastPaperFinder';
 import { SyllabusChecklist } from './components/SyllabusChecklist';
 import { EslSpeakingSimulator } from './components/EslSpeakingSimulator';
 import { HomeView } from './components/HomeView';
+import { AdminDashboard } from './components/AdminDashboard';
+import { AccountGate } from './components/AccountGate';
 import { SettingsModal } from './components/SettingsModal';
 import { ProfileModal } from './components/ProfileModal';
 import { AuthModal } from './components/AuthModal';
@@ -199,7 +201,8 @@ export function App() {
         'formulas',
         'chat',
         'boundaries',
-        'split'
+        'split',
+        'admin'
       ];
       if (tabParam && validTabs.includes(tabParam as ActiveTab)) {
         setActiveTab(tabParam as ActiveTab);
@@ -245,12 +248,26 @@ export function App() {
       grade: user.grade,
       board: user.board,
       targetGrade: user.targetGrade,
-      selectedSubjectIds: user.selectedSubjectIds
+      selectedSubjectIds: user.selectedSubjectIds,
+      role: user.role,
+      status: user.status
     }));
 
     // Find first enrolled subject for this user
     const firstSubject = IGCSE_SUBJECTS.find(s => user.selectedSubjectIds.includes(s.id));
     if (firstSubject) setActiveSubject(firstSubject);
+  };
+
+  const handleRefreshStatus = () => {
+    const user = getActiveUser();
+    setCurrentUser(user);
+    if (user) {
+      setProfile(prev => ({
+        ...prev,
+        role: user.role,
+        status: user.status
+      }));
+    }
   };
 
   const handleLogout = () => {
@@ -315,6 +332,28 @@ export function App() {
     setActiveTab('chat');
   };
 
+  const canAccessTools = Boolean(
+    currentUser && (currentUser.status === 'approved' || currentUser.role === 'admin')
+  );
+
+  const getTabFeatureName = (tab: ActiveTab): string => {
+    switch (tab) {
+      case 'solver': return 'the AI Question Solver & Grading Engine';
+      case 'finder': return 'the Past Papers & Mark Schemes Hub';
+      case 'revision': return 'the Revision Notes & Examiner Summaries';
+      case 'quiz': return 'Past Paper Mock Quizzes & Tests';
+      case 'flashcards': return 'Flashcards & Spaced Repetition';
+      case 'formulas': return 'Formulas & Command Words';
+      case 'chat': return 'the AI Chief Examiner Chat';
+      case 'checklist': return 'the Interactive Syllabus Checklist';
+      case 'esl-speaking': return 'the ESL Speaking Oral Exam Simulator';
+      case 'boundaries': return 'the Grade Boundaries Calculator';
+      case 'split': return 'the Split-Screen Exam Viewer';
+      case 'admin': return 'the Administrative Control Console';
+      default: return 'this study resource';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
       {/* Top Navbar */}
@@ -338,6 +377,7 @@ export function App() {
 
       {/* Main Container */}
       <main className={`flex-1 px-3 py-3 sm:px-6 sm:py-8 max-w-7xl mx-auto w-full ${activeTab === 'chat' ? 'pb-20 md:pb-8' : 'pb-24 md:pb-8'}`}>
+        {/* Homepage: Always accessible */}
         {activeTab === 'home' && (
           <HomeView
             subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
@@ -345,103 +385,148 @@ export function App() {
             onSelectSubject={setActiveSubject}
             onNavigateTab={setActiveTab}
             profile={profile}
-          />
-        )}
-
-        {activeTab === 'solver' && (
-          <QuestionSolver
-            subject={activeSubject}
-            profile={profile}
-            onOpenChatWithQuestion={handleOpenChatWithQuestion}
-          />
-        )}
-
-        {activeTab === 'finder' && (
-          <PastPaperFinder
-            activeSubject={activeSubject}
-            subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
-            profile={profile}
-            onOpenChatWithQuestion={handleOpenChatWithQuestion}
-            onOpenSolverWithQuestion={() => setActiveTab('solver')}
-            onOpenSplitViewer={() => setActiveTab('split')}
-          />
-        )}
-
-        {activeTab === 'checklist' && (
-          <SyllabusChecklist
-            activeSubject={activeSubject}
-            profile={profile}
-            onTriggerDiagnosticQuiz={handleTriggerDiagnosticQuiz}
-            onOpenAiChatWithTopic={(topic) => {
-              setChatInitialQuestion(`Explain official Cambridge syllabus topic: "${topic}". Include key definitions, formulas, and typical exam questions with mark scheme points.`);
-              setActiveTab('chat');
+            currentUser={currentUser}
+            onOpenAuth={(mode) => {
+              setAuthMode(mode || 'signin');
+              setIsAuthOpen(true);
             }}
           />
         )}
 
-        {activeTab === 'esl-speaking' && (
-          <EslSpeakingSimulator
-            activeSubject={activeSubject}
-            profile={profile}
+        {/* Admin Dashboard */}
+        {activeTab === 'admin' && (
+          currentUser?.role === 'admin' ? (
+            <AdminDashboard
+              currentUser={currentUser}
+              onRefreshUser={handleRefreshStatus}
+            />
+          ) : (
+            <AccountGate
+              currentUser={currentUser}
+              onOpenAuth={(mode) => {
+                setAuthMode(mode || 'signin');
+                setIsAuthOpen(true);
+              }}
+              onRefreshStatus={handleRefreshStatus}
+              onLogout={handleLogout}
+              featureName={getTabFeatureName('admin')}
+            />
+          )
+        )}
+
+        {/* Access Gate: Displayed when user lacks an active approved account */}
+        {activeTab !== 'home' && activeTab !== 'admin' && !canAccessTools && (
+          <AccountGate
+            currentUser={currentUser}
+            onOpenAuth={(mode) => {
+              setAuthMode(mode || 'signin');
+              setIsAuthOpen(true);
+            }}
+            onRefreshStatus={handleRefreshStatus}
+            onLogout={handleLogout}
+            featureName={getTabFeatureName(activeTab)}
           />
         )}
 
-        {activeTab === 'flashcards' && (
-          <FlashcardsView
-            subject={activeSubject}
-            profile={profile}
-            flashcards={flashcards}
-            onAddFlashcards={handleAddFlashcards}
-            onUpdateFlashcardMastery={handleUpdateFlashcardMastery}
-          />
-        )}
+        {/* Study Tools: Rendered only when student has an approved account or is admin */}
+        {canAccessTools && (
+          <>
+            {activeTab === 'solver' && (
+              <QuestionSolver
+                subject={activeSubject}
+                profile={profile}
+                onOpenChatWithQuestion={handleOpenChatWithQuestion}
+              />
+            )}
 
-        {activeTab === 'quiz' && (
-          <QuizView
-            subject={activeSubject}
-            profile={profile}
-            quizzes={quizzes}
-            onAddQuizzes={handleAddQuizzes}
-          />
-        )}
+            {activeTab === 'finder' && (
+              <PastPaperFinder
+                activeSubject={activeSubject}
+                subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
+                profile={profile}
+                onOpenChatWithQuestion={handleOpenChatWithQuestion}
+                onOpenSolverWithQuestion={() => setActiveTab('solver')}
+                onOpenSplitViewer={() => setActiveTab('split')}
+              />
+            )}
 
-        {activeTab === 'revision' && (
-          <RevisionNotesView
-            subject={activeSubject}
-            profile={profile}
-            revisionNotes={revisionNotes}
-            onAddRevisionNote={handleAddRevisionNote}
-          />
-        )}
+            {activeTab === 'checklist' && (
+              <SyllabusChecklist
+                activeSubject={activeSubject}
+                profile={profile}
+                onTriggerDiagnosticQuiz={handleTriggerDiagnosticQuiz}
+                onOpenAiChatWithTopic={(topic) => {
+                  setChatInitialQuestion(`Explain official Cambridge syllabus topic: "${topic}". Include key definitions, formulas, and typical exam questions with mark scheme points.`);
+                  setActiveTab('chat');
+                }}
+              />
+            )}
 
-        {activeTab === 'formulas' && (
-          <FormulaDictionary
-            subject={activeSubject}
-            formulas={formulas}
-          />
-        )}
+            {activeTab === 'esl-speaking' && (
+              <EslSpeakingSimulator
+                activeSubject={activeSubject}
+                profile={profile}
+              />
+            )}
 
-        {activeTab === 'chat' && (
-          <AiTutorChat
-            subject={activeSubject}
-            profile={profile}
-            initialQuestion={chatInitialQuestion}
-            onClearInitialQuestion={() => setChatInitialQuestion(undefined)}
-          />
-        )}
+            {activeTab === 'flashcards' && (
+              <FlashcardsView
+                subject={activeSubject}
+                profile={profile}
+                flashcards={flashcards}
+                onAddFlashcards={handleAddFlashcards}
+                onUpdateFlashcardMastery={handleUpdateFlashcardMastery}
+              />
+            )}
 
-        {activeTab === 'boundaries' && (
-          <GradeBoundariesCalculator
-            activeSubject={activeSubject}
-            profile={profile}
-          />
-        )}
+            {activeTab === 'quiz' && (
+              <QuizView
+                subject={activeSubject}
+                profile={profile}
+                quizzes={quizzes}
+                onAddQuizzes={handleAddQuizzes}
+              />
+            )}
 
-        {activeTab === 'split' && (
-          <SplitScreenPaperViewer
-            activeSubject={activeSubject}
-            profile={profile}
-          />
+            {activeTab === 'revision' && (
+              <RevisionNotesView
+                subject={activeSubject}
+                profile={profile}
+                revisionNotes={revisionNotes}
+                onAddRevisionNote={handleAddRevisionNote}
+              />
+            )}
+
+            {activeTab === 'formulas' && (
+              <FormulaDictionary
+                subject={activeSubject}
+                formulas={formulas}
+              />
+            )}
+
+            {activeTab === 'chat' && (
+              <AiTutorChat
+                subject={activeSubject}
+                profile={profile}
+                initialQuestion={chatInitialQuestion}
+                onClearInitialQuestion={() => setChatInitialQuestion(undefined)}
+              />
+            )}
+
+            {activeTab === 'boundaries' && (
+              <GradeBoundariesCalculator
+                activeSubject={activeSubject}
+                profile={profile}
+              />
+            )}
+
+            {activeTab === 'split' && (
+              <SplitScreenPaperViewer
+                activeSubject={activeSubject}
+                profile={profile}
+              />
+            )}
+          </>
         )}
       </main>
 

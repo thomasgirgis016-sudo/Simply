@@ -4,6 +4,9 @@ export type GradeLevel = 'Year 9 / Grade 8' | 'Year 10 / Grade 9 (IGCSE Yr 1)' |
 
 export type TargetGrade = '9 / A*' | '8 / A*' | '7 / A' | '6 / B' | '5 / C';
 
+export type AccountStatus = 'pending' | 'approved' | 'rejected' | 'suspended';
+export type UserRole = 'student' | 'admin';
+
 export interface UserAccount {
   id: string;
   name: string;
@@ -13,6 +16,10 @@ export interface UserAccount {
   board: ExamBoard;
   targetGrade: TargetGrade;
   selectedSubjectIds: string[];
+  role?: UserRole;
+  status?: AccountStatus;
+  approvedAt?: string;
+  approvedBy?: string;
   createdAt: string;
 }
 
@@ -41,6 +48,8 @@ export interface UserProfile {
   board: ExamBoard;
   targetGrade: TargetGrade;
   selectedSubjectIds: string[];
+  role?: UserRole;
+  status?: AccountStatus;
   geminiApiKey?: string; // Optional admin override
   selectedModel: string;
 }

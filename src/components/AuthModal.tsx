@@ -264,6 +264,24 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               </div>
             </div>
 
+            {/* Quick Admin Credential Fill */}
+            <div className="rounded-xl border border-purple-500/30 bg-purple-950/20 p-3 flex items-center justify-between text-xs">
+              <div>
+                <span className="font-bold text-purple-300 block">School Admin Access</span>
+                <span className="text-[11px] text-slate-400 font-mono">admin@simplyigcse.com</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail('admin@simplyigcse.com');
+                  setPassword('AdminPassword123!');
+                }}
+                className="rounded-lg bg-purple-600/30 border border-purple-500/40 px-2.5 py-1 text-[11px] font-bold text-purple-200 hover:bg-purple-600 hover:text-white transition cursor-pointer"
+              >
+                Fill Admin Details
+              </button>
+            </div>
+
             <button
               type="submit"
               disabled={loading}
@@ -277,6 +295,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         {/* 2. SIGN UP FORM */}
         {mode === 'signup' && (
           <form onSubmit={handleSignUp} className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
+            <div className="rounded-xl border border-amber-500/30 bg-amber-950/20 p-2.5 text-xs text-amber-200/90 leading-relaxed">
+              <span className="font-bold text-amber-300">Notice:</span> New student accounts are reviewed and accepted by an administrator before study tools are unlocked.
+            </div>
+
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
                 Full Name / Nickname

@@ -22,7 +22,9 @@ import {
   Search,
   ListChecks,
   Mic,
-  Home
+  Home,
+  Crown,
+  ShieldCheck
 } from 'lucide-react';
 import { UserProfile, Subject, UserAccount } from '../types';
 
@@ -38,7 +40,8 @@ export type ActiveTab =
   | 'formulas'
   | 'chat'
   | 'boundaries'
-  | 'split';
+  | 'split'
+  | 'admin';
 
 interface NavbarProps {
   profile: UserProfile;
@@ -71,7 +74,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
-  const navTabs = [
+  const baseTabs = [
     { id: 'home', label: 'Home', icon: Home, color: 'text-indigo-400' },
     { id: 'finder', label: 'Past Papers', icon: Search, color: 'text-amber-400' },
     { id: 'revision', label: 'Revision Notes', icon: BookOpen, color: 'text-cyan-400' },
@@ -85,6 +88,10 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'boundaries', label: 'Grade Boundaries', icon: TrendingUp, color: 'text-teal-400' },
     { id: 'split', label: 'Split-Screen Papers', icon: Columns, color: 'text-sky-400' },
   ];
+
+  const navTabs = currentUser?.role === 'admin'
+    ? [...baseTabs, { id: 'admin', label: 'Admin Console', icon: ShieldCheck, color: 'text-purple-400' }]
+    : baseTabs;
 
   const handleMobileTabClick = (tabId: ActiveTab) => {
     onSelectTab(tabId);
@@ -160,6 +167,27 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="hidden sm:flex items-center gap-2">
             {currentUser ? (
               <div className="flex items-center gap-2">
+                {currentUser.role === 'admin' && (
+                  <button
+                    onClick={() => onSelectTab('admin')}
+                    className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
+                      activeTab === 'admin'
+                        ? 'border-purple-500 bg-purple-600 text-white shadow-md'
+                        : 'border-purple-500/30 bg-purple-950/40 text-purple-300 hover:bg-purple-900/50'
+                    }`}
+                    title="Administrative Dashboard & Account Approvals"
+                  >
+                    <Crown className="h-3.5 w-3.5 text-purple-400" />
+                    <span>Admin</span>
+                  </button>
+                )}
+
+                {currentUser.status === 'pending' && (
+                  <span className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-[10px] font-bold text-amber-300 animate-pulse">
+                    Pending Approval
+                  </span>
+                )}
+
                 <button
                   onClick={onOpenProfile}
                   className="flex items-center gap-2 rounded-xl border border-indigo-500/30 bg-indigo-950/40 px-3 py-1.5 text-xs font-semibold text-indigo-200 hover:bg-indigo-900/50 transition cursor-pointer"

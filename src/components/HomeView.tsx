@@ -20,9 +20,12 @@ import {
   ChevronRight,
   ShieldCheck,
   Star,
-  BookMarked
+  BookMarked,
+  Clock,
+  Crown,
+  KeyRound
 } from 'lucide-react';
-import { Subject, UserProfile, BookmarkItem } from '../types';
+import { Subject, UserProfile, BookmarkItem, UserAccount } from '../types';
 import { PAST_PAPERS_DATABASE } from '../data/pastPapersData';
 import { INITIAL_REVISION_NOTES, INITIAL_FORMULAS } from '../data/initialData';
 import { ActiveTab } from './Navbar';
@@ -33,6 +36,8 @@ interface HomeViewProps {
   onSelectSubject: (subject: Subject) => void;
   onNavigateTab: (tab: ActiveTab) => void;
   profile: UserProfile;
+  currentUser?: UserAccount | null;
+  onOpenAuth?: (mode?: 'signin' | 'signup') => void;
 }
 
 export const HomeView: React.FC<HomeViewProps> = ({
@@ -41,6 +46,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
   onSelectSubject,
   onNavigateTab,
   profile,
+  currentUser,
+  onOpenAuth,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [boardFilter, setBoardFilter] = useState<'All' | 'CIE' | 'Edexcel'>('All');
@@ -314,6 +321,69 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </div>
         </div>
       </section>
+
+      {/* Account Status / Auth Callout Banner */}
+      {!currentUser ? (
+        <div className="rounded-2xl border border-indigo-500/30 bg-gradient-to-r from-indigo-950/40 via-purple-950/25 to-slate-900 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xl">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-600/30 text-indigo-300 border border-indigo-500/30">
+              <KeyRound className="h-5 w-5 text-indigo-400" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-white">Student Account Required for Tool Access</h3>
+              <p className="text-xs text-slate-300">Sign in or register a new student account to unlock the AI Question Solver, Past Papers, and Quizzes.</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+            {onOpenAuth && (
+              <>
+                <button
+                  onClick={() => onOpenAuth('signin')}
+                  className="rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2 text-xs font-semibold text-slate-200 hover:text-white transition cursor-pointer"
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={() => onOpenAuth('signup')}
+                  className="rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 px-4 py-2 text-xs font-bold text-white shadow-md hover:from-indigo-400 hover:to-purple-500 transition cursor-pointer"
+                >
+                  Register Account
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      ) : currentUser.status === 'pending' ? (
+        <div className="rounded-2xl border border-amber-500/40 bg-gradient-to-r from-amber-950/30 via-slate-900 to-amber-950/20 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xl">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30">
+              <Clock className="h-5 w-5 text-amber-400 animate-pulse" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-white">Your Account is Awaiting Admin Approval</h3>
+              <p className="text-xs text-amber-200/80">An administrator is reviewing your registration ({currentUser.email}). You will gain full access as soon as it is accepted.</p>
+            </div>
+          </div>
+        </div>
+      ) : currentUser.role === 'admin' ? (
+        <div className="rounded-2xl border border-purple-500/40 bg-gradient-to-r from-purple-950/30 via-slate-900 to-indigo-950/25 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xl">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/30">
+              <Crown className="h-5 w-5 text-purple-400" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-white">Administrator Mode Active</h3>
+              <p className="text-xs text-purple-200/80">You can review and accept new student accounts in the Admin Console.</p>
+            </div>
+          </div>
+          <button
+            onClick={() => onNavigateTab('admin')}
+            className="rounded-xl bg-purple-600 px-4 py-2 text-xs font-bold text-white shadow-md hover:bg-purple-500 transition cursor-pointer shrink-0"
+          >
+            Open Admin Console
+          </button>
+        </div>
+      ) : null}
 
       {/* 2. Main 4 Core Action Pillars (Instant Access) */}
       <section className="space-y-4">
