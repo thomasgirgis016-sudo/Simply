@@ -24,7 +24,9 @@ import {
   Mic,
   Home,
   Crown,
-  ShieldCheck
+  ShieldCheck,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { UserProfile, Subject, UserAccount } from '../types';
 
@@ -56,6 +58,8 @@ interface NavbarProps {
   onLogout: () => void;
   onOpenSettings: () => void;
   onOpenCalculator?: () => void;
+  theme?: 'dark' | 'light';
+  onToggleTheme?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -71,6 +75,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onLogout,
   onOpenSettings,
   onOpenCalculator,
+  theme = 'dark',
+  onToggleTheme,
 }) => {
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
@@ -227,11 +233,23 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             )}
 
+            {/* Theme Toggle (Light / Dark) */}
+            {onToggleTheme && (
+              <button
+                onClick={onToggleTheme}
+                className="rounded-xl border border-slate-800/80 bg-slate-900/60 p-2 text-slate-400 hover:bg-slate-800 hover:text-amber-400 transition cursor-pointer"
+                title={theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+                aria-label="Toggle Theme"
+              >
+                {theme === 'dark' ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-indigo-400" />}
+              </button>
+            )}
+
             {/* Subtle admin/system settings gear */}
             <button
               onClick={onOpenSettings}
               className="rounded-xl border border-slate-800/80 bg-slate-900/60 p-2 text-slate-400 hover:bg-slate-800 hover:text-white transition cursor-pointer"
-              title="AI Model & Admin Settings"
+              title="AI Model & Accessibility Settings"
             >
               <Settings className="h-4 w-4" />
             </button>
@@ -437,6 +455,18 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </div>
               )}
 
+              {onToggleTheme && (
+                <button
+                  onClick={() => {
+                    onToggleTheme();
+                  }}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl border border-slate-800 bg-slate-900/60 py-2 text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer"
+                >
+                  {theme === 'dark' ? <Sun className="h-3.5 w-3.5 text-amber-400" /> : <Moon className="h-3.5 w-3.5 text-indigo-400" />}
+                  <span>{theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}</span>
+                </button>
+              )}
+
               <button
                 onClick={() => {
                   onOpenSettings();
@@ -445,7 +475,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 className="w-full flex items-center justify-center gap-2 rounded-xl border border-slate-800 bg-slate-900/60 py-2 text-xs font-semibold text-slate-400 hover:text-white transition cursor-pointer"
               >
                 <Settings className="h-3.5 w-3.5" />
-                <span>AI Model Settings</span>
+                <span>AI Model & Font Settings</span>
               </button>
             </div>
           </div>

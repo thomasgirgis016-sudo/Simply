@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Key, X, ExternalLink, CheckCircle2, AlertCircle, Sparkles, ShieldCheck } from 'lucide-react';
+import { Key, X, ExternalLink, CheckCircle2, AlertCircle, Sparkles, ShieldCheck, Sun, Moon, Type } from 'lucide-react';
 import { UserProfile } from '../types';
 
 interface SettingsModalProps {
@@ -7,6 +7,10 @@ interface SettingsModalProps {
   onClose: () => void;
   profile: UserProfile;
   onUpdateProfile: (updated: Partial<UserProfile>) => void;
+  theme?: 'dark' | 'light';
+  onToggleTheme?: () => void;
+  fontSize?: 'default' | 'medium' | 'large';
+  onChangeFontSize?: (size: 'default' | 'medium' | 'large') => void;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -14,6 +18,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onClose,
   profile,
   onUpdateProfile,
+  theme = 'dark',
+  onToggleTheme,
+  fontSize = 'default',
+  onChangeFontSize,
 }) => {
   const [apiKey, setApiKey] = useState(profile.geminiApiKey || '');
   const [model, setModel] = useState(profile.selectedModel || 'gemini-2.5-flash');
@@ -117,6 +125,61 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <p className="mt-1 text-[11px] text-slate-400">
               Keys are stored securely in your browser's local storage and are never uploaded to any intermediary servers.
             </p>
+          </div>
+
+          {/* Theme & Display Accessibility */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-2 border-b border-slate-800">
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+                Theme Mode
+              </label>
+              <div className="flex rounded-xl bg-slate-950 p-1 border border-slate-700">
+                <button
+                  type="button"
+                  onClick={() => onToggleTheme && theme !== 'dark' && onToggleTheme()}
+                  className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-bold transition ${
+                    theme === 'dark' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Moon className="h-3.5 w-3.5" />
+                  <span>Dark</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onToggleTheme && theme !== 'light' && onToggleTheme()}
+                  className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-bold transition ${
+                    theme === 'light' ? 'bg-amber-500 text-slate-950 shadow-sm' : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Sun className="h-3.5 w-3.5" />
+                  <span>Light</span>
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+                Text Size Scaling
+              </label>
+              <div className="flex rounded-xl bg-slate-950 p-1 border border-slate-700">
+                {[
+                  { id: 'default', label: 'Default' },
+                  { id: 'medium', label: 'Medium' },
+                  { id: 'large', label: 'Large' },
+                ].map((s) => (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => onChangeFontSize && onChangeFontSize(s.id as any)}
+                    className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition ${
+                      fontSize === s.id ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
           <div>

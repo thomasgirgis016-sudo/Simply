@@ -295,8 +295,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         {/* 2. SIGN UP FORM */}
         {mode === 'signup' && (
           <form onSubmit={handleSignUp} className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
-            <div className="rounded-xl border border-amber-500/30 bg-amber-950/20 p-2.5 text-xs text-amber-200/90 leading-relaxed">
-              <span className="font-bold text-amber-300">Notice:</span> New student accounts are reviewed and accepted by an administrator before study tools are unlocked.
+            <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-2.5 text-xs text-emerald-200/90 leading-relaxed flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-emerald-400 shrink-0" />
+              <span><strong className="text-emerald-300 font-semibold">Instant Student Activation:</strong> Your student account activates immediately with instant access to past papers, AI solvers, flashcards, and quizzes!</span>
             </div>
 
             <div>

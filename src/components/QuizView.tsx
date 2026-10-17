@@ -169,6 +169,41 @@ export const QuizView: React.FC<QuizViewProps> = ({
     }
   };
 
+  // Keyboard navigation: 1-4 or A-D to select options, Enter to submit & advance
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+        return;
+      }
+      if (isAiModalOpen || isHistoryModalOpen || isQuizFinished || !currentQuestion) return;
+
+      const upper = e.key.toUpperCase();
+      const num = parseInt(e.key, 10);
+
+      if (num >= 1 && num <= currentQuestion.options.length) {
+        e.preventDefault();
+        handleSelectOption(currentQuestion.options[num - 1].id);
+      } else if (['A', 'B', 'C', 'D'].includes(upper)) {
+        const index = upper.charCodeAt(0) - 65;
+        if (index >= 0 && index < currentQuestion.options.length) {
+          e.preventDefault();
+          handleSelectOption(currentQuestion.options[index].id);
+        }
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (!isAnswerSubmitted && selectedOptionId) {
+          handleSubmitAnswer();
+        } else if (isAnswerSubmitted) {
+          handleNextQuestion();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentQuestion, isAnswerSubmitted, selectedOptionId, isQuizFinished, isAiModalOpen, isHistoryModalOpen]);
+
   const handleRestart = () => {
     setCurrentIdx(0);
     setSelectedOptionId(null);
@@ -490,6 +525,10 @@ export const QuizView: React.FC<QuizViewProps> = ({
                   optClass = 'border-indigo-500 bg-indigo-950/40 text-white ring-1 ring-indigo-500';
                 }
 
+                const optionIndex = currentQuestion.options.findIndex(o => o.id === opt.id);
+                const letter = String.fromCharCode(65 + Math.max(0, optionIndex));
+                const num = Math.max(0, optionIndex) + 1;
+
                 return (
                   <div
                     key={opt.id}
@@ -497,8 +536,9 @@ export const QuizView: React.FC<QuizViewProps> = ({
                     className={`flex items-center justify-between rounded-2xl border p-4 cursor-pointer transition select-none ${optClass}`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="h-6 w-6 rounded-lg border border-slate-700 bg-slate-900 flex items-center justify-center text-xs font-bold text-slate-300">
-                        {opt.id.replace('opt-', '').toUpperCase()}
+                      <div className="h-7 px-2 rounded-lg border border-slate-700 bg-slate-900 flex items-center justify-center text-xs font-bold text-slate-300 shrink-0 gap-1 font-mono">
+                        <span>{letter}</span>
+                        <span className="text-[10px] text-slate-500 hidden sm:inline">/{num}</span>
                       </div>
                       <MathRenderer content={opt.text} className="text-sm font-medium" />
                     </div>
@@ -516,8 +556,14 @@ export const QuizView: React.FC<QuizViewProps> = ({
 
             {/* Submission / Navigation Bar */}
             <div className="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-t border-slate-800 pt-5">
-              <div className="text-xs text-slate-400 text-center sm:text-left">
-                Score: <span className="font-bold text-emerald-400">{userScore} correct</span>
+              <div className="flex items-center justify-between sm:justify-start gap-3">
+                <div className="text-xs text-slate-400">
+                  Score: <span className="font-bold text-emerald-400">{userScore} correct</span>
+                </div>
+                <div className="hidden md:flex items-center gap-1.5 text-[11px] text-slate-500">
+                  <span>•</span>
+                  <span>Keys: <kbd className="px-1 py-0.5 rounded bg-slate-800 border border-slate-700 font-mono text-[10px] text-slate-300">1-4</kbd> / <kbd className="px-1 py-0.5 rounded bg-slate-800 border border-slate-700 font-mono text-[10px] text-slate-300">A-D</kbd> Select, <kbd className="px-1 py-0.5 rounded bg-slate-800 border border-slate-700 font-mono text-[10px] text-slate-300">Enter</kbd> Next</span>
+                </div>
               </div>
 
               {!isAnswerSubmitted ? (

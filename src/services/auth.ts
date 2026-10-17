@@ -130,10 +130,11 @@ export async function registerStudent(params: {
 
   const passwordHash = await hashPassword(params.password);
 
-  // New students start with 'pending' status unless it's the admin email
+  // Standard student accounts activate immediately!
+  // Manual approval is strictly reserved for special administrative requests.
   const isAdminEmail = normalizedEmail === 'admin@simplyigcse.com';
   const role: UserRole = isAdminEmail ? 'admin' : 'student';
-  const status: AccountStatus = isAdminEmail ? 'approved' : 'pending';
+  const status: AccountStatus = 'approved';
 
   const newUser: UserAccount = {
     id: `student_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
@@ -156,7 +157,7 @@ export async function registerStudent(params: {
   return {
     success: true,
     user: newUser,
-    isPendingApproval: status === 'pending'
+    isPendingApproval: false
   };
 }
 
@@ -336,6 +337,22 @@ export function approveAllPendingUsers(adminEmail?: string): number {
       u.status = 'approved';
       u.approvedAt = new Date().toISOString();
       u.approvedBy = adminEmail || 'Admin';
+      count++;
+    }
+  }
+  if (count > 0) {
+    saveAllUsers(users);
+  }
+  return count;
+}
+
+// Batch reject all pending users
+export function rejectAllPendingUsers(adminEmail?: string): number {
+  const users = getAllUsers();
+  let count = 0;
+  for (const u of users) {
+    if (u.status === 'pending') {
+      u.status = 'rejected';
       count++;
     }
   }

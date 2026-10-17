@@ -23,7 +23,10 @@ import {
   BookMarked,
   Clock,
   Crown,
-  KeyRound
+  KeyRound,
+  RotateCcw,
+  Check,
+  AlertTriangle
 } from 'lucide-react';
 import { Subject, UserProfile, BookmarkItem, UserAccount } from '../types';
 import { PAST_PAPERS_DATABASE } from '../data/pastPapersData';
@@ -60,6 +63,52 @@ export const HomeView: React.FC<HomeViewProps> = ({
       return [];
     }
   });
+
+  // 1-Click Guest Sandbox State
+  const [sandboxTab, setSandboxTab] = useState<'flashcards' | 'quiz' | 'photo'>('flashcards');
+  const [sandboxCardIdx, setSandboxCardIdx] = useState(0);
+  const [sandboxCardFlipped, setSandboxCardFlipped] = useState(false);
+  const [sandboxQuizSelected, setSandboxQuizSelected] = useState<number | null>(null);
+
+  const sampleFlashcards = [
+    {
+      subject: 'CIE 0580 Mathematics',
+      topic: 'Algebra & Quadratics',
+      question: 'What is the Quadratic Formula and what does the discriminant b² - 4ac indicate?',
+      answer: 'Formula: x = (-b ± √(b² - 4ac)) / (2a).\n• If b² - 4ac > 0: Two distinct real roots.\n• If b² - 4ac = 0: One repeated real root.\n• If b² - 4ac < 0: No real roots.',
+      formula: 'x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}',
+      tip: 'The division is over 2a for the entire numerator, not just the square root!'
+    },
+    {
+      subject: 'CIE 0625 Physics',
+      topic: 'Waves & Light Refraction',
+      question: 'State Snell’s Law for refraction and the condition for Total Internal Reflection (TIR).',
+      answer: 'Snell’s Law: n = sin(i) / sin(r).\nCritical Angle (c): sin(c) = 1/n.\nTIR occurs when light travels from a denser to a less dense medium and the angle of incidence i exceeds the critical angle c.',
+      formula: 'n = \\frac{\\sin i}{\\sin r} = \\frac{1}{\\sin c}',
+      tip: 'Remember that the refractive index n is always > 1 when entering from air or vacuum.'
+    },
+    {
+      subject: 'CIE 0620 Chemistry',
+      topic: 'Redox & Electrochemistry',
+      question: 'Define oxidation and reduction in terms of electron transfer and state the OIL RIG rule.',
+      answer: 'OIL RIG:\n• Oxidation Is Loss of electrons (increase in oxidation number).\n• Reduction Is Gain of electrons (decrease in oxidation number).\nAn oxidizing agent takes electrons and is itself reduced.',
+      formula: '\\text{Zn} + \\text{Cu}^{2+} \\rightarrow \\text{Zn}^{2+} + \\text{Cu}',
+      tip: 'Identify oxidation numbers on both sides of the equation to pinpoint electron movement.'
+    }
+  ];
+
+  const sampleQuiz = {
+    subject: 'Cambridge IGCSE Physics (0625/42)',
+    topic: 'Kinematics & Speed-Time Calculation',
+    question: 'A train accelerates uniformly from rest at 2.0 m/s² for 10 seconds. Calculate the total distance traveled during this acceleration.',
+    options: [
+      { text: '20 m', correct: false },
+      { text: '100 m', correct: true },
+      { text: '200 m', correct: false },
+      { text: '50 m', correct: false }
+    ],
+    explanation: 'Using kinematic equation s = ut + ½at²:\nSince starting from rest, u = 0.\ns = (0)(10) + ½(2.0)(10)² = ½(2.0)(100) = 100 m.\n[M1] for correctly selecting and applying s = ½at²\n[A1] for 100 m with correct units.'
+  };
 
   // Unique categories for filtering
   const categories = useMemo(() => {
@@ -384,6 +433,343 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </button>
         </div>
       ) : null}
+
+      {/* 1-Click Guest Sandbox (Try Before Registering) */}
+      <section className="rounded-3xl border border-indigo-500/30 bg-gradient-to-br from-slate-900/90 via-indigo-950/20 to-slate-900/90 p-5 sm:p-7 shadow-2xl space-y-5">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+          <div className="space-y-1">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-indigo-500/20 px-3 py-1 text-[11px] font-bold text-indigo-300 border border-indigo-500/30">
+              <Sparkles className="h-3.5 w-3.5 text-indigo-400" />
+              <span>1-Click Guest Sandbox · Instant Test Drive</span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+              Test Simply IGCSE Tools in 1 Click
+            </h2>
+            <p className="text-xs text-slate-300">
+              Try sample interactive study tools below before creating your free account. Instant student activation upon sign-up!
+            </p>
+          </div>
+
+          {/* Sandbox Feature Tabs */}
+          <div className="flex items-center gap-1.5 bg-slate-950/80 p-1.5 rounded-2xl border border-slate-800 self-start md:self-auto">
+            <button
+              onClick={() => {
+                setSandboxTab('flashcards');
+                setSandboxCardFlipped(false);
+              }}
+              className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
+                sandboxTab === 'flashcards'
+                  ? 'bg-indigo-600 text-white shadow-md'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Layers className="h-3.5 w-3.5" />
+              <span>3 Flashcards</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setSandboxTab('quiz');
+              }}
+              className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
+                sandboxTab === 'quiz'
+                  ? 'bg-purple-600 text-white shadow-md'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <CheckCircle className="h-3.5 w-3.5" />
+              <span>1 Real Quiz</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setSandboxTab('photo');
+              }}
+              className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
+                sandboxTab === 'photo'
+                  ? 'bg-emerald-600 text-white shadow-md'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Camera className="h-3.5 w-3.5" />
+              <span>1 AI Photo Solve</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Sandbox Content Area */}
+        {sandboxTab === 'flashcards' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between text-xs text-slate-400">
+              <span className="font-semibold text-indigo-300">
+                Card {sandboxCardIdx + 1} of {sampleFlashcards.length} · {sampleFlashcards[sandboxCardIdx].subject}
+              </span>
+              <span className="text-[11px] text-slate-500">
+                Click card or press flip to reveal Cambridge mark scheme answer
+              </span>
+            </div>
+
+            {/* Interactive Flippable Card */}
+            <div
+              onClick={() => setSandboxCardFlipped(!sandboxCardFlipped)}
+              className="relative min-h-[220px] rounded-2xl border border-slate-700 bg-slate-950 p-6 shadow-xl cursor-pointer hover:border-indigo-500/60 transition flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="rounded-lg bg-indigo-500/20 px-2.5 py-1 text-[11px] font-bold text-indigo-300">
+                    {sampleFlashcards[sandboxCardIdx].topic}
+                  </span>
+                  <span className="flex items-center gap-1 text-[11px] font-semibold text-slate-400">
+                    <RotateCcw className="h-3 w-3" />
+                    <span>{sandboxCardFlipped ? 'Answer View' : 'Question View'} (Click to flip)</span>
+                  </span>
+                </div>
+
+                {!sandboxCardFlipped ? (
+                  <div className="space-y-3">
+                    <p className="text-base sm:text-lg font-bold text-white leading-snug">
+                      {sampleFlashcards[sandboxCardIdx].question}
+                    </p>
+                    <div className="rounded-xl bg-slate-900/80 p-3 border border-slate-800 text-xs text-slate-400">
+                      💡 Tip: Formulate your answer first, then flip to check against examiner criteria.
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3 animate-fadeIn">
+                    <div className="text-sm text-emerald-300 whitespace-pre-line font-medium leading-relaxed">
+                      {sampleFlashcards[sandboxCardIdx].answer}
+                    </div>
+
+                    <div className="rounded-xl bg-slate-900/90 border border-slate-800 p-2.5 text-xs">
+                      <span className="text-slate-400 font-semibold block mb-0.5">Key Equation / Formula:</span>
+                      <code className="text-indigo-300 font-mono text-xs">{sampleFlashcards[sandboxCardIdx].formula}</code>
+                    </div>
+
+                    <div className="text-[11px] text-amber-300/90 bg-amber-950/30 border border-amber-500/20 rounded-xl p-2.5">
+                      ⚠️ Examiner Tip: {sampleFlashcards[sandboxCardIdx].tip}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center justify-between pt-4 border-t border-slate-800/80 mt-4">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSandboxCardIdx((prev) => (prev > 0 ? prev - 1 : sampleFlashcards.length - 1));
+                    setSandboxCardFlipped(false);
+                  }}
+                  className="rounded-xl border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white cursor-pointer"
+                >
+                  ← Previous Card
+                </button>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSandboxCardFlipped(!sandboxCardFlipped);
+                  }}
+                  className="rounded-xl bg-indigo-600 px-4 py-1.5 text-xs font-bold text-white shadow-md hover:bg-indigo-500 cursor-pointer"
+                >
+                  {sandboxCardFlipped ? 'Show Question' : 'Reveal Answer'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSandboxCardIdx((prev) => (prev + 1) % sampleFlashcards.length);
+                    setSandboxCardFlipped(false);
+                  }}
+                  className="rounded-xl border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white cursor-pointer"
+                >
+                  Next Card →
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {sandboxTab === 'quiz' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between text-xs text-slate-400">
+              <span className="font-semibold text-purple-300">
+                {sampleQuiz.subject} · {sampleQuiz.topic}
+              </span>
+              <span className="text-[11px] text-slate-500">
+                Select an option for instant mark scheme analysis
+              </span>
+            </div>
+
+            <div className="rounded-2xl border border-slate-700 bg-slate-950 p-6 shadow-xl space-y-4">
+              <h3 className="text-base sm:text-lg font-bold text-white leading-snug">
+                {sampleQuiz.question}
+              </h3>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {sampleQuiz.options.map((opt, i) => {
+                  const isSelected = sandboxQuizSelected === i;
+                  const isAnswered = sandboxQuizSelected !== null;
+                  return (
+                    <button
+                      key={i}
+                      disabled={isAnswered}
+                      onClick={() => setSandboxQuizSelected(i)}
+                      className={`flex items-center justify-between rounded-xl border p-3.5 text-left text-xs font-semibold transition cursor-pointer ${
+                        !isAnswered
+                          ? 'border-slate-800 bg-slate-900 text-slate-200 hover:border-purple-500 hover:bg-slate-800'
+                          : opt.correct
+                          ? 'border-emerald-500 bg-emerald-950/40 text-emerald-200'
+                          : isSelected
+                          ? 'border-rose-500 bg-rose-950/40 text-rose-200'
+                          : 'border-slate-800 bg-slate-900/50 text-slate-500'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-slate-800 text-[11px] font-bold text-slate-300">
+                          {String.fromCharCode(65 + i)}
+                        </span>
+                        <span>{opt.text}</span>
+                      </div>
+                      {isAnswered && opt.correct && (
+                        <Check className="h-4 w-4 text-emerald-400 shrink-0" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {sandboxQuizSelected !== null && (
+                <div className="rounded-xl border border-slate-800 bg-slate-900/90 p-4 space-y-2 animate-fadeIn">
+                  <div className="flex items-center gap-2">
+                    {sampleQuiz.options[sandboxQuizSelected].correct ? (
+                      <span className="flex items-center gap-1 text-xs font-bold text-emerald-400">
+                        <Check className="h-4 w-4" /> Correct Answer! (+2 Marks)
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1 text-xs font-bold text-rose-400">
+                        <AlertTriangle className="h-4 w-4" /> Incorrect Selection
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-xs text-slate-300 whitespace-pre-line leading-relaxed">
+                    {sampleQuiz.explanation}
+                  </div>
+                  <button
+                    onClick={() => setSandboxQuizSelected(null)}
+                    className="mt-2 text-xs text-purple-400 hover:underline font-semibold cursor-pointer"
+                  >
+                    Try again
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {sandboxTab === 'photo' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between text-xs text-slate-400">
+              <span className="font-semibold text-emerald-300">
+                Cambridge IGCSE Mathematics (0580/42) · Bearings & Sine Rule [4 Marks]
+              </span>
+              <span className="text-[11px] text-slate-500">
+                AI Senior Examiner 4-Part Structured Breakdown
+              </span>
+            </div>
+
+            <div className="rounded-2xl border border-slate-700 bg-slate-950 p-6 shadow-xl space-y-4">
+              {/* Question Simulated Capture */}
+              <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <span className="rounded bg-indigo-500/20 text-indigo-300 px-2 py-0.5 text-[10px] font-bold font-mono">
+                    Sample Exam Question
+                  </span>
+                  <p className="text-xs font-semibold text-white">
+                    "In triangle ABC, AB = 8.5 km, angle BAC = 42°, and angle ABC = 68°. Calculate length BC."
+                  </p>
+                </div>
+                <div className="rounded-lg bg-emerald-500/20 px-3 py-1 text-xs font-bold text-emerald-300 border border-emerald-500/30 shrink-0">
+                  Total: 4 Marks
+                </div>
+              </div>
+
+              {/* 4-Part Examiner Solution Layout */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                {/* 1. Core Concept */}
+                <div className="rounded-xl border border-slate-800 bg-slate-900/80 p-3.5 space-y-1">
+                  <div className="font-bold text-indigo-400 flex items-center gap-1.5">
+                    <span>1. Core Concept & Formula</span>
+                  </div>
+                  <p className="text-slate-300 leading-relaxed">
+                    Triangle with two known angles and an opposite side: Apply the <strong>Sine Rule</strong>:
+                  </p>
+                  <code className="text-indigo-300 font-mono text-[11px] block mt-1">
+                    BC / sin(42°) = AB / sin(ACB)
+                  </code>
+                </div>
+
+                {/* 2. Step-by-Step Working */}
+                <div className="rounded-xl border border-slate-800 bg-slate-900/80 p-3.5 space-y-1">
+                  <div className="font-bold text-purple-400 flex items-center gap-1.5">
+                    <span>2. Step-by-Step Working [M1, M2]</span>
+                  </div>
+                  <p className="text-slate-300 leading-relaxed">
+                    • Angle ACB = 180° - (42° + 68°) = 70° [M1]<br />
+                    • BC = (8.5 × sin 42°) / sin 70° [M1]<br />
+                    • BC = 5.687 / 0.9397 = 6.052 km
+                  </p>
+                </div>
+
+                {/* 3. Final Answer */}
+                <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-3.5 space-y-1">
+                  <div className="font-bold text-emerald-400 flex items-center gap-1.5">
+                    <span>3. Final Answer & Units [A1]</span>
+                  </div>
+                  <p className="text-emerald-200 font-bold text-sm">
+                    BC = 6.05 km (3 significant figures)
+                  </p>
+                  <p className="text-[11px] text-emerald-300/70">
+                    Cambridge mark schemes require 3 s.f. for non-exact values unless specified.
+                  </p>
+                </div>
+
+                {/* 4. Examiner Trap */}
+                <div className="rounded-xl border border-amber-500/30 bg-amber-950/20 p-3.5 space-y-1">
+                  <div className="font-bold text-amber-400 flex items-center gap-1.5">
+                    <span>4. Examiner Trap & Pitfall</span>
+                  </div>
+                  <p className="text-amber-200 leading-relaxed text-[11px]">
+                    Candidates who incorrectly use angle ABC (68°) directly opposite BC lose the M1 method mark and write 8.16 km. Always calculate third angle first!
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Guest Sandbox Call to Action */}
+        {!currentUser && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-2xl bg-indigo-950/50 border border-indigo-500/30 p-4">
+            <div className="flex items-center gap-2.5">
+              <ShieldCheck className="h-5 w-5 text-indigo-400 shrink-0" />
+              <p className="text-xs text-indigo-200">
+                Instant Student Activation is active. Register free now to unlock unlimited AI solves, 1,500+ past papers, and personal progress tracking.
+              </p>
+            </div>
+            {onOpenAuth && (
+              <button
+                onClick={() => onOpenAuth('signup')}
+                className="w-full sm:w-auto shrink-0 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white font-bold text-xs px-5 py-2.5 shadow-lg transition cursor-pointer"
+              >
+                Register Free Account →
+              </button>
+            )}
+          </div>
+        )}
+      </section>
 
       {/* 2. Main 4 Core Action Pillars (Instant Access) */}
       <section className="space-y-4">

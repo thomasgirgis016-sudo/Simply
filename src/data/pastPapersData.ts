@@ -292,3 +292,44 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
     examinerReportSnippet: 'Students frequently found the x-coordinates but forgot to substitute back into original equation to find the corresponding y-coordinates.'
   }
 ];
+
+export function getCustomPastPapers(): PastPaperItem[] {
+  try {
+    const raw = localStorage.getItem('simply_igcse_custom_past_papers');
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveCustomPastPapers(papers: PastPaperItem[]) {
+  try {
+    localStorage.setItem('simply_igcse_custom_past_papers', JSON.stringify(papers));
+  } catch (e) {
+    console.error('Failed to save custom past papers:', e);
+  }
+}
+
+export function getAllPastPapers(): PastPaperItem[] {
+  return [...getCustomPastPapers(), ...PAST_PAPERS_DATABASE];
+}
+
+// Generate official Cambridge/Edexcel paper archive download URL or fallback
+export function getPaperDownloadUrl(paper: PastPaperItem, type: 'qp' | 'ms'): string {
+  if (type === 'qp' && paper.pdfUrl) return paper.pdfUrl;
+  if (type === 'ms' && paper.markSchemePdfUrl) return paper.markSchemePdfUrl;
+
+  const rawCode = paper.paperCode.replace(/[^0-9a-zA-Z]/g, '');
+  const syllabusMatch = paper.paperCode.match(/(\d{4}|\w{4})/);
+  const syllabus = syllabusMatch ? syllabusMatch[1] : '0580';
+  const year = paper.year || 2023;
+  const isMayJune = paper.session.toLowerCase().includes('may') || paper.session.toLowerCase().includes('june');
+  const isOctNov = paper.session.toLowerCase().includes('oct') || paper.session.toLowerCase().includes('nov');
+  const seasonCode = isMayJune ? `s${String(year).slice(-2)}` : isOctNov ? `w${String(year).slice(-2)}` : `m${String(year).slice(-2)}`;
+  const paperComponent = rawCode.replace(syllabus, '') || '42';
+
+  if (paper.board === 'CIE') {
+    return `https://papers.gceguide.com/Cambridge%20IGCSE/${syllabus}/${year}/${syllabus}_${seasonCode}_${type}_${paperComponent}.pdf`;
+  }
+  return `https://qualifications.pearson.com/en/support/support-topics/exams/past-papers.html?q=${encodeURIComponent(paper.paperCode)}`;
+}

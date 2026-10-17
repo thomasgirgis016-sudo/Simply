@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   RotateCw,
   Sparkles,
@@ -128,6 +128,31 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
     onUpdateFlashcardMastery(currentCard.id, isMastered, intervalDays);
     handleNext();
   };
+
+  // Keyboard navigation shortcuts: Space/Enter = Flip, ArrowLeft = Still Learning, ArrowRight = Mastered
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+        return;
+      }
+      if (isAiModalOpen || !currentCard) return;
+
+      if (e.code === 'Space' || e.key === 'Enter') {
+        e.preventDefault();
+        setIsFlipped((prev) => !prev);
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        handleRateCard('again');
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        handleRateCard('good');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentCard, isAiModalOpen]);
 
   const handleGenerateAiDeck = async () => {
     if (!aiTopicInput.trim()) return;
@@ -437,6 +462,21 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                 <span>Easy (7d)</span>
               </button>
             </div>
+          </div>
+
+          {/* Desktop & Tablet Keyboard Shortcuts Guide */}
+          <div className="hidden sm:flex items-center justify-center gap-4 text-[11px] text-slate-400 font-medium">
+            <span className="flex items-center gap-1.5">
+              <kbd className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 font-mono text-[10px]">Space</kbd> or <kbd className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 font-mono text-[10px]">Enter</kbd> Flip Card
+            </span>
+            <span>•</span>
+            <span className="flex items-center gap-1.5">
+              <kbd className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 font-mono text-[10px]">←</kbd> Still Learning (1d)
+            </span>
+            <span>•</span>
+            <span className="flex items-center gap-1.5">
+              <kbd className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 font-mono text-[10px]">→</kbd> Mastered (3d)
+            </span>
           </div>
         </div>
       )}

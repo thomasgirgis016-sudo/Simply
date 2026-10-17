@@ -22,7 +22,7 @@ import {
   Share2
 } from 'lucide-react';
 import { Subject, UserProfile, PastPaperItem, BookmarkItem } from '../types';
-import { PAST_PAPERS_DATABASE } from '../data/pastPapersData';
+import { getAllPastPapers, getPaperDownloadUrl } from '../data/pastPapersData';
 import { MathRenderer } from './MathRenderer';
 import { isSubjectMatch } from '../utils/subjectMatcher';
 
@@ -105,7 +105,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
   // Filtering
   const filteredPapers = useMemo(() => {
-    return PAST_PAPERS_DATABASE.filter((paper) => {
+    return getAllPastPapers().filter((paper) => {
       // Board filter
       if (selectedBoard !== 'All' && paper.board !== selectedBoard) {
         return false;
@@ -478,6 +478,18 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                         <span className="hidden sm:inline">Exam Mode</span>
                       </button>
                     )}
+
+                    {/* Download Original Question Paper PDF */}
+                    <a
+                      href={getPaperDownloadUrl(paper, 'qp')}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-xl border border-slate-700 bg-slate-800/90 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition flex items-center gap-1.5"
+                      title="Download official examination question paper PDF"
+                    >
+                      <Download className="h-3.5 w-3.5 text-indigo-400" />
+                      <span className="hidden sm:inline">Download PDF</span>
+                    </a>
                   </div>
                 </div>
 
@@ -510,12 +522,24 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                   {isExpanded && (
                     <div className={`p-4 sm:p-5 space-y-3 ${viewMode === 'stacked' ? 'border-t border-slate-800 bg-slate-950/70' : 'bg-slate-950/50'}`}>
                       <div className="rounded-xl border border-emerald-500/25 bg-emerald-950/20 p-4 space-y-2">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
                           <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
                             <CheckCircle className="h-4 w-4" />
                             Official Mark Scheme:
                           </span>
-                          <span className="text-xs font-mono font-bold text-white">Final: {paper.finalAnswer}</span>
+                          <div className="flex items-center gap-3">
+                            <span className="text-xs font-mono font-bold text-white">Final: {paper.finalAnswer}</span>
+                            <a
+                              href={getPaperDownloadUrl(paper, 'ms')}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-bold text-emerald-300 hover:bg-emerald-500/20 transition cursor-pointer"
+                              title="Download official mark scheme PDF"
+                            >
+                              <Download className="h-3 w-3" />
+                              <span>MS PDF</span>
+                            </a>
+                          </div>
                         </div>
 
                         <div className="space-y-1.5 pt-1">

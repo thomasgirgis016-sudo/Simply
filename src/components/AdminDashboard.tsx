@@ -16,9 +16,15 @@ import {
   Key,
   Users,
   Filter,
-  CheckCheck
+  CheckCheck,
+  FileText,
+  Layers,
+  Database,
+  Upload,
+  Plus,
+  BookOpen
 } from 'lucide-react';
-import { UserAccount, AccountStatus, UserRole, GradeLevel, ExamBoard, TargetGrade } from '../types';
+import { UserAccount, AccountStatus, UserRole, GradeLevel, ExamBoard, TargetGrade, Flashcard, PastPaperItem } from '../types';
 import {
   getAllUsers,
   approveUser,
@@ -26,8 +32,11 @@ import {
   toggleUserRole,
   deleteUser,
   approveAllPendingUsers,
+  rejectAllPendingUsers,
   createPreApprovedUser
 } from '../services/auth';
+import { IGCSE_SUBJECTS } from '../data/subjects';
+import { getCustomPastPapers, saveCustomPastPapers } from '../data/pastPapersData';
 
 interface AdminDashboardProps {
   currentUser: UserAccount;
@@ -154,6 +163,185 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     showToast(`Approved ${count} pending student account${count === 1 ? '' : 's'}!`);
   };
 
+  const handleRejectAll = () => {
+    if (confirm(`Are you sure you want to suspend/reject all ${metrics.pending} pending accounts?`)) {
+      const count = rejectAllPendingUsers(currentUser.email);
+      reloadUsers();
+      showToast(`Suspended ${count} pending account${count === 1 ? '' : 's'}.`);
+    }
+  };
+
+  // CMS State
+  const [adminActiveTab, setAdminActiveTab] = useState<'accounts' | 'cms'>('accounts');
+  const [cmsSection, setCmsSection] = useState<'flashcards' | 'pastpapers'>('flashcards');
+
+  // Flashcards CMS form state
+  const [fcSubjectId, setFcSubjectId] = useState('cie-math-0580');
+  const [fcTopic, setFcTopic] = useState('');
+  const [fcQuestion, setFcQuestion] = useState('');
+  const [fcAnswer, setFcAnswer] = useState('');
+  const [fcFormula, setFcFormula] = useState('');
+  const [fcTip, setFcTip] = useState('');
+  const [fcTier, setFcTier] = useState<'Core' | 'Extended' | 'Hard'>('Extended');
+  const [fcJsonRaw, setFcJsonRaw] = useState('');
+
+  // Past Papers CMS form state
+  const [ppSubjectId, setPpSubjectId] = useState('cie-math-0580');
+  const [ppSession, setPpSession] = useState('May/June 2024 Paper 42');
+  const [ppPaperCode, setPpPaperCode] = useState('0580/42');
+  const [ppYear, setPpYear] = useState('2024');
+  const [ppQNum, setPpQNum] = useState('Q1(a)');
+  const [ppTopic, setPpTopic] = useState('');
+  const [ppMarks, setPpMarks] = useState('4');
+  const [ppTier, setPpTier] = useState<'Core' | 'Standard Extended' | 'Grade 9 Challenge'>('Standard Extended');
+  const [ppPrompt, setPpPrompt] = useState('');
+  const [ppFormula, setPpFormula] = useState('');
+  const [ppAnswer, setPpAnswer] = useState('');
+  const [ppStepReq, setPpStepReq] = useState('');
+  const [ppReport, setPpReport] = useState('');
+  const [ppPdfUrl, setPpPdfUrl] = useState('');
+  const [ppJsonRaw, setPpJsonRaw] = useState('');
+  const [customPapers, setCustomPapers] = useState<PastPaperItem[]>(() => getCustomPastPapers());
+
+  const handleCreateFlashcard = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!fcTopic.trim() || !fcQuestion.trim() || !fcAnswer.trim()) {
+      alert('Please fill out the Topic, Question, and Answer.');
+      return;
+    }
+
+    const newCard: Flashcard = {
+      id: `fc-cms-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      subjectId: fcSubjectId,
+      topic: fcTopic.trim(),
+      question: fcQuestion.trim(),
+      answer: fcAnswer.trim(),
+      keyFormula: fcFormula.trim() || undefined,
+      examinerTip: fcTip.trim() || undefined,
+      difficulty: fcTier,
+    };
+
+    try {
+      const existingStr = localStorage.getItem('simply_igcse_flashcards');
+      const existing: Flashcard[] = existingStr ? JSON.parse(existingStr) : [];
+      const updated = [newCard, ...existing];
+      localStorage.setItem('simply_igcse_flashcards', JSON.stringify(updated));
+      setFcTopic('');
+      setFcQuestion('');
+      setFcAnswer('');
+      setFcFormula('');
+      setFcTip('');
+      showToast(`Added new flashcard to ${fcSubjectId} successfully!`);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to save flashcard to storage.');
+    }
+  };
+
+  const handleImportFlashcardsJson = () => {
+    if (!fcJsonRaw.trim()) return;
+    try {
+      const parsed = JSON.parse(fcJsonRaw.trim());
+      if (!Array.isArray(parsed) || parsed.length === 0) {
+        alert('JSON must be a non-empty array of flashcard objects.');
+        return;
+      }
+      const existingStr = localStorage.getItem('simply_igcse_flashcards');
+      const existing: Flashcard[] = existingStr ? JSON.parse(existingStr) : [];
+      const formatted: Flashcard[] = parsed.map((item, idx) => ({
+        id: item.id || `fc-import-${Date.now()}-${idx}`,
+        subjectId: item.subjectId || fcSubjectId,
+        topic: item.topic || 'General Topic',
+        question: item.question || 'Question',
+        answer: item.answer || 'Answer',
+        keyFormula: item.keyFormula,
+        examinerTip: item.examinerTip,
+        difficulty: item.difficulty || 'Extended',
+      }));
+
+      const updated = [...formatted, ...existing];
+      localStorage.setItem('simply_igcse_flashcards', JSON.stringify(updated));
+      setFcJsonRaw('');
+      showToast(`Successfully imported ${formatted.length} flashcards into storage!`);
+    } catch (err: any) {
+      alert(`Invalid JSON format: ${err.message}`);
+    }
+  };
+
+  const handleCreatePastPaper = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!ppTopic.trim() || !ppPrompt.trim() || !ppAnswer.trim()) {
+      alert('Please fill out Topic, Question Prompt, and Final Answer.');
+      return;
+    }
+
+    const matchedSubject = IGCSE_SUBJECTS.find(s => s.id === ppSubjectId);
+    const newPaper: PastPaperItem = {
+      id: `pp-cms-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      subjectId: ppSubjectId,
+      subjectName: matchedSubject?.name || 'Mathematics',
+      board: matchedSubject?.board || 'CIE',
+      session: ppSession.trim(),
+      paperCode: ppPaperCode.trim(),
+      year: parseInt(ppYear, 10) || 2024,
+      questionNumber: ppQNum.trim() || 'Q1',
+      topic: ppTopic.trim(),
+      difficultyTier: ppTier,
+      snippetQuery: `${ppSession} ${ppPaperCode} ${ppTopic} ${ppPrompt.substring(0, 30)}`,
+      questionPrompt: ppPrompt.trim(),
+      diagramOrMath: ppFormula.trim() || undefined,
+      marks: parseInt(ppMarks, 10) || 4,
+      markScheme: [
+        {
+          markType: '[M1] / [A1]',
+          requirement: ppStepReq.trim() || 'Correct method and calculation as required by published mark scheme.'
+        }
+      ],
+      finalAnswer: ppAnswer.trim(),
+      examinerReportSnippet: ppReport.trim() || undefined,
+      pdfUrl: ppPdfUrl.trim() || undefined,
+    };
+
+    const updated = [newPaper, ...customPapers];
+    saveCustomPastPapers(updated);
+    setCustomPapers(updated);
+    setPpTopic('');
+    setPpPrompt('');
+    setPpFormula('');
+    setPpAnswer('');
+    setPpStepReq('');
+    setPpReport('');
+    setPpPdfUrl('');
+    showToast(`Added ${newPaper.paperCode} ${newPaper.questionNumber} to question bank!`);
+  };
+
+  const handleImportPastPapersJson = () => {
+    if (!ppJsonRaw.trim()) return;
+    try {
+      const parsed = JSON.parse(ppJsonRaw.trim());
+      if (!Array.isArray(parsed) || parsed.length === 0) {
+        alert('JSON must be a non-empty array of PastPaperItem objects.');
+        return;
+      }
+      const updated = [...parsed, ...customPapers];
+      saveCustomPastPapers(updated);
+      setCustomPapers(updated);
+      setPpJsonRaw('');
+      showToast(`Successfully imported ${parsed.length} past paper questions!`);
+    } catch (err: any) {
+      alert(`Invalid JSON format: ${err.message}`);
+    }
+  };
+
+  const handleDeleteCustomPaper = (id: string) => {
+    if (confirm('Delete this custom past paper question?')) {
+      const updated = customPapers.filter(p => p.id !== id);
+      saveCustomPastPapers(updated);
+      setCustomPapers(updated);
+      showToast('Custom question removed from question bank.');
+    }
+  };
+
   const handleCreateAccount = async (e: React.FormEvent) => {
     e.preventDefault();
     setAddError('');
@@ -232,75 +420,119 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </div>
       </div>
 
-      {/* Overview Metric Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-md">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
-            <span>Total Accounts</span>
-            <Users className="h-4 w-4 text-indigo-400" />
-          </div>
-          <div className="text-2xl font-black text-white mt-1 font-mono">{metrics.total}</div>
-          <span className="text-[10px] text-slate-500">Registered users</span>
-        </div>
+      {/* Admin Mode Tab Switcher */}
+      <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
+        <button
+          onClick={() => setAdminActiveTab('accounts')}
+          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
+            adminActiveTab === 'accounts'
+              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
+              : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
+          }`}
+        >
+          <Users className="h-4 w-4" />
+          <span>Student Accounts & Access</span>
+          <span className="rounded-full bg-slate-950/60 px-2 py-0.5 text-[10px] text-slate-300">
+            {metrics.total}
+          </span>
+        </button>
 
-        <div className={`rounded-2xl border p-4 shadow-md transition ${
-          metrics.pending > 0
-            ? 'border-amber-500/50 bg-amber-950/20 ring-1 ring-amber-500/30'
-            : 'border-slate-800 bg-slate-900/80'
-        }`}>
-          <div className="flex items-center justify-between text-xs font-medium text-amber-300">
-            <span>Pending Approvals</span>
-            <Clock className="h-4 w-4 text-amber-400 animate-pulse" />
-          </div>
-          <div className="text-2xl font-black text-amber-300 mt-1 font-mono">{metrics.pending}</div>
-          <span className="text-[10px] text-amber-400/80">Requires your review</span>
-        </div>
-
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-md">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
-            <span>Active Students</span>
-            <UserCheck className="h-4 w-4 text-emerald-400" />
-          </div>
-          <div className="text-2xl font-black text-emerald-400 mt-1 font-mono">{metrics.approved}</div>
-          <span className="text-[10px] text-slate-500">Full tool access</span>
-        </div>
-
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-md">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
-            <span>Administrators</span>
-            <Crown className="h-4 w-4 text-purple-400" />
-          </div>
-          <div className="text-2xl font-black text-purple-300 mt-1 font-mono">{metrics.admins}</div>
-          <span className="text-[10px] text-slate-500">System managers</span>
-        </div>
+        <button
+          onClick={() => setAdminActiveTab('cms')}
+          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
+            adminActiveTab === 'cms'
+              ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
+              : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
+          }`}
+        >
+          <BookOpen className="h-4 w-4" />
+          <span>Question & Flashcard CMS</span>
+          <span className="rounded-full bg-purple-500/20 px-2 py-0.5 text-[10px] text-purple-300 border border-purple-500/30">
+            Authoring Tool
+          </span>
+        </button>
       </div>
 
-      {/* Batch Approval Banner if Pending Accounts Exist */}
-      {metrics.pending > 0 && (
-        <div className="rounded-2xl border border-amber-500/40 bg-gradient-to-r from-amber-950/30 via-slate-900 to-amber-950/30 p-4 sm:p-5 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30">
-              <AlertTriangle className="h-5 w-5" />
+      {adminActiveTab === 'accounts' ? (
+        <>
+          {/* Overview Metric Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-md">
+              <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+                <span>Total Accounts</span>
+                <Users className="h-4 w-4 text-indigo-400" />
+              </div>
+              <div className="text-2xl font-black text-white mt-1 font-mono">{metrics.total}</div>
+              <span className="text-[10px] text-slate-500">Registered users</span>
             </div>
-            <div>
-              <h4 className="text-sm font-bold text-white">
-                {metrics.pending} student account{metrics.pending === 1 ? '' : 's'} waiting for approval
-              </h4>
-              <p className="text-xs text-amber-200/80">
-                These students cannot access study tools or past papers until approved.
-              </p>
+
+            <div className={`rounded-2xl border p-4 shadow-md transition ${
+              metrics.pending > 0
+                ? 'border-amber-500/50 bg-amber-950/20 ring-1 ring-amber-500/30'
+                : 'border-slate-800 bg-slate-900/80'
+            }`}>
+              <div className="flex items-center justify-between text-xs font-medium text-amber-300">
+                <span>Pending Approvals</span>
+                <Clock className="h-4 w-4 text-amber-400 animate-pulse" />
+              </div>
+              <div className="text-2xl font-black text-amber-300 mt-1 font-mono">{metrics.pending}</div>
+              <span className="text-[10px] text-amber-400/80">Requires your review</span>
+            </div>
+
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-md">
+              <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+                <span>Active Students</span>
+                <UserCheck className="h-4 w-4 text-emerald-400" />
+              </div>
+              <div className="text-2xl font-black text-emerald-400 mt-1 font-mono">{metrics.approved}</div>
+              <span className="text-[10px] text-slate-500">Full tool access</span>
+            </div>
+
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-md">
+              <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+                <span>Administrators</span>
+                <Crown className="h-4 w-4 text-purple-400" />
+              </div>
+              <div className="text-2xl font-black text-purple-300 mt-1 font-mono">{metrics.admins}</div>
+              <span className="text-[10px] text-slate-500">System managers</span>
             </div>
           </div>
 
-          <button
-            onClick={handleApproveAll}
-            className="flex items-center gap-1.5 rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-amber-400 transition cursor-pointer shadow-md shrink-0"
-          >
-            <CheckCheck className="h-4 w-4" />
-            <span>Approve All ({metrics.pending})</span>
-          </button>
-        </div>
-      )}
+          {/* Batch Approval Banner if Pending Accounts Exist */}
+          {metrics.pending > 0 && (
+            <div className="rounded-2xl border border-amber-500/40 bg-gradient-to-r from-amber-950/30 via-slate-900 to-amber-950/30 p-4 sm:p-5 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  <AlertTriangle className="h-5 w-5" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-white">
+                    {metrics.pending} student account{metrics.pending === 1 ? '' : 's'} waiting for approval
+                  </h4>
+                  <p className="text-xs text-amber-200/80">
+                    These students cannot access study tools or past papers until approved.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={handleRejectAll}
+                  className="flex items-center gap-1.5 rounded-xl border border-rose-500/40 bg-rose-950/40 px-3.5 py-2 text-xs font-bold text-rose-300 hover:bg-rose-900/50 transition cursor-pointer"
+                >
+                  <UserX className="h-4 w-4" />
+                  <span>Reject All</span>
+                </button>
+                <button
+                  onClick={handleApproveAll}
+                  className="flex items-center gap-1.5 rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-amber-400 transition cursor-pointer shadow-md"
+                >
+                  <CheckCheck className="h-4 w-4" />
+                  <span>Approve All ({metrics.pending})</span>
+                </button>
+              </div>
+            </div>
+          )}
 
       {/* Search & Filter Controls */}
       <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-lg space-y-3">
@@ -518,8 +750,483 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </div>
         )}
       </div>
+        </>
+      ) : (
+        /* CMS (Content Management System) Section */
+        <div className="space-y-6">
+          {/* CMS Sub-navigation */}
+          <div className="flex items-center gap-3 border-b border-slate-800 pb-3">
+            <button
+              onClick={() => setCmsSection('flashcards')}
+              className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition cursor-pointer ${
+                cmsSection === 'flashcards'
+                  ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+                  : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+              }`}
+            >
+              <Layers className="h-4 w-4" />
+              <span>Flashcard Decks CMS</span>
+            </button>
 
-      {/* Add Pre-Approved Account Modal */}
+            <button
+              onClick={() => setCmsSection('pastpapers')}
+              className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition cursor-pointer ${
+                cmsSection === 'pastpapers'
+                  ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+                  : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+              }`}
+            >
+              <Database className="h-4 w-4" />
+              <span>Past Paper & Question Bank CMS</span>
+              {customPapers.length > 0 && (
+                <span className="rounded-full bg-purple-500/20 px-2 py-0.5 text-[10px] text-purple-300">
+                  {customPapers.length} custom
+                </span>
+              )}
+            </button>
+          </div>
+
+          {cmsSection === 'flashcards' ? (
+            /* Flashcards Management */
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Single Flashcard Creator */}
+              <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl space-y-4">
+                <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
+                  <div className="rounded-lg bg-purple-500/20 p-2 text-purple-400 border border-purple-500/30">
+                    <Plus className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-white">Create Single Flashcard</h3>
+                    <p className="text-[11px] text-slate-400">Add a new revision card to the student deck</p>
+                  </div>
+                </div>
+
+                <form onSubmit={handleCreateFlashcard} className="space-y-3 text-xs">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-[11px] font-bold text-slate-300 block mb-1">Subject</label>
+                      <select
+                        value={fcSubjectId}
+                        onChange={(e) => setFcSubjectId(e.target.value)}
+                        className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white focus:border-purple-500 focus:outline-none"
+                      >
+                        {IGCSE_SUBJECTS.map((s) => (
+                          <option key={s.id} value={s.id}>
+                            {s.code} · {s.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="text-[11px] font-bold text-slate-300 block mb-1">Difficulty Tier</label>
+                      <select
+                        value={fcTier}
+                        onChange={(e) => setFcTier(e.target.value as any)}
+                        className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white focus:border-purple-500 focus:outline-none"
+                      >
+                        <option value="Core">Core</option>
+                        <option value="Extended">Extended</option>
+                        <option value="Hard">Grade 9 Challenge</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-300 block mb-1">Topic / Unit Name</label>
+                    <input
+                      type="text"
+                      required
+                      value={fcTopic}
+                      onChange={(e) => setFcTopic(e.target.value)}
+                      placeholder="e.g. Coordinate Geometry, Quadratic Sequences"
+                      className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white focus:border-purple-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-300 block mb-1">Card Question / Prompt</label>
+                    <textarea
+                      required
+                      rows={3}
+                      value={fcQuestion}
+                      onChange={(e) => setFcQuestion(e.target.value)}
+                      placeholder="e.g. State the formula for the distance between two coordinate points (x1, y1) and (x2, y2)."
+                      className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white focus:border-purple-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-300 block mb-1">Model Answer / Definition</label>
+                    <textarea
+                      required
+                      rows={3}
+                      value={fcAnswer}
+                      onChange={(e) => setFcAnswer(e.target.value)}
+                      placeholder="e.g. d = √((x2 - x1)² + (y2 - y1)²)"
+                      className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white focus:border-purple-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-[11px] font-bold text-slate-300 block mb-1">LaTeX Formula (Optional)</label>
+                      <input
+                        type="text"
+                        value={fcFormula}
+                        onChange={(e) => setFcFormula(e.target.value)}
+                        placeholder="e.g. d = \sqrt{(x_2-x_1)^2 + (y_2-y_1)^2}"
+                        className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white font-mono focus:border-purple-500 focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[11px] font-bold text-slate-300 block mb-1">Examiner Tip (Optional)</label>
+                      <input
+                        type="text"
+                        value={fcTip}
+                        onChange={(e) => setFcTip(e.target.value)}
+                        placeholder="e.g. Never round interim values before squaring"
+                        className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white focus:border-purple-500 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      className="w-full rounded-xl bg-purple-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-purple-500 shadow-md transition cursor-pointer flex items-center justify-center gap-2"
+                    >
+                      <Plus className="h-4 w-4" />
+                      <span>Publish Flashcard</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              {/* Bulk JSON Flashcard Importer */}
+              <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl space-y-4 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
+                    <div className="rounded-lg bg-indigo-500/20 p-2 text-indigo-400 border border-indigo-500/30">
+                      <Upload className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-white">Bulk JSON Importer</h3>
+                      <p className="text-[11px] text-slate-400">Upload multiple flashcards at once in JSON format</p>
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    Paste a JSON array of cards. Each card must include <code className="text-purple-300 font-mono">topic</code>, <code className="text-purple-300 font-mono">question</code>, and <code className="text-purple-300 font-mono">answer</code>.
+                  </p>
+
+                  <div className="relative">
+                    <textarea
+                      rows={12}
+                      value={fcJsonRaw}
+                      onChange={(e) => setFcJsonRaw(e.target.value)}
+                      placeholder={`[\n  {\n    "topic": "Algebra",\n    "question": "What is the discriminant?",\n    "answer": "b^2 - 4ac",\n    "difficulty": "Extended"\n  }\n]`}
+                      className="w-full rounded-xl border border-slate-700 bg-slate-950 p-3 font-mono text-[11px] text-white focus:border-indigo-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    onClick={handleImportFlashcardsJson}
+                    disabled={!fcJsonRaw.trim()}
+                    className="w-full rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed shadow-md transition cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <Upload className="h-4 w-4" />
+                    <span>Import Flashcards Array</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* Past Papers Management */
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Single Question Authoring Form */}
+                <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl space-y-4">
+                  <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
+                    <div className="rounded-lg bg-purple-500/20 p-2 text-purple-400 border border-purple-500/30">
+                      <Plus className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-white">Author Past Paper Question</h3>
+                      <p className="text-[11px] text-slate-400">Add an official or predicted question to the database</p>
+                    </div>
+                  </div>
+
+                  <form onSubmit={handleCreatePastPaper} className="space-y-3 text-xs">
+                    <div className="grid grid-cols-3 gap-2">
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-300 block mb-1">Subject</label>
+                        <select
+                          value={ppSubjectId}
+                          onChange={(e) => setPpSubjectId(e.target.value)}
+                          className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white focus:border-purple-500 focus:outline-none"
+                        >
+                          {IGCSE_SUBJECTS.map((s) => (
+                            <option key={s.id} value={s.id}>
+                              {s.code} · {s.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-300 block mb-1">Session</label>
+                        <input
+                          type="text"
+                          required
+                          value={ppSession}
+                          onChange={(e) => setPpSession(e.target.value)}
+                          placeholder="e.g. May/June 2024 Paper 42"
+                          className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white focus:border-purple-500 focus:outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-300 block mb-1">Paper Code</label>
+                        <input
+                          type="text"
+                          required
+                          value={ppPaperCode}
+                          onChange={(e) => setPpPaperCode(e.target.value)}
+                          placeholder="0580/42"
+                          className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white font-mono focus:border-purple-500 focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-4 gap-2">
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-300 block mb-1">Year</label>
+                        <input
+                          type="number"
+                          required
+                          value={ppYear}
+                          onChange={(e) => setPpYear(e.target.value)}
+                          className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white focus:border-purple-500 focus:outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-300 block mb-1">Q Number</label>
+                        <input
+                          type="text"
+                          required
+                          value={ppQNum}
+                          onChange={(e) => setPpQNum(e.target.value)}
+                          placeholder="Q3(b)"
+                          className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white focus:border-purple-500 focus:outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-300 block mb-1">Marks</label>
+                        <input
+                          type="number"
+                          required
+                          value={ppMarks}
+                          onChange={(e) => setPpMarks(e.target.value)}
+                          className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white focus:border-purple-500 focus:outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-300 block mb-1">Tier</label>
+                        <select
+                          value={ppTier}
+                          onChange={(e) => setPpTier(e.target.value as any)}
+                          className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white focus:border-purple-500 focus:outline-none"
+                        >
+                          <option value="Core">Core</option>
+                          <option value="Standard Extended">Extended</option>
+                          <option value="Grade 9 Challenge">Grade 9</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-[11px] font-bold text-slate-300 block mb-1">Topic</label>
+                      <input
+                        type="text"
+                        required
+                        value={ppTopic}
+                        onChange={(e) => setPpTopic(e.target.value)}
+                        placeholder="e.g. Trigonometry & Sine Rule"
+                        className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white focus:border-purple-500 focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[11px] font-bold text-slate-300 block mb-1">Question Prompt</label>
+                      <textarea
+                        required
+                        rows={3}
+                        value={ppPrompt}
+                        onChange={(e) => setPpPrompt(e.target.value)}
+                        placeholder="Calculate angle ABC using the Sine Rule..."
+                        className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white focus:border-purple-500 focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[11px] font-bold text-slate-300 block mb-1">LaTeX Formula / Diagram (Optional)</label>
+                      <input
+                        type="text"
+                        value={ppFormula}
+                        onChange={(e) => setPpFormula(e.target.value)}
+                        placeholder="e.g. \frac{a}{\sin A} = \frac{b}{\sin B}"
+                        className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white font-mono focus:border-purple-500 focus:outline-none"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-300 block mb-1">Mark Scheme Requirement</label>
+                        <input
+                          type="text"
+                          value={ppStepReq}
+                          onChange={(e) => setPpStepReq(e.target.value)}
+                          placeholder="[M1] for \sin B = (12 \times \sin 38) / 9.5"
+                          className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white focus:border-purple-500 focus:outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-300 block mb-1">Final Answer</label>
+                        <input
+                          type="text"
+                          required
+                          value={ppAnswer}
+                          onChange={(e) => setPpAnswer(e.target.value)}
+                          placeholder="51.2° or 51.21°"
+                          className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white focus:border-purple-500 focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-300 block mb-1">Examiner Report Snippet</label>
+                        <input
+                          type="text"
+                          value={ppReport}
+                          onChange={(e) => setPpReport(e.target.value)}
+                          placeholder="Candidates often forgot to set their calculator to DEG mode."
+                          className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white focus:border-purple-500 focus:outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-300 block mb-1">Official PDF URL (Optional)</label>
+                        <input
+                          type="url"
+                          value={ppPdfUrl}
+                          onChange={(e) => setPpPdfUrl(e.target.value)}
+                          placeholder="https://.../paper.pdf"
+                          className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white focus:border-purple-500 focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="pt-2">
+                      <button
+                        type="submit"
+                        className="w-full rounded-xl bg-purple-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-purple-500 shadow-md transition cursor-pointer flex items-center justify-center gap-2"
+                      >
+                        <Plus className="h-4 w-4" />
+                        <span>Add Question to Bank</span>
+                      </button>
+                    </div>
+                  </form>
+                </div>
+
+                {/* Bulk JSON Past Paper Importer */}
+                <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl space-y-4 flex flex-col justify-between">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
+                      <div className="rounded-lg bg-indigo-500/20 p-2 text-indigo-400 border border-indigo-500/30">
+                        <Upload className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-bold text-white">Bulk Past Papers Importer</h3>
+                        <p className="text-[11px] text-slate-400">Import an array of PastPaperItem objects</p>
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      Paste a JSON array of past paper questions. Each entry supports question text, diagrams, mark scheme criteria, and PDF URLs.
+                    </p>
+
+                    <div className="relative">
+                      <textarea
+                        rows={14}
+                        value={ppJsonRaw}
+                        onChange={(e) => setPpJsonRaw(e.target.value)}
+                        placeholder={`[\n  {\n    "id": "custom-pp-01",\n    "subjectId": "cie-math-0580",\n    "subjectName": "Cambridge IGCSE Mathematics",\n    "board": "CIE",\n    "session": "May/June 2024 Paper 42",\n    "paperCode": "0580/42",\n    "year": 2024,\n    "questionNumber": "Q1",\n    "topic": "Percentages",\n    "difficultyTier": "Standard Extended",\n    "questionPrompt": "Calculate the compound interest...",\n    "marks": 3,\n    "finalAnswer": "$1,450.80"\n  }\n]`}
+                        className="w-full rounded-xl border border-slate-700 bg-slate-950 p-3 font-mono text-[11px] text-white focus:border-indigo-500 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="pt-2">
+                    <button
+                      onClick={handleImportPastPapersJson}
+                      disabled={!ppJsonRaw.trim()}
+                      className="w-full rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed shadow-md transition cursor-pointer flex items-center justify-center gap-2"
+                    >
+                      <Upload className="h-4 w-4" />
+                      <span>Import Past Papers Array</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Custom Questions List */}
+              {customPapers.length > 0 && (
+                <div className="rounded-2xl border border-slate-800 bg-slate-900/90 shadow-xl overflow-hidden">
+                  <div className="p-4 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                      Custom Added Past Paper Questions ({customPapers.length})
+                    </h3>
+                  </div>
+
+                  <div className="divide-y divide-slate-800">
+                    {customPapers.map((cp) => (
+                      <div key={cp.id} className="p-4 flex items-center justify-between gap-4 hover:bg-slate-800/40 transition">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="rounded bg-indigo-500/20 text-indigo-300 px-2 py-0.5 text-[10px] font-bold font-mono">
+                              {cp.paperCode} · {cp.questionNumber}
+                            </span>
+                            <span className="text-xs font-bold text-white">{cp.topic}</span>
+                            <span className="text-[10px] text-slate-400">({cp.marks} Marks)</span>
+                          </div>
+                          <p className="text-xs text-slate-300 line-clamp-1">{cp.questionPrompt}</p>
+                        </div>
+
+                        <button
+                          onClick={() => handleDeleteCustomPaper(cp.id)}
+                          className="rounded-lg p-2 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition cursor-pointer"
+                          title="Delete custom question"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-fadeIn">
           <div className="relative w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-2xl">

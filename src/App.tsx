@@ -105,6 +105,72 @@ export function App() {
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
 
+  // 4b. Theme & Accessibility State
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    try {
+      const saved = localStorage.getItem('simply_igcse_theme');
+      if (saved === 'light' || saved === 'dark') return saved;
+      return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    } catch {
+      return 'dark';
+    }
+  });
+
+  const [fontSize, setFontSize] = useState<'default' | 'medium' | 'large'>(() => {
+    try {
+      const saved = localStorage.getItem('simply_igcse_font_size');
+      if (saved === 'default' || saved === 'medium' || saved === 'large') return saved;
+    } catch {
+      // ignore
+    }
+    return 'default';
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('simply_igcse_theme', theme);
+      if (theme === 'light') {
+        document.documentElement.classList.add('light');
+      } else {
+        document.documentElement.classList.remove('light');
+      }
+    } catch (e) {
+      console.warn('Theme storage sync error:', e);
+    }
+  }, [theme]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('simply_igcse_font_size', fontSize);
+      const sizeMap = {
+        default: '100%',
+        medium: '112%',
+        large: '125%',
+      };
+      document.documentElement.style.fontSize = sizeMap[fontSize] || '100%';
+    } catch (e) {
+      console.warn('Font size sync error:', e);
+    }
+  }, [fontSize]);
+
+  const handleToggleTheme = () => {
+    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
+  };
+
+  // Global Escape Key Listener for Modals & Overlays
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsCalculatorOpen(false);
+        setIsSettingsOpen(false);
+        setIsProfileOpen(false);
+        setIsAuthOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   // 5. Content Data State (Merge with INITIAL data so new cards/quizzes/notes automatically appear)
   const [flashcards, setFlashcards] = useState<Flashcard[]>(() => {
     try {
@@ -373,6 +439,8 @@ export function App() {
         onLogout={handleLogout}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onOpenCalculator={() => setIsCalculatorOpen(true)}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
       />
 
       {/* Main Container */}
@@ -617,6 +685,10 @@ export function App() {
         onClose={() => setIsSettingsOpen(false)}
         profile={profile}
         onUpdateProfile={handleUpdateProfile}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
+        fontSize={fontSize}
+        onChangeFontSize={setFontSize}
       />
 
       {/* Profile Modal */}

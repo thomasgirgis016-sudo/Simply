@@ -227,6 +227,8 @@ export interface PastPaperItem {
   }[];
   finalAnswer: string;
   examinerReportSnippet?: string;
+  pdfUrl?: string;
+  markSchemePdfUrl?: string;
 }
 
 // 3. Syllabus Interactive Specification Checklist Types
