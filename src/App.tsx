@@ -434,6 +434,8 @@ export function App() {
             {activeTab === 'solver' && (
               <QuestionSolver
                 subject={activeSubject}
+                subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
+                onSelectSubject={setActiveSubject}
                 profile={profile}
                 onOpenChatWithQuestion={handleOpenChatWithQuestion}
               />

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   BookmarkCheck,
   Search,
@@ -22,9 +22,22 @@ export const FormulaDictionary: React.FC<FormulaDictionaryProps> = ({
   subject,
   formulas,
 }) => {
-  const [activeTab, setActiveTab] = useState<'formulas' | 'commands'>('formulas');
+  const hasSubjectFormulas = formulas.some((f) => isSubjectMatch(f.subjectId, subject));
+
+  const [activeTab, setActiveTab] = useState<'formulas' | 'commands'>(() => {
+    return hasSubjectFormulas ? 'formulas' : 'commands';
+  });
   const [searchQuery, setSearchQuery] = useState('');
-  const [showAllSubjects, setShowAllSubjects] = useState(false);
+  const [showAllSubjects, setShowAllSubjects] = useState<boolean>(() => !hasSubjectFormulas);
+
+  // Default non-STEM / subjects with no formulas to "commands" tab
+  useEffect(() => {
+    const hasFormulas = formulas.some((f) => isSubjectMatch(f.subjectId, subject));
+    if (!hasFormulas) {
+      setActiveTab('commands');
+      setShowAllSubjects(true);
+    }
+  }, [subject.id, formulas]);
 
   // Filter formulas
   const filteredFormulas = formulas.filter((f) => {
@@ -65,7 +78,12 @@ export const FormulaDictionary: React.FC<FormulaDictionaryProps> = ({
           {/* Tab selector */}
           <div className="flex rounded-xl bg-slate-950 p-1 border border-slate-800">
             <button
-              onClick={() => setActiveTab('formulas')}
+              onClick={() => {
+                setActiveTab('formulas');
+                if (!hasSubjectFormulas) {
+                  setShowAllSubjects(true);
+                }
+              }}
               className={`rounded-lg px-4 py-1.5 text-xs font-bold transition ${
                 activeTab === 'formulas'
                   ? 'bg-amber-500 text-slate-950 shadow-sm'

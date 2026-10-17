@@ -279,8 +279,14 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
         </div>
 
-        {/* Navigation tabs bar (Desktop / Tablet) */}
-        <div className="hidden md:flex mx-auto max-w-7xl items-center gap-1 overflow-x-auto px-4 pb-2 pt-1 sm:px-6 no-scrollbar">
+        {/* Navigation tabs bar (Desktop, Tablet & Mobile Horizontal Scroll with Gradient Fade Mask) */}
+        <div
+          className="flex mx-auto max-w-7xl items-center gap-1 overflow-x-auto px-3.5 pb-2 pt-1 sm:px-6 no-scrollbar scroll-smooth"
+          style={{
+            maskImage: 'linear-gradient(to right, black 85%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to right, black 85%, transparent 100%)',
+          }}
+        >
           {navTabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -288,7 +294,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 key={tab.id}
                 onClick={() => onSelectTab(tab.id as ActiveTab)}
-                className={`flex shrink-0 items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold transition cursor-pointer ${
+                className={`flex shrink-0 items-center gap-2 rounded-xl px-3 sm:px-3.5 py-1.5 sm:py-2 text-xs font-semibold transition cursor-pointer ${
                   isActive
                     ? 'bg-slate-800 text-white shadow-sm ring-1 ring-slate-700 border-b-2 border-indigo-500'
                     : 'text-slate-400 hover:bg-slate-900/60 hover:text-slate-200'

@@ -25,12 +25,16 @@ import { MathRenderer } from './MathRenderer';
 
 interface QuestionSolverProps {
   subject: Subject;
+  subjects?: Subject[];
+  onSelectSubject?: (subject: Subject) => void;
   profile: UserProfile;
   onOpenChatWithQuestion?: (question: string) => void;
 }
 
 export const QuestionSolver: React.FC<QuestionSolverProps> = ({
   subject,
+  subjects,
+  onSelectSubject,
   profile,
   onOpenChatWithQuestion,
 }) => {
@@ -54,8 +58,15 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
   const [puterConnected, setPuterConnected] = useState<boolean>(() => isPuterSignedIn());
 
   const handleConnectPuter = async () => {
-    const success = await connectPuterSession();
-    setPuterConnected(success);
+    try {
+      const success = await connectPuterSession();
+      setPuterConnected(success);
+    } catch (err: any) {
+      setErrorMessage(
+        err?.message ||
+        'Browser popup blocker prevented authentication. Please allow popups for this site or configure a Gemini API key in ⚙ Settings.'
+      );
+    }
   };
 
   const handleReportSubmit = (e: React.FormEvent) => {
@@ -122,7 +133,9 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
     } catch (err: any) {
       console.error('Solve error:', err);
       setErrorMessage(
-        err?.message?.includes('network') || err?.message?.includes('fetch')
+        err?.message?.includes('popup') || err?.message?.includes('PUTER') || err?.message?.includes('blocked')
+          ? 'Browser popup blocker prevented guest AI authentication. Enable popups for this site or add a free Gemini API key in ⚙ Settings.'
+          : err?.message?.includes('network') || err?.message?.includes('fetch')
           ? 'Network connectivity interruption. Please verify your connection and tap Retry.'
           : 'AI service busy or rate limit reached. Tap "Retry Solution" to re-attempt with fallback engine.'
       );
@@ -151,7 +164,11 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
       setHandwrittenResult(res);
     } catch (err: any) {
       console.error('Handwritten grade error:', err);
-      setErrorMessage('Could not complete handwritten grading. Please tap retry.');
+      setErrorMessage(
+        err?.message?.includes('popup') || err?.message?.includes('PUTER') || err?.message?.includes('blocked')
+          ? 'Browser popup blocker prevented guest AI authentication. Enable popups for this site or add a free Gemini API key in ⚙ Settings.'
+          : 'Could not complete handwritten grading. Please tap retry.'
+      );
     } finally {
       setLoading(false);
     }
@@ -163,6 +180,19 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
     setResult(null);
     setHandwrittenResult(null);
     setErrorMessage(null);
+
+    // Auto-sync active global subject
+    if (onSelectSubject && subjects) {
+      const matched = subjects.find(
+        (s) =>
+          s.id.toLowerCase() === sample.subjectId.toLowerCase() ||
+          sample.title.toLowerCase().includes(s.code.toLowerCase()) ||
+          (s.code && sample.subjectId.toLowerCase().includes(s.code.toLowerCase()))
+      );
+      if (matched) {
+        onSelectSubject(matched);
+      }
+    }
   };
 
   const loadSampleHandwrittenWork = (type: 'quadratic' | 'momentum') => {
@@ -513,6 +543,11 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
                 </button>
               )}
             </div>
+
+            {/* Popup Blocker Fallback Tip */}
+            <p className="text-[11px] text-slate-400 text-center pt-1">
+              💡 <span className="font-semibold text-slate-300">Tip:</span> If nothing happens when clicking Solve, please check your browser's popup blocker or add a free Gemini API key in ⚙ Settings.
+            </p>
 
           {/* Error Message & Retry Fallback */}
           {errorMessage && (

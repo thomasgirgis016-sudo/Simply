@@ -31,9 +31,9 @@ export async function connectPuterSession(): Promise<boolean> {
   try {
     await (window as any).puter.auth.signIn();
     return isPuterSignedIn();
-  } catch (e) {
+  } catch (e: any) {
     console.warn('Puter sign in cancelled or blocked:', e);
-    return false;
+    throw new Error('Browser popup blocker prevented Puter authentication. Please enable popups for this site or configure a Gemini API key in Settings.');
   }
 }
 
@@ -45,15 +45,18 @@ async function callZeroKeyAi(prompt: string, systemPrompt?: string): Promise<str
 
       // Strict 6500ms timeout race to prevent infinite hanging if popup was closed or blocked
       const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('PUTER_TIMEOUT')), 6500)
+        setTimeout(() => reject(new Error('Browser popup blocker prevented authentication. Please enable popups for this site or add a free Gemini API key in Settings.')), 6500)
       );
 
       const chatPromise = puter.ai.chat(fullPrompt, { model: 'gpt-4o-mini' });
       const res = await Promise.race([chatPromise, timeoutPromise]);
       const text = typeof res === 'string' ? res : res?.message?.content || res?.text || '';
       if (text && text.trim() !== '') return text;
-    } catch (e) {
+    } catch (e: any) {
       console.warn('Puter AI attempt bypassed or timed out:', e);
+      if (e?.message?.includes('popup') || e?.message?.includes('blocked') || e?.message?.includes('Settings')) {
+        throw e;
+      }
     }
   }
   throw new Error('ZERO_KEY_AI_UNAVAILABLE');
