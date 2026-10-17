@@ -87,41 +87,53 @@ async function callGeminiApi(payload: {
   throw new Error('SERVERLESS_OR_KEY_UNAVAILABLE');
 }
 
+export const SENIOR_CAMBRIDGE_EXAMINER_INSTRUCTION =
+  'You are a senior Cambridge IGCSE examiner. Follow official mark scheme conventions: always show step-by-step working for method marks ($M$), state accuracy marks ($A$) and independent marks ($B$), bold all required syllabus keywords, and enforce the 3 significant figures rule for non-exact values.';
+
 export async function solveQuestionWithGemini(params: GeminiSolveParams): Promise<SolverResult> {
   const { apiKey, model = 'gemini-1.5-flash', questionText, imageBase64, imageMimeType, subjectName, examBoard, gradeLevel } = params;
 
   const prompt = `
-You are a senior Chief Examiner for ${examBoard} IGCSE ${subjectName} (${gradeLevel}).
-Analyze this student question thoroughly and return your answer STRICTLY as a valid JSON object matching this schema:
+${SENIOR_CAMBRIDGE_EXAMINER_INSTRUCTION}
+
+You are marking a student question for ${examBoard} IGCSE ${subjectName} (${gradeLevel}).
+Analyze this student question thoroughly and return your answer STRICTLY as a valid JSON object with four distinct sections matching this schema:
 {
   "questionText": "A clean transcribed summary of the question",
   "subject": "${subjectName}",
   "topic": "Specific syllabus topic name",
   "totalMarks": 4,
+  "coreConceptAndFormula": {
+    "concept": "Name and explanation of the core syllabus concept being tested",
+    "formula": "Primary formula or equation needed, in LaTeX formatting (e.g. $E_k = \\\\frac{1}{2}mv^2$ or ionic equation)"
+  },
   "stepByStepSolution": [
     {
       "stepNumber": 1,
-      "title": "Method / Formula Step",
-      "explanation": "Detailed explanation of what to write and why",
+      "title": "Method / Step Title",
+      "explanation": "Detailed explanation showing logical progression, with syllabus keywords in bold",
       "mathOrCode": "LaTeX formatted math equation or code snippet if applicable",
       "markAwarded": "[M1] Method Mark"
     }
   ],
-  "finalAnswer": "Concise final answer with exact units and 3 significant figures",
+  "finalAnswer": "Concise final answer with exact SI units and rounded to 3 significant figures (or 1 d.p. for angles)",
+  "examinerTraps": [
+    "Examiner trap: common errors or misconceptions students make on this exact question type"
+  ],
   "markSchemeBreakdown": [
-    "[M1] Description of mark 1",
+    "[M1] Description of method mark 1",
     "[A1] Description of accuracy mark"
   ],
   "examinerTips": [
-    "Secret examiner tip for this specific question style"
+    "Secret examiner tip to secure maximum marks"
   ],
   "commonMistakes": [
-    "Common student mistake from examiner reports"
+    "Common student mistake from official examiner reports"
   ],
   "relatedTopic": "Related syllabus sub-topic for further revision"
 }
 
-Ensure standard IGCSE marking criteria: [M] method, [A] accuracy, [B] independent mark, [SC] special case. Use LaTeX formatting ($...$ or $$...$$) for mathematical expressions and chemical formulas.
+Ensure standard IGCSE marking criteria: [M] method mark, [A] accuracy mark, [B] independent mark, [SC] special case. Use LaTeX formatting ($...$ or $$...$$) for mathematical expressions and chemical formulas.
 DO NOT wrap your output in markdown code blocks like \`\`\`json. Return only raw parseable JSON.
 `;
 
@@ -129,7 +141,8 @@ DO NOT wrap your output in markdown code blocks like \`\`\`json. Return only raw
   if (questionText && !imageBase64) {
     try {
       const liveJsonStr = await callZeroKeyAi(
-        `${questionText}\n\nInstructions: Return ONLY raw JSON matching the IGCSE solver schema with stepByStepSolution, finalAnswer, markSchemeBreakdown, examinerTips. No markdown backticks.`
+        `${questionText}\n\nReturn ONLY raw parseable JSON matching the 4-section IGCSE schema with coreConceptAndFormula, stepByStepSolution, finalAnswer, and examinerTraps. No markdown code blocks.`,
+        SENIOR_CAMBRIDGE_EXAMINER_INSTRUCTION
       );
       const cleaned = liveJsonStr.replace(/```json/g, '').replace(/```/g, '').trim();
       const parsed = JSON.parse(cleaned);
@@ -160,6 +173,9 @@ DO NOT wrap your output in markdown code blocks like \`\`\`json. Return only raw
     const data = await callGeminiApi({
       model,
       contents: [{ parts }],
+      systemInstruction: {
+        parts: [{ text: SENIOR_CAMBRIDGE_EXAMINER_INSTRUCTION }]
+      },
       generationConfig: {
         temperature: 0.2,
         responseMimeType: "application/json"
@@ -614,6 +630,10 @@ function generateSimulatedSolution(
       subject: 'Chemistry (CIE 0620 / Edexcel 4CH1)',
       topic: 'Redox Reactions, Oxidation States & Electron Transfer',
       totalMarks: 4,
+      coreConceptAndFormula: {
+        concept: 'Redox as simultaneous oxidation and reduction via electron transfer (OIL RIG)',
+        formula: 'Fe^{2+} \\rightarrow Fe^{3+} + e^- \\quad \\text{and} \\quad Cl_2 + 2e^- \\rightarrow 2Cl^-'
+      },
       stepByStepSolution: [
         {
           stepNumber: 1,
@@ -638,6 +658,11 @@ function generateSimulatedSolution(
         }
       ],
       finalAnswer: 'It is redox because Fe²⁺ loses electrons (oxidised) and Cl₂ gains electrons (reduced). Cl₂ is the oxidising agent; Fe²⁺ is the reducing agent.',
+      examinerTraps: [
+        'Writing vague statements like "iron gains a charge" instead of explicitly naming electron transfer.',
+        'Confusing the agent with the process (e.g. calling Fe²⁺ the oxidising agent instead of the reducing agent).',
+        'Failing to specify ionic charges (writing Fe instead of Fe²⁺).'
+      ],
       markSchemeBreakdown: [
         '[B1] Fe²⁺ loses electrons (is oxidised)',
         '[B1] Cl₂ gains electrons (is reduced)',
@@ -663,6 +688,10 @@ function generateSimulatedSolution(
       subject: 'English as a Second Language (CIE 0510)',
       topic: 'Exercise 4: Summary Writing & Cohesion',
       totalMarks: 16,
+      coreConceptAndFormula: {
+        concept: 'Exercise 4: Informational text synthesis, selective note-taking, and cohesive paragraph drafting',
+        formula: '\\text{Word Limit Target: } 100 - 120 \\text{ words (Strict Examiner Penalty at 121+ words)}'
+      },
       stepByStepSolution: [
         {
           stepNumber: 1,
@@ -685,6 +714,11 @@ function generateSimulatedSolution(
         }
       ],
       finalAnswer: 'Model Summary (114 words):\n"Vertical farming offers several remarkable environmental advantages. Firstly, it conserves substantial quantities of water through recycling systems and eliminates the necessity for chemical pesticides. Furthermore, cultivating crops within urban centres drastically diminishes transportation emissions while ensuring consistent, weather-independent yields year-round. Conversely, operators encounter significant operational hurdles. Setting up indoor facilities demands exorbitant financial capital, and maintaining continuous artificial lighting results in immense electricity expenditure. In addition, current technology restricts production largely to leafy vegetables, whilst sophisticated automated irrigation requires highly trained technical personnel to oversee operations effectively."',
+      examinerTraps: [
+        'Direct copying / lifting of whole phrases from the prompt, which severely downgrades your language mark.',
+        'Exceeding 120 words — examiners draw a line after 120 words and disregard all subsequent points.',
+        'Using bullet points or numbered lists instead of a continuous formal prose paragraph.'
+      ],
       markSchemeBreakdown: [
         '[10 Content Marks] 8+ distinct points identified across both aspects (awarded 10/10)',
         '[6 Language Marks] Cohesive paragraph structure, excellent paraphrasing with no lifting, word count strictly 100-120 words'
@@ -708,6 +742,10 @@ function generateSimulatedSolution(
       subject: 'Mathematics (CIE 0580)',
       topic: 'Quadratics & Completing the Square',
       totalMarks: 5,
+      coreConceptAndFormula: {
+        concept: 'Completing the square for quadratic expressions to deduce vertex coordinates and minimum/maximum nature',
+        formula: 'y = a(x + b)^2 + c \\implies \\text{Turning Point} = (-b, c)'
+      },
       stepByStepSolution: [
         {
           stepNumber: 1,
@@ -739,6 +777,11 @@ function generateSimulatedSolution(
         }
       ],
       finalAnswer: 'Form: 2(x - 3)² + 5. Turning point: (3, 5) [Minimum].',
+      examinerTraps: [
+        'Forgetting to multiply the subtracted term by the leading factor (computing -9 + 23 = 14 instead of -18 + 23 = 5).',
+        'Confusing the sign of the turning point: (x - 3)² = 0 implies x = +3, not -3.',
+        'Omitting whether the vertex is a minimum or maximum point.'
+      ],
       markSchemeBreakdown: [
         '[B1] Factor 2 from quadratic terms: 2(x² - 6x)',
         '[M1] (x - 3)² seen in working',
@@ -764,6 +807,10 @@ function generateSimulatedSolution(
     subject: subjectName,
     topic: 'Key Syllabus Concepts & Problem Solving',
     totalMarks: 4,
+    coreConceptAndFormula: {
+      concept: `${subjectName} core syllabus specifications and problem-solving framework`,
+      formula: '\\text{Base Working: } \\text{State relevant equation/definition} \\rightarrow \\text{Substitute values} \\rightarrow \\text{Evaluate to 3 s.f.}'
+    },
     stepByStepSolution: [
       {
         stepNumber: 1,
@@ -788,6 +835,11 @@ function generateSimulatedSolution(
       }
     ],
     finalAnswer: 'Fully worked out according to IGCSE mark scheme standards.',
+    examinerTraps: [
+      'Premature rounding in early working stages resulting in final answer inaccuracies.',
+      'Missing or incorrect SI units (e.g., writing cm instead of m, or failing to convert minutes to seconds).',
+      'Failing to quote the base formula before substituting numbers, which risks forfeiting method marks ($M$).'
+    ],
     markSchemeBreakdown: [
       '[M1] Relevant formula quoted or equivalent valid working shown',
       '[M1] Correct substitution of given data with unit alignment',

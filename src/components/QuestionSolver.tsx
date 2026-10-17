@@ -11,9 +11,13 @@ import {
   X,
   Target,
   ArrowRight,
-  BookOpen
+  BookOpen,
+  Flag,
+  Check,
+  HelpCircle,
+  Layers
 } from 'lucide-react';
-import { Subject, UserProfile, SolverResult } from '../types';
+import { Subject, UserProfile, SolverResult, FlaggedQuestionIssue } from '../types';
 import { SAMPLE_SOLVER_QUESTIONS } from '../data/initialData';
 import { solveQuestionWithGemini } from '../services/gemini';
 import { MathRenderer } from './MathRenderer';
@@ -37,6 +41,38 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
   const [result, setResult] = useState<SolverResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
+
+  // Flag / Report Issue state
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [reportIssueType, setReportIssueType] = useState('Arithmetic or calculation slip');
+  const [reportDetails, setReportDetails] = useState('');
+  const [reportSuccess, setReportSuccess] = useState(false);
+
+  const handleReportSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const existingFlagsStr = localStorage.getItem('simply_igcse_flagged_questions');
+      const existingFlags: FlaggedQuestionIssue[] = existingFlagsStr ? JSON.parse(existingFlagsStr) : [];
+      const newFlag: FlaggedQuestionIssue = {
+        id: `flag-${Date.now()}`,
+        date: new Date().toISOString(),
+        questionText: result?.questionText || questionText,
+        subject: result?.subject || subject.name,
+        issueType: reportIssueType,
+        details: reportDetails.trim() || undefined,
+      };
+      existingFlags.push(newFlag);
+      localStorage.setItem('simply_igcse_flagged_questions', JSON.stringify(existingFlags));
+      setReportSuccess(true);
+      setTimeout(() => {
+        setIsReportModalOpen(false);
+        setReportSuccess(false);
+        setReportDetails('');
+      }, 1800);
+    } catch (err) {
+      console.error('Failed to save issue report:', err);
+    }
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -185,6 +221,14 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
       {/* Input Section */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
         <div className="md:col-span-12 rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg backdrop-blur-sm space-y-4">
+          {/* Image Upload Guidelines Helper */}
+          <div className="flex items-center gap-2.5 rounded-xl bg-indigo-950/50 border border-indigo-500/25 px-3.5 py-2.5 text-xs text-indigo-200">
+            <Camera className="h-4 w-4 text-indigo-400 shrink-0" />
+            <p className="leading-snug">
+              <span className="font-bold text-indigo-300">Tip:</span> Crop tightly around the diagram, keep text upright, and ensure the mark allocation (e.g. [3]) in the margin is visible.
+            </p>
+          </div>
+
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
@@ -216,7 +260,7 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
               <button
                 type="button"
                 onClick={() => cameraInputRef.current?.click()}
-                className="flex flex-1 sm:flex-none items-center justify-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2 sm:py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition active:scale-95"
+                className="flex flex-1 sm:flex-none items-center justify-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2 sm:py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition active:scale-95 cursor-pointer"
               >
                 <Camera className="h-4 w-4 text-emerald-400" />
                 <span>Take Photo</span>
@@ -225,7 +269,7 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="flex flex-1 sm:flex-none items-center justify-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2 sm:py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition active:scale-95"
+                className="flex flex-1 sm:flex-none items-center justify-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2 sm:py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition active:scale-95 cursor-pointer"
               >
                 <Upload className="h-4 w-4 text-cyan-400" />
                 <span>Upload Image</span>
@@ -267,7 +311,7 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
             <p className="text-[11px] sm:text-xs text-slate-400">
               <span className="text-emerald-400 font-medium">
-                ✦ AI-Powered Examiner Engine Active
+                ✦ Senior Cambridge Examiner System Active
               </span>
             </p>
 
@@ -280,7 +324,7 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
               {loading ? (
                 <>
                   <RefreshCw className="h-4 w-4 animate-spin" />
-                  <span>Analyzing with IGCSE Mark Scheme...</span>
+                  <span>Evaluating with Cambridge Examiner Criteria...</span>
                 </>
               ) : (
                 <>
@@ -314,7 +358,7 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
         </div>
       </div>
 
-      {/* Results View */}
+      {/* Results View - 4 Distinct Examiner Sections */}
       {result && (
         <div className="space-y-6 animate-fadeIn">
           {/* Header Card */}
@@ -324,7 +368,7 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
                 <span className="inline-block rounded-md bg-indigo-500/20 px-2 py-0.5 text-xs font-semibold text-indigo-300 border border-indigo-500/30">
                   {result.subject} • {result.topic}
                 </span>
-                <h3 className="mt-1 text-lg font-bold text-white">Verified Mark Scheme Solution</h3>
+                <h3 className="mt-1 text-lg font-bold text-white">Cambridge & Edexcel Examiner Solution</h3>
               </div>
 
               <div className="flex items-center gap-2">
@@ -343,99 +387,176 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
             </div>
           </div>
 
-          {/* Step-by-Step Breakdown */}
-          <div className="space-y-4">
-            <h4 className="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-              <Target className="h-4 w-4 text-indigo-400" />
-              Step-by-Step Mark Awarding ([M] Method, [A] Accuracy, [B] Independent)
-            </h4>
-
-            {result.stepByStepSolution.map((step, sIdx) => {
-              const badge = step.markAwarded ? getMarkBadge(step.markAwarded) : null;
-              return (
-                <div
-                  key={sIdx}
-                  className="rounded-xl border border-slate-800 bg-slate-900/90 p-5 shadow-md hover:border-slate-700 transition"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-indigo-600/30 text-xs font-bold text-indigo-300 border border-indigo-500/30">
-                        {step.stepNumber}
-                      </span>
-                      <h5 className="font-bold text-white text-sm">{step.title}</h5>
-                    </div>
-                    {badge && (
-                      <span
-                        className={`shrink-0 rounded-lg px-2.5 py-1 text-xs font-extrabold border ${badge.badgeClass}`}
-                        title={badge.type}
-                      >
-                        {badge.label}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="mt-3 pl-10">
-                    <MathRenderer content={step.explanation} className="text-sm text-slate-300" />
-                    {step.mathOrCode && (
-                      <div className="mt-3 rounded-xl bg-slate-950 p-3 border border-slate-800/80 font-mono text-xs text-indigo-300 overflow-x-auto max-w-full scrollbar-thin scrollbar-thumb-slate-700">
-                        <MathRenderer content={`$$${step.mathOrCode}$$`} />
-                      </div>
-                    )}
-                  </div>
+          {/* Section 1: Core Concept & Formula */}
+          <div className="rounded-2xl border border-sky-500/30 bg-gradient-to-r from-sky-950/25 via-slate-900 to-indigo-950/20 p-5 shadow-md">
+            <div className="flex items-center gap-2.5 mb-2.5">
+              <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-sky-500/20 text-xs font-black text-sky-400 border border-sky-500/30">
+                1
+              </span>
+              <h4 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-sky-300">
+                Section 1: Core Concept & Required Equation
+              </h4>
+            </div>
+            <div className="pl-0 sm:pl-8 space-y-2">
+              <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
+                <span className="font-bold text-white">Syllabus Topic & Principle: </span>
+                {result.coreConceptAndFormula?.concept || result.topic}
+              </p>
+              {result.coreConceptAndFormula?.formula && (
+                <div className="mt-2 rounded-xl bg-slate-950/80 p-3 border border-sky-500/20 font-mono text-xs sm:text-sm text-sky-200 overflow-x-auto max-w-full">
+                  <MathRenderer content={`$$${result.coreConceptAndFormula.formula}$$`} />
                 </div>
-              );
-            })}
+              )}
+            </div>
           </div>
 
-          {/* Final Answer Banner */}
-          <div className="rounded-2xl border border-emerald-500/40 bg-gradient-to-r from-emerald-950/40 to-slate-900 p-5 shadow-lg">
-            <div className="flex items-start gap-3">
+          {/* Section 2: Step-by-Step Working */}
+          <div className="space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2.5">
+                <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-500/20 text-xs font-black text-indigo-400 border border-indigo-500/30">
+                  2
+                </span>
+                <h4 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-indigo-300">
+                  Section 2: Step-by-Step Working & Method Mark Allocations
+                </h4>
+              </div>
+              <div className="flex items-center gap-2 text-[10px] font-semibold text-slate-400">
+                <span className="inline-block h-2 w-2 rounded-full bg-blue-400" /> Method ($M$)
+                <span className="inline-block h-2 w-2 rounded-full bg-emerald-400 ml-1" /> Accuracy ($A$)
+                <span className="inline-block h-2 w-2 rounded-full bg-amber-400 ml-1" /> Independent ($B$)
+              </div>
+            </div>
+
+            <div className="space-y-3 pl-0 sm:pl-2">
+              {result.stepByStepSolution.map((step, sIdx) => {
+                const badge = step.markAwarded ? getMarkBadge(step.markAwarded) : null;
+                return (
+                  <div
+                    key={sIdx}
+                    className="rounded-xl border border-slate-800 bg-slate-900/90 p-4 sm:p-5 shadow-md hover:border-slate-700 transition"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-indigo-600/30 text-xs font-bold text-indigo-300 border border-indigo-500/30">
+                          {step.stepNumber}
+                        </span>
+                        <h5 className="font-bold text-white text-xs sm:text-sm">{step.title}</h5>
+                      </div>
+                      {badge && (
+                        <span
+                          className={`shrink-0 rounded-lg px-2.5 py-1 text-xs font-extrabold border ${badge.badgeClass}`}
+                          title={badge.type}
+                        >
+                          {badge.label}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="mt-3 pl-0 sm:pl-10">
+                      <MathRenderer content={step.explanation} className="text-xs sm:text-sm text-slate-300 leading-relaxed" />
+                      {step.mathOrCode && (
+                        <div className="mt-3 rounded-xl bg-slate-950 p-3 border border-slate-800/80 font-mono text-xs text-indigo-300 overflow-x-auto max-w-full scrollbar-thin scrollbar-thumb-slate-700">
+                          <MathRenderer content={`$$${step.mathOrCode}$$`} />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Section 3: Final Answer & Units */}
+          <div className="rounded-2xl border border-emerald-500/40 bg-gradient-to-r from-emerald-950/40 via-slate-900 to-emerald-950/20 p-5 shadow-lg">
+            <div className="flex items-center gap-2.5 mb-3">
+              <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-500/20 text-xs font-black text-emerald-400 border border-emerald-500/30">
+                3
+              </span>
+              <h4 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-emerald-400">
+                Section 3: Final Answer & Units (3 Significant Figures Rule)
+              </h4>
+            </div>
+            <div className="pl-0 sm:pl-8 flex items-start gap-3">
               <CheckCircle className="h-6 w-6 shrink-0 text-emerald-400 mt-0.5" />
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-emerald-400">
-                  Official Final Answer & Exact Units
-                </p>
+              <div className="w-full">
                 <MathRenderer
                   content={result.finalAnswer}
-                  className="mt-1 text-base font-bold text-white"
+                  className="text-sm sm:text-base font-bold text-white leading-relaxed"
                 />
               </div>
             </div>
           </div>
 
-          {/* Examiner Report & Pitfalls Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Examiner Tips */}
-            <div className="rounded-2xl border border-amber-500/30 bg-amber-950/20 p-5">
-              <div className="flex items-center gap-2 mb-3 text-amber-300">
-                <Lightbulb className="h-5 w-5" />
-                <h5 className="font-bold text-sm">Examiner Secrets & Tips</h5>
-              </div>
-              <ul className="space-y-2 text-xs text-amber-200/90">
-                {result.examinerTips.map((tip, idx) => (
-                  <li key={idx} className="flex items-start gap-2">
-                    <span className="text-amber-400 font-bold">•</span>
-                    <span>{tip}</span>
-                  </li>
-                ))}
-              </ul>
+          {/* Section 4: Examiner Trap */}
+          <div className="rounded-2xl border border-rose-500/30 bg-gradient-to-br from-rose-950/20 via-slate-900 to-amber-950/20 p-5 shadow-md">
+            <div className="flex items-center gap-2.5 mb-3">
+              <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-rose-500/20 text-xs font-black text-rose-400 border border-rose-500/30">
+                4
+              </span>
+              <h4 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-rose-300">
+                Section 4: Examiner Trap & High-Frequency Errors
+              </h4>
             </div>
 
-            {/* Common Traps / Mistakes */}
-            <div className="rounded-2xl border border-rose-500/30 bg-rose-950/20 p-5">
-              <div className="flex items-center gap-2 mb-3 text-rose-300">
-                <AlertTriangle className="h-5 w-5" />
-                <h5 className="font-bold text-sm">Common Pitfalls to Avoid</h5>
+            <div className="pl-0 sm:pl-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Examiner Traps */}
+              <div className="rounded-xl border border-rose-500/20 bg-rose-950/30 p-4">
+                <div className="flex items-center gap-2 mb-2.5 text-rose-300">
+                  <AlertTriangle className="h-4 w-4" />
+                  <h5 className="font-bold text-xs uppercase tracking-wider">Examiner Traps on this Question</h5>
+                </div>
+                <ul className="space-y-2 text-xs text-rose-200/90">
+                  {((result.examinerTraps && result.examinerTraps.length > 0)
+                    ? result.examinerTraps
+                    : (result.commonMistakes || [])
+                  ).map((trap, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="text-rose-400 font-bold">•</span>
+                      <span>{trap}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <ul className="space-y-2 text-xs text-rose-200/90">
-                {result.commonMistakes.map((mistake, idx) => (
-                  <li key={idx} className="flex items-start gap-2">
-                    <span className="text-rose-400 font-bold">•</span>
-                    <span>{mistake}</span>
-                  </li>
-                ))}
-              </ul>
+
+              {/* Examiner Full-Mark Tips */}
+              <div className="rounded-xl border border-amber-500/20 bg-amber-950/30 p-4">
+                <div className="flex items-center gap-2 mb-2.5 text-amber-300">
+                  <Lightbulb className="h-4 w-4" />
+                  <h5 className="font-bold text-xs uppercase tracking-wider">Examiner Full-Mark Advice</h5>
+                </div>
+                <ul className="space-y-2 text-xs text-amber-200/90">
+                  {(result.examinerTips || []).map((tip, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="text-amber-400 font-bold">•</span>
+                      <span>{tip}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
+          </div>
+
+          {/* Visible Accuracy Disclaimer & Flag / Report Issue Action */}
+          <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0" />
+              <p className="text-xs text-slate-400 leading-relaxed">
+                <span className="font-semibold text-slate-300">Accuracy Notice: </span>
+                AI models can make mistakes. Always cross-check final working with your teacher and official published mark schemes.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setIsReportModalOpen(true);
+                setReportSuccess(false);
+              }}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800/80 px-3.5 py-2 text-xs font-semibold text-slate-300 hover:border-rose-500 hover:bg-rose-950/30 hover:text-rose-300 transition shrink-0 cursor-pointer shadow-sm active:scale-95"
+            >
+              <Flag className="h-3.5 w-3.5 text-rose-400" />
+              <span>Flag / Report Issue</span>
+            </button>
           </div>
 
           {/* Quick AI Tutor follow-up */}
@@ -458,6 +579,103 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
               </button>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Flag / Report Issue Modal */}
+      {isReportModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
+          <div className="relative w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center gap-2 text-rose-400">
+                <Flag className="h-5 w-5" />
+                <h3 className="text-base font-bold text-white">Report Issue with Solution</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsReportModalOpen(false)}
+                className="text-slate-400 hover:text-white transition"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {reportSuccess ? (
+              <div className="py-6 text-center space-y-2">
+                <div className="mx-auto h-12 w-12 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
+                  <Check className="h-6 w-6 text-emerald-400" />
+                </div>
+                <h4 className="text-sm font-bold text-white">Report Recorded</h4>
+                <p className="text-xs text-slate-400">
+                  Thank you! Your feedback has been logged to help calibrate examiner criteria and improve accuracy.
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleReportSubmit} className="space-y-4">
+                <p className="text-xs text-slate-300">
+                  Did you spot an arithmetic slip or a missed mark scheme requirement? Select the issue category:
+                </p>
+
+                <div className="space-y-2">
+                  {[
+                    'Arithmetic or calculation slip',
+                    'Missed mark scheme step (e.g. missing M1 or A1)',
+                    'Incorrect syllabus terminology or keywords',
+                    'Unclear explanation or wrong units',
+                    'Other syllabus discrepancy'
+                  ].map((type) => (
+                    <label
+                      key={type}
+                      className={`flex items-center gap-2.5 p-2.5 rounded-xl border text-xs cursor-pointer transition ${
+                        reportIssueType === type
+                          ? 'border-indigo-500 bg-indigo-950/40 text-white font-semibold'
+                          : 'border-slate-800 bg-slate-950/40 text-slate-300 hover:border-slate-700'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="issueType"
+                        value={type}
+                        checked={reportIssueType === type}
+                        onChange={(e) => setReportIssueType(e.target.value)}
+                        className="text-indigo-600 focus:ring-0"
+                      />
+                      <span>{type}</span>
+                    </label>
+                  ))}
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 mb-1">
+                    Additional Details (Optional)
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={reportDetails}
+                    onChange={(e) => setReportDetails(e.target.value)}
+                    placeholder="e.g. In step 2, the division should be 12 / 3 = 4, not 3..."
+                    className="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsReportModalOpen(false)}
+                    className="rounded-xl border border-slate-800 px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white transition cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 px-5 py-2 text-xs font-bold text-white hover:from-rose-500 hover:to-pink-500 transition shadow-md cursor-pointer"
+                  >
+                    Submit Report
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
         </div>
       )}
     </div>

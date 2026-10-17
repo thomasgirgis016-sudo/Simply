@@ -131,16 +131,30 @@ export interface SolverResult {
   subject: string;
   topic: string;
   totalMarks: number;
+  coreConceptAndFormula?: {
+    concept: string;
+    formula?: string;
+  };
   stepByStepSolution: {
     stepNumber: number;
     title: string;
     explanation: string;
     mathOrCode?: string;
-    markAwarded?: string; // e.g. "M1 (Method Mark)"
+    markAwarded?: string; // e.g. "[M1] Method Mark"
   }[];
   finalAnswer: string;
-  markSchemeBreakdown: string[];
-  examinerTips: string[];
-  commonMistakes: string[];
-  relatedTopic: string;
+  examinerTraps?: string[];
+  markSchemeBreakdown?: string[];
+  examinerTips?: string[];
+  commonMistakes?: string[];
+  relatedTopic?: string;
+}
+
+export interface FlaggedQuestionIssue {
+  id: string;
+  date: string;
+  questionText: string;
+  subject: string;
+  issueType: string;
+  details?: string;
 }
