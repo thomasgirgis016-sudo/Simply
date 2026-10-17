@@ -14,12 +14,13 @@ import {
   BookOpen,
   Flag,
   Check,
-  HelpCircle,
-  Layers
+  PenTool,
+  Award,
+  Edit3
 } from 'lucide-react';
-import { Subject, UserProfile, SolverResult, FlaggedQuestionIssue } from '../types';
+import { Subject, UserProfile, SolverResult, FlaggedQuestionIssue, HandwrittenReviewResult } from '../types';
 import { SAMPLE_SOLVER_QUESTIONS } from '../data/initialData';
-import { solveQuestionWithGemini, isPuterSignedIn, connectPuterSession } from '../services/gemini';
+import { solveQuestionWithGemini, isPuterSignedIn, connectPuterSession, gradeHandwrittenWorkWithGemini } from '../services/gemini';
 import { MathRenderer } from './MathRenderer';
 
 interface QuestionSolverProps {
@@ -33,12 +34,15 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
   profile,
   onOpenChatWithQuestion,
 }) => {
+  const [solverMode, setSolverMode] = useState<'solve' | 'handwritten'>('solve');
   const [questionText, setQuestionText] = useState('');
+  const [studentTypedWorking, setStudentTypedWorking] = useState('');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [imageMimeType, setImageMimeType] = useState<string>('image/jpeg');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [result, setResult] = useState<SolverResult | null>(null);
+  const [handwrittenResult, setHandwrittenResult] = useState<HandwrittenReviewResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
@@ -127,10 +131,55 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
     }
   };
 
+  const handleGradeHandwritten = async () => {
+    if (!questionText.trim() && !studentTypedWorking.trim() && !selectedImage) return;
+
+    setLoading(true);
+    setErrorMessage(null);
+    try {
+      const res = await gradeHandwrittenWorkWithGemini({
+        apiKey: profile.geminiApiKey,
+        model: profile.selectedModel,
+        questionText: questionText.trim() || undefined,
+        handwrittenImageBase64: selectedImage || undefined,
+        handwrittenMimeType: imageMimeType,
+        studentTypedWorking: studentTypedWorking.trim() || undefined,
+        subjectName: subject.name,
+        examBoard: profile.board === 'Both' ? subject.board : profile.board,
+        gradeLevel: profile.grade,
+      });
+      setHandwrittenResult(res);
+    } catch (err: any) {
+      console.error('Handwritten grade error:', err);
+      setErrorMessage('Could not complete handwritten grading. Please tap retry.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const loadSampleQuestion = (sample: typeof SAMPLE_SOLVER_QUESTIONS[0]) => {
     setQuestionText(sample.text);
     setSelectedImage(null);
     setResult(null);
+    setHandwrittenResult(null);
+    setErrorMessage(null);
+  };
+
+  const loadSampleHandwrittenWork = (type: 'quadratic' | 'momentum') => {
+    if (type === 'quadratic') {
+      setQuestionText('Solve 3x^2 - 7x - 5 = 0 using the quadratic formula. Give solutions to 2 d.p.');
+      setStudentTypedWorking(`Line 1: x = (-(-7) ± √((-7)^2 - 4(3)(-5))) / (2 * 3)
+Line 2: x = (7 ± √(-49 + 60)) / 6   [Note: Student forgot brackets around -7]
+Line 3: x = (7 ± √11) / 6
+Line 4: x = 1.72 and x = 0.61`);
+    } else {
+      setQuestionText('A trolley of mass 0.8 kg at 2.5 m/s collides with a stationary trolley of 1.2 kg. Calculate combined velocity.');
+      setStudentTypedWorking(`Line 1: Total momentum before = 0.8 * 2.5 = 2.0
+Line 2: Total mass = 0.8 + 1.2 = 2.0 kg
+Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
+    }
+    setResult(null);
+    setHandwrittenResult(null);
     setErrorMessage(null);
   };
 
@@ -202,6 +251,40 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
               ))}
             </div>
           </div>
+        </div>
+
+        {/* Mode Switcher */}
+        <div className="flex rounded-2xl bg-slate-900/90 p-1.5 border border-slate-800">
+          <button
+            type="button"
+            onClick={() => {
+              setSolverMode('solve');
+              setErrorMessage(null);
+            }}
+            className={`flex-1 flex items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold transition cursor-pointer ${
+              solverMode === 'solve'
+                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Sparkles className="h-4 w-4" />
+            <span>Solve Question & Reveal Mark Scheme</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setSolverMode('handwritten');
+              setErrorMessage(null);
+            }}
+            className={`flex-1 flex items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold transition cursor-pointer ${
+              solverMode === 'handwritten'
+                ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 shadow-md'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <PenTool className="h-4 w-4" />
+            <span>Grade My Handwritten Work ($M1, A1, B1$)</span>
+          </button>
         </div>
 
         {/* Free Student AI Pass Card */}
@@ -322,44 +405,114 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
               </div>
             )}
 
-            {/* Text Area */}
-            <div>
-              <textarea
-                rows={3}
-                value={questionText}
-                onChange={(e) => setQuestionText(e.target.value)}
-                placeholder="Type or paste the question text here (e.g. 'Explain why 2Fe²⁺ + Cl₂ -> 2Fe³⁺ + 2Cl⁻ is a redox reaction [3 marks]')..."
-                className="w-full rounded-xl border border-slate-700/80 bg-slate-950/70 p-3.5 sm:p-4 text-base sm:text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              />
-            </div>
+            {/* Text Areas based on mode */}
+            {solverMode === 'solve' ? (
+              <div>
+                <textarea
+                  rows={3}
+                  value={questionText}
+                  onChange={(e) => setQuestionText(e.target.value)}
+                  placeholder="Type or paste the question text here (e.g. 'Explain why 2Fe²⁺ + Cl₂ -> 2Fe³⁺ + 2Cl⁻ is a redox reaction [3 marks]')..."
+                  className="w-full rounded-xl border border-slate-700/80 bg-slate-950/70 p-3.5 sm:p-4 text-base sm:text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                />
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {/* Handwritten Quick Samples */}
+                <div className="flex flex-wrap items-center gap-2 pb-1">
+                  <span className="text-[11px] font-semibold text-slate-400">Try Student Work Sample:</span>
+                  <button
+                    type="button"
+                    onClick={() => loadSampleHandwrittenWork('quadratic')}
+                    className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-[11px] font-semibold text-amber-300 hover:bg-amber-500/20 transition cursor-pointer"
+                  >
+                    Maths: Quadratic (-7)² = -49 Slip
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => loadSampleHandwrittenWork('momentum')}
+                    className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-[11px] font-semibold text-amber-300 hover:bg-amber-500/20 transition cursor-pointer"
+                  >
+                    Physics: Momentum Unit Omission
+                  </button>
+                </div>
 
-          {/* Action Row */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
-            <p className="text-[11px] sm:text-xs text-slate-400">
-              <span className="text-emerald-400 font-medium">
-                ✦ Senior Cambridge Examiner System Active
-              </span>
-            </p>
+                <div>
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                    1. Question Statement:
+                  </label>
+                  <input
+                    type="text"
+                    value={questionText}
+                    onChange={(e) => setQuestionText(e.target.value)}
+                    placeholder="e.g. Solve 3x² - 7x - 5 = 0 using the quadratic formula [3 marks]"
+                    className="w-full rounded-xl border border-slate-700/80 bg-slate-950/70 px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:border-amber-500 focus:outline-none"
+                  />
+                </div>
 
-            <button
-              type="button"
-              onClick={handleSolve}
-              disabled={loading || (!questionText.trim() && !selectedImage)}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 px-6 py-3 sm:py-2.5 text-xs sm:text-sm font-bold text-white shadow-lg shadow-indigo-500/25 hover:from-indigo-400 hover:to-pink-400 transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-            >
-              {loading ? (
-                <>
-                  <RefreshCw className="h-4 w-4 animate-spin" />
-                  <span>Evaluating with Cambridge Examiner Criteria...</span>
-                </>
+                <div>
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                    2. Student's Handwritten Working (Type or Upload Photo above):
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={studentTypedWorking}
+                    onChange={(e) => setStudentTypedWorking(e.target.value)}
+                    placeholder="Line 1: x = (-(-7) ± √((-7)² - 4*3*(-5))) / (2*3)&#10;Line 2: x = (7 ± √(-49 + 60)) / 6&#10;Line 3: ..."
+                    className="w-full rounded-xl border border-slate-700/80 bg-slate-950/70 p-3.5 text-xs sm:text-sm font-mono text-amber-200 placeholder-slate-500 focus:border-amber-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Action Row */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
+              <p className="text-[11px] sm:text-xs text-slate-400">
+                <span className="text-emerald-400 font-medium">
+                  ✦ Senior Cambridge Examiner System Active
+                </span>
+              </p>
+
+              {solverMode === 'solve' ? (
+                <button
+                  type="button"
+                  onClick={handleSolve}
+                  disabled={loading || (!questionText.trim() && !selectedImage)}
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 px-6 py-3 sm:py-2.5 text-xs sm:text-sm font-bold text-white shadow-lg shadow-indigo-500/25 hover:from-indigo-400 hover:to-pink-400 transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  {loading ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 animate-spin" />
+                      <span>Evaluating with Cambridge Examiner Criteria...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-4 w-4" />
+                      <span>Solve & Reveal Mark Scheme</span>
+                    </>
+                  )}
+                </button>
               ) : (
-                <>
-                  <Sparkles className="h-4 w-4" />
-                  <span>Solve & Reveal Mark Scheme</span>
-                </>
+                <button
+                  type="button"
+                  onClick={handleGradeHandwritten}
+                  disabled={loading || (!questionText.trim() && !studentTypedWorking.trim() && !selectedImage)}
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-3 sm:py-2.5 text-xs sm:text-sm font-bold text-slate-950 shadow-lg shadow-amber-500/25 hover:from-amber-400 hover:to-orange-400 transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  {loading ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 animate-spin" />
+                      <span>Grading Handwritten Method & Marks...</span>
+                    </>
+                  ) : (
+                    <>
+                      <PenTool className="h-4 w-4" />
+                      <span>Grade Handwritten Work ($M1, A1, B1$)</span>
+                    </>
+                  )}
+                </button>
               )}
-            </button>
-          </div>
+            </div>
 
           {/* Error Message & Retry Fallback */}
           {errorMessage && (
@@ -605,6 +758,145 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
               </button>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Handwritten Work Examiner Review View */}
+      {handwrittenResult && (
+        <div className="space-y-6 animate-fadeIn">
+          {/* Header Card */}
+          <div className="rounded-2xl border border-amber-500/30 bg-gradient-to-r from-slate-900 via-amber-950/20 to-slate-900 p-6 shadow-xl">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
+              <div>
+                <span className="inline-block rounded-md bg-amber-500/20 px-2.5 py-0.5 text-xs font-bold text-amber-300 border border-amber-500/30">
+                  Annotated Handwritten Examination
+                </span>
+                <h3 className="mt-1 text-lg font-bold text-white">Cambridge Senior Examiner Graded Solution</h3>
+              </div>
+
+              {/* Marks Earned Pill */}
+              <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 px-5 py-2.5 text-center">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-amber-400">
+                  Marks Awarded
+                </div>
+                <div className="text-2xl font-black text-amber-300 font-mono">
+                  {handwrittenResult.marksEarned} / {handwrittenResult.totalMarksPossible} Marks
+                </div>
+                <div className="text-[10px] text-slate-400 font-semibold">
+                  {handwrittenResult.percentageScore}% Method Score
+                </div>
+              </div>
+            </div>
+
+            {/* Question Summary */}
+            <div className="mt-4 rounded-xl bg-slate-950/60 p-4 border border-slate-800">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
+                Question Graded:
+              </p>
+              <MathRenderer content={handwrittenResult.questionSummary} className="text-sm text-slate-200" />
+            </div>
+          </div>
+
+          {/* Point of Failure Alert */}
+          {handwrittenResult.breakdownPointOfFailure && (
+            <div className="rounded-2xl border border-rose-500/40 bg-rose-950/30 p-5 shadow-lg space-y-2">
+              <div className="flex items-center gap-2 text-rose-300 font-bold text-sm">
+                <AlertTriangle className="h-5 w-5 text-rose-400 shrink-0" />
+                <span>Exact Step Where Method Broke Down:</span>
+              </div>
+              <p className="text-xs text-rose-200 leading-relaxed pl-7">
+                {handwrittenResult.breakdownPointOfFailure}
+              </p>
+            </div>
+          )}
+
+          {/* Line-by-Line Red-Ink Examiner Annotations */}
+          <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 sm:p-6 shadow-xl space-y-4">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+              <Edit3 className="h-4 w-4 text-amber-400" />
+              Line-by-Line Examiner Margin Annotations:
+            </h4>
+
+            <div className="space-y-3">
+              {handwrittenResult.lineByLineReview.map((line) => (
+                <div
+                  key={line.lineNumber}
+                  className={`rounded-xl border p-3.5 space-y-1.5 transition ${
+                    line.isCorrect
+                      ? 'border-emerald-500/25 bg-slate-950/70'
+                      : 'border-rose-500/30 bg-rose-950/20'
+                  }`}
+                >
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-mono text-slate-400 font-bold">Line {line.lineNumber}:</span>
+                    {line.markAwarded && (
+                      <span
+                        className={`rounded-md px-2 py-0.5 text-[10px] font-bold font-mono border ${
+                          line.isCorrect
+                            ? 'bg-blue-500/15 text-blue-300 border-blue-500/30'
+                            : 'bg-rose-500/15 text-rose-300 border-rose-500/30'
+                        }`}
+                      >
+                        {line.markAwarded}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="font-mono text-xs text-white bg-slate-950/80 p-2.5 rounded-lg border border-slate-800">
+                    <MathRenderer content={line.studentLineText} />
+                  </div>
+
+                  <div className={`text-xs font-medium flex items-start gap-1.5 pt-0.5 ${
+                    line.isCorrect ? 'text-emerald-300' : 'text-rose-300'
+                  }`}>
+                    <span className="font-bold shrink-0">{line.isCorrect ? '✓' : '✗'}</span>
+                    <span>{line.examinerAnnotation}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Correct Step-by-Step Model Working */}
+          {handwrittenResult.correctWorkingStepByStep && handwrittenResult.correctWorkingStepByStep.length > 0 && (
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 sm:p-6 shadow-xl space-y-3">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                <CheckCircle className="h-4 w-4 text-emerald-400" />
+                Correct Method to Secure Full Marks:
+              </h4>
+
+              <div className="space-y-2 text-xs">
+                {handwrittenResult.correctWorkingStepByStep.map((step, idx) => (
+                  <div key={idx} className="rounded-xl border border-slate-800 bg-slate-950/80 p-3 text-slate-200">
+                    <MathRenderer content={step} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Examiner Final Verdict & Recovery Advice */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <div className="rounded-xl border border-indigo-500/30 bg-indigo-950/20 p-4 space-y-1">
+              <div className="font-bold text-indigo-300 flex items-center gap-1.5">
+                <Award className="h-4 w-4" />
+                Senior Examiner Verdict:
+              </div>
+              <p className="text-slate-200 leading-relaxed">{handwrittenResult.examinerFinalVerdict}</p>
+            </div>
+
+            <div className="rounded-xl border border-amber-500/30 bg-amber-950/20 p-4 space-y-1">
+              <div className="font-bold text-amber-300 flex items-center gap-1.5">
+                <Lightbulb className="h-4 w-4" />
+                How to Avoid Repeating This Slip:
+              </div>
+              <ul className="space-y-1 text-amber-200/90 list-disc list-inside">
+                {handwrittenResult.examinerTipsToRegainMarks?.map((tip, idx) => (
+                  <li key={idx}>{tip}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
       )}
 

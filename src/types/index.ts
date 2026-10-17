@@ -161,3 +161,86 @@ export interface FlaggedQuestionIssue {
   issueType: string;
   details?: string;
 }
+
+// 1. Handwritten Student Work Grader Types
+export interface HandwrittenLineReview {
+  lineNumber: number;
+  studentLineText: string;
+  isCorrect: boolean;
+  markAwarded?: string; // e.g. "[M1] Method Mark", "[A0] Accuracy Lost", "[B1]"
+  examinerAnnotation: string; // margin note
+}
+
+export interface HandwrittenReviewResult {
+  questionSummary: string;
+  totalMarksPossible: number;
+  marksEarned: number;
+  percentageScore: number;
+  breakdownPointOfFailure?: string; // exact step where method broke down
+  lineByLineReview: HandwrittenLineReview[];
+  correctWorkingStepByStep: string[];
+  examinerFinalVerdict: string;
+  examinerTipsToRegainMarks: string[];
+}
+
+// 2. Past Paper Finder & Topic Classification Types
+export interface PastPaperItem {
+  id: string;
+  subjectId: string;
+  subjectName: string;
+  board: ExamBoard;
+  session: string; // e.g. "May/June 2023 Paper 42"
+  paperCode: string; // e.g. "0580/42"
+  year: number;
+  questionNumber: string; // e.g. "Q4(b)"
+  topic: string;
+  difficultyTier: 'Core' | 'Standard Extended' | 'Grade 9 Challenge';
+  snippetQuery: string; // memorable keywords e.g. "two cyclists bearing 040"
+  questionPrompt: string;
+  questionText?: string;
+  diagramSnippet?: string;
+  diagramOrMath?: string;
+  marks: number;
+  markScheme: {
+    markType: string;
+    requirement: string;
+  }[];
+  finalAnswer: string;
+  examinerReportSnippet?: string;
+}
+
+// 3. Syllabus Interactive Specification Checklist Types
+export interface SyllabusChecklistItem {
+  id: string;
+  subjectId: string;
+  unitNumber: string; // e.g. "Topic 1"
+  unitTitle: string;
+  specCode: string; // e.g. "1.1.2", "C3.4"
+  statement: string; // verbatim learning objective
+  tier: 'Core' | 'Extended';
+  confidence: 'green' | 'amber' | 'red' | 'unrated';
+  notes?: string;
+}
+
+// 4. ESL Speaking Oral Exam Simulator Types
+export interface EslSpeakingPrompt {
+  id: string;
+  title: string;
+  part: 1 | 2 | 3;
+  examinerPrompt: string;
+  topicCardBulletPoints?: string[]; // prompts A to E on official card
+  suggestedPhrases: string[];
+  sampleBand9Response: string;
+}
+
+export interface EslSpeakingEvaluation {
+  overallBand: number; // 1 to 10
+  structureAndGrammar: { score: number; feedback: string };
+  vocabularyRange: { score: number; feedback: string };
+  fluencyAndCohesion: { score: number; feedback: string };
+  pronunciationAndIntonation: { score: number; feedback: string };
+  keyStrengths: string[];
+  areasForImprovement: string[];
+  suggestedUpgradedPhrases: { original: string; upgraded: string }[];
+}
+

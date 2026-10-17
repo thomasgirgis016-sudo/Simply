@@ -24,6 +24,9 @@ import { FormulaDictionary } from './components/FormulaDictionary';
 import { AiTutorChat } from './components/AiTutorChat';
 import { GradeBoundariesCalculator } from './components/GradeBoundariesCalculator';
 import { SplitScreenPaperViewer } from './components/SplitScreenPaperViewer';
+import { PastPaperFinder } from './components/PastPaperFinder';
+import { SyllabusChecklist } from './components/SyllabusChecklist';
+import { EslSpeakingSimulator } from './components/EslSpeakingSimulator';
 import { SettingsModal } from './components/SettingsModal';
 import { ProfileModal } from './components/ProfileModal';
 import { AuthModal } from './components/AuthModal';
@@ -183,6 +186,9 @@ export function App() {
 
       const validTabs: ActiveTab[] = [
         'solver',
+        'finder',
+        'checklist',
+        'esl-speaking',
         'flashcards',
         'quiz',
         'revision',
@@ -299,6 +305,12 @@ export function App() {
     setActiveTab('chat');
   };
 
+  const handleTriggerDiagnosticQuiz = (weakTopics: string[]) => {
+    const prompt = `Please create an urgent 5-question diagnostic exam drill with official Cambridge mark scheme rubrics targeting my weak syllabus topics: ${weakTopics.join(', ')}.`;
+    setChatInitialQuestion(prompt);
+    setActiveTab('chat');
+  };
+
   return (
     <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
       {/* Top Navbar */}
@@ -327,6 +339,35 @@ export function App() {
             subject={activeSubject}
             profile={profile}
             onOpenChatWithQuestion={handleOpenChatWithQuestion}
+          />
+        )}
+
+        {activeTab === 'finder' && (
+          <PastPaperFinder
+            activeSubject={activeSubject}
+            profile={profile}
+            onOpenChatWithQuestion={handleOpenChatWithQuestion}
+            onOpenSolverWithQuestion={() => setActiveTab('solver')}
+            onOpenSplitViewer={() => setActiveTab('split')}
+          />
+        )}
+
+        {activeTab === 'checklist' && (
+          <SyllabusChecklist
+            activeSubject={activeSubject}
+            profile={profile}
+            onTriggerDiagnosticQuiz={handleTriggerDiagnosticQuiz}
+            onOpenAiChatWithTopic={(topic) => {
+              setChatInitialQuestion(`Explain official Cambridge syllabus topic: "${topic}". Include key definitions, formulas, and typical exam questions with mark scheme points.`);
+              setActiveTab('chat');
+            }}
+          />
+        )}
+
+        {activeTab === 'esl-speaking' && (
+          <EslSpeakingSimulator
+            activeSubject={activeSubject}
+            profile={profile}
           />
         )}
 

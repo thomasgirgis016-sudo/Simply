@@ -18,12 +18,18 @@ import {
   X,
   TrendingUp,
   Columns,
-  Calculator
+  Calculator,
+  Search,
+  ListChecks,
+  Mic
 } from 'lucide-react';
 import { UserProfile, Subject, UserAccount } from '../types';
 
 export type ActiveTab =
   | 'solver'
+  | 'finder'
+  | 'checklist'
+  | 'esl-speaking'
   | 'flashcards'
   | 'quiz'
   | 'revision'
@@ -64,13 +70,16 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
   const navTabs = [
-    { id: 'solver', label: 'AI Question Solver', icon: Camera, color: 'text-pink-400' },
+    { id: 'solver', label: 'AI Solver & Grading', icon: Camera, color: 'text-pink-400' },
+    { id: 'finder', label: 'Paper Finder', icon: Search, color: 'text-amber-400' },
+    { id: 'checklist', label: 'Syllabus Tracker', icon: ListChecks, color: 'text-emerald-400' },
+    { id: 'esl-speaking', label: 'ESL Speaking Oral', icon: Mic, color: 'text-violet-400' },
     { id: 'flashcards', label: 'Flashcards', icon: Layers, color: 'text-indigo-400' },
     { id: 'quiz', label: 'Past Paper Quizzes', icon: GraduationCap, color: 'text-emerald-400' },
     { id: 'revision', label: 'Revision Notes', icon: BookOpen, color: 'text-cyan-400' },
     { id: 'formulas', label: 'Formulas & Commands', icon: BookmarkCheck, color: 'text-amber-400' },
     { id: 'chat', label: 'AI Examiner Chat', icon: MessageSquare, color: 'text-purple-400' },
-    { id: 'boundaries', label: 'Grade Boundaries', icon: TrendingUp, color: 'text-emerald-400' },
+    { id: 'boundaries', label: 'Grade Boundaries', icon: TrendingUp, color: 'text-teal-400' },
     { id: 'split', label: 'Split-Screen Papers', icon: Columns, color: 'text-sky-400' },
   ];
 

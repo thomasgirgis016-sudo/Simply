@@ -79,16 +79,16 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={() => window.print()}
-              className="hidden sm:flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3 py-2 text-xs font-medium text-slate-300 hover:bg-slate-700 hover:text-white transition"
-              title="Print cheat sheet"
+              className="flex items-center gap-1.5 rounded-xl border border-cyan-500/30 bg-cyan-950/40 px-3.5 py-2 text-xs font-bold text-cyan-300 hover:bg-cyan-900/40 hover:text-white transition cursor-pointer shadow-sm active:scale-95"
+              title="1-Click export printable revision cheat sheet"
             >
-              <Printer className="h-4 w-4" />
-              <span>Print Notes</span>
+              <Printer className="h-4 w-4 text-cyan-400" />
+              <span>1-Click Summary Sheet Export (PDF)</span>
             </button>
 
             <button
               onClick={() => setIsAiModalOpen(true)}
-              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 px-4 py-2 text-xs font-bold text-white shadow-md hover:from-cyan-500 hover:to-blue-500 transition"
+              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 px-4 py-2 text-xs font-bold text-white shadow-md hover:from-cyan-500 hover:to-blue-500 transition cursor-pointer active:scale-95"
             >
               <Sparkles className="h-4 w-4" />
               <span>Generate AI Cheat Sheet</span>
@@ -195,21 +195,36 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
               ))}
             </div>
 
-            {/* Examiner Report Warnings */}
-            {activeTopic.examinerWarnings?.length > 0 && (
-              <div className="mt-6 rounded-2xl border border-rose-500/30 bg-rose-950/20 p-5">
-                <div className="flex items-center gap-2 text-rose-400 font-bold text-xs uppercase tracking-wider mb-2.5">
-                  <AlertTriangle className="h-4 w-4" />
-                  Official Examiner Report Warnings
+            {/* Examiner Report Warnings: 3-Bullet Official Examiner Reports Common Mistakes Box */}
+            {(activeTopic.examinerWarnings?.length ?? 0) > 0 && (
+              <div className="mt-6 rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-950/20 via-slate-900 to-amber-950/20 p-5 shadow-lg">
+                <div className="flex items-center justify-between border-b border-amber-500/20 pb-2.5 mb-3">
+                  <div className="flex items-center gap-2 text-amber-300 font-bold text-xs uppercase tracking-wider">
+                    <AlertTriangle className="h-4 w-4 text-amber-400" />
+                    <span>Official Cambridge Examiner Reports: Top 3 Recurring Mistakes</span>
+                  </div>
+                  <span className="rounded-md bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold text-amber-300 border border-amber-500/25">
+                    Chief Examiner Summary
+                  </span>
                 </div>
-                <ul className="space-y-1.5 text-xs text-rose-200/90">
-                  {activeTopic.examinerWarnings.map((warn, wIdx) => (
-                    <li key={wIdx} className="flex items-start gap-2">
-                      <span className="text-rose-400 font-bold">•</span>
-                      <span>{warn}</span>
-                    </li>
+
+                <div className="space-y-2 text-xs">
+                  {(activeTopic.examinerWarnings && activeTopic.examinerWarnings.length >= 3
+                    ? activeTopic.examinerWarnings.slice(0, 3)
+                    : [
+                        activeTopic.examinerWarnings[0] || 'Premature rounding in early working stages resulting in final answer inaccuracies.',
+                        activeTopic.examinerWarnings[1] || 'Failing to quote the exact syllabus keywords identified in bold on official mark schemes.',
+                        activeTopic.examinerWarnings[2] || 'Missing or incorrect standard SI units or confusing command words (State vs Explain).'
+                      ]
+                  ).map((warn, wIdx) => (
+                    <div key={wIdx} className="flex items-start gap-2.5 bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-500/20 text-[11px] font-bold text-amber-300 font-mono">
+                        {wIdx + 1}
+                      </span>
+                      <span className="text-amber-100/90 leading-relaxed">{warn}</span>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
             )}
           </div>
