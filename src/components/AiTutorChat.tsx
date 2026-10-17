@@ -116,12 +116,126 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
     ]);
   };
 
-  const quickQuestions = [
-    `Explain Redox reactions (OIL RIG & mark scheme criteria)`,
-    `How do I get an A* / Grade 9 in ${subject.name}?`,
-    `What are the most common mistakes candidates make in this exam?`,
-    `Give me a challenging past paper question on ${subject.topics[0] || 'core concepts'}`
-  ];
+  const getSubjectQuickPrompts = (): string[] => {
+    // 1. Exact subject ID match
+    const promptMap: Record<string, string[]> = {
+      'cie-math-0580': [
+        'How do I solve quadratic equations using the formula and avoid negative sign slips?',
+        'Explain the circle theorems and exact geometric reasons required by Cambridge mark schemes.',
+        'How do I find the equation of a perpendicular bisector and midpoints in coordinate geometry?',
+        `Give me a challenging 5-mark Paper 4 question on ${subject.topics[5] || 'vectors and transformations'}.`
+      ],
+      'edx-math-4ma1': [
+        'How do I find turning points and gradients using differentiation (dy/dx)?',
+        'Explain sine rule, cosine rule, and 3D trigonometry with method marks.',
+        'How to calculate cumulative frequency, median, and interquartile range correctly?',
+        'Walk through a high-mark problem on algebraic fractions and proofs.'
+      ],
+      'cie-addmath-0606': [
+        'Explain circular measure: arc length and sector area in radians ($s = r\\theta, A = \\frac{1}{2}r^2\\theta$).',
+        'How do I evaluate permutations vs combinations in exam scenarios?',
+        'Integration: finding the equation of a curve given dy/dx and a point.',
+        'Logarithmic and exponential laws with mark scheme steps.'
+      ],
+      'cie-physics-0625': [
+        'Explain conservation of momentum ($m_1u_1 + m_2u_2 = m_1v_1 + m_2v_2$) with mark breakdown.',
+        'How do I calculate refractive index and critical angle using total internal reflection?',
+        'Explain the transformer equation ($V_p/V_s = N_p/N_s$) and electrical power transmission loss ($P = I^2R$).',
+        'Break down half-life calculations and radioactive decay curve interpretation.'
+      ],
+      'edx-physics-4ph1': [
+        'Explain terminal velocity for a falling parachutist with forces and mark points.',
+        'How do I calculate Doppler effect and frequency shift for moving sound or light?',
+        'Mains electricity: Earth wire, fuse ratings, and double insulation explained.',
+        'Astrophysics: Redshift, Hubble\'s Law, and Big Bang evidence.'
+      ],
+      'cie-chem-0620': [
+        'Explain Redox reactions (OIL RIG, oxidation states & identifying agents).',
+        'How to write full ionic equations and identify spectator ions for precipitation.',
+        'Explain electrolysis of molten lead(II) bromide vs concentrated aqueous NaCl (brine).',
+        'Le Chatelier\'s principle: predicting equilibrium yield with temperature and pressure changes.'
+      ],
+      'edx-chem-4ch1': [
+        'Explain fractional distillation of crude oil and uses of each hydrocarbon fraction.',
+        'How to calculate empirical formula and molecular formula from combustion masses.',
+        'Reactivity series: displacement reactions and blast furnace iron extraction.',
+        'Energetics: bond energy calculation (bonds broken minus bonds formed).'
+      ],
+      'cie-bio-0610': [
+        'Explain enzyme action, the lock-and-key hypothesis, and thermal denaturation.',
+        'Mitosis vs Meiosis: chromosome number, daughter cells, and biological purpose.',
+        'Explain the transpiration stream: water uptake via root hair cells and stomatal control.',
+        'How do alveoli adapt to maximize the rate of gas diffusion in human lungs?'
+      ],
+      'edx-bio-4bi1': [
+        'Explain selective breeding vs genetic engineering with restriction enzymes and ligase.',
+        'How does ADH control water balance and osmoregulation in the nephron?',
+        'Photosynthesis limiting factors: light intensity, CO2 concentration, and temperature.',
+        'Explain ecological food webs, energy loss between trophic levels, and pyramids of biomass.'
+      ],
+      'cie-esl-0510': [
+        'How do I structure an informal email (Exercise 5) to score maximum marks in Style and Content?',
+        'Summary Writing (Exercise 4): Technique to extract 10 key points within 120 words.',
+        'Top transition words and complex sentence connectors for school magazine articles.',
+        'What are the key differences between a review and a formal report for Exercise 6?'
+      ],
+      'edx-esl-4es1': [
+        'Paper 1 Part 4: How to paraphrase effectively in summary writing to earn language marks.',
+        'Structure and formal register for Edexcel 4ES1 extended writing tasks.',
+        'Tips to avoid common grammatical pitfalls in reading comprehension matching exercises.',
+        'How to manage timing across Paper 1 reading and writing sections.'
+      ],
+      'cie-cs-0478': [
+        'Explain Two\'s Complement representation for negative numbers and overflow error.',
+        'Trace table technique: How to trace while loops and 1D arrays without making mistakes.',
+        'How does the Von Neumann CPU architecture work (Fetch-Decode-Execute cycle)?',
+        'Explain symmetric vs asymmetric encryption and digital certificates.'
+      ],
+      'cie-econ-0455': [
+        'Explain Price Elasticity of Demand (PED) formula, elastic vs inelastic, and total revenue.',
+        'Fiscal Policy vs Monetary Policy: government instruments, diagrams, and evaluation.',
+        'How do negative externalities in production lead to market failure and social cost?',
+        'Explain comparative advantage and the pros and cons of protectionist trade tariffs.'
+      ],
+      'cie-history-0470': [
+        'How to structure a 10-mark source utility question using provenance, tone, and context.',
+        'Who was to blame for the Cold War (1945–1949): Yalta, Potsdam, and Marshall Plan.',
+        'What were the primary weaknesses of the League of Nations in Manchuria and Abyssinia?',
+        'Germany 1918–1945: How did Hitler consolidate power between 1933 and 1934?'
+      ]
+    };
+
+    if (promptMap[subject.id]) {
+      return promptMap[subject.id];
+    }
+
+    // 2. Fallback based on category
+    if (subject.category === 'Mathematics') {
+      return [
+        `How do I solve key equations in ${subject.name} without losing method marks?`,
+        `What formulas are NOT given on the formula sheet for ${subject.code}?`,
+        `Walk me through an exam question on ${subject.topics[0] || 'core algebra'}.`,
+        `What are the most common arithmetic errors candidates make in ${subject.name}?`
+      ];
+    }
+    if (subject.category === 'Sciences') {
+      return [
+        `What are the compulsory keywords for ${subject.topics[0] || 'core concepts'}?`,
+        `Explain the experimental procedures and precautions for Paper 6 / Practical.`,
+        `How do examiners allocate [M], [A], and [B] marks in ${subject.name}?`,
+        `Give me a challenging question on ${subject.topics[1] || 'advanced principles'}.`
+      ];
+    }
+
+    return [
+      `How do I get an A* / Grade 9 in ${subject.name}?`,
+      `What are the most common mistakes candidates make in ${subject.code}?`,
+      `Give me a challenging past paper question on ${subject.topics[0] || 'core concepts'}.`,
+      `Explain the top command words and mark scheme criteria for ${subject.name}.`
+    ];
+  };
+
+  const quickQuestions = getSubjectQuickPrompts();
 
   return (
     <div className="mx-auto flex h-[calc(100dvh-135px)] sm:h-[calc(100vh-180px)] max-w-4xl flex-col rounded-2xl sm:rounded-3xl border border-slate-800 bg-slate-900/90 shadow-2xl backdrop-blur-md overflow-hidden">

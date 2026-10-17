@@ -99,6 +99,25 @@ export const IGCSE_SUBJECTS: Subject[] = [
     ]
   },
   {
+    id: 'edx-math-4mb1',
+    name: 'Mathematics B',
+    code: 'Edexcel 4MB1',
+    board: 'Edexcel',
+    category: 'Mathematics',
+    icon: 'Calculator',
+    color: '#1d4ed8',
+    topics: [
+      'Number and Sets',
+      'Algebra, Equations & Inequalities',
+      'Matrices and Determinants',
+      'Geometry, Polygons & Circle Theorems',
+      'Trigonometry and Bearings',
+      'Vectors in 2 Dimensions',
+      'Probability, Tree Diagrams and Venns',
+      'Elementary Calculus & Rates of Change'
+    ]
+  },
+  {
     id: 'cie-addmath-0606',
     name: 'Additional Mathematics',
     code: 'CIE 0606',
@@ -216,6 +235,22 @@ export const IGCSE_SUBJECTS: Subject[] = [
     ]
   },
   {
+    id: 'edx-bio-4bi1',
+    name: 'Biology',
+    code: 'Edexcel 4BI1',
+    board: 'Edexcel',
+    category: 'Sciences',
+    icon: 'Dna',
+    color: '#059669',
+    topics: [
+      'The Nature and Variety of Living Organisms',
+      'Structures and Functions in Living Organisms',
+      'Reproduction and Inheritance (Selective breeding & Genetic modification)',
+      'Ecology and the Environment (Nutrient cycles, Global warming)',
+      'Use of Biological Resources (Food production, Fermentation)'
+    ]
+  },
+  {
     id: 'cie-combined-sci-0653',
     name: 'Combined Science',
     code: 'CIE 0653 / 0654',
@@ -250,6 +285,23 @@ export const IGCSE_SUBJECTS: Subject[] = [
       'Programming Concepts (Variables, Arrays, Functions)',
       'Databases & SQL',
       'Boolean Logic (Logic Gates & Truth Tables)'
+    ]
+  },
+  {
+    id: 'edx-cs-4cp0',
+    name: 'Computer Science',
+    code: 'Edexcel 4CP0',
+    board: 'Edexcel',
+    category: 'Tech',
+    icon: 'Cpu',
+    color: '#7c3aed',
+    topics: [
+      'Topic 1: Computational Thinking & Algorithms',
+      'Topic 2: Data Representation (Binary, Hex, Sound, Images)',
+      'Topic 3: Computer Systems, Hardware & Software',
+      'Topic 4: Networks, Topologies & Cyber Security',
+      'Topic 5: Environmental and Ethical Issues of Emerging Tech',
+      'Topic 6: Practical Python Programming & Syntax'
     ]
   },
 
@@ -345,6 +397,21 @@ export const IGCSE_SUBJECTS: Subject[] = [
     ]
   },
   {
+    id: 'edx-econ-4ec1',
+    name: 'Economics',
+    code: 'Edexcel 4EC1',
+    board: 'Edexcel',
+    category: 'Commercial',
+    icon: 'TrendingUp',
+    color: '#ea580c',
+    topics: [
+      'The Market System (Demand, Supply, Equilibrium price)',
+      'Business Economics (Costs, Revenue, Profit, Market structures)',
+      'Government and the Economy (Macro objectives, Fiscal & Monetary policy)',
+      'The Global Economy (Trade, Exchange rates, Globalization)'
+    ]
+  },
+  {
     id: 'cie-business-0450',
     name: 'Business Studies',
     code: 'CIE 0450',
@@ -359,6 +426,22 @@ export const IGCSE_SUBJECTS: Subject[] = [
       'Operations Management (Production Methods, Quality)',
       'Financial Information and Decisions (Cash Flow, Income Statement)',
       'External Influences on Business Activity'
+    ]
+  },
+  {
+    id: 'edx-bus-4bs1',
+    name: 'Business',
+    code: 'Edexcel 4BS1',
+    board: 'Edexcel',
+    category: 'Commercial',
+    icon: 'Briefcase',
+    color: '#db2777',
+    topics: [
+      'Business Activity and Influences on Business',
+      'People in Business (Recruitment, Training, Motivation)',
+      'Business Finance (Sources of finance, Break-even analysis)',
+      'Marketing (Marketing mix, Market analysis)',
+      'Business Operations (Economies of scale, Quality control)'
     ]
   },
   {

@@ -23,7 +23,7 @@ interface FlashcardsViewProps {
   profile: UserProfile;
   flashcards: Flashcard[];
   onAddFlashcards: (newCards: Flashcard[]) => void;
-  onUpdateFlashcardMastery: (id: string, mastered: boolean) => void;
+  onUpdateFlashcardMastery: (id: string, mastered: boolean, intervalDays?: number) => void;
 }
 
 export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
@@ -116,9 +116,16 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
     setTouchEndX(null);
   };
 
-  const handleToggleMastery = (mastered: boolean) => {
+  const handleRateCard = (rating: 'again' | 'good' | 'easy') => {
     if (!currentCard) return;
-    onUpdateFlashcardMastery(currentCard.id, mastered);
+    const intervalMap = {
+      again: 1,
+      good: 3,
+      easy: 7,
+    };
+    const intervalDays = intervalMap[rating];
+    const isMastered = rating !== 'again';
+    onUpdateFlashcardMastery(currentCard.id, isMastered, intervalDays);
     handleNext();
   };
 
@@ -301,7 +308,12 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    {currentCard?.intervalDays && (
+                      <span className="rounded-md bg-indigo-500/15 px-2 py-0.5 text-[10px] font-bold text-indigo-300 border border-indigo-500/25">
+                        Interval: {currentCard.intervalDays}d
+                      </span>
+                    )}
                     {currentCard?.mastered && (
                       <span className="flex items-center gap-1 rounded-md bg-emerald-500/10 px-2 py-0.5 text-[11px] font-bold text-emerald-400 border border-emerald-500/20">
                         <Award className="h-3 w-3" /> Mastered
@@ -395,21 +407,34 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
               </button>
             </div>
 
-            {/* Confidence Ratings */}
-            <div className="flex items-center gap-2 order-1 sm:order-2">
+            {/* 3-Button Spaced Repetition Ratings */}
+            <div className="flex items-center gap-1.5 sm:gap-2 order-1 sm:order-2">
               <button
-                onClick={() => handleToggleMastery(false)}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-2.5 sm:py-2 text-xs font-bold text-rose-300 hover:bg-rose-500/20 active:scale-95 transition cursor-pointer"
+                type="button"
+                onClick={() => handleRateCard('again')}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-1 sm:gap-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 sm:px-3.5 py-2 sm:py-2 text-xs font-bold text-rose-300 hover:bg-rose-500/20 active:scale-95 transition cursor-pointer"
+                title="Review tomorrow (1 day interval)"
               >
-                <HelpCircle className="h-4 w-4" />
-                <span>Still Learning</span>
+                <HelpCircle className="h-3.5 w-3.5 shrink-0" />
+                <span>Again (1d)</span>
               </button>
               <button
-                onClick={() => handleToggleMastery(true)}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5 sm:py-2 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20 active:scale-95 transition cursor-pointer"
+                type="button"
+                onClick={() => handleRateCard('good')}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-1 sm:gap-1.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-3 sm:px-3.5 py-2 sm:py-2 text-xs font-bold text-indigo-300 hover:bg-indigo-500/20 active:scale-95 transition cursor-pointer"
+                title="Review in 3 days"
               >
-                <CheckCircle className="h-4 w-4" />
-                <span>Mastered (+1)</span>
+                <CheckCircle className="h-3.5 w-3.5 shrink-0" />
+                <span>Good (3d)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleRateCard('easy')}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-1 sm:gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 sm:px-3.5 py-2 sm:py-2 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20 active:scale-95 transition cursor-pointer"
+                title="Review in 7 days"
+              >
+                <Award className="h-3.5 w-3.5 shrink-0" />
+                <span>Easy (7d)</span>
               </button>
             </div>
           </div>

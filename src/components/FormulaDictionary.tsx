@@ -133,41 +133,41 @@ export const FormulaDictionary: React.FC<FormulaDictionaryProps> = ({
             filteredFormulas.map((f) => (
               <div
                 key={f.id}
-                className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-lg hover:border-slate-700 transition space-y-3"
+                className="rounded-2xl border border-slate-800 bg-slate-900/90 p-6 sm:p-7 shadow-lg hover:border-slate-700 transition space-y-4"
               >
-                <div className="flex items-start justify-between gap-2 border-b border-slate-800 pb-2.5">
+                <div className="flex items-start justify-between gap-2 border-b border-slate-800/80 pb-3">
                   <div>
-                    <span className="rounded-md bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold text-amber-300 border border-amber-500/20">
+                    <span className="rounded-md bg-amber-500/10 px-2.5 py-0.5 text-[10px] font-bold text-amber-300 border border-amber-500/20">
                       {f.topic}
                     </span>
-                    <h4 className="text-base font-bold text-white mt-1">{f.name}</h4>
+                    <h4 className="text-base sm:text-lg font-bold text-white mt-1.5">{f.name}</h4>
                   </div>
                 </div>
 
                 {/* Big Formula Box with responsive scroll and scaling */}
-                <div className="rounded-xl border border-slate-700/60 bg-slate-950 p-3 sm:p-4 text-center overflow-x-auto max-w-full scrollbar-thin scrollbar-thumb-slate-800">
-                  <div className="inline-block min-w-full">
-                    <MathRenderer content={`$$${f.formula}$$`} className="text-xs sm:text-sm md:text-base text-amber-300 font-bold" />
+                <div className="rounded-xl border border-slate-700/60 bg-slate-950/90 p-4 sm:p-5 text-center overflow-x-auto max-w-full scrollbar-thin scrollbar-thumb-slate-700/50 my-1">
+                  <div className="inline-block min-w-full py-1">
+                    <MathRenderer content={`$$${f.formula}$$`} className="text-xs sm:text-sm md:text-base text-amber-300 font-bold tracking-wide" />
                   </div>
                 </div>
 
-                <div className="space-y-1.5 text-xs">
-                  <div className="flex items-start gap-1.5 text-slate-300">
+                <div className="space-y-2 text-xs pt-1">
+                  <div className="flex items-start gap-2 text-slate-300">
                     <span className="font-bold text-slate-400 shrink-0">Variables:</span>
-                    <span>{f.whereVariables}</span>
+                    <span className="leading-relaxed">{f.whereVariables}</span>
                   </div>
-                  <div className="flex items-start gap-1.5 text-slate-300">
+                  <div className="flex items-start gap-2 text-slate-300">
                     <span className="font-bold text-slate-400 shrink-0">Standard Units:</span>
-                    <span className="font-mono text-cyan-300">{f.units}</span>
+                    <span className="font-mono text-cyan-300 font-semibold">{f.units}</span>
                   </div>
                 </div>
 
                 {/* Exam Tip */}
                 {f.examTip && (
-                  <div className="rounded-xl border border-amber-500/20 bg-amber-950/20 p-3">
-                    <div className="flex items-center gap-1.5 text-[11px] font-bold text-amber-300 mb-0.5">
+                  <div className="rounded-xl border border-amber-500/25 bg-amber-950/25 p-3.5 mt-2">
+                    <div className="flex items-center gap-1.5 text-[11px] font-bold text-amber-300 mb-1">
                       <Lightbulb className="h-3.5 w-3.5" />
-                      Examiner Trap:
+                      Examiner Trap & Warning:
                     </div>
                     <p className="text-[11px] text-amber-200/90 leading-relaxed">{f.examTip}</p>
                   </div>

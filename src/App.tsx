@@ -22,6 +22,8 @@ import { QuizView } from './components/QuizView';
 import { RevisionNotesView } from './components/RevisionNotesView';
 import { FormulaDictionary } from './components/FormulaDictionary';
 import { AiTutorChat } from './components/AiTutorChat';
+import { GradeBoundariesCalculator } from './components/GradeBoundariesCalculator';
+import { SplitScreenPaperViewer } from './components/SplitScreenPaperViewer';
 import { SettingsModal } from './components/SettingsModal';
 import { ProfileModal } from './components/ProfileModal';
 import { AuthModal } from './components/AuthModal';
@@ -171,6 +173,57 @@ export function App() {
     localStorage.setItem('simply_igcse_revision', JSON.stringify(revisionNotes));
   }, [revisionNotes]);
 
+  // URL Query Parameters Routing (?tab=...&subject=...)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get('tab');
+      const subjectParam = params.get('subject');
+
+      const validTabs: ActiveTab[] = [
+        'solver',
+        'flashcards',
+        'quiz',
+        'revision',
+        'formulas',
+        'chat',
+        'boundaries',
+        'split'
+      ];
+      if (tabParam && validTabs.includes(tabParam as ActiveTab)) {
+        setActiveTab(tabParam as ActiveTab);
+      }
+
+      if (subjectParam) {
+        const found = IGCSE_SUBJECTS.find(
+          s =>
+            s.id.toLowerCase() === subjectParam.toLowerCase() ||
+            s.code.toLowerCase().includes(subjectParam.toLowerCase())
+        );
+        if (found) {
+          setActiveSubject(found);
+        }
+      }
+    } catch (e) {
+      console.warn('URL routing read bypassed:', e);
+    }
+  }, []);
+
+  // Synchronize URL with activeTab and activeSubject changes
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      params.set('tab', activeTab);
+      params.set('subject', activeSubject.id);
+      const newUrl = `${window.location.pathname}?${params.toString()}`;
+      window.history.replaceState(null, '', newUrl);
+    } catch (e) {
+      console.warn('URL sync bypassed:', e);
+    }
+  }, [activeTab, activeSubject]);
+
   // Auth Handlers
   const handleAuthSuccess = (user: UserAccount) => {
     setCurrentUser(user);
@@ -213,9 +266,23 @@ export function App() {
     setFlashcards(prev => [...newCards, ...prev]);
   };
 
-  const handleUpdateFlashcardMastery = (id: string, mastered: boolean) => {
+  const handleUpdateFlashcardMastery = (id: string, mastered: boolean, intervalDays?: number) => {
+    const nextDate = intervalDays
+      ? new Date(Date.now() + intervalDays * 24 * 60 * 60 * 1000).toISOString()
+      : undefined;
+
     setFlashcards(prev =>
-      prev.map(c => (c.id === id ? { ...c, mastered } : c))
+      prev.map(c =>
+        c.id === id
+          ? {
+              ...c,
+              mastered,
+              intervalDays: intervalDays ?? c.intervalDays,
+              nextReviewDate: nextDate ?? c.nextReviewDate,
+              reviewCount: (c.reviewCount || 0) + 1,
+            }
+          : c
+      )
     );
   };
 
@@ -250,6 +317,7 @@ export function App() {
         }}
         onLogout={handleLogout}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenCalculator={() => setIsCalculatorOpen(true)}
       />
 
       {/* Main Container */}
@@ -303,6 +371,20 @@ export function App() {
             profile={profile}
             initialQuestion={chatInitialQuestion}
             onClearInitialQuestion={() => setChatInitialQuestion(undefined)}
+          />
+        )}
+
+        {activeTab === 'boundaries' && (
+          <GradeBoundariesCalculator
+            activeSubject={activeSubject}
+            profile={profile}
+          />
+        )}
+
+        {activeTab === 'split' && (
+          <SplitScreenPaperViewer
+            activeSubject={activeSubject}
+            profile={profile}
           />
         )}
       </main>

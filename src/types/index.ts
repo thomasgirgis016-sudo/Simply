@@ -55,6 +55,9 @@ export interface Flashcard {
   examinerTip?: string;
   difficulty: 'Core' | 'Extended' | 'Hard';
   mastered?: boolean;
+  intervalDays?: number; // 1, 3, 7
+  nextReviewDate?: string; // ISO date
+  reviewCount?: number;
 }
 
 export interface QuizOption {

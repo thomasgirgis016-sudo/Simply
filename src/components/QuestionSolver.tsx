@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { Subject, UserProfile, SolverResult, FlaggedQuestionIssue } from '../types';
 import { SAMPLE_SOLVER_QUESTIONS } from '../data/initialData';
-import { solveQuestionWithGemini } from '../services/gemini';
+import { solveQuestionWithGemini, isPuterSignedIn, connectPuterSession } from '../services/gemini';
 import { MathRenderer } from './MathRenderer';
 
 interface QuestionSolverProps {
@@ -47,6 +47,12 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
   const [reportIssueType, setReportIssueType] = useState('Arithmetic or calculation slip');
   const [reportDetails, setReportDetails] = useState('');
   const [reportSuccess, setReportSuccess] = useState(false);
+  const [puterConnected, setPuterConnected] = useState<boolean>(() => isPuterSignedIn());
+
+  const handleConnectPuter = async () => {
+    const success = await connectPuterSession();
+    setPuterConnected(success);
+  };
 
   const handleReportSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -208,14 +214,34 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-xs font-bold text-white">Student Free AI Pass Active</span>
                 <span className="inline-block rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-400 border border-emerald-500/20">
-                  Zero-Config • No API Key Needed
+                  Zero-Config • No Personal API Keys Needed
                 </span>
+                {puterConnected ? (
+                  <span className="inline-block rounded-full bg-indigo-500/20 px-2 py-0.5 text-[10px] font-semibold text-indigo-300 border border-indigo-500/30">
+                    Live Client Session Connected
+                  </span>
+                ) : (
+                  <span className="inline-block rounded-full bg-slate-800 px-2 py-0.5 text-[10px] font-semibold text-slate-400 border border-slate-700">
+                    Guest Mode • Instant Fallback Active
+                  </span>
+                )}
               </div>
               <p className="text-[11px] text-slate-400 mt-0.5">
-                Instant access to Cambridge & Edexcel mark schemes, photo solving, and examiner advice. No personal keys or logins required.
+                Instant access to Cambridge & Edexcel mark schemes, photo solving, and examiner advice. Protected against pop-up hangs.
               </p>
             </div>
           </div>
+
+          {!puterConnected && (
+            <button
+              type="button"
+              onClick={handleConnectPuter}
+              className="shrink-0 flex items-center gap-1.5 rounded-xl border border-indigo-500/40 bg-indigo-600/30 hover:bg-indigo-600/50 px-3 py-1.5 text-xs font-bold text-indigo-200 transition active:scale-95 cursor-pointer"
+            >
+              <Sparkles className="h-3.5 w-3.5 text-indigo-300" />
+              <span>Connect Free AI Session (Optional)</span>
+            </button>
+          )}
         </div>
 
         {/* Input Section */}

@@ -12,17 +12,48 @@ export interface GeminiSolveParams {
   gradeLevel: string;
 }
 
-// Zero-Key Client-Side AI caller (Uses Puter.js in browser with no API key required!)
+// Zero-Key Client-Side AI caller (Uses Puter.js in browser with zero keys required)
+export function isPuterAvailable(): boolean {
+  return typeof window !== 'undefined' && Boolean((window as any).puter?.ai?.chat);
+}
+
+export function isPuterSignedIn(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return Boolean((window as any).puter?.auth?.isSignedIn?.());
+  } catch {
+    return false;
+  }
+}
+
+export async function connectPuterSession(): Promise<boolean> {
+  if (typeof window === 'undefined' || !(window as any).puter?.auth?.signIn) return false;
+  try {
+    await (window as any).puter.auth.signIn();
+    return isPuterSignedIn();
+  } catch (e) {
+    console.warn('Puter sign in cancelled or blocked:', e);
+    return false;
+  }
+}
+
 async function callZeroKeyAi(prompt: string, systemPrompt?: string): Promise<string> {
   if (typeof window !== 'undefined' && (window as any).puter?.ai?.chat) {
     try {
       const puter = (window as any).puter;
       const fullPrompt = systemPrompt ? `${systemPrompt}\n\nStudent Question:\n${prompt}` : prompt;
-      const res = await puter.ai.chat(fullPrompt, { model: 'gpt-4o-mini' });
+
+      // Strict 6500ms timeout race to prevent infinite hanging if popup was closed or blocked
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('PUTER_TIMEOUT')), 6500)
+      );
+
+      const chatPromise = puter.ai.chat(fullPrompt, { model: 'gpt-4o-mini' });
+      const res = await Promise.race([chatPromise, timeoutPromise]);
       const text = typeof res === 'string' ? res : res?.message?.content || res?.text || '';
       if (text && text.trim() !== '') return text;
     } catch (e) {
-      console.warn('Puter AI attempt bypassed:', e);
+      console.warn('Puter AI attempt bypassed or timed out:', e);
     }
   }
   throw new Error('ZERO_KEY_AI_UNAVAILABLE');
