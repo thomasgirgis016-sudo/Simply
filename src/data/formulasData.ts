@@ -395,5 +395,113 @@ export const COMPREHENSIVE_FORMULAS: FormulaItem[] = [
     whereVariables: 'Capital Employed = Non-Current Liabilities + Owner\'s Equity (or Total Assets - Current Liabilities)',
     units: 'ROCE in %, Working Capital in currency',
     examTip: 'A higher ROCE indicates more efficient generation of profit from the financial capital invested in the business.'
+  },
+
+  // ==========================================================
+  // BIOLOGY (CIE 0610 & EDEXCEL 4BI1)
+  // ==========================================================
+  {
+    id: 'f-b-1',
+    subjectId: 'cie-bio-0610',
+    topic: 'Cell Structure & Organisation',
+    name: 'Magnification Equation (M = I / A)',
+    formula: 'M = \\frac{I}{A}, \\quad A = \\frac{I}{M}, \\quad I = M \\times A',
+    whereVariables: 'M = Magnification (dimensionless ratio), I = Image size (measured with ruler), A = Actual size of specimen',
+    units: 'Convert image and actual size to identical units! 1 mm = 1000 µm, 1 cm = 10 mm = 10,000 µm',
+    examTip: 'Examiner trap: Measure image with a millimetre ruler, multiply by 1000 to convert to micrometres (µm), THEN divide by actual size.'
+  },
+  {
+    id: 'f-b-2',
+    subjectId: 'cie-bio-0610',
+    topic: 'Plant Nutrition & Photosynthesis',
+    name: 'Balanced Photosynthesis Chemical Equation',
+    formula: '6\\text{CO}_2 + 6\\text{H}_2\\text{O} \\xrightarrow[\\text{chlorophyll}]{\\text{light}} \\text{C}_6\\text{H}_{12}\\text{O}_6 + 6\\text{O}_2',
+    whereVariables: 'Carbon dioxide + water yields glucose + oxygen in chloroplasts containing chlorophyll',
+    units: 'Equimolar gas conversion (6 mol CO₂ produce 6 mol O₂)',
+    examTip: 'Examiners award zero marks for unbalanced chemical symbols! You must write 6CO₂ and 6O₂ with light & chlorophyll written over/under arrow.'
+  },
+  {
+    id: 'f-b-3',
+    subjectId: 'cie-bio-0610',
+    topic: 'Respiration & Gas Exchange',
+    name: 'Aerobic & Anaerobic Respiration Equations',
+    formula: '\\text{Aerobic: } \\text{C}_6\\text{H}_{12}\\text{O}_6 + 6\\text{O}_2 \\rightarrow 6\\text{CO}_2 + 6\\text{H}_2\\text{O} \\quad | \\quad \\text{Anaerobic (Muscle): } \\text{C}_6\\text{H}_{12}\\text{O}_6 \\rightarrow 2\\text{C}_3\\text{H}_6\\text{O}_3 \\text{ (Lactic Acid)}',
+    whereVariables: 'Anaerobic in Yeast (Fermentation): C₆H₁₂O₆ → 2C₂H₅OH (Ethanol) + 2CO₂',
+    units: 'Energy released per mole glucose: ~2830 kJ (aerobic) vs ~150 kJ (anaerobic)',
+    examTip: 'Anaerobic respiration in human muscle produces ONLY lactic acid (no carbon dioxide!). Carbon dioxide is only produced in yeast anaerobic respiration.'
+  },
+  {
+    id: 'f-b-4',
+    subjectId: 'cie-bio-0610',
+    topic: 'Transport in Animals (Circulation)',
+    name: 'Cardiac Output & Heart Rate',
+    formula: '\\text{Cardiac Output } (\\text{cm}^3/\\text{min}) = \\text{Stroke Volume } (\\text{cm}^3) \\times \\text{Heart Rate } (\\text{beats/min})',
+    whereVariables: 'Stroke Volume = volume of blood pumped per ventricle contraction; Heart Rate = beats per minute',
+    units: 'cm³/min or dm³/min (1 dm³ = 1000 cm³)',
+    examTip: 'During intense aerobic exercise, both stroke volume and heart rate increase simultaneously to supply oxygenated blood to contracting muscles.'
+  },
+  {
+    id: 'f-b-5',
+    subjectId: 'cie-bio-0610',
+    topic: 'Human Nutrition & Diet',
+    name: 'Body Mass Index (BMI)',
+    formula: '\\text{BMI} = \\frac{\\text{Mass in kilograms}}{(\\text{Height in metres})^2} = \\frac{m}{h^2}',
+    whereVariables: 'm = mass in kg, h = vertical stature height in metres',
+    units: 'kg/m²',
+    examTip: 'Remember to square height FIRST before dividing into mass. E.g. 70 kg / (1.75 m)² = 70 / 3.0625 = 22.9 kg/m².'
+  },
+  {
+    id: 'f-b-6',
+    subjectId: 'cie-bio-0610',
+    topic: 'Experimental Biology & Ecology',
+    name: 'Percentage Change & Surface Area to Volume Ratio',
+    formula: '\\%\\text{ Change} = \\frac{\\text{Final} - \\text{Initial}}{\\text{Initial}} \\times 100\\%, \\quad \\text{SA:V Ratio} = \\frac{\\text{Total Surface Area}}{\\text{Volume}}',
+    whereVariables: 'Used in osmosis experiments (chip mass/length change) and heat retention in organisms',
+    units: 'Percentage (%) or ratio unitless (e.g. 6 : 1)',
+    examTip: 'If potato chip loses mass, percentage change MUST have a negative sign (e.g. -12.5%)!'
+  },
+
+  // ==========================================================
+  // CHEMISTRY QUALITATIVE ANALYSIS & DATA (CIE 0620 & 4CH1)
+  // ==========================================================
+  {
+    id: 'f-c-7',
+    subjectId: 'cie-chem-0620',
+    topic: 'Qualitative Analysis (Ion Tests)',
+    name: 'Aqueous Cation Tests (NaOH & NH₃ Precipitation)',
+    formula: '\\text{Cu}^{2+} \\rightarrow \\text{Light blue ppt} \\quad | \\quad \\text{Fe}^{2+} \\rightarrow \\text{Green ppt} \\quad | \\quad \\text{Fe}^{3+} \\rightarrow \\text{Red-brown ppt}',
+    whereVariables: 'Al³⁺: White ppt soluble in excess NaOH (colourless), insoluble in NH₃ | Zn²⁺: White ppt soluble in excess NaOH & excess NH₃ | Ca²⁺: White ppt insoluble in excess NaOH, no ppt with NH₃',
+    units: 'Precipitate observations & colour shifts',
+    examTip: 'To distinguish Al³⁺ from Zn²⁺: add excess aqueous ammonia (NH₃). Zn²⁺ precipitate dissolves to give colourless solution, whereas Al³⁺ precipitate remains insoluble.'
+  },
+  {
+    id: 'f-c-8',
+    subjectId: 'cie-chem-0620',
+    topic: 'Qualitative Analysis (Ion Tests)',
+    name: 'Anion Tests (Carbonate, Halides, Sulfate, Nitrate)',
+    formula: '\\text{Cl}^- \\rightarrow \\text{White ppt (AgCl)}, \\quad \\text{Br}^- \\rightarrow \\text{Cream ppt (AgBr)}, \\quad \\text{I}^- \\rightarrow \\text{Yellow ppt (AgI)}',
+    whereVariables: 'Halides: Acidify with dilute HNO₃ + aqueous AgNO₃ | Sulfate (SO₄²⁻): Acidify with dilute HNO₃ + Ba(NO₃)₂ → White ppt (BaSO₄) | Carbonate: Add dilute HCl → Effervescence of CO₂',
+    units: 'Qualitative precipitate & gas evolution',
+    examTip: 'Always acidify with dilute nitric acid (HNO₃) first! Never acidify halide tests with hydrochloric acid (HCl), because HCl contains chloride ions and produces a false positive white precipitate.'
+  },
+  {
+    id: 'f-c-9',
+    subjectId: 'cie-chem-0620',
+    topic: 'Qualitative Analysis (Gases & Flame Tests)',
+    name: 'Gas Identification & Flame Tests',
+    formula: '\\text{Gases: } \\text{H}_2 \\text{ (pop with lighted splint)}, \\; \\text{O}_2 \\text{ (relights glowing splint)}, \\; \\text{CO}_2 \\text{ (milky limewater)}, \\; \\text{Cl}_2 \\text{ (bleaches litmus)}',
+    whereVariables: 'Flame tests: Li⁺ (Crimson red), Na⁺ (Persistent yellow), K⁺ (Lilac), Ca²⁺ (Orange-red), Cu²⁺ (Blue-green), Ba²⁺ (Apple green)',
+    units: 'Flame emission colors & gas chemical reactions',
+    examTip: 'Ammonia (NH₃) is the ONLY syllabus alkaline gas: it turns damp red litmus paper blue and produces dense white smoke of NH₄Cl with concentrated HCl fumes.'
+  },
+  {
+    id: 'f-c-10',
+    subjectId: 'cie-chem-0620',
+    topic: 'Acids, Bases and Salts',
+    name: 'Solubility Rules for Common Inorganic Salts',
+    formula: '\\text{All Nitrates & Group 1 Salts Soluble} \\quad | \\quad \\text{All Carbonates Insoluble (except Gp 1 & NH}_4^+)',
+    whereVariables: 'Chlorides: All soluble EXCEPT AgCl & PbCl₂ | Sulfates: All soluble EXCEPT BaSO₄, PbSO₄ & CaSO₄ (sparingly) | Hydroxides: Insoluble EXCEPT Group 1, NH₄⁺ and Ca(OH)₂ (slightly)',
+    units: 'Solubility rules (sol. / insol.)',
+    examTip: 'To prepare an insoluble salt (like BaSO₄ or PbI₂), use precipitation: mix two soluble salt solutions, filter the precipitate, wash with distilled water, and dry.'
   }
 ];

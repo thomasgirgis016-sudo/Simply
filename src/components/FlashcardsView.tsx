@@ -24,6 +24,8 @@ interface FlashcardsViewProps {
   flashcards: Flashcard[];
   onAddFlashcards: (newCards: Flashcard[]) => void;
   onUpdateFlashcardMastery: (id: string, mastered: boolean, intervalDays?: number) => void;
+  subjects?: Subject[];
+  onSelectSubject?: (subject: Subject) => void;
 }
 
 export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
@@ -32,6 +34,8 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
   flashcards,
   onAddFlashcards,
   onUpdateFlashcardMastery,
+  subjects,
+  onSelectSubject,
 }) => {
   const [selectedTopic, setSelectedTopic] = useState<string>('All');
   const [selectedTier, setSelectedTier] = useState<'All' | 'Core' | 'Extended'>('All');
@@ -42,10 +46,11 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [touchEndX, setTouchEndX] = useState<number | null>(null);
 
-  // AI Modal
+  // AI Modal & 10-Card Fast Engine
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [aiTopicInput, setAiTopicInput] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isGeneratingTen, setIsGeneratingTen] = useState(false);
 
   // Filter flashcards for this subject, topic, and tier
   const subjectCards = flashcards.filter(c => isSubjectMatch(c.subjectId, subject));
@@ -176,6 +181,32 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
     }
   };
 
+  const handleGenerateNext10Cards = async () => {
+    const chapterName = selectedTopic !== 'All' ? selectedTopic : (subject.topics[0] || 'Core Exam Definitions');
+    setIsGeneratingTen(true);
+    try {
+      const generated = await generateFlashcardsWithGemini(
+        subject.name,
+        chapterName,
+        10,
+        profile.geminiApiKey,
+        profile.selectedModel
+      );
+      if (generated && generated.length > 0) {
+        onAddFlashcards(generated);
+        if (selectedTopic === 'All' && generated[0].topic) {
+          setSelectedTopic(generated[0].topic);
+        }
+        setCurrentIndex(0);
+        setIsFlipped(false);
+      }
+    } catch (err) {
+      console.error('Failed to generate 10 cards:', err);
+    } finally {
+      setIsGeneratingTen(false);
+    }
+  };
+
   const masteredCount = subjectCards.filter(c => c.mastered).length;
   const masteryPercentage = subjectCards.length > 0
     ? Math.round((masteredCount / subjectCards.length) * 100)
@@ -211,13 +242,81 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
               <span>Export Deck (Anki)</span>
             </button>
 
+            {/* Fast 1-Click Generate Next 10 Cards Button */}
+            <button
+              onClick={handleGenerateNext10Cards}
+              disabled={isGeneratingTen}
+              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-emerald-500/20 hover:from-emerald-500 hover:to-teal-500 transition cursor-pointer active:scale-95 disabled:opacity-50"
+              title="Generate the next 10 high-yield exam flashcards for this chapter via AI"
+            >
+              <Sparkles className={`h-4 w-4 ${isGeneratingTen ? 'animate-spin' : ''}`} />
+              <span>{isGeneratingTen ? 'Generating 10 Cards...' : '⚡ AI Generate Next 10 Cards'}</span>
+            </button>
+
             <button
               onClick={() => setIsAiModalOpen(true)}
-              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-indigo-500/20 hover:from-indigo-400 hover:to-purple-500 transition cursor-pointer"
+              className="flex items-center gap-2 rounded-xl bg-slate-800 border border-slate-700 px-3.5 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-700 hover:text-white transition cursor-pointer"
             >
-              <Sparkles className="h-4 w-4" />
-              <span>AI Generate More Cards</span>
+              <PlusCircle className="h-4 w-4 text-indigo-400" />
+              <span>Custom Prompt</span>
             </button>
+          </div>
+        </div>
+
+        {/* Linked Dropdowns: Select Subject & Select Chapter */}
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-slate-800/80 pt-4">
+          <div>
+            <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+              Select Subject:
+            </label>
+            <select
+              value={subject.id}
+              onChange={(e) => {
+                const found = subjects?.find((s) => s.id === e.target.value);
+                if (found && onSelectSubject) {
+                  onSelectSubject(found);
+                  setSelectedTopic('All');
+                  setCurrentIndex(0);
+                  setIsFlipped(false);
+                }
+              }}
+              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-xs font-semibold text-white focus:border-indigo-500 focus:outline-none cursor-pointer"
+            >
+              {subjects && subjects.length > 0 ? (
+                subjects.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.board} {s.code} - {s.name}
+                  </option>
+                ))
+              ) : (
+                <option value={subject.id}>{subject.board} {subject.code} - {subject.name}</option>
+              )}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+              Select Chapter / Topic:
+            </label>
+            <select
+              value={selectedTopic}
+              onChange={(e) => {
+                setSelectedTopic(e.target.value);
+                setCurrentIndex(0);
+                setIsFlipped(false);
+              }}
+              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-xs font-semibold text-white focus:border-indigo-500 focus:outline-none cursor-pointer"
+            >
+              <option value="All">All Chapters ({subjectCards.length} cards total)</option>
+              {subject.topics.map((t) => {
+                const count = subjectCards.filter((c) => c.topic === t).length;
+                return (
+                  <option key={t} value={t}>
+                    {t} {count > 0 ? `(${count} cards)` : '(0 cards - click AI Generate)'}
+                  </option>
+                );
+              })}
+            </select>
           </div>
         </div>
 

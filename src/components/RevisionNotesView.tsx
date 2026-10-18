@@ -100,10 +100,43 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
     }
   };
 
+  const [selectedChapterToGenerate, setSelectedChapterToGenerate] = useState(subject.topics[0] || '');
+  const [isGeneratingChapter, setIsGeneratingChapter] = useState(false);
+
+  const handleQuickGenerateChapter = async (chapterName: string) => {
+    if (!chapterName) return;
+    setIsGeneratingChapter(true);
+    try {
+      const generated = await generateRevisionNotesWithGemini(
+        subject.name,
+        subject.id,
+        chapterName,
+        profile.geminiApiKey,
+        profile.selectedModel
+      );
+      onAddRevisionNote(generated);
+      setSelectedTopicId(generated.id);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsGeneratingChapter(false);
+    }
+  };
+
   return (
     <div className="mx-auto max-w-5xl space-y-6">
+      <style>{`
+        @media print {
+          body { background: #ffffff !important; color: #000000 !important; }
+          nav, header, footer, button, .no-print { display: none !important; }
+          .rounded-2xl, .rounded-xl { border: 1px solid #d1d5db !important; box-shadow: none !important; background: #ffffff !important; color: #111827 !important; }
+          .text-white, .text-slate-200, .text-slate-300 { color: #111827 !important; }
+          .text-cyan-400, .text-indigo-400, .text-amber-300 { color: #0369a1 !important; font-weight: bold; }
+        }
+      `}</style>
+
       {/* Top Banner */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg backdrop-blur-sm">
+      <div className="no-print rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg backdrop-blur-sm">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <span className="inline-block rounded-md bg-cyan-500/20 px-2 py-0.5 text-xs font-semibold text-cyan-300 border border-cyan-500/30">
@@ -128,7 +161,38 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
               className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 px-4 py-2 text-xs font-bold text-white shadow-md hover:from-cyan-500 hover:to-blue-500 transition cursor-pointer active:scale-95"
             >
               <Sparkles className="h-4 w-4" />
-              <span>Generate AI Cheat Sheet</span>
+              <span>Custom Topic Sheet</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Biology & Chemistry Fast Chapter Notes Workflow */}
+        <div className="mt-4 rounded-xl border border-slate-800 bg-slate-950/70 p-3.5 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="flex h-2 w-2 rounded-full bg-cyan-400 animate-pulse" />
+            <span className="text-xs font-bold text-slate-300">Chapter Revision Generator:</span>
+          </div>
+
+          <div className="flex flex-1 items-center gap-2 min-w-[260px] max-w-md">
+            <select
+              value={selectedChapterToGenerate}
+              onChange={(e) => setSelectedChapterToGenerate(e.target.value)}
+              className="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs text-slate-200 focus:border-cyan-500 focus:outline-none cursor-pointer"
+            >
+              {subject.topics.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+
+            <button
+              onClick={() => handleQuickGenerateChapter(selectedChapterToGenerate || subject.topics[0])}
+              disabled={isGeneratingChapter}
+              className="shrink-0 flex items-center gap-1.5 rounded-xl bg-cyan-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-cyan-500 transition cursor-pointer disabled:opacity-50"
+            >
+              <Sparkles className={`h-3.5 w-3.5 ${isGeneratingChapter ? 'animate-spin' : ''}`} />
+              <span>{isGeneratingChapter ? 'Generating...' : '⚡ Generate'}</span>
             </button>
           </div>
         </div>
@@ -184,11 +248,31 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
               </div>
             </div>
 
-            {/* Must-Know Definitions Callout */}
+            {/* Part 1: Learning Objectives */}
+            {activeTopic.learningObjectives && activeTopic.learningObjectives.length > 0 && (
+              <div className="mt-6 rounded-xl border border-cyan-500/25 bg-cyan-950/20 p-5 space-y-3">
+                <div className="flex items-center gap-2 text-cyan-300 font-bold text-xs uppercase tracking-wider">
+                  <CheckCircle className="h-4 w-4 text-cyan-400" />
+                  <span>Part 1: Official Syllabus Learning Objectives</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                  {activeTopic.learningObjectives.map((obj, oIdx) => (
+                    <div key={oIdx} className="flex items-start gap-2 bg-slate-950/70 p-2.5 rounded-lg border border-slate-800/80">
+                      <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-cyan-500/20 text-[10px] font-bold text-cyan-300">
+                        ✓
+                      </span>
+                      <span className="text-slate-200 leading-relaxed">{obj}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Part 2: Must-Know Definitions Callout */}
             <div className="mt-6 space-y-3">
               <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
                 <BookmarkCheck className="h-4 w-4 text-cyan-400" />
-                Must-Know Definitions (Guaranteed Exam Marks)
+                Part 2: Must-Know Definitions (Compulsory Mark Scheme Keywords)
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {activeTopic.mustKnowDefinitions.map((def, dIdx) => (
@@ -205,11 +289,28 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
               </div>
             </div>
 
-            {/* Key Concepts & Step-by-Step Rules */}
+            {/* Part 3: Core Equations / Chemical & Biological Pathways */}
+            {activeTopic.coreEquationsOrPathways && activeTopic.coreEquationsOrPathways.length > 0 && (
+              <div className="mt-6 rounded-xl border border-indigo-500/25 bg-indigo-950/20 p-5 space-y-3">
+                <div className="flex items-center gap-2 text-indigo-300 font-bold text-xs uppercase tracking-wider">
+                  <Sparkles className="h-4 w-4 text-indigo-400" />
+                  <span>Part 3: Core Equations & Reaction / Biological Pathways</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                  {activeTopic.coreEquationsOrPathways.map((eq, eIdx) => (
+                    <div key={eIdx} className="bg-slate-950/80 p-3 rounded-xl border border-indigo-500/30">
+                      <MathRenderer content={eq} className="text-slate-200 leading-relaxed" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Core Concepts & Methodologies */}
             <div className="mt-6 space-y-4">
               <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
                 <Layers className="h-4 w-4 text-indigo-400" />
-                Core Concepts & Methodologies
+                Detailed Concepts & Methodologies
               </h4>
 
               {activeTopic.keyConcepts.map((concept, cIdx) => (
@@ -245,38 +346,36 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
               ))}
             </div>
 
-            {/* Examiner Report Warnings: 3-Bullet Official Examiner Reports Common Mistakes Box */}
-            {(activeTopic.examinerWarnings?.length ?? 0) > 0 && (
-              <div className="mt-6 rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-950/20 via-slate-900 to-amber-950/20 p-5 shadow-lg">
-                <div className="flex items-center justify-between border-b border-amber-500/20 pb-2.5 mb-3">
-                  <div className="flex items-center gap-2 text-amber-300 font-bold text-xs uppercase tracking-wider">
-                    <AlertTriangle className="h-4 w-4 text-amber-400" />
-                    <span>Official Cambridge Examiner Reports: Top 3 Recurring Mistakes</span>
-                  </div>
-                  <span className="rounded-md bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold text-amber-300 border border-amber-500/25">
-                    Chief Examiner Summary
-                  </span>
+            {/* Part 4: Examiner Report Warnings: Official Examiner Reports Common Mistakes Box */}
+            <div className="mt-6 rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-950/20 via-slate-900 to-amber-950/20 p-5 shadow-lg">
+              <div className="flex items-center justify-between border-b border-amber-500/20 pb-2.5 mb-3">
+                <div className="flex items-center gap-2 text-amber-300 font-bold text-xs uppercase tracking-wider">
+                  <AlertTriangle className="h-4 w-4 text-amber-400" />
+                  <span>Part 4: Cambridge Chief Examiner Reports: Top Traps & Recurring Mistakes</span>
                 </div>
-
-                <div className="space-y-2 text-xs">
-                  {(activeTopic.examinerWarnings && activeTopic.examinerWarnings.length >= 3
-                    ? activeTopic.examinerWarnings.slice(0, 3)
-                    : [
-                        activeTopic.examinerWarnings[0] || 'Premature rounding in early working stages resulting in final answer inaccuracies.',
-                        activeTopic.examinerWarnings[1] || 'Failing to quote the exact syllabus keywords identified in bold on official mark schemes.',
-                        activeTopic.examinerWarnings[2] || 'Missing or incorrect standard SI units or confusing command words (State vs Explain).'
-                      ]
-                  ).map((warn, wIdx) => (
-                    <div key={wIdx} className="flex items-start gap-2.5 bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
-                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-500/20 text-[11px] font-bold text-amber-300 font-mono">
-                        {wIdx + 1}
-                      </span>
-                      <span className="text-amber-100/90 leading-relaxed">{warn}</span>
-                    </div>
-                  ))}
-                </div>
+                <span className="rounded-md bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold text-amber-300 border border-amber-500/25">
+                  Guaranteed Mark Saver
+                </span>
               </div>
-            )}
+
+              <div className="space-y-2 text-xs">
+                {(activeTopic.examinerWarnings && activeTopic.examinerWarnings.length >= 3
+                  ? activeTopic.examinerWarnings.slice(0, 3)
+                  : [
+                      activeTopic.examinerWarnings?.[0] || 'Premature rounding in early working stages resulting in final answer inaccuracies.',
+                      activeTopic.examinerWarnings?.[1] || 'Failing to quote the exact syllabus keywords identified in bold on official mark schemes.',
+                      activeTopic.examinerWarnings?.[2] || 'Missing or incorrect standard SI units or confusing command words (State vs Explain).'
+                    ]
+                ).map((warn, wIdx) => (
+                  <div key={wIdx} className="flex items-start gap-2.5 bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-500/20 text-[11px] font-bold text-amber-300 font-mono">
+                      {wIdx + 1}
+                    </span>
+                    <span className="text-amber-100/90 leading-relaxed">{warn}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       ) : (

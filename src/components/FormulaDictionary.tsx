@@ -28,20 +28,18 @@ export const FormulaDictionary: React.FC<FormulaDictionaryProps> = ({
     return hasSubjectFormulas ? 'formulas' : 'commands';
   });
   const [searchQuery, setSearchQuery] = useState('');
-  const [showAllSubjects, setShowAllSubjects] = useState<boolean>(() => !hasSubjectFormulas);
 
   // Default non-STEM / subjects with no formulas to "commands" tab
   useEffect(() => {
     const hasFormulas = formulas.some((f) => isSubjectMatch(f.subjectId, subject));
     if (!hasFormulas) {
       setActiveTab('commands');
-      setShowAllSubjects(true);
     }
   }, [subject.id, formulas]);
 
-  // Filter formulas
+  // Strict subject scoping: ONLY formulas belonging to the active subject
   const filteredFormulas = formulas.filter((f) => {
-    const matchesSubject = showAllSubjects || isSubjectMatch(f.subjectId, subject);
+    const matchesSubject = isSubjectMatch(f.subjectId, subject);
     const matchesSearch =
       f.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       f.topic.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -78,12 +76,7 @@ export const FormulaDictionary: React.FC<FormulaDictionaryProps> = ({
           {/* Tab selector */}
           <div className="flex rounded-xl bg-slate-950 p-1 border border-slate-800">
             <button
-              onClick={() => {
-                setActiveTab('formulas');
-                if (!hasSubjectFormulas) {
-                  setShowAllSubjects(true);
-                }
-              }}
+              onClick={() => setActiveTab('formulas')}
               className={`rounded-lg px-4 py-1.5 text-xs font-bold transition ${
                 activeTab === 'formulas'
                   ? 'bg-amber-500 text-slate-950 shadow-sm'
@@ -115,26 +108,17 @@ export const FormulaDictionary: React.FC<FormulaDictionaryProps> = ({
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={
                 activeTab === 'formulas'
-                  ? 'Search formulas, units or variables (e.g. kinetic energy, Snell, sphere)...'
+                  ? `Search formulas for ${subject.code} (e.g. formula name, unit, variable)...`
                   : 'Search command word (e.g. State, Explain, Evaluate, Calculate)...'
               }
               className="w-full rounded-xl border border-slate-700 bg-slate-950/80 py-2.5 pl-10 pr-4 text-xs text-white placeholder-slate-500 focus:border-amber-500 focus:outline-none"
             />
           </div>
 
-          {activeTab === 'formulas' && (
-            <button
-              onClick={() => setShowAllSubjects(!showAllSubjects)}
-              className={`flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold transition ${
-                showAllSubjects
-                  ? 'border-amber-500 bg-amber-500/10 text-amber-300'
-                  : 'border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700'
-              }`}
-            >
-              <Filter className="h-3.5 w-3.5" />
-              <span>{showAllSubjects ? 'Showing All Subjects' : `Only ${subject.name}`}</span>
-            </button>
-          )}
+          <div className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs font-semibold text-slate-300">
+            <Filter className="h-3.5 w-3.5 text-amber-400" />
+            <span>Syllabus: <strong className="text-white">{subject.code}</strong></span>
+          </div>
         </div>
       </div>
 

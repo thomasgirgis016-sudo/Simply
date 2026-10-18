@@ -118,6 +118,7 @@ export interface RevisionTopic {
   subjectId: string;
   title: string;
   chapter: string;
+  learningObjectives?: string[];
   keyConcepts: {
     heading: string;
     points: string[];
@@ -128,6 +129,7 @@ export interface RevisionTopic {
     term: string;
     definition: string;
   }[];
+  coreEquationsOrPathways?: string[];
   examinerWarnings: string[];
 }
 
@@ -255,14 +257,52 @@ export interface EslSpeakingPrompt {
   sampleBand9Response: string;
 }
 
+export interface GrammarCorrection {
+  youSaid: string;
+  better: string;
+  ruleExplanation: string;
+}
+
+export interface VocabularyUpgrade {
+  original: string;
+  upgraded: string;
+  context?: string;
+}
+
 export interface EslSpeakingEvaluation {
+  totalScore?: number; // 0 to 30
+  maxScore?: number; // 30
+  estimatedGrade?: string; // e.g. "Grade 9 / A*"
   overallBand: number; // 1 to 10
-  structureAndGrammar: { score: number; feedback: string };
-  vocabularyRange: { score: number; feedback: string };
-  fluencyAndCohesion: { score: number; feedback: string };
-  pronunciationAndIntonation: { score: number; feedback: string };
-  keyStrengths: string[];
-  areasForImprovement: string[];
-  suggestedUpgradedPhrases: { original: string; upgraded: string }[];
+  // Cambridge Component 5 Three Official Criteria (10 Marks Each):
+  grammaticalAccuracyAndVariety?: {
+    score: number;
+    feedback: string;
+    quotedPhrases?: string[];
+    grammarCorrections?: GrammarCorrection[];
+  };
+  vocabulary?: {
+    score: number;
+    feedback: string;
+    band9Upgrades?: VocabularyUpgrade[];
+  };
+  developmentAndFluency?: {
+    score: number;
+    feedback: string;
+    discourseMarkersUsed?: string[];
+    pacingWpm?: number;
+    fillerWordsCount?: number;
+    fillerWordsDetected?: string[];
+  };
+  // Backwards compatibility fields:
+  structureAndGrammar?: { score: number; feedback: string };
+  vocabularyRange?: { score: number; feedback: string };
+  fluencyAndCohesion?: { score: number; feedback: string };
+  pronunciationAndIntonation?: { score: number; feedback: string };
+  keyStrengths?: string[];
+  areasForImprovement?: string[];
+  suggestedUpgradedPhrases?: { original: string; upgraded: string }[];
+  followUpQuestion?: string;
+  examinerRecommendations?: string[];
 }
 

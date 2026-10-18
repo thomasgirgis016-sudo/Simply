@@ -546,6 +546,8 @@ export function App() {
                 flashcards={flashcards}
                 onAddFlashcards={handleAddFlashcards}
                 onUpdateFlashcardMastery={handleUpdateFlashcardMastery}
+                subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
+                onSelectSubject={setActiveSubject}
               />
             )}
 

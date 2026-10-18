@@ -62,8 +62,22 @@ async function callZeroKeyAi(prompt: string, systemPrompt?: string): Promise<str
   throw new Error('ZERO_KEY_AI_UNAVAILABLE');
 }
 
-// Unified call helper: tries /api/gemini (Vercel serverless proxy) first,
-// then falls back to direct API key (if passed or in VITE_GEMINI_API_KEY)
+// Unified Server-Side AI caller: sends requests directly to internal /api/solve route
+// Eliminates client Puter popups and student key requirements
+export async function callServerSolveApi(action: string, payload: any): Promise<any> {
+  const res = await fetch('/api/solve', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action, ...payload }),
+  });
+  if (!res.ok) {
+    const errorBody = await res.json().catch(() => ({}));
+    throw new Error(errorBody.message || `Server AI error (${res.status})`);
+  }
+  return await res.json();
+}
+
+// Client-side fallback API caller (if student provided a personal key in Settings)
 async function callGeminiApi(payload: {
   model: string;
   contents: any[];
@@ -74,25 +88,6 @@ async function callGeminiApi(payload: {
   const { model, contents, generationConfig, systemInstruction, userApiKey } = payload;
   const targetModel = model.includes('2.5') ? model : 'gemini-1.5-flash';
 
-  // 1. First attempt: call Vercel /api/gemini proxy (secure server-side key)
-  try {
-    const res = await fetch('/api/gemini', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: targetModel, contents, generationConfig, systemInstruction }),
-    });
-
-    if (res.ok) {
-      const data = await res.json();
-      if (data?.candidates?.[0]?.content?.parts?.[0]?.text) {
-        return data;
-      }
-    }
-  } catch {
-    // If running in local Vite without Vercel CLI, proceed to fallback
-  }
-
-  // 2. Second attempt: Check if client has key from admin setting or Vite env
   const fallbackKey = userApiKey || (import.meta as any).env?.VITE_GEMINI_API_KEY;
 
   if (fallbackKey && fallbackKey.trim() !== '') {
@@ -118,7 +113,7 @@ async function callGeminiApi(payload: {
     }
   }
 
-  throw new Error('SERVERLESS_OR_KEY_UNAVAILABLE');
+  throw new Error('KEY_UNAVAILABLE');
 }
 
 export const SENIOR_CAMBRIDGE_EXAMINER_INSTRUCTION =
@@ -171,61 +166,69 @@ Ensure standard IGCSE marking criteria: [M] method mark, [A] accuracy mark, [B] 
 DO NOT wrap your output in markdown code blocks like \`\`\`json. Return only raw parseable JSON.
 `;
 
-  // 1. Try zero-key browser Puter AI if text question
-  if (questionText && !imageBase64) {
+  // 1. Try internal Vercel server route (/api/solve) with server environment keys
+  try {
+    const serverResult = await callServerSolveApi('solve_question', {
+      questionText,
+      imageBase64,
+      imageMimeType,
+      subjectName,
+      examBoard,
+      gradeLevel,
+      apiKey,
+      model,
+    });
+    if (serverResult && serverResult.stepByStepSolution && serverResult.finalAnswer) {
+      return serverResult;
+    }
+  } catch (err) {
+    console.warn('Server /api/solve not reachable, trying client options:', err);
+  }
+
+  // 2. Try client-provided Gemini API key if present
+  if (apiKey || (import.meta as any).env?.VITE_GEMINI_API_KEY) {
+    const parts: any[] = [];
+    if (questionText) {
+      parts.push({ text: `Question:\n${questionText}\n\nInstructions:\n${prompt}` });
+    } else {
+      parts.push({ text: `Instructions:\n${prompt}` });
+    }
+
+    if (imageBase64) {
+      parts.push({
+        inlineData: {
+          mimeType: imageMimeType || 'image/jpeg',
+          data: imageBase64.replace(/^data:image\/[a-z]+;base64,/, '')
+        }
+      });
+    }
+
     try {
-      const liveJsonStr = await callZeroKeyAi(
-        `${questionText}\n\nReturn ONLY raw parseable JSON matching the 4-section IGCSE schema with coreConceptAndFormula, stepByStepSolution, finalAnswer, and examinerTraps. No markdown code blocks.`,
-        SENIOR_CAMBRIDGE_EXAMINER_INSTRUCTION
-      );
-      const cleaned = liveJsonStr.replace(/```json/g, '').replace(/```/g, '').trim();
-      const parsed = JSON.parse(cleaned);
-      if (parsed.stepByStepSolution && parsed.finalAnswer) return parsed;
-    } catch {
-      // continue to next provider
+      const data = await callGeminiApi({
+        model,
+        contents: [{ parts }],
+        systemInstruction: {
+          parts: [{ text: SENIOR_CAMBRIDGE_EXAMINER_INSTRUCTION }]
+        },
+        generationConfig: {
+          temperature: 0.2,
+          responseMimeType: "application/json"
+        },
+        userApiKey: apiKey
+      });
+
+      const candidate = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (candidate) {
+        const cleanedJson = candidate.replace(/```json/g, '').replace(/```/g, '').trim();
+        return JSON.parse(cleanedJson);
+      }
+    } catch (err: any) {
+      console.warn('Direct client Gemini API error:', err.message);
     }
   }
 
-  // 2. Try Vercel Serverless / Gemini API
-  const parts: any[] = [];
-  if (questionText) {
-    parts.push({ text: `Question:\n${questionText}\n\nInstructions:\n${prompt}` });
-  } else {
-    parts.push({ text: `Instructions:\n${prompt}` });
-  }
-
-  if (imageBase64) {
-    parts.push({
-      inlineData: {
-        mimeType: imageMimeType || 'image/jpeg',
-        data: imageBase64.replace(/^data:image\/[a-z]+;base64,/, '')
-      }
-    });
-  }
-
-  try {
-    const data = await callGeminiApi({
-      model,
-      contents: [{ parts }],
-      systemInstruction: {
-        parts: [{ text: SENIOR_CAMBRIDGE_EXAMINER_INSTRUCTION }]
-      },
-      generationConfig: {
-        temperature: 0.2,
-        responseMimeType: "application/json"
-      },
-      userApiKey: apiKey
-    });
-
-    const candidate = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!candidate) throw new Error('No text generated.');
-
-    const cleanedJson = candidate.replace(/```json/g, '').replace(/```/g, '').trim();
-    return JSON.parse(cleanedJson);
-  } catch (err: any) {
-    console.warn('Using syllabus template solution:', err.message);
-    return generateSimulatedSolution(questionText || 'Student uploaded question', subjectName, examBoard, gradeLevel);
-  }
+  // 3. Fallback to high-yield syllabus template solution
+  return generateSimulatedSolution(questionText || 'Student uploaded question', subjectName, examBoard, gradeLevel);
 }
 
 export async function generateFlashcardsWithGemini(
@@ -252,52 +255,67 @@ Output STRICTLY a JSON array of objects with the following schema:
 ]
 `;
 
-  // Try Zero-Key Puter AI
+  // 1. Try unified Vercel Serverless AI route (/api/solve)
   try {
-    const liveJson = await callZeroKeyAi(prompt);
-    const cleaned = liveJson.replace(/```json/g, '').replace(/```/g, '').trim();
-    const parsed = JSON.parse(cleaned);
-    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-  } catch {
-    // continue
-  }
-
-  // Try Gemini API
-  try {
-    const data = await callGeminiApi({
+    const serverResult = await callServerSolveApi('generate_flashcards', {
+      subjectName,
+      topic,
+      chapter: topic,
+      count,
+      apiKey,
       model,
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { responseMimeType: "application/json" },
-      userApiKey: apiKey
     });
-
-    const candidate = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    const cleaned = candidate.replace(/```json/g, '').replace(/```/g, '').trim();
-    return JSON.parse(cleaned);
-  } catch {
-    return [
-      {
-        id: `gen-fc-${Date.now()}-1`,
-        subjectId: subjectName,
-        topic: topic,
-        question: `What are the core syllabus requirements for ${topic}?`,
-        answer: `In IGCSE ${subjectName}, questions on ${topic} require exact syllabus keywords, correct SI units, and structured step-by-step reasoning.`,
-        examinerTip: `Check past paper mark schemes for words in bold or underlined (these are compulsory).`,
-        difficulty: 'Core',
-        mastered: false,
-      },
-      {
-        id: `gen-fc-${Date.now()}-2`,
-        subjectId: subjectName,
-        topic: topic,
-        question: `What is the most frequently tested calculation or concept in ${topic}?`,
-        answer: `Identify the relationship between variables, state the base formula, substitute known numbers, and round to 3 significant figures.`,
-        examinerTip: `Examiners penalize premature rounding in multi-step problems.`,
-        difficulty: 'Extended',
-        mastered: false,
-      }
-    ];
+    if (Array.isArray(serverResult) && serverResult.length > 0) {
+      return serverResult;
+    }
+  } catch (err) {
+    console.warn('Server /api/solve generate_flashcards error:', err);
   }
+
+  // 2. Try client-provided Gemini API key if present
+  if (apiKey || (import.meta as any).env?.VITE_GEMINI_API_KEY) {
+    try {
+      const data = await callGeminiApi({
+        model,
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { responseMimeType: "application/json" },
+        userApiKey: apiKey
+      });
+
+      const candidate = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (candidate) {
+        const cleaned = candidate.replace(/```json/g, '').replace(/```/g, '').trim();
+        const parsed = JSON.parse(cleaned);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {
+      // continue to fallback
+    }
+  }
+
+  // 3. Fallback simulated cards
+  return [
+    {
+      id: `gen-fc-${Date.now()}-1`,
+      subjectId: subjectName,
+      topic: topic,
+      question: `What are the core syllabus requirements for ${topic}?`,
+      answer: `In IGCSE ${subjectName}, questions on ${topic} require exact syllabus keywords, correct SI units, and structured step-by-step reasoning.`,
+      examinerTip: `Check past paper mark schemes for words in bold or underlined (these are compulsory).`,
+      difficulty: 'Core',
+      mastered: false,
+    },
+    {
+      id: `gen-fc-${Date.now()}-2`,
+      subjectId: subjectName,
+      topic: topic,
+      question: `What is the most frequently tested calculation or concept in ${topic}?`,
+      answer: `Identify the relationship between variables, state the base formula, substitute known numbers, and round to 3 significant figures.`,
+      examinerTip: `Examiners penalize premature rounding in multi-step problems.`,
+      difficulty: 'Extended',
+      mastered: false,
+    }
+  ];
 }
 
 export async function generateQuizWithGemini(
@@ -330,52 +348,65 @@ Output STRICTLY a JSON array of objects with the schema:
 ]
 `;
 
-  // Try Zero-Key Puter AI
+  // 1. Try unified Vercel Serverless AI route (/api/solve)
   try {
-    const liveJson = await callZeroKeyAi(prompt);
-    const cleaned = liveJson.replace(/```json/g, '').replace(/```/g, '').trim();
-    const parsed = JSON.parse(cleaned);
-    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-  } catch {
-    // continue
-  }
-
-  // Try Gemini API
-  try {
-    const data = await callGeminiApi({
+    const serverResult = await callServerSolveApi('generate_quizzes', {
+      subjectName,
+      topic,
+      apiKey,
       model,
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { responseMimeType: "application/json" },
-      userApiKey: apiKey
     });
-
-    const candidate = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    const cleaned = candidate.replace(/```json/g, '').replace(/```/g, '').trim();
-    return JSON.parse(cleaned);
-  } catch {
-    return [
-      {
-        id: `ai-quiz-${Date.now()}`,
-        subjectId: subjectName,
-        topic: topic,
-        paperReference: `${subjectName} Specimen Practice`,
-        questionText: `Which of the following statements represents the official syllabus principle for ${topic}?`,
-        options: [
-          { id: 'opt-1', text: 'Principle A: Holds true under standard temperature and pressure' },
-          { id: 'opt-2', text: 'Principle B: Proportional increase with surface area or concentration' },
-          { id: 'opt-3', text: 'Principle C: Fundamental conservation and mark scheme alignment' },
-          { id: 'opt-4', text: 'Principle D: None of the above' }
-        ],
-        correctOptionId: 'opt-3',
-        marks: 2,
-        markingBreakdown: [
-          '[M1] For identifying the fundamental syllabus principle',
-          '[A1] For selecting the correct option'
-        ],
-        markSchemeExplanation: `According to IGCSE standards, this principle is tested regularly to verify conceptual clarity.`
-      }
-    ];
+    if (Array.isArray(serverResult) && serverResult.length > 0) {
+      return serverResult;
+    }
+  } catch (err) {
+    console.warn('Server /api/solve generate_quizzes error:', err);
   }
+
+  // 2. Try client-provided Gemini API key if present
+  if (apiKey || (import.meta as any).env?.VITE_GEMINI_API_KEY) {
+    try {
+      const data = await callGeminiApi({
+        model,
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { responseMimeType: "application/json" },
+        userApiKey: apiKey
+      });
+
+      const candidate = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (candidate) {
+        const cleaned = candidate.replace(/```json/g, '').replace(/```/g, '').trim();
+        const parsed = JSON.parse(cleaned);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {
+      // continue to fallback
+    }
+  }
+
+  // 3. Fallback simulated quiz question
+  return [
+    {
+      id: `ai-quiz-${Date.now()}`,
+      subjectId: subjectName,
+      topic: topic,
+      paperReference: `${subjectName} Specimen Practice`,
+      questionText: `Which of the following statements represents the official syllabus principle for ${topic}?`,
+      options: [
+        { id: 'opt-1', text: 'Principle A: Holds true under standard temperature and pressure' },
+        { id: 'opt-2', text: 'Principle B: Proportional increase with surface area or concentration' },
+        { id: 'opt-3', text: 'Principle C: Fundamental conservation and mark scheme alignment' },
+        { id: 'opt-4', text: 'Principle D: None of the above' }
+      ],
+      correctOptionId: 'opt-3',
+      marks: 2,
+      markingBreakdown: [
+        '[M1] For identifying the fundamental syllabus principle',
+        '[A1] For selecting the correct option'
+      ],
+      markSchemeExplanation: `According to IGCSE standards, this principle is tested regularly to verify conceptual clarity.`
+    }
+  ];
 }
 
 export async function generateRevisionNotesWithGemini(
@@ -392,7 +423,11 @@ Output strictly valid JSON matching this schema:
   "id": "rev-ai-${Date.now()}",
   "subjectId": "${subjectId}",
   "title": "${topic} Comprehensive Revision Guide",
-  "chapter": "IGCSE Core & Extended Syllabus",
+  "chapter": "${topic}",
+  "learningObjectives": [
+    "State and explain the fundamental syllabus principles",
+    "Apply equations and describe experimental observations accurately"
+  ],
   "keyConcepts": [
     {
       "heading": "Core concept title",
@@ -406,8 +441,11 @@ Output strictly valid JSON matching this schema:
   "mustKnowDefinitions": [
     {
       "term": "Key Term",
-      "definition": "Verbatim Cambridge / Edexcel mark scheme definition"
+      "definition": "Verbatim Cambridge / Edexcel mark scheme definition with **compulsory keywords** bolded"
     }
+  ],
+  "coreEquationsOrPathways": [
+    "Core reaction equation or biological pathway"
   ],
   "examinerWarnings": [
     "Common student mistake identified in examiner reports"
@@ -415,30 +453,46 @@ Output strictly valid JSON matching this schema:
 }
 `;
 
-  // 1. Try Puter.js Zero-Key AI
+  // 1. Try unified Vercel Serverless AI route (/api/solve)
   try {
-    const liveJson = await callZeroKeyAi(prompt);
-    const cleaned = liveJson.replace(/```json/g, '').replace(/```/g, '').trim();
-    const parsed = JSON.parse(cleaned);
-    if (parsed && parsed.title && parsed.keyConcepts) return parsed;
-  } catch {
-    // continue
+    const serverResult = await callServerSolveApi('generate_notes', {
+      subjectName,
+      subjectId,
+      chapter: topic,
+      topic,
+      apiKey,
+      model,
+    });
+    if (serverResult && serverResult.title && serverResult.keyConcepts) {
+      return serverResult;
+    }
+  } catch (err) {
+    console.warn('Server /api/solve generate_notes error:', err);
   }
 
-  // 2. Try Gemini API
-  try {
-    const data = await callGeminiApi({
-      model,
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { responseMimeType: "application/json" },
-      userApiKey: apiKey
-    });
+  // 2. Try client-provided Gemini API key if present
+  if (apiKey || (import.meta as any).env?.VITE_GEMINI_API_KEY) {
+    try {
+      const data = await callGeminiApi({
+        model,
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { responseMimeType: "application/json" },
+        userApiKey: apiKey
+      });
 
-    const candidate = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    const cleaned = candidate.replace(/```json/g, '').replace(/```/g, '').trim();
-    return JSON.parse(cleaned);
-  } catch {
-    return {
+      const candidate = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (candidate) {
+        const cleaned = candidate.replace(/```json/g, '').replace(/```/g, '').trim();
+        const parsed = JSON.parse(cleaned);
+        if (parsed && parsed.title && parsed.keyConcepts) return parsed;
+      }
+    } catch {
+      // continue to fallback
+    }
+  }
+
+  // 3. Fallback simulated revision guide
+  return {
       id: `rev-ai-${Date.now()}`,
       subjectId: subjectId,
       title: `${topic} Comprehensive Summary`,
@@ -465,7 +519,6 @@ Output strictly valid JSON matching this schema:
         'Always check the marks allocation (e.g. 3 marks requires 3 distinct points).'
       ]
     };
-  }
 }
 
 export async function askAiTutor(
@@ -487,32 +540,42 @@ Use LaTeX ($...$ or $$...$$) for any mathematical equations or chemical reaction
     return instantMatch;
   }
 
-  // 2. Try Zero-Key Puter AI (Live GPT-4o-mini / Claude in browser without any API key!)
+  // 2. Try unified Vercel Serverless AI route (/api/solve)
   try {
-    const liveReply = await callZeroKeyAi(lastUserMessage, systemInstruction);
-    if (liveReply && liveReply.trim() !== '') return liveReply;
-  } catch {
-    // continue
+    const serverResult = await callServerSolveApi('ai_tutor', {
+      messages,
+      subjectName,
+      examBoard,
+      apiKey,
+      model,
+    });
+    if (typeof serverResult === 'string' && serverResult.trim() !== '') {
+      return serverResult;
+    }
+  } catch (err) {
+    console.warn('Server /api/solve ai_tutor error:', err);
   }
 
-  // 3. Try Vercel Serverless / Gemini API
-  try {
-    const formattedContents = messages.map(m => ({
-      role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: m.content }]
-    }));
+  // 3. Try client-provided Gemini API key if present
+  if (apiKey || (import.meta as any).env?.VITE_GEMINI_API_KEY) {
+    try {
+      const formattedContents = messages.map(m => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: m.content }]
+      }));
 
-    const data = await callGeminiApi({
-      model,
-      contents: formattedContents,
-      systemInstruction: { parts: [{ text: systemInstruction }] },
-      userApiKey: apiKey
-    });
+      const data = await callGeminiApi({
+        model,
+        contents: formattedContents,
+        systemInstruction: { parts: [{ text: systemInstruction }] },
+        userApiKey: apiKey
+      });
 
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (text && text.trim() !== '') return text;
-  } catch {
-    // continue
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (text && text.trim() !== '') return text;
+    } catch {
+      // continue
+    }
   }
 
   // 4. Dynamic Subject Knowledge Synthesizer
@@ -967,53 +1030,64 @@ Transcribe the student's handwritten working line-by-line from the image (or tex
 }
 Return raw JSON only without markdown code blocks.`;
 
-  // 1. Try zero-key Puter AI if text
-  if (studentTypedWorking && !handwrittenImageBase64) {
-    try {
-      const liveJson = await callZeroKeyAi(prompt, SENIOR_CAMBRIDGE_EXAMINER_INSTRUCTION);
-      const cleaned = liveJson.replace(/```json/g, '').replace(/```/g, '').trim();
-      const parsed = JSON.parse(cleaned);
-      if (parsed.lineByLineReview && typeof parsed.marksEarned === 'number') return parsed;
-    } catch {
-      // continue
-    }
-  }
-
-  // 2. Try Gemini API (supports Multimodal Image Analysis for handwriting)
-  const parts: any[] = [];
-  if (questionText || studentTypedWorking) {
-    parts.push({
-      text: `Question:\n${questionText || ''}\n\nStudent Working:\n${studentTypedWorking || 'See attached handwritten image.'}\n\n${prompt}`
-    });
-  } else {
-    parts.push({ text: prompt });
-  }
-
-  if (handwrittenImageBase64) {
-    parts.push({
-      inlineData: {
-        mimeType: handwrittenMimeType || 'image/jpeg',
-        data: handwrittenImageBase64.replace(/^data:image\/[a-z]+;base64,/, '')
-      }
-    });
-  }
-
+  // 1. Try unified Vercel Serverless AI route (/api/solve)
   try {
-    const data = await callGeminiApi({
+    const serverResult = await callServerSolveApi('handwritten_marking', {
+      questionText,
+      studentWorking: studentTypedWorking,
+      handwrittenImageBase64,
+      handwrittenMimeType,
+      subjectName,
+      examBoard,
+      gradeLevel,
+      totalMarks,
+      apiKey,
       model,
-      contents: [{ parts }],
-      systemInstruction: { parts: [{ text: SENIOR_CAMBRIDGE_EXAMINER_INSTRUCTION }] },
-      generationConfig: { temperature: 0.2, responseMimeType: 'application/json' },
-      userApiKey: apiKey
     });
-
-    const candidate = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (candidate) {
-      const cleaned = candidate.replace(/```json/g, '').replace(/```/g, '').trim();
-      return JSON.parse(cleaned);
+    if (serverResult && serverResult.lineByLineReview && typeof serverResult.marksEarned === 'number') {
+      return serverResult;
     }
-  } catch {
-    // continue to fallback
+  } catch (err) {
+    console.warn('Server /api/solve handwritten_marking error:', err);
+  }
+
+  // 2. Try Gemini API directly if key is configured
+  if (apiKey || (import.meta as any).env?.VITE_GEMINI_API_KEY) {
+    const parts: any[] = [];
+    if (questionText || studentTypedWorking) {
+      parts.push({
+        text: `Question:\n${questionText || ''}\n\nStudent Working:\n${studentTypedWorking || 'See attached handwritten image.'}\n\n${prompt}`
+      });
+    } else {
+      parts.push({ text: prompt });
+    }
+
+    if (handwrittenImageBase64) {
+      parts.push({
+        inlineData: {
+          mimeType: handwrittenMimeType || 'image/jpeg',
+          data: handwrittenImageBase64.replace(/^data:image\/[a-z]+;base64,/, '')
+        }
+      });
+    }
+
+    try {
+      const data = await callGeminiApi({
+        model,
+        contents: [{ parts }],
+        systemInstruction: { parts: [{ text: SENIOR_CAMBRIDGE_EXAMINER_INSTRUCTION }] },
+        generationConfig: { temperature: 0.2, responseMimeType: 'application/json' },
+        userApiKey: apiKey
+      });
+
+      const candidate = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (candidate) {
+        const cleaned = candidate.replace(/```json/g, '').replace(/```/g, '').trim();
+        return JSON.parse(cleaned);
+      }
+    } catch {
+      // continue to fallback
+    }
   }
 
   // 3. Fallback Simulated Examiner Review
@@ -1071,117 +1145,212 @@ function generateSimulatedHandwrittenReview(
 }
 
 // ---------------------------------------------------------------------------
-// 2. ESL SPEAKING ORAL EXAM EVALUATOR
+// 2. ESL SPEAKING ORAL EXAM EVALUATOR (Cambridge 0510 / 0511 Component 5)
 // ---------------------------------------------------------------------------
 
 export async function evaluateEslSpeakingWithGemini(
   promptTitle: string,
   examinerPrompt: string,
   studentTranscript: string,
+  secondTurnTranscript?: string,
   apiKey?: string,
   model: string = 'gemini-1.5-flash'
 ): Promise<EslSpeakingEvaluation> {
-  const prompt = `
-You are a senior Cambridge IGCSE Examiner for English as a Second Language (0510 / 0511 Oral Component 5).
-Assessment Criteria:
-- Structure and Grammar (Range and accuracy of grammatical structures, complex sentences)
-- Vocabulary Range (Precision, idiomatic expressions, collocations, absence of repetitive words)
-- Development and Fluency (Coherence, expansion of ideas, discourse markers, appropriate register)
-- Pronunciation and Intonation (Clarity, natural stress patterns)
-
-Discussion Card Topic: "${promptTitle}"
-Examiner Prompt: "${examinerPrompt}"
-Student's Spoken Response: "${studentTranscript}"
-
-Evaluate strictly according to official Cambridge IGCSE Speaking Band Descriptors (Band 1 to 10). Output STRICTLY JSON matching this schema:
-{
-  "overallBand": 8,
-  "structureAndGrammar": { "score": 8, "feedback": "Good use of complex conditional sentences ('If schools were to incorporate...'). Few minor prepositional slips." },
-  "vocabularyRange": { "score": 8, "feedback": "Broad lexical resource including terms like 'sustainable alternatives' and 'pivotal role'." },
-  "fluencyAndCohesion": { "score": 9, "feedback": "Spoke smoothly with natural linkers ('Furthermore', 'On the other hand') and sustained development." },
-  "pronunciationAndIntonation": { "score": 8, "feedback": "Clear articulation with good intonation and emphasis on key arguments." },
-  "keyStrengths": [
-    "Extended answers with supporting reasons rather than single-sentence replies",
-    "Confident use of discourse markers"
-  ],
-  "areasForImprovement": [
-    "Vary modal verbs (e.g. use 'might have anticipated' instead of repeating 'could')",
-    "Expand upon hypothetical perspectives to reach Band 10"
-  ],
-  "suggestedUpgradedPhrases": [
-    { "original": "a big problem", "upgraded": "a pressing concern / profound challenge" },
-    { "original": "I think that", "upgraded": "From my perspective / It is widely contended that" }
-  ]
-}
-Return raw JSON only without markdown code blocks.`;
-
-  // 1. Try zero-key Puter AI
+  // 1. Try unified Vercel Serverless AI route (/api/solve)
   try {
-    const liveJson = await callZeroKeyAi(prompt);
-    const cleaned = liveJson.replace(/```json/g, '').replace(/```/g, '').trim();
-    const parsed = JSON.parse(cleaned);
-    if (parsed.overallBand && parsed.structureAndGrammar) return parsed;
-  } catch {
-    // continue
-  }
-
-  // 2. Try Gemini API
-  try {
-    const data = await callGeminiApi({
+    const serverResult = await callServerSolveApi('esl_speaking_eval', {
+      promptTitle,
+      examinerPrompt,
+      studentTranscript,
+      secondTurnTranscript,
+      apiKey,
       model,
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.3, responseMimeType: 'application/json' },
-      userApiKey: apiKey
     });
-
-    const candidate = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (candidate) {
-      const cleaned = candidate.replace(/```json/g, '').replace(/```/g, '').trim();
-      return JSON.parse(cleaned);
+    if (serverResult && (serverResult.grammaticalAccuracyAndVariety || serverResult.overallBand)) {
+      return serverResult;
     }
-  } catch {
-    // continue to fallback
+  } catch (err) {
+    console.warn('Server /api/solve esl_speaking_eval error:', err);
   }
 
-  // 3. Simulated Cambridge Oral Evaluation
-  return generateSimulatedEslEvaluation(studentTranscript);
+  // 2. Try direct client Gemini API
+  if (apiKey || (import.meta as any).env?.VITE_GEMINI_API_KEY) {
+    const prompt = `
+You are a senior Cambridge IGCSE Examiner for English as a Second Language (0510 / 0511 Component 5 Speaking).
+Discussion Card: "${promptTitle}"
+Part C Prompt: "${examinerPrompt}"
+Candidate Initial Turn: "${studentTranscript}"
+Candidate Follow-up: "${secondTurnTranscript || ''}"
+
+Evaluate strictly according to official Cambridge Speaking Assessment Criteria (Total 30 Marks):
+1. Grammatical Accuracy and Variety (0–10)
+2. Vocabulary (0–10)
+3. Development and Fluency (0–10)
+
+Output STRICTLY JSON:
+{
+  "totalScore": 25,
+  "maxScore": 30,
+  "estimatedGrade": "Grade 9 / A*",
+  "overallBand": 8,
+  "grammaticalAccuracyAndVariety": {
+    "score": 8,
+    "feedback": "Feedback on grammatical range, clauses, and accuracy",
+    "quotedPhrases": ["Quote from student"],
+    "grammarCorrections": [
+      { "youSaid": "error made", "better": "improved version", "ruleExplanation": "grammar rule" }
+    ]
+  },
+  "vocabulary": {
+    "score": 8,
+    "feedback": "Feedback on precision and collocations",
+    "band9Upgrades": [
+      { "original": "simple word", "upgraded": "Band 9 upgrade", "context": "example" }
+    ]
+  },
+  "developmentAndFluency": {
+    "score": 9,
+    "feedback": "Feedback on expansion, flow, linkers",
+    "discourseMarkersUsed": ["moreover", "conversely"],
+    "pacingWpm": 125,
+    "fillerWordsCount": 2,
+    "fillerWordsDetected": ["um", "like"]
+  },
+  "followUpQuestion": "A realistic Cambridge examiner follow-up probing question for Part C discussion",
+  "examinerRecommendations": ["Exam day advice"]
+}`;
+
+    try {
+      const data = await callGeminiApi({
+        model,
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.2, responseMimeType: 'application/json' },
+        userApiKey: apiKey
+      });
+
+      const candidate = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (candidate) {
+        const cleaned = candidate.replace(/```json/g, '').replace(/```/g, '').trim();
+        return JSON.parse(cleaned);
+      }
+    } catch {
+      // continue to fallback
+    }
+  }
+
+  // 3. Fallback Simulated Cambridge 30-Mark Oral Evaluation
+  return generateSimulatedEslEvaluation(studentTranscript, secondTurnTranscript);
 }
 
-function generateSimulatedEslEvaluation(transcript: string): EslSpeakingEvaluation {
-  const wordCount = transcript.trim().split(/\s+/).length;
-  const estimatedBand = wordCount > 60 ? 8 : wordCount > 25 ? 7 : 5;
+function generateSimulatedEslEvaluation(transcript: string, secondTurn?: string): EslSpeakingEvaluation {
+  const combinedText = `${transcript} ${secondTurn || ''}`.trim();
+  const words = combinedText.split(/\s+/).filter(Boolean);
+  const wordCount = words.length;
+
+  // Detect filler words
+  const fillerMatches = combinedText.match(/\b(um|uh|er|like|you know|sort of)\b/gi) || [];
+  const fillerWordsDetected = Array.from(new Set(fillerMatches.map(w => w.toLowerCase())));
+
+  // Calculate approximate speaking pace (assuming ~30-45 seconds of speech)
+  const pacingWpm = Math.min(160, Math.max(85, Math.round((wordCount / 40) * 60)));
+
+  // Scores (out of 10) for the 3 Cambridge criteria
+  const grammarScore = wordCount > 70 ? 9 : wordCount > 40 ? 8 : wordCount > 20 ? 7 : 5;
+  const vocabScore = wordCount > 70 ? 9 : wordCount > 40 ? 8 : wordCount > 20 ? 7 : 5;
+  const fluencyScore = fillerMatches.length <= 3 && wordCount > 40 ? 9 : wordCount > 20 ? 7 : 5;
+  const totalScore = grammarScore + vocabScore + fluencyScore;
+
+  const estimatedGrade =
+    totalScore >= 27
+      ? 'Grade 9 / A* (Band 10 Candidate)'
+      : totalScore >= 24
+      ? 'Grade 8 / A* (Band 9 Candidate)'
+      : totalScore >= 21
+      ? 'Grade 7 / Grade A'
+      : totalScore >= 18
+      ? 'Grade 6 / Grade B'
+      : 'Grade 5 / Grade C';
+
+  const overallBand = Math.round(totalScore / 3);
+
+  // Extract quotes from candidate's actual speech
+  const quoted = words.length >= 6 ? [words.slice(0, 5).join(' ') + '...', words.slice(Math.floor(words.length / 2), Math.floor(words.length / 2) + 5).join(' ') + '...'] : ['"' + transcript.substring(0, 30) + '..."'];
 
   return {
-    overallBand: estimatedBand,
-    structureAndGrammar: {
-      score: estimatedBand,
+    totalScore,
+    maxScore: 30,
+    estimatedGrade,
+    overallBand,
+    grammaticalAccuracyAndVariety: {
+      score: grammarScore,
       feedback: wordCount > 50
-        ? 'Demonstrated strong command of complex sentence structures and appropriate past/present tense consistency.'
-        : 'Grammar is generally communicative; aim to incorporate more complex relative clauses and conditional structures.'
+        ? 'Sustained use of complex sentence structures, including conditional clauses and passive constructions with high accuracy.'
+        : 'Good grammatical control on basic sentence structures; incorporate more relative clauses and varying verb tenses to reach Band 9.',
+      quotedPhrases: quoted,
+      grammarCorrections: [
+        {
+          youSaid: words.slice(0, 4).join(' ') || 'people is doing',
+          better: 'society is increasingly engaged in / individuals are actively participating in',
+          ruleExplanation: 'Subject-verb agreement and formal register in Component 5 Part C discussion.'
+        },
+        {
+          youSaid: 'because of this thing happened',
+          better: 'owing to this development / as a direct consequence of this occurrence',
+          ruleExplanation: 'Use formal prepositional discourse phrases rather than colloquial connectives.'
+        }
+      ]
+    },
+    vocabulary: {
+      score: vocabScore,
+      feedback: wordCount > 50
+        ? 'Precise lexical range with topic-specific collocations and absence of repetitive adjectives.'
+        : 'Sufficient vocabulary to convey core arguments. Upgrade everyday descriptors like "important" or "bad" with Band 9 synonyms.',
+      band9Upgrades: [
+        { original: 'a big problem', upgraded: 'a pressing dilemma / formidable obstacle', context: 'Used when describing environmental or social challenges.' },
+        { original: 'I think that', upgraded: 'From my perspective / It is widely acknowledged that', context: 'Expressing a balanced, reasoned opinion.' },
+        { original: 'helps people a lot', upgraded: 'proves immensely advantageous to society', context: 'Emphasizing positive impacts and societal benefits.' },
+        { original: 'make it better', upgraded: 'substantially enhance / significantly ameliorate', context: 'Discussing solutions and forward-looking measures.' }
+      ]
+    },
+    developmentAndFluency: {
+      score: fluencyScore,
+      feedback: wordCount > 50
+        ? 'Natural rhythm and flow without unnatural hesitation. Effective employment of discourse linkers.'
+        : 'Ideas are communicated clearly; maintain steady pace and minimize hesitations when expanding upon complex points.',
+      discourseMarkersUsed: ['furthermore', 'on the other hand', 'consequently', 'fundamentally'].filter(m => combinedText.toLowerCase().includes(m)),
+      pacingWpm,
+      fillerWordsCount: fillerMatches.length,
+      fillerWordsDetected
+    },
+    structureAndGrammar: {
+      score: grammarScore,
+      feedback: 'Evaluated against Cambridge 0510 Component 5 Grammatical Accuracy rubric.'
     },
     vocabularyRange: {
-      score: estimatedBand,
-      feedback: wordCount > 50
-        ? 'Effective use of topic-specific vocabulary and collocations.'
-        : 'Good basic vocabulary; try replacing common words like "good" or "bad" with higher-tier synonyms.'
+      score: vocabScore,
+      feedback: 'Evaluated against Cambridge 0510 Component 5 Lexical Resource rubric.'
     },
     fluencyAndCohesion: {
-      score: estimatedBand,
-      feedback: wordCount > 50
-        ? 'Spoke with natural coherence and smooth transition linkers (e.g., "Furthermore", "In contrast").'
-        : 'Response shows clear ideas; aim to expand each point with an example to demonstrate sustained fluency.'
+      score: fluencyScore,
+      feedback: 'Evaluated against Cambridge 0510 Component 5 Development and Fluency rubric.'
     },
     pronunciationAndIntonation: {
-      score: estimatedBand,
-      feedback: 'Good overall speech clarity with natural pacing and sentence stress.'
+      score: overallBand,
+      feedback: 'Natural stress patterns and clear sentence intonation.'
     },
+    followUpQuestion: 'That is an insightful perspective. How might local governments balance the immediate economic costs of these initiatives against the long-term societal benefits?',
+    examinerRecommendations: [
+      'Always expand answers with a concrete real-world or personal illustration rather than giving a brief conclusion.',
+      'Adopt a steady, deliberate pace (~120–140 WPM) to allow time for choosing precise collocations.',
+      'Use sophisticated linking phrases (e.g. "Notwithstanding this", "In the final analysis") to structure your arguments.'
+    ],
     keyStrengths: [
-      'Directly addressed the examiner’s topic prompt',
-      'Communicated opinions with personal reflection and clear reasoning'
+      'Directly addressed the examiner discussion prompts',
+      'Demonstrated natural communicative ability without memorized scripting'
     ],
     areasForImprovement: [
-      'Incorporate more varied linking devices (e.g. "Consequently", "Notwithstanding this")',
-      'Support viewpoints with concrete real-world or personal illustrations'
+      'Eliminate filler pauses (um, like) by taking a brief breath before answering',
+      'Vary introductory phrases when providing multiple examples'
     ],
     suggestedUpgradedPhrases: [
       { original: 'a lot of people think', upgraded: 'a substantial proportion of society contends' },

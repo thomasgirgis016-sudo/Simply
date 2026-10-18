@@ -69,9 +69,14 @@ export const QuizView: React.FC<QuizViewProps> = ({
     return [];
   });
 
-  // Filter quizzes by subject, topic, tier, and paper component
+  // Exact paper code search & Mixed Paper Drill state
+  const [paperCodeQuery, setPaperCodeQuery] = useState('');
+  const [isDrillMode, setIsDrillMode] = useState(false);
+  const [drillQuestions, setDrillQuestions] = useState<QuizQuestion[]>([]);
+
+  // Filter quizzes by subject, topic, tier, paper component, or paper code query
   const subjectQuizzes = quizzes.filter(q => isSubjectMatch(q.subjectId, subject));
-  const filteredQuizzes = subjectQuizzes.filter((q) => {
+  const standardFiltered = subjectQuizzes.filter((q) => {
     const matchesTopic = selectedTopic === 'All' || q.topic === selectedTopic;
     const matchesTier =
       selectedTier === 'All' ||
@@ -79,10 +84,30 @@ export const QuizView: React.FC<QuizViewProps> = ({
     const matchesPaper =
       selectedPaper === 'All' ||
       (q.paperReference ? q.paperReference.toLowerCase().includes(selectedPaper.toLowerCase()) : true);
-    return matchesTopic && matchesTier && matchesPaper;
+    const matchesPaperCode =
+      !paperCodeQuery.trim() ||
+      (q.paperReference && q.paperReference.toLowerCase().includes(paperCodeQuery.trim().toLowerCase().replace(/\s+/g, '')));
+    return matchesTopic && matchesTier && matchesPaper && matchesPaperCode;
   });
 
+  const filteredQuizzes = isDrillMode ? drillQuestions : standardFiltered;
   const currentQuestion = filteredQuizzes[currentIdx];
+
+  const handleStartMixedPaperDrill = () => {
+    if (subjectQuizzes.length === 0) return;
+    const shuffled = [...subjectQuizzes].sort(() => Math.random() - 0.5);
+    const selected = shuffled.slice(0, Math.min(10, shuffled.length));
+    setDrillQuestions(selected);
+    setIsDrillMode(true);
+    setIsTimerEnabled(true);
+    handleRestart();
+  };
+
+  const handleExitMixedPaperDrill = () => {
+    setIsDrillMode(false);
+    setDrillQuestions([]);
+    handleRestart();
+  };
 
   // Timer effect per question (Standard IGCSE pacing: 1.5 minutes = 90s per mark)
   useEffect(() => {
@@ -292,6 +317,15 @@ export const QuizView: React.FC<QuizViewProps> = ({
               <span className="hidden sm:inline">Score History</span>
             </button>
 
+            {/* Mixed Paper Exam Drill Button */}
+            <button
+              onClick={handleStartMixedPaperDrill}
+              className="flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 px-3 py-2 text-xs font-bold text-white shadow-md hover:from-amber-400 hover:to-orange-500 transition cursor-pointer active:scale-95"
+              title="Start a 10-question randomized exam drill across years, seasons, and variants"
+            >
+              <span>🎲 Mixed Paper Drill</span>
+            </button>
+
             {/* AI Generate Questions */}
             <button
               onClick={() => setIsAiModalOpen(true)}
@@ -303,49 +337,94 @@ export const QuizView: React.FC<QuizViewProps> = ({
           </div>
         </div>
 
-        {/* Tier & Paper Filter Bar */}
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-800/80 pt-3">
-          <div className="flex flex-wrap items-center gap-3">
-            {/* Core vs Extended */}
-            <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
-              <span className="px-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tier:</span>
-              {(['All', 'Core', 'Extended'] as const).map((tier) => (
+        {/* Mixed Paper Exam Drill Banner (if active) */}
+        {isDrillMode && (
+          <div className="mt-4 flex items-center justify-between rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-xs text-amber-200">
+            <div className="flex items-center gap-2">
+              <span className="flex h-2 w-2 rounded-full bg-amber-400 animate-ping" />
+              <span className="font-bold">Mixed Paper Exam Drill Active:</span>
+              <span>10 randomized questions from multiple years & variants with strict mark schemes.</span>
+            </div>
+            <button
+              onClick={handleExitMixedPaperDrill}
+              className="rounded-lg bg-amber-500/20 px-2.5 py-1 font-bold text-amber-300 hover:bg-amber-500/30 border border-amber-500/30 transition cursor-pointer"
+            >
+              Exit Drill
+            </button>
+          </div>
+        )}
+
+        {/* Exact Paper Code Search Bar & Filters */}
+        <div className="mt-4 space-y-3 border-t border-slate-800/80 pt-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="relative flex-1 min-w-[240px]">
+              <input
+                type="text"
+                value={paperCodeQuery}
+                onChange={(e) => {
+                  setPaperCodeQuery(e.target.value);
+                  handleRestart();
+                }}
+                placeholder="Lookup exact paper code (e.g. 0580/42/M/J/23, 0625/21/O/N/22)..."
+                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3.5 py-1.5 text-xs text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none"
+              />
+              {paperCodeQuery && (
                 <button
-                  key={tier}
-                  onClick={() => { setSelectedTier(tier); handleRestart(); }}
-                  className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
-                    selectedTier === tier
-                      ? 'bg-emerald-600 text-white shadow-sm'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
+                  onClick={() => {
+                    setPaperCodeQuery('');
+                    handleRestart();
+                  }}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs"
                 >
-                  {tier}
+                  ✕
                 </button>
-              ))}
+              )}
             </div>
 
-            {/* Paper Component Filter */}
-            <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
-              <span className="px-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Paper:</span>
-              {(['All', 'Paper 2', 'Paper 4'] as const).map((paper) => (
-                <button
-                  key={paper}
-                  onClick={() => { setSelectedPaper(paper === 'All' ? 'All' : paper); handleRestart(); }}
-                  className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
-                    (selectedPaper === 'All' && paper === 'All') || selectedPaper === paper
-                      ? 'bg-indigo-600 text-white shadow-sm'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  {paper}
-                </button>
-              ))}
-            </div>
+            <span className="text-xs text-slate-400 shrink-0">
+              {filteredQuizzes.length} questions found
+            </span>
           </div>
 
-          <span className="text-xs text-slate-400">
-            {filteredQuizzes.length} questions available
-          </span>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Core vs Extended */}
+              <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
+                <span className="px-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tier:</span>
+                {(['All', 'Core', 'Extended'] as const).map((tier) => (
+                  <button
+                    key={tier}
+                    onClick={() => { setSelectedTier(tier); handleRestart(); }}
+                    className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
+                      selectedTier === tier
+                        ? 'bg-emerald-600 text-white shadow-sm'
+                        : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    {tier}
+                  </button>
+                ))}
+              </div>
+
+              {/* Paper Component Filter */}
+              <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
+                <span className="px-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Paper:</span>
+                {(['All', 'Paper 2', 'Paper 4'] as const).map((paper) => (
+                  <button
+                    key={paper}
+                    onClick={() => { setSelectedPaper(paper === 'All' ? 'All' : paper); handleRestart(); }}
+                    className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
+                      (selectedPaper === 'All' && paper === 'All') || selectedPaper === paper
+                        ? 'bg-indigo-600 text-white shadow-sm'
+                        : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    {paper}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Topic filter bar */}
