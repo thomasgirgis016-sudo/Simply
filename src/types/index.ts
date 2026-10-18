@@ -233,6 +233,23 @@ export interface PastPaperItem {
   markSchemePdfUrl?: string;
 }
 
+export interface OfficialPaperPdf {
+  id: string;
+  subjectId: string;
+  subjectName: string;
+  subjectCode: string;
+  board: ExamBoard;
+  year: number;
+  session: string; // e.g. "June 2024", "2025 Specimen", "2023 Specimen"
+  paperComponent: string; // e.g. "Paper 4 (Extended)", "Paper 2 (Core/Ext)"
+  paperCode: string; // e.g. "0580/41", "0625/4", "0620/4"
+  tier: 'Core' | 'Extended' | 'General';
+  qpPdfUrl: string;
+  msPdfUrl?: string;
+  examinerReportUrl?: string;
+  fileSizeBytes?: string; // e.g. "1.2 MB"
+}
+
 // 3. Syllabus Interactive Specification Checklist Types
 export interface SyllabusChecklistItem {
   id: string;
