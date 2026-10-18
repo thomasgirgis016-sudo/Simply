@@ -688,15 +688,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </div>
 
                   {/* Right: Actions */}
-                  <div className="flex items-center gap-2 self-end md:self-auto flex-wrap">
+                  <div className="flex items-center gap-2 w-full md:w-auto justify-end flex-wrap pt-2 md:pt-0 border-t border-slate-800/60 md:border-t-0">
                     {/* Approve Button */}
                     {isPending && (
                       <button
                         onClick={() => handleApprove(u)}
-                        className="flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-emerald-500 transition shadow-sm cursor-pointer"
+                        className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 py-2.5 px-4 text-xs font-black text-slate-950 shadow-md shadow-emerald-500/20 active:scale-95 transition cursor-pointer"
                         title="Accept & activate student account"
                       >
-                        <CheckCircle className="h-3.5 w-3.5" />
+                        <CheckCircle className="h-4 w-4" />
                         <span>Accept Account</span>
                       </button>
                     )}
@@ -705,7 +705,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     {isRejected && (
                       <button
                         onClick={() => handleApprove(u)}
-                        className="flex items-center gap-1.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-3 py-1.5 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20 transition cursor-pointer"
+                        className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 py-2 px-3 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20 transition cursor-pointer"
                       >
                         <UserCheck className="h-3.5 w-3.5" />
                         <span>Reactivate</span>
@@ -716,7 +716,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     {isApproved && !isSelf && (
                       <button
                         onClick={() => handleReject(u)}
-                        className="rounded-xl border border-slate-800 bg-slate-900/80 px-2.5 py-1.5 text-xs font-semibold text-slate-400 hover:text-rose-400 hover:border-rose-500/40 transition cursor-pointer"
+                        className="flex-1 sm:flex-initial rounded-xl border border-slate-800 bg-slate-900/80 py-2 px-3 text-xs font-semibold text-slate-400 hover:text-rose-400 hover:border-rose-500/40 transition cursor-pointer"
                         title="Suspend access"
                       >
                         Suspend
@@ -727,7 +727,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     {!isSelf && (
                       <button
                         onClick={() => handleToggleRole(u)}
-                        className={`rounded-xl border px-2.5 py-1.5 text-xs font-semibold transition cursor-pointer ${
+                        className={`flex-1 sm:flex-initial rounded-xl border py-2 px-3 text-xs font-semibold transition cursor-pointer ${
                           isAdmin
                             ? 'border-purple-500/30 bg-purple-950/40 text-purple-300 hover:bg-purple-900/50'
                             : 'border-slate-800 bg-slate-900/80 text-slate-400 hover:text-white'

@@ -490,6 +490,7 @@ export function App() {
         onOpenCalculator={() => setIsCalculatorOpen(true)}
         theme={theme}
         onToggleTheme={handleToggleTheme}
+        onOpenSecretAdmin={() => setIsSecretAdminOpen(true)}
       />
 
       {/* Main Container */}

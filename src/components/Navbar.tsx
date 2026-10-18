@@ -61,6 +61,7 @@ interface NavbarProps {
   onOpenCalculator?: () => void;
   theme?: 'dark' | 'light';
   onToggleTheme?: () => void;
+  onOpenSecretAdmin?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -78,8 +79,43 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenCalculator,
   theme = 'dark',
   onToggleTheme,
+  onOpenSecretAdmin,
 }) => {
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
+  const tapTimesRef = React.useRef<number[]>([]);
+  const longPressTimerRef = React.useRef<any>(null);
+
+  const handleLogoTouchStart = () => {
+    longPressTimerRef.current = setTimeout(() => {
+      if (onOpenSecretAdmin) {
+        if ('vibrate' in navigator) navigator.vibrate?.([60, 40, 60]);
+        onOpenSecretAdmin();
+      }
+    }, 1200);
+  };
+
+  const handleLogoTouchEnd = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  };
+
+  const handleLogoClick = () => {
+    const now = Date.now();
+    tapTimesRef.current = tapTimesRef.current.filter(t => now - t < 1500);
+    tapTimesRef.current.push(now);
+
+    // Secret mobile trigger: 3 rapid taps opens secret admin passcode portal
+    if (tapTimesRef.current.length >= 3) {
+      tapTimesRef.current = [];
+      if ('vibrate' in navigator) navigator.vibrate?.([60, 40, 60]);
+      if (onOpenSecretAdmin) onOpenSecretAdmin();
+      return;
+    }
+
+    onSelectTab('home');
+  };
 
   const baseTabs = [
     { id: 'home', label: 'Home', icon: Home, color: 'text-indigo-400' },
@@ -109,7 +145,9 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="mx-auto flex max-w-7xl items-center justify-between px-3.5 py-2.5 sm:px-6 sm:py-3">
           {/* Brand / Logo */}
           <button
-            onClick={() => onSelectTab('home')}
+            onClick={handleLogoClick}
+            onTouchStart={handleLogoTouchStart}
+            onTouchEnd={handleLogoTouchEnd}
             className="flex items-center text-left cursor-pointer group focus:outline-none transition hover:opacity-95"
             title="Go to Homepage"
           >
@@ -225,14 +263,43 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </div>
 
-          {/* Mobile Right: Clean Hamburger Menu Button */}
-          <div className="flex sm:hidden items-center gap-2">
+          {/* Mobile Right: Quick Action & Hamburger Menu */}
+          <div className="flex sm:hidden items-center gap-1.5">
+            {onToggleTheme && (
+              <button
+                onClick={onToggleTheme}
+                className="rounded-xl border border-slate-800 bg-slate-900/90 p-2 text-slate-400 hover:text-amber-400 transition"
+                aria-label="Toggle Theme"
+              >
+                {theme === 'dark' ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-indigo-400" />}
+              </button>
+            )}
+
+            {currentUser ? (
+              <button
+                onClick={onOpenProfile}
+                className="flex items-center gap-1.5 rounded-xl border border-slate-800 bg-slate-900/90 px-2 py-1.5 text-xs text-white"
+                title="Profile"
+              >
+                <div className="h-5 w-5 rounded-full bg-gradient-to-tr from-[#FF5E62] to-[#FFA63A] flex items-center justify-center text-[10px] font-black text-slate-950 uppercase">
+                  {currentUser.name.charAt(0)}
+                </div>
+              </button>
+            ) : (
+              <button
+                onClick={() => onOpenAuth('signin')}
+                className="rounded-xl bg-gradient-to-r from-[#FF5E62] to-[#FFA63A] px-2.5 py-1 text-[11px] font-extrabold text-slate-950 shadow-sm"
+              >
+                Sign In
+              </button>
+            )}
+
             <button
               onClick={() => setIsMobileDrawerOpen(true)}
-              className="rounded-xl border border-slate-800 bg-slate-900/90 p-2 text-slate-300 hover:text-white hover:border-slate-700 transition cursor-pointer"
+              className="rounded-xl border border-slate-800 bg-slate-900/90 p-2 text-slate-300 hover:text-white transition cursor-pointer"
               aria-label="Open Mobile Menu"
             >
-              <Menu className="h-5 w-5 text-indigo-400" />
+              <Menu className="h-5 w-5 text-amber-400" />
             </button>
           </div>
         </div>
@@ -439,6 +506,22 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <Settings className="h-3.5 w-3.5" />
                 <span>AI Model & Font Settings</span>
               </button>
+
+              <div className="flex items-center justify-between pt-3 px-1 text-[11px] text-slate-500 border-t border-slate-800/40">
+                <span>Simply IGCSE v2.6</span>
+                {onOpenSecretAdmin && (
+                  <button
+                    onClick={() => {
+                      setIsMobileDrawerOpen(false);
+                      onOpenSecretAdmin();
+                    }}
+                    className="text-slate-600 hover:text-slate-400 active:text-amber-400 transition cursor-default p-1 text-[10px]"
+                    title="System Portal"
+                  >
+                    © Portal
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
