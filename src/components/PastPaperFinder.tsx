@@ -174,7 +174,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
       if (selectedSubjectId !== 'all') {
         const matchesSub =
           pdf.subjectId === selectedSubjectId ||
-          isSubjectMatch(pdf.subjectId, activeSubject);
+          pdf.subjectCode.toLowerCase() === selectedSubjectId.toLowerCase();
         if (!matchesSub) return false;
       }
 
@@ -495,8 +495,8 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               onChange={(e) => setSelectedYear(e.target.value)}
               className="w-full rounded-xl border border-sky-500/40 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
             >
-              <option value="All">All Years (2018–2024)</option>
-              <option value="2025">2025 Specimen</option>
+              <option value="All">All Years (2016–2025)</option>
+              <option value="2025">2025 Specimen Series</option>
               <option value="2024">2024 Series</option>
               <option value="2023">2023 Series</option>
               <option value="2022">2022 Series</option>
@@ -504,6 +504,8 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               <option value="2020">2020 Series</option>
               <option value="2019">2019 Series</option>
               <option value="2018">2018 Series</option>
+              <option value="2017">2017 Series</option>
+              <option value="2016">2016 Series</option>
             </select>
           </div>
 
@@ -521,6 +523,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               <option value="May/June">May / June (Summer - s)</option>
               <option value="Oct/Nov">Oct / Nov (Winter - w)</option>
               <option value="Feb/March">Feb / March (Spring - m)</option>
+              <option value="January">January Series (Edexcel)</option>
               <option value="Specimen">Specimen Series</option>
             </select>
           </div>
@@ -537,16 +540,16 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               className="w-full rounded-xl border border-sky-500/40 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
             >
               <option value="All">All Papers</option>
-              <option value="1">Paper 1 (Core / MCQ / CS)</option>
-              <option value="2">Paper 2 (Ext MCQ / Short / Structured)</option>
+              <option value="1">Paper 1 (MCQ / Short / Foundation)</option>
+              <option value="2">Paper 2 (Extended / Theory / Calculator)</option>
               <option value="3">Paper 3 (Core Structured)</option>
-              <option value="4">Paper 4 (Ext Theory / Calc)</option>
+              <option value="4">Paper 4 (Extended Theory / Calc)</option>
               <option value="5">Paper 5 (Practical Test)</option>
-              <option value="6">Paper 6 (Alt to Practical)</option>
+              <option value="6">Paper 6 (Alternative to Practical)</option>
             </select>
           </div>
 
-          {/* 6. Variant Filter (1, 2, 3) */}
+          {/* 6. Variant Filter (1, 2, 3 & Regional) */}
           <div>
             <label className="text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center justify-between">
               <span>Variant</span>
@@ -557,10 +560,10 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               onChange={(e) => setSelectedVariant(e.target.value)}
               className="w-full rounded-xl border border-sky-500/40 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
             >
-              <option value="All">All Variants (1, 2, 3)</option>
-              <option value="1">Variant 1 (e.g. 21, 41)</option>
-              <option value="2">Variant 2 (e.g. 22, 42)</option>
-              <option value="3">Variant 3 (e.g. 23, 43)</option>
+              <option value="All">All Variants (1, 2, 3 & Regional)</option>
+              <option value="1">Variant 1 (e.g. 11, 21, 41 / Standard)</option>
+              <option value="2">Variant 2 (e.g. 12, 22, 42 / Regional "R")</option>
+              <option value="3">Variant 3 (e.g. 13, 23, 43)</option>
             </select>
           </div>
         </div>
@@ -570,7 +573,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
           <div className="flex items-center gap-2 text-slate-400 flex-wrap">
             {activeTab === 'pdf-library' ? (
               <span>
-                Found <strong className="text-white">{filteredPdfs.length}</strong> past paper PDFs across 2018–2024
+                Found <strong className="text-white">{filteredPdfs.length}</strong> past paper PDFs across 2016–2025
                 {filteredPdfs.length > displayedPdfs.length && (
                   <span className="text-sky-400 ml-1.5">(Showing first {displayedPdfs.length})</span>
                 )}
@@ -641,7 +644,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                 <FileDown className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs font-bold text-white">Full Exam Library: 2018 to 2024 (Every Paper & Variant)</p>
+                <p className="text-xs font-bold text-white">Full Exam Library: 2016 to 2025 (All Subjects, All Papers & All Variants)</p>
                 <p className="text-[11px] text-slate-400">
                   Click <strong>Open Fullscreen</strong> to open in native viewer, or <strong>View</strong> to inspect in-app with Google Docs & direct mirrors.
                 </p>

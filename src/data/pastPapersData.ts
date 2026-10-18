@@ -352,100 +352,306 @@ interface SubjectConfig {
   }[];
 }
 
+// ═══════════════════════════════════════════════════════════
+// ALL 16 CAMBRIDGE IGCSE SUBJECTS — Full Papers & Variants
+// ═══════════════════════════════════════════════════════════
 const CAMBRIDGE_SUBJECT_CONFIGS: SubjectConfig[] = [
+  // ── MATHEMATICS ─────────────────────────────────────────
   {
-    id: 'cie-math-0580',
-    name: 'Mathematics',
-    code: '0580',
-    slug: 'mathematics-0580',
-    board: 'CIE',
+    id: 'cie-math-0580', name: 'Mathematics', code: '0580',
+    slug: 'mathematics-0580', board: 'CIE',
     papers: [
-      { paperNumber: 2, title: 'Paper 2 (Extended Short-Answer)', tier: 'Extended', variants: [1, 2, 3] },
-      { paperNumber: 4, title: 'Paper 4 (Extended Structured Calculator)', tier: 'Extended', variants: [1, 2, 3] },
-      { paperNumber: 1, title: 'Paper 1 (Core Short-Answer)', tier: 'Core', variants: [1, 2, 3] },
-      { paperNumber: 3, title: 'Paper 3 (Core Structured)', tier: 'Core', variants: [1, 2, 3] }
+      { paperNumber: 1, title: 'Paper 1 (Core Short Answer)',            tier: 'Core',     variants: [1, 2, 3] },
+      { paperNumber: 2, title: 'Paper 2 (Extended Short Answer)',        tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 3, title: 'Paper 3 (Core Structured)',              tier: 'Core',     variants: [1, 2, 3] },
+      { paperNumber: 4, title: 'Paper 4 (Extended Structured)',          tier: 'Extended', variants: [1, 2, 3] },
     ]
   },
   {
-    id: 'cie-physics-0625',
+    id: 'cie-addmath-0606', name: 'Additional Mathematics', code: '0606',
+    slug: 'additional-mathematics-0606', board: 'CIE',
+    papers: [
+      { paperNumber: 1, title: 'Paper 1 (Non-Calculator)',               tier: 'General', variants: [1, 2, 3] },
+      { paperNumber: 2, title: 'Paper 2 (Calculator)',                   tier: 'General', variants: [1, 2, 3] },
+    ]
+  },
+  // ── SCIENCES ────────────────────────────────────────────
+  {
+    id: 'cie-physics-0625', name: 'Physics', code: '0625',
+    slug: 'physics-0625', board: 'CIE',
+    papers: [
+      { paperNumber: 1, title: 'Paper 1 (MCQ Core)',                     tier: 'Core',     variants: [1, 2, 3] },
+      { paperNumber: 2, title: 'Paper 2 (MCQ Extended)',                 tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 3, title: 'Paper 3 (Theory Core)',                  tier: 'Core',     variants: [1, 2, 3] },
+      { paperNumber: 4, title: 'Paper 4 (Theory Extended)',              tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 5, title: 'Paper 5 (Practical Test)',               tier: 'General',  variants: [1, 2, 3] },
+      { paperNumber: 6, title: 'Paper 6 (Alternative to Practical)',     tier: 'General',  variants: [1, 2, 3] },
+    ]
+  },
+  {
+    id: 'cie-chem-0620', name: 'Chemistry', code: '0620',
+    slug: 'chemistry-0620', board: 'CIE',
+    papers: [
+      { paperNumber: 1, title: 'Paper 1 (MCQ Core)',                     tier: 'Core',     variants: [1, 2, 3] },
+      { paperNumber: 2, title: 'Paper 2 (MCQ Extended)',                 tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 3, title: 'Paper 3 (Theory Core)',                  tier: 'Core',     variants: [1, 2, 3] },
+      { paperNumber: 4, title: 'Paper 4 (Theory Extended)',              tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 5, title: 'Paper 5 (Practical Test)',               tier: 'General',  variants: [1, 2, 3] },
+      { paperNumber: 6, title: 'Paper 6 (Alternative to Practical)',     tier: 'General',  variants: [1, 2, 3] },
+    ]
+  },
+  {
+    id: 'cie-bio-0610', name: 'Biology', code: '0610',
+    slug: 'biology-0610', board: 'CIE',
+    papers: [
+      { paperNumber: 1, title: 'Paper 1 (MCQ Core)',                     tier: 'Core',     variants: [1, 2, 3] },
+      { paperNumber: 2, title: 'Paper 2 (MCQ Extended)',                 tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 3, title: 'Paper 3 (Theory Core)',                  tier: 'Core',     variants: [1, 2, 3] },
+      { paperNumber: 4, title: 'Paper 4 (Theory Extended)',              tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 5, title: 'Paper 5 (Practical Test)',               tier: 'General',  variants: [1, 2, 3] },
+      { paperNumber: 6, title: 'Paper 6 (Alternative to Practical)',     tier: 'General',  variants: [1, 2, 3] },
+    ]
+  },
+  {
+    id: 'cie-combined-sci-0653', name: 'Co-ordinated Sciences', code: '0653',
+    slug: 'co-ordinated-sciences-0653', board: 'CIE',
+    papers: [
+      { paperNumber: 1, title: 'Paper 1 (MCQ Core)',                     tier: 'Core',     variants: [1, 2] },
+      { paperNumber: 2, title: 'Paper 2 (MCQ Extended)',                 tier: 'Extended', variants: [1, 2] },
+      { paperNumber: 3, title: 'Paper 3 (Theory Core)',                  tier: 'Core',     variants: [1, 2] },
+      { paperNumber: 4, title: 'Paper 4 (Theory Extended)',              tier: 'Extended', variants: [1, 2] },
+      { paperNumber: 5, title: 'Paper 5 (Practical Test)',               tier: 'General',  variants: [1, 2] },
+      { paperNumber: 6, title: 'Paper 6 (Alternative to Practical)',     tier: 'General',  variants: [1, 2] },
+    ]
+  },
+  // ── COMPUTER SCIENCE ────────────────────────────────────
+  {
+    id: 'cie-cs-0478', name: 'Computer Science', code: '0478',
+    slug: 'computer-science-0478', board: 'CIE',
+    papers: [
+      { paperNumber: 1, title: 'Paper 1 (Theory of Computer Systems)',   tier: 'General', variants: [1, 2, 3] },
+      { paperNumber: 2, title: 'Paper 2 (Algorithms & Programming)',     tier: 'General', variants: [1, 2, 3] },
+    ]
+  },
+  // ── LANGUAGES ───────────────────────────────────────────
+  {
+    id: 'cie-esl-0510', name: 'English as a Second Language', code: '0510',
+    slug: 'english-second-language-0510', board: 'CIE',
+    papers: [
+      { paperNumber: 1, title: 'Paper 1 (Reading & Writing)',            tier: 'General', variants: [1, 2, 3] },
+      { paperNumber: 2, title: 'Paper 2 (Listening Comprehension)',      tier: 'General', variants: [1, 2, 3] },
+    ]
+  },
+  {
+    id: 'cie-eng-0500', name: 'English First Language', code: '0500',
+    slug: 'first-language-english-0500', board: 'CIE',
+    papers: [
+      { paperNumber: 1, title: 'Paper 1 (Reading)',                      tier: 'General', variants: [1, 2] },
+      { paperNumber: 2, title: 'Paper 2 (Directed Writing & Composition)', tier: 'General', variants: [1, 2] },
+    ]
+  },
+  // ── HUMANITIES ──────────────────────────────────────────
+  {
+    id: 'cie-history-0470', name: 'History', code: '0470',
+    slug: 'history-0470', board: 'CIE',
+    papers: [
+      { paperNumber: 1, title: 'Paper 1 (Core Content)',                 tier: 'General', variants: [1, 2] },
+      { paperNumber: 2, title: 'Paper 2 (Depth Study)',                  tier: 'General', variants: [1, 2] },
+      { paperNumber: 4, title: 'Paper 4 (Alternative to Coursework)',    tier: 'General', variants: [1, 2] },
+    ]
+  },
+  {
+    id: 'cie-geography-0460', name: 'Geography', code: '0460',
+    slug: 'geography-0460', board: 'CIE',
+    papers: [
+      { paperNumber: 1, title: 'Paper 1 (Geographical Themes)',          tier: 'General', variants: [1, 2] },
+      { paperNumber: 2, title: 'Paper 2 (Geographical Skills)',          tier: 'General', variants: [1, 2] },
+      { paperNumber: 4, title: 'Paper 4 (Alternative to Coursework)',    tier: 'General', variants: [1, 2] },
+    ]
+  },
+  {
+    id: 'cie-sociology-0495', name: 'Sociology', code: '0495',
+    slug: 'sociology-0495', board: 'CIE',
+    papers: [
+      { paperNumber: 1, title: 'Paper 1 (Sociology Topics)',             tier: 'General', variants: [1, 2] },
+      { paperNumber: 2, title: 'Paper 2 (Research Methods & Theory)',    tier: 'General', variants: [1, 2] },
+    ]
+  },
+  {
+    id: 'cie-environ-0680', name: 'Environmental Management', code: '0680',
+    slug: 'environmental-management-0680', board: 'CIE',
+    papers: [
+      { paperNumber: 1, title: 'Paper 1 (Short Answer)',                 tier: 'General', variants: [1, 2] },
+      { paperNumber: 2, title: 'Paper 2 (Data Stimulus)',                tier: 'General', variants: [1, 2] },
+    ]
+  },
+  // ── COMMERCIAL ──────────────────────────────────────────
+  {
+    id: 'cie-econ-0455', name: 'Economics', code: '0455',
+    slug: 'economics-0455', board: 'CIE',
+    papers: [
+      { paperNumber: 1, title: 'Paper 1 (Multiple Choice)',              tier: 'General', variants: [1, 2, 3] },
+      { paperNumber: 2, title: 'Paper 2 (Structured Questions)',         tier: 'General', variants: [1, 2, 3] },
+    ]
+  },
+  {
+    id: 'cie-business-0450', name: 'Business Studies', code: '0450',
+    slug: 'business-studies-0450', board: 'CIE',
+    papers: [
+      { paperNumber: 1, title: 'Paper 1 (Short Answer & Data Response)', tier: 'General', variants: [1, 2] },
+      { paperNumber: 2, title: 'Paper 2 (Case Study)',                   tier: 'General', variants: [1, 2] },
+    ]
+  },
+  {
+    id: 'cie-accounting-0452', name: 'Accounting', code: '0452',
+    slug: 'accounting-0452', board: 'CIE',
+    papers: [
+      { paperNumber: 1, title: 'Paper 1 (Multiple Choice)',              tier: 'General', variants: [1, 2] },
+      { paperNumber: 2, title: 'Paper 2 (Structured Questions)',         tier: 'General', variants: [1, 2] },
+    ]
+  },
+];
+
+// ============================================================
+// PEARSON EDEXCEL IGCSE SUBJECTS (All 9 subjects + all variants)
+// ============================================================
+interface EdexcelPaperDef {
+  num: number;
+  suffix: string;
+  variantNum: number;
+  title: string;
+  tier: 'Extended' | 'Core' | 'General';
+}
+
+interface EdexcelSubjectConfig {
+  id: string;
+  name: string;
+  code: string;
+  specUrl: string;
+  papers: EdexcelPaperDef[];
+}
+
+const EDEXCEL_SUBJECT_CONFIGS: EdexcelSubjectConfig[] = [
+  {
+    id: 'edx-math-4ma1',
+    name: 'Mathematics A',
+    code: '4MA1',
+    specUrl: 'https://qualifications.pearson.com/en/qualifications/edexcel-international-gcses/international-gcse-mathematics-a-2016.coursematerials.html#%2FfilterQuery=category:Pearson-UK:Category%2FExam-materials',
+    papers: [
+      { num: 1, suffix: '1H', variantNum: 1, title: 'Paper 1H (Higher Non-Calculator)', tier: 'Extended' },
+      { num: 2, suffix: '2H', variantNum: 1, title: 'Paper 2H (Higher Calculator)', tier: 'Extended' },
+      { num: 1, suffix: '1HR', variantNum: 2, title: 'Paper 1HR (Regional Higher Non-Calculator)', tier: 'Extended' },
+      { num: 2, suffix: '2HR', variantNum: 2, title: 'Paper 2HR (Regional Higher Calculator)', tier: 'Extended' },
+      { num: 1, suffix: '1F', variantNum: 1, title: 'Paper 1F (Foundation Non-Calculator)', tier: 'Core' },
+      { num: 2, suffix: '2F', variantNum: 1, title: 'Paper 2F (Foundation Calculator)', tier: 'Core' },
+      { num: 1, suffix: '1FR', variantNum: 2, title: 'Paper 1FR (Regional Foundation Non-Calculator)', tier: 'Core' },
+      { num: 2, suffix: '2FR', variantNum: 2, title: 'Paper 2FR (Regional Foundation Calculator)', tier: 'Core' }
+    ]
+  },
+  {
+    id: 'edx-math-4mb1',
+    name: 'Mathematics B',
+    code: '4MB1',
+    specUrl: 'https://qualifications.pearson.com/en/qualifications/edexcel-international-gcses/international-gcse-mathematics-b-2016.coursematerials.html',
+    papers: [
+      { num: 1, suffix: '01', variantNum: 1, title: 'Paper 1 (Standard Non-Calculator)', tier: 'Extended' },
+      { num: 2, suffix: '02', variantNum: 1, title: 'Paper 2 (Standard Calculator)', tier: 'Extended' },
+      { num: 1, suffix: '01R', variantNum: 2, title: 'Paper 1R (Regional Non-Calculator)', tier: 'Extended' },
+      { num: 2, suffix: '02R', variantNum: 2, title: 'Paper 2R (Regional Calculator)', tier: 'Extended' }
+    ]
+  },
+  {
+    id: 'edx-physics-4ph1',
     name: 'Physics',
-    code: '0625',
-    slug: 'physics-0625',
-    board: 'CIE',
+    code: '4PH1',
+    specUrl: 'https://qualifications.pearson.com/en/qualifications/edexcel-international-gcses/international-gcse-physics-2017.coursematerials.html#%2FfilterQuery=category:Pearson-UK:Category%2FExam-materials',
     papers: [
-      { paperNumber: 2, title: 'Paper 2 (Multiple Choice Extended)', tier: 'Extended', variants: [1, 2, 3] },
-      { paperNumber: 4, title: 'Paper 4 (Theory Extended)', tier: 'Extended', variants: [1, 2, 3] },
-      { paperNumber: 6, title: 'Paper 6 (Alternative to Practical)', tier: 'General', variants: [1, 2, 3] },
-      { paperNumber: 1, title: 'Paper 1 (Multiple Choice Core)', tier: 'Core', variants: [1, 2, 3] },
-      { paperNumber: 3, title: 'Paper 3 (Theory Core)', tier: 'Core', variants: [1, 2, 3] }
+      { num: 1, suffix: '1P', variantNum: 1, title: 'Paper 1P (Written Paper)', tier: 'Extended' },
+      { num: 2, suffix: '2P', variantNum: 1, title: 'Paper 2P (Practical Investigations)', tier: 'Extended' },
+      { num: 1, suffix: '1PR', variantNum: 2, title: 'Paper 1PR (Regional Written Paper)', tier: 'Extended' },
+      { num: 2, suffix: '2PR', variantNum: 2, title: 'Paper 2PR (Regional Practical Investigations)', tier: 'Extended' }
     ]
   },
   {
-    id: 'cie-chem-0620',
+    id: 'edx-chem-4ch1',
     name: 'Chemistry',
-    code: '0620',
-    slug: 'chemistry-0620',
-    board: 'CIE',
+    code: '4CH1',
+    specUrl: 'https://qualifications.pearson.com/en/qualifications/edexcel-international-gcses/international-gcse-chemistry-2017.coursematerials.html#%2FfilterQuery=category:Pearson-UK:Category%2FExam-materials',
     papers: [
-      { paperNumber: 2, title: 'Paper 2 (Multiple Choice Extended)', tier: 'Extended', variants: [1, 2, 3] },
-      { paperNumber: 4, title: 'Paper 4 (Theory Extended)', tier: 'Extended', variants: [1, 2, 3] },
-      { paperNumber: 6, title: 'Paper 6 (Alternative to Practical)', tier: 'General', variants: [1, 2, 3] },
-      { paperNumber: 1, title: 'Paper 1 (Multiple Choice Core)', tier: 'Core', variants: [1, 2, 3] },
-      { paperNumber: 3, title: 'Paper 3 (Theory Core)', tier: 'Core', variants: [1, 2, 3] }
+      { num: 1, suffix: '1C', variantNum: 1, title: 'Paper 1C (Written Paper)', tier: 'Extended' },
+      { num: 2, suffix: '2C', variantNum: 1, title: 'Paper 2C (Practical Investigations)', tier: 'Extended' },
+      { num: 1, suffix: '1CR', variantNum: 2, title: 'Paper 1CR (Regional Written Paper)', tier: 'Extended' },
+      { num: 2, suffix: '2CR', variantNum: 2, title: 'Paper 2CR (Regional Practical Investigations)', tier: 'Extended' }
     ]
   },
   {
-    id: 'cie-bio-0610',
+    id: 'edx-bio-4bi1',
     name: 'Biology',
-    code: '0610',
-    slug: 'biology-0610',
-    board: 'CIE',
+    code: '4BI1',
+    specUrl: 'https://qualifications.pearson.com/en/qualifications/edexcel-international-gcses/international-gcse-biology-2017.coursematerials.html#%2FfilterQuery=category:Pearson-UK:Category%2FExam-materials',
     papers: [
-      { paperNumber: 2, title: 'Paper 2 (Multiple Choice Extended)', tier: 'Extended', variants: [1, 2, 3] },
-      { paperNumber: 4, title: 'Paper 4 (Theory Extended)', tier: 'Extended', variants: [1, 2, 3] },
-      { paperNumber: 6, title: 'Paper 6 (Alternative to Practical)', tier: 'General', variants: [1, 2, 3] },
-      { paperNumber: 1, title: 'Paper 1 (Multiple Choice Core)', tier: 'Core', variants: [1, 2, 3] },
-      { paperNumber: 3, title: 'Paper 3 (Theory Core)', tier: 'Core', variants: [1, 2, 3] }
+      { num: 1, suffix: '1B', variantNum: 1, title: 'Paper 1B (Written Paper)', tier: 'Extended' },
+      { num: 2, suffix: '2B', variantNum: 1, title: 'Paper 2B (Practical Investigations)', tier: 'Extended' },
+      { num: 1, suffix: '1BR', variantNum: 2, title: 'Paper 1BR (Regional Written Paper)', tier: 'Extended' },
+      { num: 2, suffix: '2BR', variantNum: 2, title: 'Paper 2BR (Regional Practical Investigations)', tier: 'Extended' }
     ]
   },
   {
-    id: 'cie-cs-0478',
-    name: 'Computer Science',
-    code: '0478',
-    slug: 'computer-science-0478',
-    board: 'CIE',
-    papers: [
-      { paperNumber: 1, title: 'Paper 1 (Theory of Computer Systems)', tier: 'General', variants: [1, 2, 3] },
-      { paperNumber: 2, title: 'Paper 2 (Algorithms, Programming & Logic)', tier: 'General', variants: [1, 2, 3] }
-    ]
-  },
-  {
-    id: 'cie-econ-0455',
+    id: 'edx-econ-4ec1',
     name: 'Economics',
-    code: '0455',
-    slug: 'economics-0455',
-    board: 'CIE',
+    code: '4EC1',
+    specUrl: 'https://qualifications.pearson.com/en/qualifications/edexcel-international-gcses/international-gcse-economics-2017.coursematerials.html#%2FfilterQuery=category:Pearson-UK:Category%2FExam-materials',
     papers: [
-      { paperNumber: 1, title: 'Paper 1 (Multiple Choice)', tier: 'General', variants: [1, 2, 3] },
-      { paperNumber: 2, title: 'Paper 2 (Structured Questions)', tier: 'General', variants: [1, 2, 3] }
+      { num: 1, suffix: '01', variantNum: 1, title: 'Paper 1 (Microeconomics and Business Economics)', tier: 'General' },
+      { num: 2, suffix: '02', variantNum: 1, title: 'Paper 2 (Macroeconomics and Global Economy)', tier: 'General' },
+      { num: 1, suffix: '01R', variantNum: 2, title: 'Paper 1R (Regional Microeconomics)', tier: 'General' },
+      { num: 2, suffix: '02R', variantNum: 2, title: 'Paper 2R (Regional Macroeconomics)', tier: 'General' }
     ]
   },
   {
-    id: 'cie-esl-0510',
-    name: 'English as a Second Language',
-    code: '0510',
-    slug: 'english-second-language-0510',
-    board: 'CIE',
+    id: 'edx-cs-4cp0',
+    name: 'Computer Science',
+    code: '4CP0',
+    specUrl: 'https://qualifications.pearson.com/en/qualifications/edexcel-international-gcses/international-gcse-computer-science-2017.coursematerials.html',
     papers: [
-      { paperNumber: 1, title: 'Paper 1 (Reading & Writing)', tier: 'General', variants: [1, 2, 3] },
-      { paperNumber: 2, title: 'Paper 2 (Listening Comprehension)', tier: 'General', variants: [1, 2, 3] }
+      { num: 1, suffix: '01', variantNum: 1, title: 'Paper 1 (Principles of Computer Science)', tier: 'General' },
+      { num: 2, suffix: '02', variantNum: 1, title: 'Paper 2 (Application of Computational Thinking)', tier: 'General' }
+    ]
+  },
+  {
+    id: 'edx-esl-4es1',
+    name: 'English as a Second Language',
+    code: '4ES1',
+    specUrl: 'https://qualifications.pearson.com/en/qualifications/edexcel-international-gcses/international-gcse-english-as-a-second-language-2016.coursematerials.html',
+    papers: [
+      { num: 1, suffix: '01', variantNum: 1, title: 'Paper 1 (Reading & Writing)', tier: 'General' },
+      { num: 2, suffix: '02', variantNum: 1, title: 'Paper 2 (Listening)', tier: 'General' },
+      { num: 1, suffix: '01R', variantNum: 2, title: 'Paper 1R (Regional Reading & Writing)', tier: 'General' },
+      { num: 2, suffix: '02R', variantNum: 2, title: 'Paper 2R (Regional Listening)', tier: 'General' }
+    ]
+  },
+  {
+    id: 'edx-bus-4bs1',
+    name: 'Business Studies',
+    code: '4BS1',
+    specUrl: 'https://qualifications.pearson.com/en/qualifications/edexcel-international-gcses/international-gcse-business-2017.coursematerials.html',
+    papers: [
+      { num: 1, suffix: '01', variantNum: 1, title: 'Paper 1 (Investigating Small Businesses)', tier: 'General' },
+      { num: 2, suffix: '02', variantNum: 1, title: 'Paper 2 (Investigating Large Businesses)', tier: 'General' },
+      { num: 1, suffix: '01R', variantNum: 2, title: 'Paper 1R (Regional Small Businesses)', tier: 'General' },
+      { num: 2, suffix: '02R', variantNum: 2, title: 'Paper 2R (Regional Large Businesses)', tier: 'General' }
     ]
   }
 ];
 
+// ============================================================
+// DYNAMIC PAST PAPER CATALOG GENERATOR
+// Years: 2016 – 2024 (9 full exam years + Specimen Series)
+// CIE: all variants 1, 2, 3 per paper | Edexcel: June + Jan + R variants
+// ============================================================
 function generateOfficialPastPapers(): OfficialPaperPdf[] {
   const result: OfficialPaperPdf[] = [];
-  const years = [2024, 2023, 2022, 2021, 2020, 2019, 2018];
+  const CIE_YEARS = [2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016];
 
   const seriesList: { code: 's' | 'w' | 'm'; name: string }[] = [
     { code: 's', name: 'May/June' },
@@ -453,9 +659,9 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
     { code: 'm', name: 'Feb/March' }
   ];
 
-  // 1. Cambridge IGCSE 2018 - 2024 Full Variants & Papers
+  // 1. Cambridge IGCSE 2016 - 2024 Full Variants & Papers (All 16 Subjects)
   for (const sub of CAMBRIDGE_SUBJECT_CONFIGS) {
-    for (const yr of years) {
+    for (const yr of CIE_YEARS) {
       const yy = String(yr).slice(-2);
 
       for (const series of seriesList) {
@@ -513,7 +719,7 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
     }
   }
 
-  // 2. Specimen 2025 Assessment Papers
+  // 2. Specimen Assessment Papers (2023 - 2025 Series)
   result.unshift(
     {
       id: 'pdf-0580-sp25-4',
@@ -568,6 +774,23 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
       qpPdfUrl: '/past-papers/0625_sp23_qp_4.pdf',
       msPdfUrl: '/past-papers/0625_sp23_ms_4.pdf',
       fileSizeBytes: '1.39 MB'
+    },
+    {
+      id: 'pdf-0625-sp23-2',
+      subjectId: 'cie-physics-0625',
+      subjectName: 'Physics',
+      subjectCode: '0625',
+      board: 'CIE',
+      year: 2023,
+      session: '2023-2025 Specimen Series',
+      seasonCode: 'sp',
+      paperNumber: 2,
+      variant: 2,
+      paperComponent: 'Paper 2 (Multiple Choice Extended Specimen)',
+      paperCode: '0625/02',
+      tier: 'Extended',
+      qpPdfUrl: '/past-papers/0625_sp23_qp_2.pdf',
+      fileSizeBytes: '1.53 MB'
     },
     {
       id: 'pdf-0620-sp23-4',
@@ -641,38 +864,35 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
     }
   );
 
-  // 3. Pearson Edexcel International GCSEs (2018 - 2024 Archive)
-  const edexcelSubjects = [
-    { id: 'edx-math-4ma1', name: 'Mathematics A', code: '4MA1', specUrl: 'https://qualifications.pearson.com/en/qualifications/edexcel-international-gcses/international-gcse-mathematics-a-2016.coursematerials.html#%2FfilterQuery=category:Pearson-UK:Category%2FExam-materials' },
-    { id: 'edx-physics-4ph1', name: 'Physics', code: '4PH1', specUrl: 'https://qualifications.pearson.com/en/qualifications/edexcel-international-gcses/international-gcse-physics-2017.coursematerials.html#%2FfilterQuery=category:Pearson-UK:Category%2FExam-materials' },
-    { id: 'edx-chem-4ch1', name: 'Chemistry', code: '4CH1', specUrl: 'https://qualifications.pearson.com/en/qualifications/edexcel-international-gcses/international-gcse-chemistry-2017.coursematerials.html#%2FfilterQuery=category:Pearson-UK:Category%2FExam-materials' },
-    { id: 'edx-bio-4bi1', name: 'Biology', code: '4BI1', specUrl: 'https://qualifications.pearson.com/en/qualifications/edexcel-international-gcses/international-gcse-biology-2017.coursematerials.html#%2FfilterQuery=category:Pearson-UK:Category%2FExam-materials' },
-    { id: 'edx-econ-4ec1', name: 'Economics', code: '4EC1', specUrl: 'https://qualifications.pearson.com/en/qualifications/edexcel-international-gcses/international-gcse-economics-2017.coursematerials.html#%2FfilterQuery=category:Pearson-UK:Category%2FExam-materials' },
+  // 3. Pearson Edexcel International GCSEs (2016 - 2024 Archive with All Variants)
+  const EDX_YEARS = [2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016];
+  const EDX_SESSIONS: { label: string; sc: 's' | 'm' }[] = [
+    { label: 'June', sc: 's' },
+    { label: 'January', sc: 'm' }
   ];
 
-  for (const edx of edexcelSubjects) {
-    for (const yr of [2024, 2023, 2022, 2021, 2020, 2019, 2018]) {
-      for (const sess of ['June', 'January']) {
-        for (const pNum of [1, 2]) {
-          const tierSuffix = edx.code === '4MA1' ? 'H' : (pNum === 1 ? '1P' : '2P');
-          const paperCode = `${edx.code}/${pNum}${tierSuffix}`;
-          const qpUrl = `https://qualifications.pearson.com/en/support/support-topics/exams/past-papers.html?q=${encodeURIComponent(edx.code + ' ' + yr + ' ' + sess + ' Paper ' + pNum)}`;
-          const msUrl = `https://qualifications.pearson.com/en/support/support-topics/exams/past-papers.html?q=${encodeURIComponent(edx.code + ' ' + yr + ' ' + sess + ' Mark Scheme')}`;
+  for (const edx of EDEXCEL_SUBJECT_CONFIGS) {
+    for (const yr of EDX_YEARS) {
+      for (const sess of EDX_SESSIONS) {
+        for (const p of edx.papers) {
+          const paperCode = `${edx.code}/${p.suffix}`;
+          const qpUrl = `https://qualifications.pearson.com/en/support/support-topics/exams/past-papers.html?q=${encodeURIComponent(`${edx.code} ${yr} ${sess.label} ${p.suffix}`)}`;
+          const msUrl = `https://qualifications.pearson.com/en/support/support-topics/exams/past-papers.html?q=${encodeURIComponent(`${edx.code} ${yr} ${sess.label} ${p.suffix} Mark Scheme`)}`;
 
           result.push({
-            id: `pdf-edx-${edx.code}-${yr}-${sess.toLowerCase()}-${pNum}`,
+            id: `pdf-edx-${edx.code}-${yr}-${sess.sc}-${p.suffix.toLowerCase()}`,
             subjectId: edx.id,
             subjectName: edx.name,
             subjectCode: edx.code,
             board: 'Edexcel',
             year: yr,
-            session: `${sess} ${yr}`,
-            seasonCode: sess === 'June' ? 's' : 'm',
-            paperNumber: pNum,
-            variant: 1,
-            paperComponent: `Paper ${pNum}${tierSuffix} (Higher Tier Assessment)`,
+            session: `${sess.label} ${yr}`,
+            seasonCode: sess.sc,
+            paperNumber: p.num,
+            variant: p.variantNum,
+            paperComponent: p.title,
             paperCode,
-            tier: 'Extended',
+            tier: p.tier,
             qpPdfUrl: qpUrl,
             backupQpUrl: edx.specUrl,
             msPdfUrl: msUrl,

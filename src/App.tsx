@@ -512,7 +512,7 @@ export function App() {
             {activeTab === 'finder' && (
               <PastPaperFinder
                 activeSubject={activeSubject}
-                subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
+                subjects={IGCSE_SUBJECTS}
                 profile={profile}
                 onOpenChatWithQuestion={handleOpenChatWithQuestion}
                 onOpenSolverWithQuestion={() => setActiveTab('solver')}
