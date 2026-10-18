@@ -34,6 +34,8 @@ import { SettingsModal } from './components/SettingsModal';
 import { ProfileModal } from './components/ProfileModal';
 import { AuthModal } from './components/AuthModal';
 import { ScientificCalculator } from './components/ScientificCalculator';
+import { SecretAdminModal } from './components/SecretAdminModal';
+import { SimplyLogo } from './components/SimplyLogo';
 import { getActiveUser, setActiveUser } from './services/auth';
 import {
   Camera,
@@ -104,6 +106,7 @@ export function App() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
+  const [isSecretAdminOpen, setIsSecretAdminOpen] = useState(false);
 
   // 4b. Theme & Accessibility State
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
@@ -165,10 +168,36 @@ export function App() {
         setIsSettingsOpen(false);
         setIsProfileOpen(false);
         setIsAuthOpen(false);
+        setIsSecretAdminOpen(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Secret Admin Access via URL (?admin=portal / ?admin=true) or Hotkey (Ctrl+Shift+A)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('admin') === 'portal' || params.get('admin') === 'true') {
+        setIsSecretAdminOpen(true);
+        params.delete('admin');
+        const cleanUrl = `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`;
+        window.history.replaceState(null, '', cleanUrl);
+      }
+    } catch (e) {
+      console.warn('Admin param detection bypassed:', e);
+    }
+
+    const handleSecretShortcut = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        e.preventDefault();
+        setIsSecretAdminOpen(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleSecretShortcut);
+    return () => window.removeEventListener('keydown', handleSecretShortcut);
   }, []);
 
   // 5. Content Data State (Merge with INITIAL data so new cards/quizzes/notes automatically appear)
@@ -207,9 +236,11 @@ export function App() {
       const saved = localStorage.getItem('simply_igcse_revision');
       if (saved) {
         const parsed: RevisionTopic[] = JSON.parse(saved);
-        const existingIds = new Set(parsed.map(r => r.id));
-        const missing = INITIAL_REVISION_NOTES.filter(r => !existingIds.has(r.id));
-        return [...parsed, ...missing];
+        // Merge initial topics with saved data so newly added diagrams and worked examples appear
+        return INITIAL_REVISION_NOTES.map(initNote => {
+          const savedNote = parsed.find(p => p.id === initNote.id);
+          return savedNote ? { ...savedNote, ...initNote } : initNote;
+        }).concat(parsed.filter(p => !INITIAL_REVISION_NOTES.some(i => i.id === p.id)));
       }
     } catch (e) {
       console.error(e);
@@ -344,6 +375,24 @@ export function App() {
     if (first) setActiveSubject(first);
   };
 
+  const handleSecretAdminSuccess = (admin: UserAccount) => {
+    setCurrentUser(admin);
+    setProfile(prev => ({
+      ...prev,
+      id: admin.id,
+      name: admin.name,
+      email: admin.email,
+      grade: admin.grade,
+      board: admin.board,
+      targetGrade: admin.targetGrade,
+      selectedSubjectIds: admin.selectedSubjectIds,
+      role: 'admin',
+      status: 'approved',
+    }));
+    setActiveTab('admin');
+    setIsSecretAdminOpen(false);
+  };
+
   const handleUpdateProfile = (updated: Partial<UserProfile>) => {
     setProfile(prev => {
       const next = { ...prev, ...updated };
@@ -445,24 +494,8 @@ export function App() {
 
       {/* Main Container */}
       <main className={`flex-1 px-3 py-3 sm:px-6 sm:py-8 max-w-7xl mx-auto w-full ${activeTab === 'chat' ? 'pb-20 md:pb-8' : 'pb-24 md:pb-8'}`}>
-        {/* Homepage: Always accessible */}
-        {activeTab === 'home' && (
-          <HomeView
-            subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
-            activeSubject={activeSubject}
-            onSelectSubject={setActiveSubject}
-            onNavigateTab={setActiveTab}
-            profile={profile}
-            currentUser={currentUser}
-            onOpenAuth={(mode) => {
-              setAuthMode(mode || 'signin');
-              setIsAuthOpen(true);
-            }}
-          />
-        )}
-
-        {/* Admin Dashboard */}
-        {activeTab === 'admin' && (
+        {/* Admin Dashboard (Only when activeTab is admin and current user has admin role) */}
+        {activeTab === 'admin' ? (
           currentUser?.role === 'admin' ? (
             <AdminDashboard
               currentUser={currentUser}
@@ -480,25 +513,36 @@ export function App() {
               featureName={getTabFeatureName('admin')}
             />
           )
-        )}
-
-        {/* Access Gate: Displayed when user lacks an active approved account */}
-        {activeTab !== 'home' && activeTab !== 'admin' && !canAccessTools && (
+        ) : !canAccessTools ? (
+          /* Mandatory Account & Waitlist Access Gate for all visitors and pending accounts */
           <AccountGate
             currentUser={currentUser}
             onOpenAuth={(mode) => {
-              setAuthMode(mode || 'signin');
+              setAuthMode(mode || 'signup');
               setIsAuthOpen(true);
             }}
             onRefreshStatus={handleRefreshStatus}
             onLogout={handleLogout}
             featureName={getTabFeatureName(activeTab)}
           />
-        )}
-
-        {/* Study Tools: Rendered only when student has an approved account or is admin */}
-        {canAccessTools && (
+        ) : (
+          /* Approved Students & Admins: Full study platform views */
           <>
+            {activeTab === 'home' && (
+              <HomeView
+                subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
+                activeSubject={activeSubject}
+                onSelectSubject={setActiveSubject}
+                onNavigateTab={setActiveTab}
+                profile={profile}
+                currentUser={currentUser}
+                onOpenAuth={(mode) => {
+                  setAuthMode(mode || 'signin');
+                  setIsAuthOpen(true);
+                }}
+              />
+            )}
+
             {activeTab === 'solver' && (
               <QuestionSolver
                 subject={activeSubject}
@@ -638,13 +682,11 @@ export function App() {
       {/* Footer */}
       <footer className="mt-auto border-t border-slate-800/80 bg-slate-950/90 py-8 px-4 text-xs text-slate-400">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-600 text-white font-bold text-xs">
-              S
-            </div>
+          <div className="flex items-center gap-2.5">
+            <SimplyLogo size="sm" showText={false} />
             <span className="font-bold text-slate-200">Simply IGCSE AI Co-Pilot</span>
             <span className="text-slate-600">|</span>
-            <span>Cambridge (CIE) & Pearson Edexcel IGCSE Curriculum</span>
+            <span>Cambridge (CIE) & Pearson Edexcel Curriculum</span>
           </div>
 
           <div className="flex items-center gap-4 text-slate-400">
@@ -653,9 +695,9 @@ export function App() {
             ) : (
               <button
                 onClick={() => { setAuthMode('signup'); setIsAuthOpen(true); }}
-                className="text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer"
+                className="text-amber-400 hover:text-amber-300 font-semibold cursor-pointer"
               >
-                Create Student Account
+                Create Account & Join Waitlist
               </button>
             )}
             <span>•</span>
@@ -667,11 +709,27 @@ export function App() {
             </button>
             <span>•</span>
             <span className="text-slate-500 flex items-center gap-1">
-              Target Goal: <span className="font-bold text-amber-400">{profile.targetGrade}</span>
+              Target: <span className="font-bold text-amber-400">{profile.targetGrade}</span>
             </span>
+            <span>•</span>
+            {/* Discreet Secret Admin Trigger */}
+            <button
+              onClick={() => setIsSecretAdminOpen(true)}
+              className="text-slate-600 hover:text-slate-400 transition p-1 cursor-default opacity-40 hover:opacity-100"
+              title="System"
+            >
+              ©
+            </button>
           </div>
         </div>
       </footer>
+
+      {/* Secret Admin Passcode Modal (Hidden Portal) */}
+      <SecretAdminModal
+        isOpen={isSecretAdminOpen}
+        onClose={() => setIsSecretAdminOpen(false)}
+        onSuccess={handleSecretAdminSuccess}
+      />
 
       {/* Auth Modal (Sign in, Sign up, Forgot password) */}
       <AuthModal

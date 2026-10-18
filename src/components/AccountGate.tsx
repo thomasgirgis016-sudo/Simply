@@ -3,17 +3,17 @@ import {
   Lock,
   Clock,
   ShieldAlert,
-  Sparkles,
   LogIn,
   UserPlus,
   RefreshCw,
   LogOut,
   CheckCircle,
-  ShieldCheck,
-  GraduationCap,
-  KeyRound
+  Sparkles,
+  Layers,
+  BookOpen
 } from 'lucide-react';
 import { UserAccount } from '../types';
+import { SimplyLogo } from './SimplyLogo';
 
 interface AccountGateProps {
   currentUser: UserAccount | null;
@@ -28,51 +28,67 @@ export const AccountGate: React.FC<AccountGateProps> = ({
   onOpenAuth,
   onRefreshStatus,
   onLogout,
-  featureName = 'this study module',
+  featureName = 'Simply IGCSE study tools',
 }) => {
-  // Case 1: User is logged in, but their account status is 'pending'
+  // Case 1: User is logged in, but their account status is 'pending' (On Waitlist)
   if (currentUser && currentUser.status === 'pending') {
     return (
       <div className="mx-auto max-w-xl py-12 px-4 animate-fadeIn">
-        <div className="relative overflow-hidden rounded-3xl border border-amber-500/40 bg-gradient-to-b from-slate-900 via-amber-950/20 to-slate-900 p-8 sm:p-10 text-center shadow-2xl backdrop-blur-xl">
+        <div className="relative overflow-hidden rounded-3xl border border-amber-500/30 bg-gradient-to-b from-slate-900 via-amber-950/20 to-slate-950 p-8 sm:p-10 text-center shadow-2xl backdrop-blur-xl">
           <div className="absolute -top-12 -right-12 h-44 w-44 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
 
-          {/* Pending Icon */}
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-500/15 text-amber-400 border border-amber-500/30 shadow-lg shadow-amber-500/10 mb-6">
-            <Clock className="h-8 w-8 animate-pulse" />
+          {/* Logo */}
+          <div className="flex justify-center mb-6">
+            <SimplyLogo size="md" />
           </div>
 
-          <span className="inline-block rounded-full bg-amber-500/20 px-3 py-1 text-xs font-bold text-amber-300 border border-amber-500/30 mb-3">
-            Status: Pending Administrator Approval
-          </span>
+          {/* Pending Badge */}
+          <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/15 px-3.5 py-1 text-xs font-bold text-amber-300 border border-amber-500/30 mb-4">
+            <Clock className="h-3.5 w-3.5 animate-pulse text-amber-400" />
+            <span>Priority Waitlist • Pending Administrator Approval</span>
+          </div>
 
           <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            Account Awaiting Verification
+            Application Under Review
           </h2>
 
           <p className="mt-3 text-sm text-slate-300 leading-relaxed">
-            Welcome, <strong className="text-white">{currentUser.name}</strong>! Your account (<code className="text-amber-300 bg-slate-950 px-2 py-0.5 rounded font-mono text-xs">{currentUser.email}</code>) has been registered.
+            Welcome, <strong className="text-white">{currentUser.name}</strong>! Your account has been registered and placed in the student verification queue.
           </p>
 
-          <p className="mt-2 text-xs text-slate-400 leading-relaxed max-w-md mx-auto">
-            An administrator must accept your account before you can unlock full access to the AI Question Solver, Past Papers, Revision Notes, and Mock Quizzes.
-          </p>
-
-          {/* Admin Demo Hint */}
-          <div className="mt-6 rounded-xl border border-slate-800 bg-slate-950/70 p-3.5 text-xs text-slate-400 max-w-md mx-auto">
-            <div className="flex items-center justify-center gap-1.5 font-bold text-indigo-300 mb-1">
-              <ShieldCheck className="h-4 w-4" />
-              <span>Are you an administrator?</span>
+          {/* Waitlist details summary */}
+          <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-950/80 p-4 text-left space-y-2 text-xs text-slate-300">
+            <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
+              <span className="text-slate-400">Registered Email:</span>
+              <span className="font-mono text-amber-300 font-semibold">{currentUser.email}</span>
             </div>
-            Sign in with <strong className="text-slate-200">admin@simplyigcse.com</strong> to accept this student account from the Admin Console.
+            <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
+              <span className="text-slate-400">Target Grade Level:</span>
+              <span className="text-white font-medium">{currentUser.grade}</span>
+            </div>
+            <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
+              <span className="text-slate-400">Current Queue Status:</span>
+              <span className="font-bold text-amber-400 flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-amber-400 animate-ping" />
+                Awaiting Admin Verification
+              </span>
+            </div>
+            <div className="flex items-center justify-between pt-1">
+              <span className="text-slate-400">Estimated Review Time:</span>
+              <span className="text-slate-200">Usually within 24 hours</span>
+            </div>
           </div>
+
+          <p className="mt-4 text-xs text-slate-400 leading-relaxed max-w-md mx-auto">
+            Once approved by an administrator, full access to past papers, mark schemes, high-yield revision notes, and the AI Question Solver will unlock automatically.
+          </p>
 
           {/* Action buttons */}
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
             {onRefreshStatus && (
               <button
                 onClick={onRefreshStatus}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-5 py-2.5 text-xs font-bold text-slate-950 shadow-md shadow-amber-500/20 hover:from-amber-400 hover:to-amber-500 transition active:scale-95 cursor-pointer"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#FF5E62] to-[#FFA63A] px-5 py-2.5 text-xs font-bold text-slate-950 shadow-md shadow-amber-500/20 hover:opacity-95 transition active:scale-95 cursor-pointer"
               >
                 <RefreshCw className="h-4 w-4" />
                 <span>Check Approval Status</span>
@@ -82,7 +98,7 @@ export const AccountGate: React.FC<AccountGateProps> = ({
             {onLogout && (
               <button
                 onClick={onLogout}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-800 px-5 py-2.5 text-xs font-semibold text-slate-300 hover:bg-slate-700 hover:text-white transition cursor-pointer"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-800/80 px-5 py-2.5 text-xs font-semibold text-slate-300 hover:bg-slate-700 hover:text-white transition cursor-pointer"
               >
                 <LogOut className="h-4 w-4" />
                 <span>Sign Out</span>
@@ -98,7 +114,7 @@ export const AccountGate: React.FC<AccountGateProps> = ({
   if (currentUser && (currentUser.status === 'rejected' || currentUser.status === 'suspended')) {
     return (
       <div className="mx-auto max-w-xl py-12 px-4 animate-fadeIn">
-        <div className="relative overflow-hidden rounded-3xl border border-rose-500/40 bg-gradient-to-b from-slate-900 via-rose-950/20 to-slate-900 p-8 sm:p-10 text-center shadow-2xl backdrop-blur-xl">
+        <div className="relative overflow-hidden rounded-3xl border border-rose-500/40 bg-gradient-to-b from-slate-900 via-rose-950/20 to-slate-950 p-8 sm:p-10 text-center shadow-2xl backdrop-blur-xl">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-rose-500/15 text-rose-400 border border-rose-500/30 shadow-lg mb-6">
             <ShieldAlert className="h-8 w-8" />
           </div>
@@ -112,7 +128,7 @@ export const AccountGate: React.FC<AccountGateProps> = ({
           </h2>
 
           <p className="mt-3 text-sm text-slate-300">
-            Access for <strong className="text-white">{currentUser.email}</strong> is currently paused by an administrator. Please reach out to your teacher or school coordinator.
+            Access for <strong className="text-white">{currentUser.email}</strong> is currently paused. Please contact school administration or support.
           </p>
 
           <div className="mt-6 flex justify-center">
@@ -131,63 +147,67 @@ export const AccountGate: React.FC<AccountGateProps> = ({
     );
   }
 
-  // Case 3: Not logged in at all (Authentication Required)
+  // Case 3: Not logged in at all (Mandatory Account Gate)
   return (
     <div className="mx-auto max-w-xl py-12 px-4 animate-fadeIn">
-      <div className="relative overflow-hidden rounded-3xl border border-indigo-500/30 bg-gradient-to-b from-slate-900 via-indigo-950/20 to-slate-900 p-8 sm:p-10 text-center shadow-2xl backdrop-blur-xl">
-        <div className="absolute -top-12 -left-12 h-44 w-44 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-950 p-8 sm:p-10 text-center shadow-2xl backdrop-blur-xl">
+        <div className="absolute -top-12 -left-12 h-44 w-44 rounded-full bg-[#FF5E62]/10 blur-3xl pointer-events-none" />
 
-        {/* Lock Icon */}
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 shadow-lg shadow-indigo-500/10 mb-6">
-          <Lock className="h-8 w-8" />
+        {/* Brand Logo */}
+        <div className="flex justify-center mb-6">
+          <SimplyLogo size="lg" />
         </div>
 
-        <span className="inline-block rounded-full bg-indigo-500/20 px-3 py-1 text-xs font-bold text-indigo-300 border border-indigo-500/30 mb-3">
-          Account Required for Full Access
+        <span className="inline-block rounded-full bg-[#FF5E62]/15 px-3.5 py-1 text-xs font-bold text-[#FFA63A] border border-[#FF5E62]/30 mb-3">
+          Verified Student Account Required
         </span>
 
         <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-          Sign In to Access {featureName}
+          Welcome to Simply IGCSE
         </h2>
 
         <p className="mt-3 text-sm text-slate-300 leading-relaxed max-w-md mx-auto">
-          Simply IGCSE provides authentic Cambridge & Edexcel past papers, mark schemes, high-yield revision notes, and AI examiner grading.
+          To access {featureName}, past paper mark schemes, worked exam examples, and AI grading, please create an account or sign in.
         </p>
 
-        <p className="mt-1 text-xs text-slate-400">
-          Please sign in to your verified student account or create one to get started.
-        </p>
+        {/* Value pills */}
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-2.5 max-w-md mx-auto text-left text-xs">
+          <div className="flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900/60 p-2.5">
+            <BookOpen className="h-4 w-4 text-cyan-400 shrink-0" />
+            <span className="text-slate-300 text-[11px] font-medium">Cambridge & Edexcel Notes</span>
+          </div>
+          <div className="flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900/60 p-2.5">
+            <Sparkles className="h-4 w-4 text-[#FFA63A] shrink-0" />
+            <span className="text-slate-300 text-[11px] font-medium">AI Step-by-Step Marking</span>
+          </div>
+          <div className="flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900/60 p-2.5">
+            <Layers className="h-4 w-4 text-emerald-400 shrink-0" />
+            <span className="text-slate-300 text-[11px] font-medium">Official Exam Questions</span>
+          </div>
+        </div>
 
         {/* Action Buttons */}
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
           <button
-            onClick={() => onOpenAuth('signin')}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-3 text-xs font-bold text-white shadow-lg shadow-indigo-500/25 hover:from-indigo-400 hover:to-purple-500 transition active:scale-95 cursor-pointer"
+            onClick={() => onOpenAuth('signup')}
+            className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#FF5E62] to-[#FFA63A] px-6 py-3 text-xs font-extrabold text-slate-950 shadow-lg shadow-amber-500/20 hover:opacity-95 transition active:scale-95 cursor-pointer"
           >
-            <LogIn className="h-4 w-4" />
-            <span>Sign In to Account</span>
+            <UserPlus className="h-4 w-4" />
+            <span>Create Account & Join Waitlist</span>
           </button>
 
           <button
-            onClick={() => onOpenAuth('signup')}
+            onClick={() => onOpenAuth('signin')}
             className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-800/80 px-6 py-3 text-xs font-bold text-slate-200 hover:bg-slate-700 hover:text-white transition active:scale-95 cursor-pointer"
           >
-            <UserPlus className="h-4 w-4 text-indigo-400" />
-            <span>Create Student Account</span>
+            <LogIn className="h-4 w-4 text-amber-400" />
+            <span>Sign In to Account</span>
           </button>
         </div>
 
-        {/* Admin Login Shortcut */}
-        <div className="mt-6 pt-6 border-t border-slate-800/80 text-xs text-slate-400 flex items-center justify-center gap-2">
-          <ShieldCheck className="h-3.5 w-3.5 text-indigo-400" />
-          <span>School Coordinator or Admin?</span>
-          <button
-            onClick={() => onOpenAuth('signin')}
-            className="text-indigo-400 hover:text-indigo-300 font-bold underline cursor-pointer"
-          >
-            Admin Sign In
-          </button>
-        </div>
+        <p className="mt-5 text-[11px] text-slate-500">
+          Newly registered accounts are submitted for administrator approval to ensure dedicated exam board alignment.
+        </p>
       </div>
     </div>
   );

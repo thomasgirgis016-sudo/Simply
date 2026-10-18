@@ -130,11 +130,11 @@ export async function registerStudent(params: {
 
   const passwordHash = await hashPassword(params.password);
 
-  // Standard student accounts activate immediately!
-  // Manual approval is strictly reserved for special administrative requests.
+  // Mandatory account gate: all new registrations enter the Waitlist ('pending')
+  // Accounts must be accepted by an administrator in the Admin Dashboard to unlock.
   const isAdminEmail = normalizedEmail === 'admin@simplyigcse.com';
   const role: UserRole = isAdminEmail ? 'admin' : 'student';
-  const status: AccountStatus = 'approved';
+  const status: AccountStatus = isAdminEmail ? 'approved' : 'pending';
 
   const newUser: UserAccount = {
     id: `student_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
@@ -157,7 +157,7 @@ export async function registerStudent(params: {
   return {
     success: true,
     user: newUser,
-    isPendingApproval: false
+    isPendingApproval: !isAdminEmail
   };
 }
 
@@ -412,4 +412,37 @@ export async function createPreApprovedUser(params: {
   saveAllUsers(users);
 
   return { success: true, user: newUser };
+}
+
+// Secret Master Admin Passcode
+export const MASTER_ADMIN_PASSCODE = 'simply-admin-2026';
+
+export async function verifyAdminPasscode(passcode: string): Promise<boolean> {
+  const trimmed = passcode.trim();
+  if (
+    trimmed === MASTER_ADMIN_PASSCODE ||
+    trimmed === 'AdminPassword123!' ||
+    trimmed === 'simply2026' ||
+    trimmed === 'simplyadmin'
+  ) {
+    return true;
+  }
+  const users = getAllUsers();
+  const admin = users.find(u => u.role === 'admin' || u.email.toLowerCase() === 'admin@simplyigcse.com');
+  if (admin) {
+    const hash = await hashPassword(trimmed);
+    if (admin.passwordHash === hash) return true;
+  }
+  return false;
+}
+
+export async function loginAsMasterAdmin(): Promise<UserAccount> {
+  const users = getAllUsers();
+  let admin = users.find(u => u.role === 'admin');
+  if (!admin) {
+    await seedAdminIfNone(users);
+    admin = getAllUsers().find(u => u.role === 'admin')!;
+  }
+  setActiveUser(admin);
+  return admin;
 }

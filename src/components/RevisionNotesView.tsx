@@ -10,7 +10,11 @@ import {
   ChevronUp,
   Layers,
   X,
-  Bookmark
+  Bookmark,
+  Compass,
+  Award,
+  CheckSquare,
+  FileQuestion
 } from 'lucide-react';
 import { Subject, RevisionTopic, UserProfile, BookmarkItem } from '../types';
 import { MathRenderer } from './MathRenderer';
@@ -376,6 +380,151 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
                 ))}
               </div>
             </div>
+
+            {/* Part 5: Scientific Apparatus & Technical Diagram */}
+            {activeTopic.diagramSvg && (
+              <div className="mt-6 rounded-2xl border border-sky-500/30 bg-gradient-to-b from-sky-950/20 via-slate-900 to-slate-950 p-5 shadow-xl">
+                <div className="flex items-center justify-between border-b border-sky-500/20 pb-2.5 mb-4">
+                  <div className="flex items-center gap-2 text-sky-300 font-bold text-xs uppercase tracking-wider">
+                    <Compass className="h-4 w-4 text-sky-400" />
+                    <span>Part 5: Technical Visual Diagram & Apparatus / Schematic Drawing</span>
+                  </div>
+                  <span className="rounded-md bg-sky-500/15 px-2 py-0.5 text-[10px] font-bold text-sky-300 border border-sky-500/25">
+                    Examiner Illustrated
+                  </span>
+                </div>
+
+                {activeTopic.diagramTitle && (
+                  <h5 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-sky-400" />
+                    {activeTopic.diagramTitle}
+                  </h5>
+                )}
+
+                <div className="overflow-hidden rounded-xl border border-slate-800 bg-slate-950/90 p-4 flex items-center justify-center">
+                  <div
+                    className="w-full max-w-2xl text-slate-100 flex items-center justify-center [&>svg]:w-full [&>svg]:max-h-[380px] [&>svg]:h-auto"
+                    dangerouslySetInnerHTML={{ __html: activeTopic.diagramSvg }}
+                  />
+                </div>
+                <p className="mt-2.5 text-center text-[11px] text-slate-400">
+                  💡 Cambridge / Edexcel Spec Drawing: Study all labels, arrows, and apparatus setups closely for Paper 4 and Paper 6 (Alternative to Practical).
+                </p>
+              </div>
+            )}
+
+            {/* Part 6: Official Worked Exam Examples with Mark Scheme Allocations */}
+            {activeTopic.workedExamples && activeTopic.workedExamples.length > 0 && (
+              <div className="mt-6 space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                  <div className="flex items-center gap-2 text-emerald-300 font-bold text-xs uppercase tracking-wider">
+                    <Award className="h-4 w-4 text-emerald-400" />
+                    <span>Part 6: Official Cambridge / Edexcel Worked Exam Examples & Mark Rubric</span>
+                  </div>
+                  <span className="rounded-md bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-300 border border-emerald-500/25">
+                    Method [M1] & Accuracy [A1]
+                  </span>
+                </div>
+
+                {activeTopic.workedExamples.map((ex, exIdx) => (
+                  <div
+                    key={exIdx}
+                    className="rounded-2xl border border-emerald-500/30 bg-gradient-to-b from-slate-900 via-emerald-950/10 to-slate-950 p-5 shadow-xl space-y-4"
+                  >
+                    {/* Question header */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-500/20 text-xs font-bold text-emerald-300">
+                          #{exIdx + 1}
+                        </span>
+                        <h5 className="text-sm font-bold text-white">{ex.title}</h5>
+                      </div>
+                      <span className="self-start sm:self-auto rounded-full bg-emerald-500/20 border border-emerald-500/30 px-3 py-0.5 text-xs font-bold text-emerald-300 font-mono">
+                        Total: {ex.totalMarks} Marks
+                      </span>
+                    </div>
+
+                    {/* Question Text */}
+                    <div className="rounded-xl border border-slate-800 bg-slate-950/80 p-4">
+                      <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+                        <FileQuestion className="h-3.5 w-3.5 text-emerald-400" />
+                        <span>Official Exam Question Prompt</span>
+                      </div>
+                      <p className="text-xs sm:text-sm text-slate-200 whitespace-pre-line leading-relaxed font-sans">
+                        {ex.examQuestion}
+                      </p>
+                    </div>
+
+                    {/* Step-by-Step Mark Scheme Solution */}
+                    <div className="space-y-3">
+                      <h6 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                        <CheckSquare className="h-3.5 w-3.5 text-emerald-400" />
+                        <span>Step-by-Step Cambridge Marking Breakdown</span>
+                      </h6>
+
+                      {ex.steps.map((st) => (
+                        <div
+                          key={st.stepNumber}
+                          className="rounded-xl border border-slate-800 bg-slate-900/60 p-3.5 transition hover:border-slate-700"
+                        >
+                          <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                            <div className="flex items-center gap-2">
+                              <span className="flex h-5 w-5 items-center justify-center rounded-md bg-slate-800 text-[10px] font-bold text-slate-300 font-mono">
+                                {st.stepNumber}
+                              </span>
+                              <span className="text-xs font-bold text-slate-200">{st.title}</span>
+                            </div>
+                            <span className={`rounded-md px-2 py-0.5 text-[10px] font-extrabold font-mono border ${
+                              st.markAwarded.includes('[A1]')
+                                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                                : st.markAwarded.includes('[M1]')
+                                ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
+                                : 'bg-purple-500/20 text-purple-300 border-purple-500/40'
+                            }`}>
+                              {st.markAwarded}
+                            </span>
+                          </div>
+
+                          {st.working && (
+                            <div className="my-2 rounded-lg bg-slate-950 p-2.5 font-mono text-xs text-emerald-300 border border-slate-800/80">
+                              <MathRenderer content={st.working} />
+                            </div>
+                          )}
+
+                          <p className="text-xs text-slate-400 leading-relaxed">
+                            {st.explanation}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Final Answer */}
+                    <div className="rounded-xl border border-emerald-500/40 bg-emerald-950/20 p-3.5 flex items-start gap-3">
+                      <div className="rounded-lg bg-emerald-500/20 p-1.5 text-emerald-400 mt-0.5">
+                        <CheckCircle className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400">Final Answer</span>
+                        <div className="text-sm font-bold text-white font-mono mt-0.5">
+                          <MathRenderer content={ex.finalAnswer} />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Principal Examiner Commentary */}
+                    {ex.examinerCommentary && (
+                      <div className="rounded-xl border border-amber-500/30 bg-amber-950/20 p-3.5 text-xs text-amber-200/90 leading-relaxed">
+                        <span className="font-bold text-amber-300 flex items-center gap-1.5 mb-1">
+                          <AlertTriangle className="h-3.5 w-3.5" />
+                          Principal Examiner Commentary & Common Student Traps
+                        </span>
+                        <p>{ex.examinerCommentary}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       ) : (

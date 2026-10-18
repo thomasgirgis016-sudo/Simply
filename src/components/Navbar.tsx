@@ -29,6 +29,7 @@ import {
   Moon
 } from 'lucide-react';
 import { UserProfile, Subject, UserAccount } from '../types';
+import { SimplyLogo } from './SimplyLogo';
 
 export type ActiveTab =
   | 'home'
@@ -95,9 +96,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'split', label: 'Split-Screen Papers', icon: Columns, color: 'text-sky-400' },
   ];
 
-  const navTabs = currentUser?.role === 'admin'
-    ? [...baseTabs, { id: 'admin', label: 'Admin Console', icon: ShieldCheck, color: 'text-purple-400' }]
-    : baseTabs;
+  const navTabs = baseTabs;
 
   const handleMobileTabClick = (tabId: ActiveTab) => {
     onSelectTab(tabId);
@@ -111,25 +110,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Brand / Logo */}
           <button
             onClick={() => onSelectTab('home')}
-            className="flex items-center gap-2.5 sm:gap-3 text-left cursor-pointer group focus:outline-none"
+            className="flex items-center text-left cursor-pointer group focus:outline-none transition hover:opacity-95"
             title="Go to Homepage"
           >
-            <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 text-white shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition">
-              <Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                <span className="text-base sm:text-lg font-black tracking-tight text-white group-hover:text-indigo-200 transition">
-                  SIMPLY <span className="bg-gradient-to-r from-indigo-400 to-pink-400 bg-clip-text text-transparent">IGCSE</span>
-                </span>
-                <span className="hidden sm:inline-flex items-center rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-400 border border-emerald-500/20">
-                  Grade 9 AI
-                </span>
-              </div>
-              <p className="hidden md:block text-[11px] text-slate-400">
-                Cambridge & Pearson Edexcel Study Platform
-              </p>
-            </div>
+            <SimplyLogo size="md" />
           </button>
 
           {/* Center: Subject Switcher & Grade Badge (Desktop / Tablet) */}
@@ -173,20 +157,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="hidden sm:flex items-center gap-2">
             {currentUser ? (
               <div className="flex items-center gap-2">
-                {currentUser.role === 'admin' && (
-                  <button
-                    onClick={() => onSelectTab('admin')}
-                    className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
-                      activeTab === 'admin'
-                        ? 'border-purple-500 bg-purple-600 text-white shadow-md'
-                        : 'border-purple-500/30 bg-purple-950/40 text-purple-300 hover:bg-purple-900/50'
-                    }`}
-                    title="Administrative Dashboard & Account Approvals"
-                  >
-                    <Crown className="h-3.5 w-3.5 text-purple-400" />
-                    <span>Admin</span>
-                  </button>
-                )}
 
                 {currentUser.status === 'pending' && (
                   <span className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-[10px] font-bold text-amber-300 animate-pulse">
@@ -333,15 +303,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Drawer Header */}
             <div>
               <div className="flex items-center justify-between border-b border-slate-800/80 pb-4">
-                <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white font-bold text-sm">
-                    S
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-white text-sm">Simply IGCSE</h3>
-                    <p className="text-[10px] text-slate-400">{activeSubject.code} Active</p>
-                  </div>
-                </div>
+                <SimplyLogo size="sm" />
                 <button
                   onClick={() => setIsMobileDrawerOpen(false)}
                   className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white"

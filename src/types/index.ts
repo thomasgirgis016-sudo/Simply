@@ -113,6 +113,21 @@ export interface QuizHistoryEntry {
   timeSpentSeconds: number;
 }
 
+export interface RevisionWorkedExample {
+  title: string;
+  examQuestion: string;
+  totalMarks: number;
+  steps: Array<{
+    stepNumber: number;
+    title: string;
+    working: string;
+    markAwarded: string; // e.g. "[M1] Method Mark", "[A1] Accuracy Mark"
+    explanation: string;
+  }>;
+  finalAnswer: string;
+  examinerCommentary: string;
+}
+
 export interface RevisionTopic {
   id: string;
   subjectId: string;
@@ -124,6 +139,8 @@ export interface RevisionTopic {
     points: string[];
     formula?: string;
     diagramDescription?: string;
+    diagramTitle?: string;
+    diagramSvg?: string;
   }[];
   mustKnowDefinitions: {
     term: string;
@@ -131,6 +148,9 @@ export interface RevisionTopic {
   }[];
   coreEquationsOrPathways?: string[];
   examinerWarnings: string[];
+  diagramTitle?: string;
+  diagramSvg?: string;
+  workedExamples?: RevisionWorkedExample[];
 }
 
 export interface FormulaItem {

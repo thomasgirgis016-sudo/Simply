@@ -37,6 +37,7 @@ import {
 } from '../services/auth';
 import { IGCSE_SUBJECTS } from '../data/subjects';
 import { getCustomPastPapers, saveCustomPastPapers } from '../data/pastPapersData';
+import { SimplyLogo } from './SimplyLogo';
 
 interface AdminDashboardProps {
   currentUser: UserAccount;
@@ -384,22 +385,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       )}
 
       {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl border border-indigo-500/30 bg-gradient-to-br from-slate-900 via-indigo-950/40 to-slate-900 p-6 sm:p-8 shadow-2xl">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/20 px-3 py-1 text-xs font-bold text-indigo-300 border border-indigo-500/30">
-              <ShieldCheck className="h-4 w-4 text-indigo-400" />
-              <span>Simply IGCSE Administrative Control Center</span>
+      <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 p-6 sm:p-8 shadow-2xl">
+        <div className="absolute -top-12 -right-12 h-44 w-44 rounded-full bg-[#FF5E62]/10 blur-3xl pointer-events-none" />
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative">
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <SimplyLogo size="sm" />
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-[#FF5E62]/15 px-3 py-0.5 text-xs font-bold text-[#FFA63A] border border-[#FF5E62]/30">
+                <ShieldCheck className="h-3.5 w-3.5 text-[#FF5E62]" />
+                <span>Administrative Portal (Hidden)</span>
+              </div>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-              Account Management & Student Approvals
+              Admissions Waitlist & Student Approvals
             </h1>
-            <p className="text-xs sm:text-sm text-slate-300">
-              Review new registrations, accept pending student accounts, assign admin privileges, and manage curriculum access.
+            <p className="text-xs sm:text-sm text-slate-300 max-w-2xl">
+              Manage student waitlist verification, review new applicants, authorize access to Cambridge & Edexcel study suites, and publish content.
             </p>
           </div>
 
-          <div className="flex items-center gap-2 self-start md:self-auto">
+          <div className="flex items-center gap-2 self-start md:self-auto shrink-0">
             <button
               onClick={reloadUsers}
               className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800/80 px-3.5 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition cursor-pointer"
@@ -411,10 +416,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
             <button
               onClick={() => setIsAddModalOpen(true)}
-              className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-indigo-500/25 hover:from-indigo-400 hover:to-purple-500 transition cursor-pointer"
+              className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#FF5E62] to-[#FFA63A] px-4 py-2 text-xs font-extrabold text-slate-950 shadow-lg shadow-amber-500/20 hover:opacity-95 transition cursor-pointer"
             >
               <UserPlus className="h-4 w-4" />
-              <span>New Account</span>
+              <span>Pre-Approve Account</span>
             </button>
           </div>
         </div>
