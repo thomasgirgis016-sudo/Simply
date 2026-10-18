@@ -173,6 +173,26 @@ export interface SolverResult {
   examinerTips?: string[];
   commonMistakes?: string[];
   relatedTopic?: string;
+  studentWorkingEvaluation?: {
+    hasEvaluatedMath: boolean;
+    totalLinesChecked: number;
+    marksEarned: number;
+    marksPossible: number;
+    percentageScore: number;
+    lineReviews: Array<{
+      lineNumber: number;
+      rawText: string;
+      isMathEquation: boolean;
+      isCorrect: boolean;
+      marksEarned: number;
+      markBadge: string;
+      exactReason: string;
+      exactCorrection?: string;
+    }>;
+    overallVerdict: string;
+    breakdownPointOfFailure?: string;
+    correctStepByStep: string[];
+  };
 }
 
 export interface FlaggedQuestionIssue {
@@ -191,6 +211,7 @@ export interface HandwrittenLineReview {
   isCorrect: boolean;
   markAwarded?: string; // e.g. "[M1] Method Mark", "[A0] Accuracy Lost", "[B1]"
   examinerAnnotation: string; // margin note
+  exactCorrection?: string; // exact replacement line candidate must write
 }
 
 export interface HandwrittenReviewResult {

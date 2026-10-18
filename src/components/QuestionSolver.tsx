@@ -153,7 +153,7 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
   };
 
   const handleSolve = async () => {
-    if (!questionText.trim() && !selectedImage) return;
+    if (!questionText.trim() && !studentTypedWorking.trim() && !selectedImage) return;
 
     setLoading(true);
     setErrorMessage(null);
@@ -162,6 +162,7 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
         apiKey: profile.geminiApiKey,
         model: profile.selectedModel,
         questionText: questionText.trim() || undefined,
+        studentWorking: studentTypedWorking.trim() || undefined,
         imageBase64: selectedImage || undefined,
         imageMimeType,
         subjectName: subject.name,
@@ -765,14 +766,38 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
                 )}
               </div>
             ) : solverMode === 'solve' ? (
-              <div>
-                <textarea
-                  rows={3}
-                  value={questionText}
-                  onChange={(e) => setQuestionText(e.target.value)}
-                  placeholder="Type or paste the question text here (e.g. 'Explain why 2Fe²⁺ + Cl₂ -> 2Fe³⁺ + 2Cl⁻ is a redox reaction [3 marks]')..."
-                  className="w-full rounded-xl border border-slate-700/80 bg-slate-950/70 p-3.5 sm:p-4 text-base sm:text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                />
+              <div className="space-y-3">
+                <div>
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                    1. Question Statement or Problem:
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={questionText}
+                    onChange={(e) => setQuestionText(e.target.value)}
+                    placeholder="Type or paste the question text here (e.g. 'Solve 10 - x = 2' or '10 - 2 = 8' or upload a photo above)..."
+                    className="w-full rounded-xl border border-slate-700/80 bg-slate-950/70 p-3.5 sm:p-4 text-base sm:text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-indigo-300 flex items-center justify-between mb-1">
+                    <span className="flex items-center gap-1.5">
+                      <Edit3 className="h-3.5 w-3.5 text-indigo-400" />
+                      2. Test Your Working Line / Calculation (Optional):
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-normal">
+                      e.g. write "10 - 2 = 8" or "10 + 2 = 8" to see marks awarded or exact error reasons
+                    </span>
+                  </label>
+                  <input
+                    type="text"
+                    value={studentTypedWorking}
+                    onChange={(e) => setStudentTypedWorking(e.target.value)}
+                    placeholder="Type your working step here (e.g. '10 - 2 = 8' or '10 + 2 = 8')..."
+                    className="w-full rounded-xl border border-indigo-500/30 bg-slate-950/80 px-3.5 py-2.5 text-xs sm:text-sm font-mono text-indigo-200 placeholder-slate-500 focus:border-indigo-400 focus:outline-none"
+                  />
+                </div>
               </div>
             ) : (
               <div className="space-y-3">
@@ -835,7 +860,7 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
                 <button
                   type="button"
                   onClick={handleSolve}
-                  disabled={loading || (!questionText.trim() && !selectedImage)}
+                  disabled={loading || (!questionText.trim() && !studentTypedWorking.trim() && !selectedImage)}
                   className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 px-6 py-3 sm:py-2.5 text-xs sm:text-sm font-bold text-white shadow-lg shadow-indigo-500/25 hover:from-indigo-400 hover:to-pink-400 transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {loading ? (
@@ -928,6 +953,88 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
               <MathRenderer content={result.questionText} className="text-sm text-slate-200" />
             </div>
           </div>
+
+          {/* Dedicated Student Working & Calculation Mark Evaluation Card */}
+          {result.studentWorkingEvaluation && result.studentWorkingEvaluation.hasEvaluatedMath && (
+            <div className={`rounded-2xl border p-5 shadow-xl space-y-4 animate-fadeIn ${
+              result.studentWorkingEvaluation.lineReviews.every((l) => l.isCorrect)
+                ? 'border-emerald-500/40 bg-gradient-to-r from-emerald-950/30 via-slate-900 to-slate-900'
+                : 'border-rose-500/40 bg-gradient-to-r from-rose-950/30 via-slate-900 to-slate-900'
+            }`}>
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
+                <div className="flex items-center gap-2">
+                  <Award className={`h-6 w-6 ${
+                    result.studentWorkingEvaluation.lineReviews.every((l) => l.isCorrect)
+                      ? 'text-emerald-400'
+                      : 'text-rose-400'
+                  }`} />
+                  <div>
+                    <h4 className="text-sm font-bold text-white">
+                      Cambridge Examiner Working & Calculation Evaluation
+                    </h4>
+                    <p className="text-[11px] text-slate-400">
+                      Line-by-line mark scheme verification of your calculations
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className={`rounded-xl px-3 py-1 text-sm font-black font-mono border ${
+                    result.studentWorkingEvaluation.lineReviews.every((l) => l.isCorrect)
+                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                      : 'bg-rose-500/20 text-rose-300 border-rose-500/30'
+                  }`}>
+                    {result.studentWorkingEvaluation.marksEarned} / {result.studentWorkingEvaluation.marksPossible} Marks ({result.studentWorkingEvaluation.percentageScore}%)
+                  </span>
+                </div>
+              </div>
+
+              {/* Line by line review */}
+              <div className="space-y-3">
+                {result.studentWorkingEvaluation.lineReviews.map((line) => (
+                  <div
+                    key={line.lineNumber}
+                    className={`rounded-xl border p-4 space-y-2 ${
+                      line.isCorrect
+                        ? 'border-emerald-500/30 bg-emerald-950/20'
+                        : 'border-rose-500/30 bg-rose-950/25'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-mono text-slate-300 font-bold">Line {line.lineNumber}:</span>
+                      <span className={`rounded-md px-2.5 py-0.5 text-xs font-bold font-mono border ${
+                        line.isCorrect
+                          ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                          : 'bg-rose-500/20 text-rose-300 border-rose-500/30'
+                      }`}>
+                        {line.markBadge}
+                      </span>
+                    </div>
+
+                    <div className="font-mono text-xs sm:text-sm text-white bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                      {line.rawText}
+                    </div>
+
+                    <div className={`text-xs font-medium leading-relaxed ${
+                      line.isCorrect ? 'text-emerald-300' : 'text-rose-200'
+                    }`}>
+                      {line.exactReason}
+                    </div>
+
+                    {line.exactCorrection && (
+                      <div className="rounded-lg border border-amber-500/30 bg-amber-950/30 p-2.5 text-xs text-amber-200 flex items-start gap-2">
+                        <CheckCircle className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
+                        <div>
+                          <strong className="text-amber-300">Exact Working Required: </strong>
+                          <span className="font-mono font-bold text-white">{line.exactCorrection}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Section 1: Core Concept & Formula */}
           <div className="rounded-2xl border border-sky-500/30 bg-gradient-to-r from-sky-950/25 via-slate-900 to-indigo-950/20 p-5 shadow-md">
@@ -1215,6 +1322,16 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
                     <span className="font-bold shrink-0">{line.isCorrect ? '✓' : '✗'}</span>
                     <span>{line.examinerAnnotation}</span>
                   </div>
+
+                  {line.exactCorrection && (
+                    <div className="rounded-lg border border-amber-500/30 bg-amber-950/30 p-2 text-xs text-amber-200 flex items-start gap-1.5 mt-1">
+                      <CheckCircle className="h-3.5 w-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                      <div>
+                        <strong className="text-amber-300">Exact Working Required: </strong>
+                        <span className="font-mono font-bold text-white">{line.exactCorrection}</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

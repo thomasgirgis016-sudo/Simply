@@ -7,7 +7,7 @@ export const config = {
 };
 
 const SENIOR_CAMBRIDGE_SYSTEM_PROMPT =
-  'You are a senior Cambridge IGCSE examiner and master educator. Follow official mark scheme conventions strictly: show step-by-step working for method marks [M], accuracy marks [A], independent marks [B], and special case marks [SC]. Bold all required syllabus keywords. Enforce the 3 significant figures rule for non-exact numerical values, and include SI units.';
+  'You are a senior Cambridge IGCSE examiner and master educator. Follow official mark scheme conventions strictly: show step-by-step working for method marks [M], accuracy marks [A], independent marks [B], and special case marks [SC]. Bold all required syllabus keywords. Enforce the 3 significant figures rule for non-exact numerical values, and include SI units.\nCRITICAL MATHEMATICAL MARKING RULE:\nStrictly evaluate every equation and calculation step for factual mathematical truth.\n- If a student writes a valid mathematical step (e.g. "10 - 2 = 8"), award the mark (+1 Mark [M1] or [A1]) and explain why.\n- If a student writes a false equation or arithmetic/algebraic contradiction (e.g. "10 + 2 = 8"), IMMEDIATELY WITHHOLD / DEDUCT the mark (0 Marks [M0]). You MUST explain EXACTLY why on that specific equation (e.g. "You wrote 10 + 2 = 8, but 10 + 2 = 12, not 8. You added instead of subtracting."). You MUST provide the EXACT line the student must write (e.g. "Write instead: 10 - 2 = 8"). NEVER give vague general advice leaving the student to correct it themselves.';
 
 export default async function handler(req: any, res?: any) {
   // CORS headers
@@ -85,6 +85,7 @@ export default async function handler(req: any, res?: any) {
     if (action === 'solve_question') {
       userPrompt = `You are marking a student question for ${examBoard} IGCSE ${subjectName} (${gradeLevel}).
 Question: "${questionText || 'Given Question in Image'}"
+${studentWorking ? `Student Working Provided: "${studentWorking}"` : ''}
 
 Output STRICTLY a valid JSON object matching this schema:
 {
@@ -127,20 +128,26 @@ Question: "${questionText || 'Question'}"
 Student's Working: "${studentWorking || 'See attached image'}"
 Total Available Marks: ${totalMarks}
 
-Transcribe line-by-line, allocate exact Cambridge mark scheme designations ([M1], [A1], [B1]), identify where any method broke down, and output STRICTLY JSON matching:
+CRITICAL INSTRUCTIONS:
+- Transcribe line-by-line.
+- Verify EVERY arithmetic calculation and algebraic transposition strictly:
+  * If student wrote a correct line (e.g. "10 - 2 = 8"), award [M1] with isCorrect: true, state "✓ Correct step 10 - 2 = 8".
+  * If student wrote a false line (e.g. "10 + 2 = 8"), award [M0] with isCorrect: false. You MUST state EXACTLY why: "10 + 2 = 12, not 8. Added instead of subtracted." AND set exactCorrection: "Write instead: 10 - 2 = 8".
+- Output STRICTLY JSON matching:
 {
   "questionSummary": "Summary",
   "totalMarksPossible": ${totalMarks},
   "marksEarned": 3,
   "percentageScore": 75,
-  "breakdownPointOfFailure": "Exact line where method broke down or calculation slipped",
+  "breakdownPointOfFailure": "Exact line where method broke down (e.g. Line 1: wrote 10+2=8 instead of 10-2=8)",
   "lineByLineReview": [
     {
       "lineNumber": 1,
       "studentLineText": "Transcribed line",
       "isCorrect": true,
       "markAwarded": "[M1] Method Mark",
-      "examinerAnnotation": "Annotation"
+      "examinerAnnotation": "Annotation explaining why correct or why incorrect",
+      "exactCorrection": "Exact replacement line candidate must write (if incorrect)"
     }
   ],
   "correctWorkingStepByStep": [

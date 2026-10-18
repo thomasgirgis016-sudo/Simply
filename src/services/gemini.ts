@@ -1,11 +1,13 @@
 import { SolverResult, Flashcard, QuizQuestion, RevisionTopic, HandwrittenReviewResult, EslSpeakingEvaluation } from '../types';
 import { searchUniversalKnowledge } from './knowledgeEngine';
 import { findPastPaperQuestionByReference, evaluateStudentAnswerAgainstMarkScheme } from './examQuestionEngine';
+import { evaluateStudentWorking } from './mathWorkingValidator';
 
 export interface GeminiSolveParams {
   apiKey?: string;
   model?: string;
   questionText?: string;
+  studentWorking?: string;
   imageBase64?: string;
   imageMimeType?: string;
   subjectName: string;
@@ -121,7 +123,7 @@ export const SENIOR_CAMBRIDGE_EXAMINER_INSTRUCTION =
   'You are a senior Cambridge IGCSE examiner. Follow official mark scheme conventions: always show step-by-step working for method marks ($M$), state accuracy marks ($A$) and independent marks ($B$), bold all required syllabus keywords, and enforce the 3 significant figures rule for non-exact values.';
 
 export async function solveQuestionWithGemini(params: GeminiSolveParams): Promise<SolverResult> {
-  const { apiKey, model = 'gemini-1.5-flash', questionText, imageBase64, imageMimeType, subjectName, examBoard, gradeLevel } = params;
+  const { apiKey, model = 'gemini-1.5-flash', questionText, studentWorking, imageBase64, imageMimeType, subjectName, examBoard, gradeLevel } = params;
 
   const prompt = `
 ${SENIOR_CAMBRIDGE_EXAMINER_INSTRUCTION}
@@ -167,7 +169,52 @@ Ensure standard IGCSE marking criteria: [M] method mark, [A] accuracy mark, [B] 
 DO NOT wrap your output in markdown code blocks like \`\`\`json. Return only raw parseable JSON.
 `;
 
-  // 0. Instant official question and marking scheme match
+  // 0a. Check if input is a direct arithmetic / algebraic statement or student working (e.g. "10-2=8", "10+2=8", "x = 10 + 2 = 8")
+  const textToCheckForMath = (studentWorking || questionText || '').trim();
+  const directMathEval = textToCheckForMath ? evaluateStudentWorking(textToCheckForMath, 4) : null;
+
+  if (directMathEval && directMathEval.hasEvaluatedMath && !imageBase64) {
+    const isShortDirectEquation = textToCheckForMath.split('\n').length <= 3 && textToCheckForMath.length < 80;
+    if (isShortDirectEquation || (studentWorking && !questionText)) {
+      const firstFailure = directMathEval.lineReviews.find((l) => !l.isCorrect);
+      return {
+        questionText: `Student Working Evaluation: "${textToCheckForMath}"`,
+        subject: subjectName,
+        topic: 'Algebraic & Arithmetic Verification',
+        totalMarks: directMathEval.marksPossible,
+        studentWorkingEvaluation: directMathEval,
+        coreConceptAndFormula: {
+          concept: 'Strict Mathematical Line-by-Line Equality Verification',
+          formula: directMathEval.correctStepByStep.join(' \\quad \\text{and} \\quad ') || textToCheckForMath,
+        },
+        stepByStepSolution: directMathEval.lineReviews.map((r, idx) => ({
+          stepNumber: idx + 1,
+          title: `Line ${r.lineNumber}: ${r.isCorrect ? 'Valid Equation ✅' : 'Arithmetic Contradiction ❌'}`,
+          explanation: `${r.exactReason}\n\n${r.exactCorrection ? `**Required Correction:** \`${r.exactCorrection}\`` : ''}`,
+          mathOrCode: r.rawText,
+          markAwarded: r.markBadge,
+        })),
+        finalAnswer: firstFailure
+          ? `❌ Marks Withheld: 0 / ${directMathEval.marksPossible} Marks (${directMathEval.percentageScore}%). Error: ${firstFailure.exactReason}. ${firstFailure.exactCorrection || ''}`
+          : `✅ Marks Awarded: ${directMathEval.marksEarned} / ${directMathEval.marksPossible} Marks (${directMathEval.percentageScore}%). All calculation steps are mathematically sound.`,
+        examinerTraps: [
+          firstFailure
+            ? firstFailure.exactReason
+            : 'Writing an untrue mathematical statement (e.g. 10 + 2 = 8) immediately forfeits the Method mark in Cambridge exams.',
+        ],
+        markSchemeBreakdown: directMathEval.lineReviews.map((r) => `${r.markBadge} - ${r.rawText}`),
+        examinerTips: [
+          'In Cambridge IGCSE, never write a false equation. If an operation is subtraction, write 10 - 2 = 8; writing 10 + 2 = 8 forfeits method marks immediately.',
+        ],
+        commonMistakes: [
+          firstFailure ? `Writing "${firstFailure.rawText}" instead of "${firstFailure.exactCorrection || 'correct working'}"` : 'Arithmetic slip in intermediate steps.',
+        ],
+        relatedTopic: 'Arithmetic & Algebraic Rearrangement',
+      };
+    }
+  }
+
+  // 0b. Instant official question and marking scheme match
   if (questionText && !imageBase64) {
     const matchedPaper = findPastPaperQuestionByReference(questionText);
     if (matchedPaper) {
@@ -201,6 +248,7 @@ DO NOT wrap your output in markdown code blocks like \`\`\`json. Return only raw
           examinerTips: [matchedPaper.examinerReportSnippet || 'Always show every step of working.'],
           commonMistakes: evalResult.missingMarksExplained.map((m) => m.whatWasMissing),
           relatedTopic: matchedPaper.topic,
+          studentWorkingEvaluation: directMathEval?.hasEvaluatedMath ? directMathEval : undefined,
         };
       }
 
@@ -234,6 +282,7 @@ DO NOT wrap your output in markdown code blocks like \`\`\`json. Return only raw
   try {
     const serverResult = await callServerSolveApi('solve_question', {
       questionText,
+      studentWorking,
       imageBase64,
       imageMimeType,
       subjectName,
@@ -243,6 +292,9 @@ DO NOT wrap your output in markdown code blocks like \`\`\`json. Return only raw
       model,
     });
     if (serverResult && serverResult.stepByStepSolution && serverResult.finalAnswer) {
+      if (directMathEval && directMathEval.hasEvaluatedMath) {
+        serverResult.studentWorkingEvaluation = directMathEval;
+      }
       return serverResult;
     }
   } catch (err) {
@@ -653,6 +705,53 @@ ${
 ---
 💡 **Want me to mark your answer?**  
 Reply with your answer (e.g. *"For this question my answer is ..."*), and I will calculate your mark, state what marks were awarded for, and tell you what you need to write if any marks were missed!`;
+  }
+
+  // 0b. Check for Direct Mathematical Equation Validation (e.g. "10-2=8", "10+2=8", "Mark my working: 10+2=8")
+  const directMath = evaluateStudentWorking(lastUserMessage, 1);
+  if (directMath.hasEvaluatedMath) {
+    const isAllOk = directMath.lineReviews.every((l) => l.isCorrect);
+    if (!isAllOk) {
+      const err = directMath.lineReviews.find((l) => !l.isCorrect)!;
+      return `### ❌ Cambridge Examiner Evaluation: Mark Lost [M0] (0 / 1 Marks)
+
+**Your Working:**
+\`\`\`
+${err.rawText}
+\`\`\`
+
+---
+
+#### 🔍 Exact Reason Mark is Withheld:
+${err.exactReason}
+
+---
+
+#### ✏️ What You Must Write Instead:
+\`\`\`
+${err.exactCorrection || 'See corrected working above'}
+\`\`\`
+
+> 💡 **Cambridge Principal Examiner Rule:**  
+> In IGCSE examinations, writing a false equation (such as stating that two unequal quantities are equal) forfeits the Method ($M$) mark immediately. Follow-through cannot be awarded after a fundamentally invalid premise. Always write the operation as subtraction (\`10 - 2 = 8\`) rather than addition (\`10 + 2 = 8\`).`;
+    } else {
+      const ok = directMath.lineReviews.find((l) => l.isCorrect)!;
+      return `### ✅ Cambridge Examiner Evaluation: Awarded [M1] (+1 Mark)
+
+**Your Working:**
+\`\`\`
+${ok.rawText}
+\`\`\`
+
+---
+
+#### 🎯 Marks Awarded:
+- **[M1] Method Mark Awarded**: ${ok.exactReason}
+- **Score:** 1 / 1 Marks (100%)
+
+> 💡 **Cambridge Examiner Tip:**  
+> This line is mathematically and algebraically sound. Showing this step explicitly ensures you secure the method mark even if an arithmetic slip occurs in a later calculation.`;
+    }
   }
 
   // 1. Check Universal Syllabus Knowledge Engine for Instant High-Yield Mark-Scheme Breakdown
@@ -1166,6 +1265,24 @@ Return raw JSON only without markdown code blocks.`;
       model,
     });
     if (serverResult && serverResult.lineByLineReview && typeof serverResult.marksEarned === 'number') {
+      if (studentTypedWorking) {
+        const mathEval = evaluateStudentWorking(studentTypedWorking, totalMarks);
+        if (mathEval.hasEvaluatedMath && mathEval.lineReviews.some((r) => !r.isCorrect)) {
+          const failure = mathEval.lineReviews.find((r) => !r.isCorrect)!;
+          serverResult.marksEarned = mathEval.marksEarned;
+          serverResult.percentageScore = mathEval.percentageScore;
+          serverResult.breakdownPointOfFailure = failure.exactReason;
+          const matchingLine = serverResult.lineByLineReview.find(
+            (l: any) => l.lineNumber === failure.lineNumber || l.studentLineText?.includes(failure.rawText)
+          );
+          if (matchingLine) {
+            matchingLine.isCorrect = false;
+            matchingLine.markAwarded = failure.markBadge;
+            matchingLine.examinerAnnotation = failure.exactReason;
+            matchingLine.exactCorrection = failure.exactCorrection;
+          }
+        }
+      }
       return serverResult;
     }
   } catch (err) {
@@ -1204,7 +1321,17 @@ Return raw JSON only without markdown code blocks.`;
       const candidate = data.candidates?.[0]?.content?.parts?.[0]?.text;
       if (candidate) {
         const cleaned = candidate.replace(/```json/g, '').replace(/```/g, '').trim();
-        return JSON.parse(cleaned);
+        const parsed = JSON.parse(cleaned);
+        if (studentTypedWorking) {
+          const mathEval = evaluateStudentWorking(studentTypedWorking, totalMarks);
+          if (mathEval.hasEvaluatedMath && mathEval.lineReviews.some((r) => !r.isCorrect)) {
+            const failure = mathEval.lineReviews.find((r) => !r.isCorrect)!;
+            parsed.marksEarned = mathEval.marksEarned;
+            parsed.percentageScore = mathEval.percentageScore;
+            parsed.breakdownPointOfFailure = failure.exactReason;
+          }
+        }
+        return parsed;
       }
     } catch {
       // continue to fallback
@@ -1212,15 +1339,42 @@ Return raw JSON only without markdown code blocks.`;
   }
 
   // 3. Fallback Simulated Examiner Review
-  return generateSimulatedHandwrittenReview(questionText || 'Handwritten Equation Problem', subjectName, examBoard, totalMarks);
+  return generateSimulatedHandwrittenReview(questionText || 'Handwritten Equation Problem', subjectName, examBoard, totalMarks, studentTypedWorking);
 }
 
 function generateSimulatedHandwrittenReview(
   question: string,
   subject: string,
   board: string,
-  totalMarks: number
+  totalMarks: number,
+  studentWorkingText?: string
 ): HandwrittenReviewResult {
+  if (studentWorkingText && studentWorkingText.trim()) {
+    const mathEval = evaluateStudentWorking(studentWorkingText, totalMarks);
+    if (mathEval.hasEvaluatedMath) {
+      return {
+        questionSummary: question,
+        totalMarksPossible: mathEval.marksPossible,
+        marksEarned: mathEval.marksEarned,
+        percentageScore: mathEval.percentageScore,
+        breakdownPointOfFailure: mathEval.breakdownPointOfFailure,
+        lineByLineReview: mathEval.lineReviews.map((r) => ({
+          lineNumber: r.lineNumber,
+          studentLineText: r.rawText,
+          isCorrect: r.isCorrect,
+          markAwarded: r.markBadge,
+          examinerAnnotation: r.exactReason,
+          exactCorrection: r.exactCorrection,
+        })),
+        correctWorkingStepByStep: mathEval.correctStepByStep,
+        examinerFinalVerdict: mathEval.overallVerdict,
+        examinerTipsToRegainMarks: [
+          'In Cambridge IGCSE mathematics, never write a false equation (e.g. 10 + 2 = 8). It forfeits method marks immediately.',
+          'Always check whether you should add or subtract when transposing terms.',
+        ],
+      };
+    }
+  }
   const earned = Math.max(1, totalMarks - 1);
   return {
     questionSummary: question,

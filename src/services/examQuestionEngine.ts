@@ -1,5 +1,6 @@
 import { PastPaperItem } from '../types';
 import { getAllPastPapers } from '../data/pastPapersData';
+import { evaluateStudentWorking } from './mathWorkingValidator';
 
 export interface ExamGradingResult {
   paper: PastPaperItem;
@@ -180,6 +181,11 @@ export function evaluateStudentAnswerAgainstMarkScheme(
   const sAnsLower = sAns.toLowerCase();
   const totalMarks = paper.marks;
 
+  // Run rigorous mathematical line-by-line verification
+  const mathValidation = evaluateStudentWorking(sAns, totalMarks);
+  const mathFailure = mathValidation.lineReviews.find((r) => !r.isCorrect);
+  const mathSuccess = mathValidation.lineReviews.find((r) => r.isMathEquation && r.isCorrect);
+
   const marksBreakdown: ExamGradingResult['marksBreakdown'] = [];
   const missingMarksExplained: ExamGradingResult['missingMarksExplained'] = [];
 
@@ -205,36 +211,51 @@ export function evaluateStudentAnswerAgainstMarkScheme(
 
     // Check method mark [M]
     if (item.markType.includes('M')) {
-      const hasKeywords = keywords.some((k: string) => sAnsLower.includes(k));
-      const hasNumbers = reqNumbers.some((n: string) => numbersInStudentAnswer.includes(n));
-      const hasFormulaWorking = sAns.includes('=') || sAns.includes('+') || sAns.includes('-') || sAns.includes('*') || sAns.includes('/') || sAns.includes('^');
-
-      if (hasKeywords || (hasNumbers && hasFormulaWorking)) {
-        isAwarded = true;
-        feedback = '✓ Method Mark: Correct working step, algebraic formula, or substitution identified.';
-      } else {
+      // If student wrote a mathematically false equation (e.g. 10 + 2 = 8), REJECT method mark immediately!
+      if (mathFailure) {
         isAwarded = false;
-        feedback = '✗ Method Mark Lost: Step or valid algebraic method was not shown.';
+        feedback = `✗ Method Mark Lost [M0]: ${mathFailure.exactReason}`;
+      } else {
+        const hasKeywords = keywords.some((k: string) => sAnsLower.includes(k));
+        const hasNumbers = reqNumbers.some((n: string) => numbersInStudentAnswer.includes(n));
+        const hasFormulaWorking = sAns.includes('=') || sAns.includes('+') || sAns.includes('-') || sAns.includes('*') || sAns.includes('/') || sAns.includes('^');
+
+        if (mathSuccess) {
+          isAwarded = true;
+          feedback = `✓ Method Mark Awarded [M1]: Valid mathematical calculation step "${mathSuccess.rawText}".`;
+        } else if (hasKeywords || (hasNumbers && hasFormulaWorking)) {
+          isAwarded = true;
+          feedback = '✓ Method Mark: Correct working step, algebraic formula, or substitution identified.';
+        } else {
+          isAwarded = false;
+          feedback = '✗ Method Mark Lost: Step or valid algebraic method was not shown.';
+        }
       }
     }
     // Check accuracy mark [A]
     else if (item.markType.includes('A')) {
-      const hasFinalNumber = officialFinalNumbers.some((n) => {
-        const floatOfficial = parseFloat(n);
-        return numbersInStudentAnswer.some((sn) => {
-          const floatStudent = parseFloat(sn);
-          return Math.abs(floatOfficial - floatStudent) < 0.05 || floatStudent.toFixed(1) === floatOfficial.toFixed(1);
-        });
-      });
-
-      const hasExactPhrase = keywords.filter((k) => sAnsLower.includes(k)).length >= Math.min(2, keywords.length);
-
-      if (hasFinalNumber || hasExactPhrase) {
-        isAwarded = true;
-        feedback = '✓ Accuracy Mark: Accurate numerical answer or required precision demonstrated.';
-      } else {
+      // Cannot award accuracy mark if an earlier arithmetic calculation was false
+      if (mathFailure) {
         isAwarded = false;
-        feedback = '✗ Accuracy Mark Lost: Final value incorrect or required precision (3 s.f.) missing.';
+        feedback = `✗ Accuracy Mark Lost [A0]: Accuracy forfeited due to arithmetic error in working: ${mathFailure.exactReason}`;
+      } else {
+        const hasFinalNumber = officialFinalNumbers.some((n) => {
+          const floatOfficial = parseFloat(n);
+          return numbersInStudentAnswer.some((sn) => {
+            const floatStudent = parseFloat(sn);
+            return Math.abs(floatOfficial - floatStudent) < 0.05 || floatStudent.toFixed(1) === floatOfficial.toFixed(1);
+          });
+        });
+
+        const hasExactPhrase = keywords.filter((k) => sAnsLower.includes(k)).length >= Math.min(2, keywords.length);
+
+        if (hasFinalNumber || hasExactPhrase) {
+          isAwarded = true;
+          feedback = '✓ Accuracy Mark: Accurate numerical answer or required precision demonstrated.';
+        } else {
+          isAwarded = false;
+          feedback = '✗ Accuracy Mark Lost: Final value incorrect or required precision (3 s.f.) missing.';
+        }
       }
     }
     // Check independent mark [B] / Content mark
@@ -256,8 +277,12 @@ export function evaluateStudentAnswerAgainstMarkScheme(
     } else {
       missingMarksExplained.push({
         markType: item.markType,
-        whatWasMissing: `Candidate omitted the required condition or calculation for ${item.markType}: "${item.requirement}".`,
-        whatToWriteToGetMark: `To secure this mark, write: "${item.requirement}".`,
+        whatWasMissing: mathFailure
+          ? mathFailure.exactReason
+          : `Candidate omitted the required condition or calculation for ${item.markType}: "${item.requirement}".`,
+        whatToWriteToGetMark: mathFailure && mathFailure.exactCorrection
+          ? mathFailure.exactCorrection
+          : `To secure this mark, write: "${item.requirement}".`,
       });
     }
 
