@@ -1,5 +1,6 @@
 import { SolverResult, Flashcard, QuizQuestion, RevisionTopic, HandwrittenReviewResult, EslSpeakingEvaluation } from '../types';
 import { searchUniversalKnowledge } from './knowledgeEngine';
+import { findPastPaperQuestionByReference, evaluateStudentAnswerAgainstMarkScheme } from './examQuestionEngine';
 
 export interface GeminiSolveParams {
   apiKey?: string;
@@ -165,6 +166,69 @@ Analyze this student question thoroughly and return your answer STRICTLY as a va
 Ensure standard IGCSE marking criteria: [M] method mark, [A] accuracy mark, [B] independent mark, [SC] special case. Use LaTeX formatting ($...$ or $$...$$) for mathematical expressions and chemical formulas.
 DO NOT wrap your output in markdown code blocks like \`\`\`json. Return only raw parseable JSON.
 `;
+
+  // 0. Instant official question and marking scheme match
+  if (questionText && !imageBase64) {
+    const matchedPaper = findPastPaperQuestionByReference(questionText);
+    if (matchedPaper) {
+      const isSubmittingAnswer =
+        questionText.toLowerCase().includes('my answer') ||
+        questionText.toLowerCase().includes('i got') ||
+        questionText.toLowerCase().includes('i wrote') ||
+        questionText.toLowerCase().includes('mark me') ||
+        questionText.toLowerCase().includes('grade me');
+
+      if (isSubmittingAnswer) {
+        const evalResult = evaluateStudentAnswerAgainstMarkScheme(matchedPaper, questionText);
+        return {
+          questionText: `${matchedPaper.paperCode} ${matchedPaper.session} ${matchedPaper.questionNumber}: ${matchedPaper.questionPrompt}`,
+          subject: matchedPaper.subjectName,
+          topic: matchedPaper.topic,
+          totalMarks: matchedPaper.marks,
+          coreConceptAndFormula: {
+            concept: `Official Cambridge Exam Question: ${matchedPaper.topic}`,
+            formula: matchedPaper.diagramOrMath || matchedPaper.finalAnswer,
+          },
+          stepByStepSolution: evalResult.marksBreakdown.map((m, idx) => ({
+            stepNumber: idx + 1,
+            title: `Mark Criteria ${m.markType} - ${m.awarded ? 'Awarded ✅' : 'Missing ❌'}`,
+            explanation: `${m.requirement}\n\n**Examiner Note:** ${m.feedback}`,
+            markAwarded: m.markType,
+          })),
+          finalAnswer: `Student Result: ${evalResult.marksEarned} / ${evalResult.totalMarks} Marks (${evalResult.percentage}%). Official Answer: ${matchedPaper.finalAnswer}`,
+          examinerTraps: evalResult.missingMarksExplained.map((m) => `${m.markType}: ${m.whatWasMissing} -> ${m.whatToWriteToGetMark}`),
+          markSchemeBreakdown: matchedPaper.markScheme.map((m) => `${m.markType} ${m.requirement}`),
+          examinerTips: [matchedPaper.examinerReportSnippet || 'Always show every step of working.'],
+          commonMistakes: evalResult.missingMarksExplained.map((m) => m.whatWasMissing),
+          relatedTopic: matchedPaper.topic,
+        };
+      }
+
+      // If user is asking for the solution/mark scheme:
+      return {
+        questionText: `${matchedPaper.paperCode} ${matchedPaper.session} ${matchedPaper.questionNumber}: ${matchedPaper.questionPrompt}`,
+        subject: matchedPaper.subjectName,
+        topic: matchedPaper.topic,
+        totalMarks: matchedPaper.marks,
+        coreConceptAndFormula: {
+          concept: matchedPaper.topic,
+          formula: matchedPaper.diagramOrMath || matchedPaper.finalAnswer,
+        },
+        stepByStepSolution: matchedPaper.markScheme.map((m, idx) => ({
+          stepNumber: idx + 1,
+          title: `Official Mark Scheme Step ${idx + 1} (${m.markType})`,
+          explanation: m.requirement,
+          markAwarded: m.markType,
+        })),
+        finalAnswer: matchedPaper.finalAnswer,
+        examinerTraps: matchedPaper.examinerReportSnippet ? [matchedPaper.examinerReportSnippet] : ['Always write 3 significant figures and include standard SI units.'],
+        markSchemeBreakdown: matchedPaper.markScheme.map((m) => `${m.markType} ${m.requirement}`),
+        examinerTips: [matchedPaper.examinerReportSnippet || 'Show all method steps to guarantee partial marks even if an arithmetic slip occurs.'],
+        commonMistakes: [matchedPaper.examinerReportSnippet || 'Omitting units or rounding prematurely in multi-step equations.'],
+        relatedTopic: matchedPaper.topic,
+      };
+    }
+  }
 
   // 1. Try internal Vercel server route (/api/solve) with server environment keys
   try {
@@ -533,6 +597,63 @@ export async function askAiTutor(
 The student is studying: ${examBoard} ${subjectName}.
 Tone: Encouraging, rigorous, mark-scheme focused. Always point out where [M] method marks, [A] accuracy marks, and [B] independent marks are awarded.
 Use LaTeX ($...$ or $$...$$) for any mathematical equations or chemical reactions.`;
+
+  // 0. Check for Official Exam Question Code & Question Number Reference
+  const matchedExamPaper = findPastPaperQuestionByReference(lastUserMessage);
+  if (matchedExamPaper) {
+    const lower = lastUserMessage.toLowerCase();
+    const isSubmittingAnswer =
+      lower.includes('my answer') ||
+      lower.includes('i got') ||
+      lower.includes('i wrote') ||
+      lower.includes('grade me') ||
+      lower.includes('mark me') ||
+      lower.includes('how many marks') ||
+      lower.includes('is this right') ||
+      lower.includes('is it correct') ||
+      lower.includes('my working') ||
+      lower.includes('here is my') ||
+      lower.includes('check this') ||
+      lower.includes('score');
+
+    if (isSubmittingAnswer) {
+      // Evaluate student's answer against official mark scheme!
+      const evalResult = evaluateStudentAnswerAgainstMarkScheme(matchedExamPaper, lastUserMessage);
+      return evalResult.formattedMarkdown;
+    }
+
+    // Student is looking up the question and official marking scheme
+    return `### 📑 Official Exam Question: ${matchedExamPaper.paperCode} ${matchedExamPaper.questionNumber}
+**Subject:** ${matchedExamPaper.subjectName} (${matchedExamPaper.paperCode}) • **Session:** ${matchedExamPaper.session}  
+**Topic:** ${matchedExamPaper.topic} • **Difficulty:** ${matchedExamPaper.difficultyTier} • **Marks Available:** [${matchedExamPaper.marks} Marks]
+
+---
+
+#### ❓ Question Paper Prompt:
+${matchedExamPaper.questionPrompt}
+
+${matchedExamPaper.diagramOrMath ? `$$\n${matchedExamPaper.diagramOrMath}\n$$` : ''}
+
+---
+
+#### 📋 Official Cambridge / Edexcel Mark Scheme:
+${matchedExamPaper.markScheme
+  .map((m) => `- **${m.markType}**: ${m.requirement}`)
+  .join('\n')}
+
+**Official Final Answer:** $${matchedExamPaper.finalAnswer}$
+
+${
+  matchedExamPaper.examinerReportSnippet
+    ? `> 💡 **Principal Examiner Report Warning:**  
+> "${matchedExamPaper.examinerReportSnippet}"\n`
+    : ''
+}
+
+---
+💡 **Want me to mark your answer?**  
+Reply with your answer (e.g. *"For this question my answer is ..."*), and I will calculate your mark, state what marks were awarded for, and tell you what you need to write if any marks were missed!`;
+  }
 
   // 1. Check Universal Syllabus Knowledge Engine for Instant High-Yield Mark-Scheme Breakdown
   const instantMatch = searchUniversalKnowledge(lastUserMessage, subjectName, examBoard);

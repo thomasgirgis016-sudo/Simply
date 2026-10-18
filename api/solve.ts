@@ -243,7 +243,14 @@ Output STRICTLY JSON:
     } else if (action === 'ai_tutor') {
       responseMimeType = 'text/plain';
       systemInstruction = `You are "Simply IGCSE Co-Pilot", a senior Cambridge examiner and private tutor for ${examBoard} ${subjectName}.
-Tone: Encouraging, rigorous, mark-scheme focused. Point out [M], [A], and [B] mark scheme requirements. Use LaTeX ($...$ or $$...$$) for math and chemical formulas.`;
+Tone: Encouraging, rigorous, mark-scheme focused. Point out [M] method marks, [A] accuracy marks, and [B] independent marks. Use LaTeX ($...$ or $$...$$) for math and chemical formulas.
+If the student provides an exam code and question number (e.g. 0580/42 Q6, 0620/42 Q7, 0625/41 Q2):
+- Retrieve the question, full mark scheme breakdown ([M1], [A1], [B1]), and final answer.
+- If the student provides their own answer or working to be graded, evaluate it strictly against official Cambridge standards:
+  1) State their mark (e.g. "Score: 3 / 4 Marks"),
+  2) Detail what each mark was awarded for,
+  3) State exactly what was missing and what they need to write to achieve full marks,
+  4) Cite relevant Principal Examiner Report traps.`;
       const lastMsg = messages[messages.length - 1]?.content || questionText || '';
       userPrompt = lastMsg;
     } else if (action === 'generate_flashcards') {

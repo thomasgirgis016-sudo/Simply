@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   MessageSquare,
   Send,
@@ -8,10 +8,14 @@ import {
   Trash2,
   RefreshCw,
   Lightbulb,
-  Award
+  Award,
+  BookOpen,
+  CheckCircle,
+  HelpCircle
 } from 'lucide-react';
 import { Subject, UserProfile } from '../types';
 import { askAiTutor } from '../services/gemini';
+import { getAllPastPapers } from '../data/pastPapersData';
 import { MathRenderer } from './MathRenderer';
 
 interface Message {
@@ -244,6 +248,16 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
 
   const quickQuestions = getSubjectQuickPrompts();
 
+  const examQuestionsForSubject = useMemo(() => {
+    const all = getAllPastPapers();
+    return all.filter((p) => {
+      if (p.subjectId === subject.id || (p.subjectCode && subject.code && p.subjectCode.toLowerCase() === subject.code.toLowerCase())) {
+        return true;
+      }
+      return false;
+    });
+  }, [subject.id, subject.code]);
+
   return (
     <div className="mx-auto flex h-[calc(100dvh-135px)] sm:h-[calc(100vh-180px)] max-w-4xl flex-col rounded-2xl sm:rounded-3xl border border-slate-800 bg-slate-900/90 shadow-2xl backdrop-blur-md overflow-hidden">
       {/* Chat Header */}
@@ -328,6 +342,37 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Exam Code & Question Quick Selector */}
+      {examQuestionsForSubject.length > 0 && (
+        <div className="border-t border-slate-800/80 bg-slate-950/80 px-4 py-1.5 flex items-center gap-2 overflow-x-auto no-scrollbar">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-sky-400 shrink-0 flex items-center gap-1">
+            <BookOpen className="h-3 w-3" />
+            Exam Qs & Mark Schemes:
+          </span>
+          {examQuestionsForSubject.map((p) => (
+            <button
+              key={p.id}
+              type="button"
+              onClick={() => handleSend(`Show me ${p.paperCode} ${p.session} ${p.questionNumber} question and mark scheme`)}
+              className="shrink-0 rounded-lg border border-sky-500/30 bg-sky-950/50 px-2.5 py-1 text-[11px] text-sky-200 hover:border-sky-400 hover:bg-sky-900/60 transition cursor-pointer flex items-center gap-1"
+              title={`Ask AI for ${p.paperCode} ${p.questionNumber}: ${p.topic}`}
+            >
+              <span className="font-mono text-[10px] text-sky-300">{p.paperCode}</span>
+              <span className="font-bold">{p.questionNumber}</span>
+              <span className="text-[10px] text-slate-400 font-normal">({p.topic})</span>
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={() => handleSend(`For ${examQuestionsForSubject[0].paperCode} ${examQuestionsForSubject[0].questionNumber}, here is my answer: [type your answer here]. Grade my answer and tell me my marks.`)}
+            className="shrink-0 rounded-lg border border-emerald-500/30 bg-emerald-950/40 px-2.5 py-1 text-[11px] text-emerald-300 hover:bg-emerald-900/50 transition cursor-pointer flex items-center gap-1"
+          >
+            <CheckCircle className="h-3 w-3" />
+            <span>Test & Grade My Answer</span>
+          </button>
+        </div>
+      )}
+
       {/* Quick Prompts Bar */}
       <div className="border-t border-slate-800/80 bg-slate-950/50 px-4 py-2 flex items-center gap-2 overflow-x-auto no-scrollbar">
         <Sparkles className="h-3.5 w-3.5 text-purple-400 shrink-0" />
@@ -356,7 +401,7 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={`Ask anything about ${subject.name} (e.g. explain redox, formula)...`}
+            placeholder={`Ask a question or enter exam code & Q# (e.g. 0580/42 Q6 or "Grade my answer: ...")...`}
             className="flex-1 rounded-xl sm:rounded-2xl border border-slate-700 bg-slate-900 px-3.5 sm:px-4 py-2.5 sm:py-3 text-base sm:text-sm text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none"
           />
           <button

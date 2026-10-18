@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   Camera,
   Upload,
@@ -16,10 +16,13 @@ import {
   Check,
   PenTool,
   Award,
-  Edit3
+  Edit3,
+  Search
 } from 'lucide-react';
-import { Subject, UserProfile, SolverResult, FlaggedQuestionIssue, HandwrittenReviewResult } from '../types';
+import { Subject, UserProfile, SolverResult, FlaggedQuestionIssue, HandwrittenReviewResult, PastPaperItem } from '../types';
 import { SAMPLE_SOLVER_QUESTIONS } from '../data/initialData';
+import { getAllPastPapers } from '../data/pastPapersData';
+import { findPastPaperQuestionByReference, evaluateStudentAnswerAgainstMarkScheme, ExamGradingResult } from '../services/examQuestionEngine';
 import { solveQuestionWithGemini, isPuterSignedIn, connectPuterSession, gradeHandwrittenWorkWithGemini } from '../services/gemini';
 import { MathRenderer } from './MathRenderer';
 
@@ -38,7 +41,7 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
   profile,
   onOpenChatWithQuestion,
 }) => {
-  const [solverMode, setSolverMode] = useState<'solve' | 'handwritten'>('solve');
+  const [solverMode, setSolverMode] = useState<'solve' | 'exam-lookup' | 'handwritten'>('solve');
   const [questionText, setQuestionText] = useState('');
   const [studentTypedWorking, setStudentTypedWorking] = useState('');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -47,6 +50,32 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [result, setResult] = useState<SolverResult | null>(null);
   const [handwrittenResult, setHandwrittenResult] = useState<HandwrittenReviewResult | null>(null);
+
+  // Exam Question Lookup & Mark Scheme Grader State
+  const [examSearchQuery, setExamSearchQuery] = useState('');
+  const [selectedExamPaper, setSelectedExamPaper] = useState<PastPaperItem | null>(null);
+  const [studentExamAnswer, setStudentExamAnswer] = useState('');
+  const [examGradingResult, setExamGradingResult] = useState<ExamGradingResult | null>(null);
+  const [showOfficialMarkScheme, setShowOfficialMarkScheme] = useState(false);
+
+  const availableExamPapers = useMemo(() => {
+    const all = getAllPastPapers();
+    return all.filter((p) => {
+      if (profile.board !== 'Both' && p.board !== profile.board) return false;
+      return true;
+    });
+  }, [profile.board]);
+
+  const handleGradeExamAnswer = () => {
+    if (!selectedExamPaper) return;
+    if (!studentExamAnswer.trim()) {
+      setErrorMessage('Please enter your answer or working steps first.');
+      return;
+    }
+    setErrorMessage(null);
+    const evalRes = evaluateStudentAnswerAgainstMarkScheme(selectedExamPaper, studentExamAnswer);
+    setExamGradingResult(evalRes);
+  };
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
@@ -294,21 +323,36 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
         </div>
 
         {/* Mode Switcher */}
-        <div className="flex rounded-2xl bg-slate-900/90 p-1.5 border border-slate-800">
+        <div className="flex flex-wrap rounded-2xl bg-slate-900/90 p-1.5 border border-slate-800 gap-1">
           <button
             type="button"
             onClick={() => {
               setSolverMode('solve');
               setErrorMessage(null);
             }}
-            className={`flex-1 flex items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold transition cursor-pointer ${
+            className={`flex-1 min-w-[140px] flex items-center justify-center gap-2 rounded-xl py-2.5 px-3 text-xs font-bold transition cursor-pointer ${
               solverMode === 'solve'
                 ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
             <Sparkles className="h-4 w-4" />
-            <span>Solve Question & Reveal Mark Scheme</span>
+            <span>Solve Question / Photo</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setSolverMode('exam-lookup');
+              setErrorMessage(null);
+            }}
+            className={`flex-1 min-w-[170px] flex items-center justify-center gap-2 rounded-xl py-2.5 px-3 text-xs font-bold transition cursor-pointer ${
+              solverMode === 'exam-lookup'
+                ? 'bg-gradient-to-r from-sky-600 to-cyan-600 text-white shadow-md'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <BookOpen className="h-4 w-4" />
+            <span>Search by Exam Code & Q#</span>
           </button>
           <button
             type="button"
@@ -316,14 +360,14 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
               setSolverMode('handwritten');
               setErrorMessage(null);
             }}
-            className={`flex-1 flex items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold transition cursor-pointer ${
+            className={`flex-1 min-w-[140px] flex items-center justify-center gap-2 rounded-xl py-2.5 px-3 text-xs font-bold transition cursor-pointer ${
               solverMode === 'handwritten'
                 ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 shadow-md'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
             <PenTool className="h-4 w-4" />
-            <span>Grade My Handwritten Work ($M1, A1, B1$)</span>
+            <span>Grade Handwritten ($M1, A1$)</span>
           </button>
         </div>
 
@@ -446,7 +490,281 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
             )}
 
             {/* Text Areas based on mode */}
-            {solverMode === 'solve' ? (
+            {solverMode === 'exam-lookup' ? (
+              <div className="space-y-4">
+                {/* Search Exam Code & Q# Bar */}
+                <div>
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-sky-400 block mb-1.5 flex items-center justify-between">
+                    <span>1. Search Exam Paper Code & Question Number:</span>
+                    <span className="text-[10px] text-slate-400 font-normal">e.g. 0580/42 Q6, 0620/42 Q7, 4MA1 Q12</span>
+                  </label>
+                  <div className="relative">
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <input
+                      type="text"
+                      value={examSearchQuery}
+                      onChange={(e) => {
+                        setExamSearchQuery(e.target.value);
+                        const matched = findPastPaperQuestionByReference(e.target.value);
+                        if (matched) {
+                          setSelectedExamPaper(matched);
+                          setStudentExamAnswer('');
+                          setExamGradingResult(null);
+                          setShowOfficialMarkScheme(false);
+                        }
+                      }}
+                      placeholder="Type exam code & question (e.g. '0580/42 Q6' or '0620/42 Q7')..."
+                      className="w-full rounded-xl border border-sky-500/40 bg-slate-950/90 py-2.5 pl-10 pr-10 text-xs text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none"
+                    />
+                    {examSearchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setExamSearchQuery('');
+                          setSelectedExamPaper(null);
+                          setExamGradingResult(null);
+                        }}
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-white"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Quick Exam Question Shortcuts */}
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">
+                    Or select an authentic exam question from the archive:
+                  </span>
+                  <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto pr-1">
+                    {availableExamPapers.map((p) => {
+                      const isSelected = selectedExamPaper?.id === p.id;
+                      return (
+                        <button
+                          key={p.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedExamPaper(p);
+                            setStudentExamAnswer('');
+                            setExamGradingResult(null);
+                            setShowOfficialMarkScheme(false);
+                            setExamSearchQuery(`${p.paperCode} ${p.questionNumber}`);
+                            if (onSelectSubject && subjects) {
+                              const matchedSub = subjects.find(
+                                (s) => s.id === p.subjectId || s.code === p.subjectCode
+                              );
+                              if (matchedSub) onSelectSubject(matchedSub);
+                            }
+                          }}
+                          className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+                            isSelected
+                              ? 'bg-sky-500 text-white shadow-sm ring-1 ring-sky-400'
+                              : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700/60'
+                          }`}
+                        >
+                          <span className="font-mono text-[11px] text-sky-300">{p.paperCode}</span>
+                          <span className="font-bold">{p.questionNumber}</span>
+                          <span className="text-[10px] text-slate-400">({p.marks}m)</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Selected Question Display Card */}
+                {selectedExamPaper ? (
+                  <div className="rounded-2xl border border-sky-500/30 bg-sky-950/20 p-4 sm:p-5 space-y-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-sky-500/20 pb-3">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="rounded-md bg-sky-500/20 px-2.5 py-0.5 text-xs font-bold text-sky-200 border border-sky-500/30 font-mono">
+                          {selectedExamPaper.paperCode} • {selectedExamPaper.session}
+                        </span>
+                        <span className="font-extrabold text-white text-sm">
+                          {selectedExamPaper.questionNumber} ({selectedExamPaper.marks} Marks)
+                        </span>
+                        <span className="text-slate-500">•</span>
+                        <span className="text-xs text-slate-300 font-semibold">{selectedExamPaper.topic}</span>
+                        <span className="text-xs text-sky-400 font-medium">({selectedExamPaper.difficultyTier})</span>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => setShowOfficialMarkScheme(!showOfficialMarkScheme)}
+                        className="rounded-xl border border-sky-500/40 bg-sky-900/40 px-3 py-1.5 text-xs font-bold text-sky-200 hover:bg-sky-800/60 transition cursor-pointer"
+                      >
+                        {showOfficialMarkScheme ? 'Hide Mark Scheme' : 'Reveal Mark Scheme Directly'}
+                      </button>
+                    </div>
+
+                    {/* Question Prompt */}
+                    <div className="space-y-2">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        Official Question Paper Statement:
+                      </span>
+                      <MathRenderer
+                        content={selectedExamPaper.questionPrompt}
+                        className="text-sm text-slate-100 font-medium leading-relaxed"
+                      />
+                      {selectedExamPaper.diagramOrMath && (
+                        <div className="rounded-xl border border-slate-800 bg-slate-950 p-3 text-center overflow-x-auto">
+                          <MathRenderer content={`$$${selectedExamPaper.diagramOrMath}$$`} className="text-sm font-bold text-sky-300" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Direct Mark Scheme Reveal (if requested) */}
+                    {showOfficialMarkScheme && (
+                      <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/30 p-4 space-y-2 animate-fadeIn">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                            <CheckCircle className="h-4 w-4" />
+                            Official Mark Scheme Steps:
+                          </span>
+                          <span className="text-xs font-mono font-bold text-white">
+                            Final Answer: {selectedExamPaper.finalAnswer}
+                          </span>
+                        </div>
+                        <div className="space-y-1.5 pt-1">
+                          {selectedExamPaper.markScheme.map((m, idx) => (
+                            <div key={idx} className="flex items-start gap-2 text-xs text-slate-200">
+                              <span className="font-mono font-bold text-indigo-400 shrink-0">{m.markType}</span>
+                              <MathRenderer content={m.requirement} />
+                            </div>
+                          ))}
+                        </div>
+                        {selectedExamPaper.examinerReportSnippet && (
+                          <div className="mt-2 rounded-lg border border-amber-500/20 bg-amber-950/30 p-2.5 text-xs text-amber-200">
+                            <strong>Principal Examiner Report Advice:</strong> {selectedExamPaper.examinerReportSnippet}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Student Answer Input Box */}
+                    <div className="pt-2 border-t border-sky-500/20 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="text-[11px] font-bold uppercase tracking-wider text-sky-300 flex items-center gap-1.5">
+                          <Edit3 className="h-3.5 w-3.5" />
+                          Test Yourself: Enter Your Working or Final Answer to be Graded:
+                        </label>
+                        <span className="text-[10px] text-slate-400">Total Available: [{selectedExamPaper.marks} Marks]</span>
+                      </div>
+                      <textarea
+                        rows={3}
+                        value={studentExamAnswer}
+                        onChange={(e) => setStudentExamAnswer(e.target.value)}
+                        placeholder="Type your answer, numerical value, or working steps here (e.g. 'Distance = 39.0 km' or show your calculations)..."
+                        className="w-full rounded-xl border border-sky-500/40 bg-slate-950 p-3 text-sm text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none"
+                      />
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={handleGradeExamAnswer}
+                          disabled={!studentExamAnswer.trim()}
+                          className="rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-md hover:from-sky-500 hover:to-indigo-500 transition cursor-pointer disabled:opacity-50"
+                        >
+                          Grade My Answer Against Official Mark Scheme
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Grading Assessment Report Card */}
+                    {examGradingResult && (
+                      <div className="rounded-2xl border border-indigo-500/40 bg-slate-950 p-5 space-y-4 shadow-xl animate-fadeIn">
+                        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
+                          <div className="flex items-center gap-2">
+                            <Award className="h-6 w-6 text-amber-400" />
+                            <div>
+                              <h4 className="text-sm font-bold text-white">Cambridge Examiner Assessment</h4>
+                              <p className="text-[11px] text-slate-400">Graded against official {selectedExamPaper.paperCode} mark scheme</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="rounded-xl bg-indigo-500/20 border border-indigo-500/30 px-3 py-1 text-sm font-extrabold text-indigo-300">
+                              Score: {examGradingResult.marksEarned} / {examGradingResult.totalMarks} Marks ({examGradingResult.percentage}%)
+                            </span>
+                            <span className="rounded-xl bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-1 text-xs font-bold text-emerald-300">
+                              {examGradingResult.verdict}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Marks Breakdown Table */}
+                        <div className="space-y-2">
+                          <span className="text-xs font-bold uppercase tracking-wider text-slate-300">
+                            Marks Awarded Breakdown:
+                          </span>
+                          <div className="space-y-1.5">
+                            {examGradingResult.marksBreakdown.map((m, idx) => (
+                              <div
+                                key={idx}
+                                className={`rounded-xl border p-3 text-xs flex items-start justify-between gap-3 ${
+                                  m.awarded
+                                    ? 'border-emerald-500/30 bg-emerald-950/20 text-emerald-200'
+                                    : 'border-rose-500/30 bg-rose-950/20 text-rose-200'
+                                }`}
+                              >
+                                <div>
+                                  <div className="flex items-center gap-1.5 font-bold mb-0.5">
+                                    <span className="font-mono">{m.markType}</span>
+                                    <span>{m.awarded ? '✅ [AWARDED]' : '❌ [LOST]'}</span>
+                                  </div>
+                                  <p className="text-slate-300">{m.requirement}</p>
+                                  <p className="text-[11px] text-slate-400 mt-1 italic">{m.feedback}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Missing Marks Guidance */}
+                        {examGradingResult.missingMarksExplained.length > 0 && (
+                          <div className="rounded-xl border border-amber-500/30 bg-amber-950/20 p-4 space-y-2">
+                            <span className="text-xs font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
+                              <AlertTriangle className="h-4 w-4" />
+                              What Was Missing & Exact Phrasing Needed for Full Marks:
+                            </span>
+                            <div className="space-y-2 pt-1 text-xs text-amber-100">
+                              {examGradingResult.missingMarksExplained.map((miss, idx) => (
+                                <div key={idx} className="rounded-lg bg-amber-950/40 p-2.5 border border-amber-500/20 space-y-1">
+                                  <p><strong>Missing {miss.markType}:</strong> {miss.whatWasMissing}</p>
+                                  <p className="text-emerald-300 font-semibold">👉 {miss.whatToWriteToGetMark}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Official Final Answer Comparison */}
+                        <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-3.5 flex flex-wrap items-center justify-between gap-2 text-xs">
+                          <div>
+                            <span className="text-slate-400">Official Final Answer: </span>
+                            <span className="font-mono font-bold text-white">${selectedExamPaper.finalAnswer}$</span>
+                          </div>
+                          <div>
+                            <span className="text-slate-400">Your Answer: </span>
+                            <span className="font-mono font-bold text-slate-200">"{studentExamAnswer}"</span>
+                          </div>
+                        </div>
+
+                        {selectedExamPaper.examinerReportSnippet && (
+                          <div className="text-xs text-slate-400 italic">
+                            💡 <strong>Examiner Report Advice:</strong> {selectedExamPaper.examinerReportSnippet}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="rounded-2xl border border-dashed border-slate-800 bg-slate-950/50 p-8 text-center text-slate-400">
+                    <BookOpen className="mx-auto h-8 w-8 text-sky-400 mb-2 opacity-80" />
+                    <p className="text-sm font-bold text-slate-300">Select an exam question above or search by code.</p>
+                    <p className="text-xs text-slate-500 mt-1">Try typing "0580/42 Q6", "0620/42 Q7", or "0625/41 Q2".</p>
+                  </div>
+                )}
+              </div>
+            ) : solverMode === 'solve' ? (
               <div>
                 <textarea
                   rows={3}
@@ -532,7 +850,7 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
                     </>
                   )}
                 </button>
-              ) : (
+              ) : solverMode === 'handwritten' ? (
                 <button
                   type="button"
                   onClick={handleGradeHandwritten}
@@ -551,7 +869,7 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
                     </>
                   )}
                 </button>
-              )}
+              ) : null}
             </div>
 
             {/* Popup Blocker Fallback Tip */}

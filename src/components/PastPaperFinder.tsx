@@ -28,10 +28,12 @@ import {
   TrendingUp,
   RefreshCw,
   Copy,
-  Check
+  Check,
+  Edit3
 } from 'lucide-react';
 import { Subject, UserProfile, PastPaperItem, BookmarkItem, OfficialPaperPdf } from '../types';
 import { getAllPastPapers, getPaperDownloadUrl, OFFICIAL_PAST_PAPER_PDFS } from '../data/pastPapersData';
+import { evaluateStudentAnswerAgainstMarkScheme, ExamGradingResult } from '../services/examQuestionEngine';
 import { MathRenderer } from './MathRenderer';
 import { isSubjectMatch } from '../utils/subjectMatcher';
 
@@ -92,6 +94,18 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
   const [selectedVariant, setSelectedVariant] = useState<string>('All');
   const [selectedTier, setSelectedTier] = useState<string>('All');
   const [copiedQuestionId, setCopiedQuestionId] = useState<string | null>(null);
+
+  // Interactive Answer Grading State
+  const [testingPaperId, setTestingPaperId] = useState<string | null>(null);
+  const [studentAnswers, setStudentAnswers] = useState<Record<string, string>>({});
+  const [gradingReports, setGradingReports] = useState<Record<string, ExamGradingResult>>({});
+
+  const handleGradePaperAnswer = (paper: PastPaperItem) => {
+    const studentAns = studentAnswers[paper.id] || '';
+    if (!studentAns.trim()) return;
+    const report = evaluateStudentAnswerAgainstMarkScheme(paper, studentAns);
+    setGradingReports((prev) => ({ ...prev, [paper.id]: report }));
+  };
 
   // Reset topic whenever active subject or board changes
   useEffect(() => {
@@ -481,7 +495,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             placeholder={
               activeTab === 'pdf-library'
                 ? "Search paper code (0580/42), subject name, session (May/June 2023), variant..."
-                : "Search keywords, bearings, chemical formulas, or paper ref (e.g. 0580/42 May 2023)..."
+                : "Search by Exam Code & Q# (e.g. 0580/42 Q6, 0620/42 Q7, 4MA1 Q12) or topic..."
             }
             className="w-full rounded-xl border border-slate-700 bg-slate-950 py-3 pl-10 pr-10 text-sm text-white placeholder-slate-500 focus:border-sky-500 focus:outline-none"
           />
@@ -494,6 +508,36 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             </button>
           )}
         </div>
+
+        {/* Quick Exam Code & Q# Lookup shortcuts */}
+        {activeTab === 'questions' && (
+          <div className="flex flex-wrap items-center gap-1.5 pt-0.5 text-xs">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1 shrink-0">
+              <Sparkles className="h-3 w-3" />
+              Quick Exam Q Lookup:
+            </span>
+            {[
+              { label: '0580/42 Q6(b) (Bearings)', query: '0580/42 Q6' },
+              { label: '0580/42 Q7(c) (Sequences)', query: '0580/42 Q7' },
+              { label: '0580/22 Q14 (Circle Theorems)', query: '0580/22 Q14' },
+              { label: '0620/42 Q7 (Redox)', query: '0620/42 Q7' },
+              { label: '0625/41 Q2 (Momentum)', query: '0625/41 Q2' },
+              { label: '0610/41 Q3 (Osmosis)', query: '0610/41 Q3' },
+              { label: '4MA1/1H Q12 (Functions)', query: '4MA1/1H Q12' },
+              { label: '0478/12 Q5 (RLE)', query: '0478/12 Q5' },
+              { label: '0510/12 Q4 (Summary)', query: '0510/12 Q4' },
+            ].map((shortcut, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => setSearchQuery(shortcut.query)}
+                className="rounded-lg border border-sky-500/30 bg-sky-950/40 px-2 py-0.5 text-[11px] text-sky-200 hover:border-sky-400 hover:bg-sky-900/60 transition cursor-pointer"
+              >
+                {shortcut.label}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Detailed 6-Column Filter Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 text-xs">
@@ -1197,6 +1241,20 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                         </button>
                       )}
 
+                      {/* Grade My Answer Button */}
+                      <button
+                        onClick={() => setTestingPaperId(testingPaperId === paper.id ? null : paper.id)}
+                        className={`rounded-xl border px-3 py-1.5 text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                          testingPaperId === paper.id
+                            ? 'border-emerald-500/50 bg-emerald-500/20 text-emerald-300'
+                            : 'border-slate-700 bg-slate-800/80 text-emerald-400 hover:bg-slate-700 hover:text-white'
+                        }`}
+                        title="Enter your answer and get instant Cambridge marks"
+                      >
+                        <Award className="h-3.5 w-3.5" />
+                        <span>Grade My Answer</span>
+                      </button>
+
                       {/* Solve in AI */}
                       {onOpenSolverWithQuestion && (
                         <button
@@ -1273,6 +1331,99 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                       {paper.diagramOrMath && (
                         <div className="rounded-xl border border-slate-800 bg-slate-950 p-3 text-center overflow-x-auto">
                           <MathRenderer content={`$$${paper.diagramOrMath}$$`} className="text-sm font-bold text-sky-300" />
+                        </div>
+                      )}
+
+                      {/* Interactive Student Answer Grading Drawer */}
+                      {testingPaperId === paper.id && (
+                        <div className="mt-3 rounded-xl border border-emerald-500/30 bg-slate-950/90 p-4 space-y-3 animate-fadeIn">
+                          <div className="flex items-center justify-between">
+                            <label className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                              <Edit3 className="h-4 w-4" />
+                              Test Yourself: Enter Your Working or Final Answer:
+                            </label>
+                            <span className="text-xs text-slate-400">Total Marks: [{paper.marks}]</span>
+                          </div>
+                          <textarea
+                            rows={2}
+                            value={studentAnswers[paper.id] || ''}
+                            onChange={(e) => setStudentAnswers((prev) => ({ ...prev, [paper.id]: e.target.value }))}
+                            placeholder={`Enter your answer or working for ${paper.questionNumber} to be evaluated against official Cambridge mark scheme...`}
+                            className="w-full rounded-xl border border-slate-700 bg-slate-900 p-3 text-xs sm:text-sm text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none"
+                          />
+                          <div className="flex items-center justify-between flex-wrap gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleGradePaperAnswer(paper)}
+                              disabled={!(studentAnswers[paper.id] || '').trim()}
+                              className="rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-2 text-xs font-bold text-white shadow-md hover:from-emerald-500 hover:to-teal-500 transition cursor-pointer disabled:opacity-50"
+                            >
+                              Grade My Answer Against Official MS
+                            </button>
+                            <span className="text-[11px] text-slate-500">Instant step-by-step marking with [M], [A], [B] allocations</span>
+                          </div>
+
+                          {/* Grading Report */}
+                          {gradingReports[paper.id] && (
+                            <div className="rounded-xl border border-emerald-500/30 bg-slate-900/95 p-4 space-y-3 text-xs mt-3 animate-fadeIn">
+                              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2">
+                                <span className="font-bold text-white flex items-center gap-1.5">
+                                  <Award className="h-4 w-4 text-amber-400" />
+                                  Official Examiner Evaluation:
+                                </span>
+                                <div className="flex items-center gap-2">
+                                  <span className="rounded-lg bg-indigo-500/20 border border-indigo-500/30 px-2.5 py-0.5 font-bold text-indigo-300">
+                                    Mark: {gradingReports[paper.id].marksEarned} / {gradingReports[paper.id].totalMarks} ({gradingReports[paper.id].percentage}%)
+                                  </span>
+                                  <span className="rounded-lg bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 font-semibold text-emerald-300">
+                                    {gradingReports[paper.id].verdict}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Step-by-step marks awarded */}
+                              <div className="space-y-1.5">
+                                {gradingReports[paper.id].marksBreakdown.map((m, idx) => (
+                                  <div
+                                    key={idx}
+                                    className={`p-2.5 rounded-lg border flex items-start justify-between gap-2 ${
+                                      m.awarded ? 'border-emerald-500/25 bg-emerald-950/20 text-emerald-200' : 'border-rose-500/25 bg-rose-950/20 text-rose-200'
+                                    }`}
+                                  >
+                                    <div>
+                                      <div className="font-bold flex items-center gap-1">
+                                        <span className="font-mono">{m.markType}</span>
+                                        <span>{m.awarded ? '✅ [AWARDED]' : '❌ [LOST]'}</span>
+                                      </div>
+                                      <p className="text-slate-300 mt-0.5">{m.requirement}</p>
+                                      <p className="text-[10px] text-slate-400 italic mt-0.5">{m.feedback}</p>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+
+                              {/* Missing marks */}
+                              {gradingReports[paper.id].missingMarksExplained.length > 0 && (
+                                <div className="rounded-lg border border-amber-500/25 bg-amber-950/20 p-3 space-y-1.5 text-amber-200">
+                                  <div className="font-bold flex items-center gap-1 text-amber-300">
+                                    <AlertCircle className="h-3.5 w-3.5" />
+                                    What Was Missing & Exact Phrasing Needed:
+                                  </div>
+                                  {gradingReports[paper.id].missingMarksExplained.map((miss, idx) => (
+                                    <div key={idx} className="pt-1">
+                                      <p><strong>{miss.markType}:</strong> {miss.whatWasMissing}</p>
+                                      <p className="text-emerald-300 font-semibold">👉 {miss.whatToWriteToGetMark}</p>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
+                              <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-800 text-[11px] text-slate-400">
+                                <div>Final Answer: <strong className="text-white">${paper.finalAnswer}$</strong></div>
+                                {paper.examinerReportSnippet && <div>💡 {paper.examinerReportSnippet}</div>}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
