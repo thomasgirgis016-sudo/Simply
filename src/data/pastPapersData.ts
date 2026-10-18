@@ -1,10 +1,14 @@
 import { PastPaperItem, OfficialPaperPdf } from '../types';
 
 export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
+  // ─────────────────────────────────────────────────────────────
+  // 1. MATHEMATICS (CIE 0580)
+  // ─────────────────────────────────────────────────────────────
   {
     id: 'pp-math-1',
     subjectId: 'cie-math-0580',
     subjectName: 'Mathematics',
+    subjectCode: '0580',
     board: 'CIE',
     session: 'May/June 2023 Paper 42',
     paperCode: '0580/42',
@@ -30,6 +34,7 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
     id: 'pp-math-2',
     subjectId: 'cie-math-0580',
     subjectName: 'Mathematics',
+    subjectCode: '0580',
     board: 'CIE',
     session: 'Oct/Nov 2022 Paper 42',
     paperCode: '0580/42',
@@ -54,6 +59,7 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
     id: 'pp-math-3',
     subjectId: 'cie-math-0580',
     subjectName: 'Mathematics',
+    subjectCode: '0580',
     board: 'CIE',
     session: 'May/June 2022 Paper 42',
     paperCode: '0580/42',
@@ -76,9 +82,122 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
     examinerReportSnippet: 'Vector proofs are regularly among the lowest-scoring questions on Paper 4. Candidates fail to explicitly state that the vectors share a common point.'
   },
   {
+    id: 'pp-math-4',
+    subjectId: 'cie-math-0580',
+    subjectName: 'Mathematics',
+    subjectCode: '0580',
+    board: 'CIE',
+    session: 'May/June 2024 Paper 41',
+    paperCode: '0580/41',
+    year: 2024,
+    questionNumber: 'Q5(a)',
+    topic: 'Mensuration: Cones & Frustums',
+    difficultyTier: 'Grade 9 Challenge',
+    snippetQuery: 'frustum cone volume water depth radius similar triangles ratio',
+    questionPrompt: 'A solid cone has radius $12\\text{ cm}$ and height $30\\text{ cm}$. A smaller cone of height $10\\text{ cm}$ is cut from the top to form a frustum.\n(i) Show that the radius of the smaller cone is $4\\text{ cm}$.\n(ii) Calculate the volume of the remaining frustum. Give your answer in terms of $\\pi$.',
+    diagramOrMath: 'V_{\\text{frustum}} = \\frac{1}{3}\\pi R^2 H - \\frac{1}{3}\\pi r^2 h',
+    marks: 5,
+    markScheme: [
+      { markType: '[B1]', requirement: 'Using similar triangles: $\\frac{r}{12} = \\frac{10}{30} \\implies r = 4\\text{ cm}$' },
+      { markType: '[M1]', requirement: 'Volume of large cone = $\\frac{1}{3}\\pi (12)^2 (30) = 1440\\pi$' },
+      { markType: '[M1]', requirement: 'Volume of small cone = $\\frac{1}{3}\\pi (4)^2 (10) = \\frac{160}{3}\\pi$' },
+      { markType: '[M1]', requirement: 'Subtracting volumes: $1440\\pi - \\frac{160}{3}\\pi = \\frac{4160}{3}\\pi$' },
+      { markType: '[A1]', requirement: '$V = \\frac{4160}{3}\\pi\\text{ cm}^3$ or $1386.7\\pi\\text{ cm}^3$ (or approx $4356\\text{ cm}^3$)' }
+    ],
+    finalAnswer: '$\\frac{4160}{3}\\pi\\text{ cm}^3$ (approx $4356\\text{ cm}^3$)',
+    examinerReportSnippet: 'Candidates often cubed linear scale factor $k = 1/3$ correctly ($k^3 = 1/27$), but multiplied it by the whole cone without subtracting from the original.'
+  },
+  {
+    id: 'pp-math-5',
+    subjectId: 'cie-math-0580',
+    subjectName: 'Mathematics',
+    subjectCode: '0580',
+    board: 'CIE',
+    session: 'Oct/Nov 2023 Paper 22',
+    paperCode: '0580/22',
+    year: 2023,
+    questionNumber: 'Q14',
+    topic: 'Circle Theorems',
+    difficultyTier: 'Standard Extended',
+    snippetQuery: 'circle theorem tangent radius cyclic quadrilateral alternate segment theorem',
+    questionPrompt: '$A, B, C$ and $D$ lie on the circumference of a circle, center $O$. Line $TAT\\prime$ is a tangent to the circle at $A$.\nAngle $TAB = 62°$ and angle $CBD = 34°$.\n(i) State angle $ADB$ and give a geometrical reason.\n(ii) Find angle $BCD$.',
+    diagramOrMath: '\\angle ADB = \\angle TAB = 62° \\quad (\\text{Alternate Segment Theorem})',
+    marks: 4,
+    markScheme: [
+      { markType: '[B1]', requirement: '$\\angle ADB = 62°$' },
+      { markType: '[B1]', requirement: 'Reason: Alternate segment theorem' },
+      { markType: '[M1]', requirement: 'In cyclic quadrilateral $ABCD$, opposite angles sum to $180°$' },
+      { markType: '[A1]', requirement: '$\\angle BCD = 180° - 62° = 118°$' }
+    ],
+    finalAnswer: '(i) $62°$ (Alternate segment theorem); (ii) $118°$ (Opposite angles of cyclic quad sum to $180°$)',
+    examinerReportSnippet: 'The alternate segment theorem remains the least recognized circle theorem on Paper 2. Candidates frequently guessed "tangent meets radius at 90°".'
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // 2. ADDITIONAL MATHEMATICS (CIE 0606)
+  // ─────────────────────────────────────────────────────────────
+  {
+    id: 'pp-addmath-1',
+    subjectId: 'cie-addmath-0606',
+    subjectName: 'Additional Mathematics',
+    subjectCode: '0606',
+    board: 'CIE',
+    session: 'May/June 2023 Paper 12',
+    paperCode: '0606/12',
+    year: 2023,
+    questionNumber: 'Q7',
+    topic: 'Calculus: Product & Quotient Rule',
+    difficultyTier: 'Grade 9 Challenge',
+    snippetQuery: 'additional maths product rule quotient rule e^2x ln x derivative stationary point',
+    questionPrompt: 'A curve has equation $y = x^2 e^{-3x}$.\n(i) Find $\\frac{dy}{dx}$ in fully factorised form.\n(ii) Hence find the exact coordinates of the non-zero stationary point and determine its nature.',
+    diagramOrMath: '\\frac{dy}{dx} = 2x e^{-3x} - 3x^2 e^{-3x} = x e^{-3x}(2 - 3x)',
+    marks: 6,
+    markScheme: [
+      { markType: '[M1]', requirement: 'Apply product rule: $u = x^2, v = e^{-3x} \\implies u\\prime = 2x, v\\prime = -3e^{-3x}$' },
+      { markType: '[A1]', requirement: '$\\frac{dy}{dx} = 2x e^{-3x} - 3x^2 e^{-3x} = x e^{-3x}(2 - 3x)$' },
+      { markType: '[M1]', requirement: 'Set $\\frac{dy}{dx} = 0 \\implies x(2 - 3x) = 0 \\implies x = \\frac{2}{3}$' },
+      { markType: '[A1]', requirement: '$y = \\left(\\frac{2}{3}\\right)^2 e^{-3(2/3)} = \\frac{4}{9}e^{-2}$. Point is $\\left(\\frac{2}{3}, \\frac{4}{9e^2}\\right)$' },
+      { markType: '[M1]', requirement: 'Second derivative test or sign test around $x = 2/3$' },
+      { markType: '[A1]', requirement: '$\\frac{d^2y}{dx^2} < 0 \\implies$ Local Maximum' }
+    ],
+    finalAnswer: 'Stationary point at $\\left(\\frac{2}{3}, \\frac{4}{9}e^{-2}\\right)$, which is a local maximum.',
+    examinerReportSnippet: 'Candidates frequently missed the negative sign when differentiating $e^{-3x}$ (chain rule error) or did not factor out $x e^{-3x}$ cleanly.'
+  },
+  {
+    id: 'pp-addmath-2',
+    subjectId: 'cie-addmath-0606',
+    subjectName: 'Additional Mathematics',
+    subjectCode: '0606',
+    board: 'CIE',
+    session: 'Oct/Nov 2022 Paper 22',
+    paperCode: '0606/22',
+    year: 2022,
+    questionNumber: 'Q4',
+    topic: 'Permutations & Combinations',
+    difficultyTier: 'Grade 9 Challenge',
+    snippetQuery: 'permutations combinations team selection committee boys girls restrictions',
+    questionPrompt: 'A committee of 6 people is to be selected from a group of 7 men and 5 women.\nCalculate the number of different ways to form the committee if:\n(i) There are no restrictions.\n(ii) The committee must contain at least 4 women.',
+    diagramOrMath: '^{12}C_6 \\quad \\text{and} \\quad ^5C_4 \\times ^7C_2 + ^5C_5 \\times ^7C_1',
+    marks: 4,
+    markScheme: [
+      { markType: '[M1]', requirement: 'Total ways without restriction = $^{12}C_6 = \\frac{12!}{6!6!} = 924$' },
+      { markType: '[A1]', requirement: '$924$ ways' },
+      { markType: '[M1]', requirement: 'Case 1 (4 women, 2 men): $^5C_4 \\times ^7C_2 = 5 \\times 21 = 105$' },
+      { markType: '[M1]', requirement: 'Case 2 (5 women, 1 man): $^5C_5 \\times ^7C_1 = 1 \\times 7 = 7$' },
+      { markType: '[A1]', requirement: 'Total = $105 + 7 = 112$ ways' }
+    ],
+    finalAnswer: '(i) $924$ ways; (ii) $112$ ways',
+    examinerReportSnippet: 'Common error: Candidates used permutations ($^{12}P_6$) instead of combinations ($^{12}C_6$), indicating a fundamental misunderstanding of order vs grouping.'
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // 3. CHEMISTRY (CIE 0620 & EDEXCEL 4CH1)
+  // ─────────────────────────────────────────────────────────────
+  {
     id: 'pp-chem-1',
     subjectId: 'cie-chem-0620',
     subjectName: 'Chemistry',
+    subjectCode: '0620',
     board: 'CIE',
     session: 'Oct/Nov 2022 Paper 42',
     paperCode: '0620/42',
@@ -103,6 +222,7 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
     id: 'pp-chem-2',
     subjectId: 'cie-chem-0620',
     subjectName: 'Chemistry',
+    subjectCode: '0620',
     board: 'CIE',
     session: 'May/June 2023 Paper 41',
     paperCode: '0620/41',
@@ -124,9 +244,40 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
     examinerReportSnippet: 'Common error: Writing that sodium metal forms at the cathode. Candidates must know that hydrogen is below sodium in the reactivity series.'
   },
   {
+    id: 'pp-chem-3',
+    subjectId: 'cie-chem-0620',
+    subjectName: 'Chemistry',
+    subjectCode: '0620',
+    board: 'CIE',
+    session: 'May/June 2024 Paper 42',
+    paperCode: '0620/42',
+    year: 2024,
+    questionNumber: 'Q3',
+    topic: 'Stoichiometry & Mole Concept',
+    difficultyTier: 'Grade 9 Challenge',
+    snippetQuery: 'moles limiting reactant gas volume 24 dm3 yield percentage concentration titration',
+    questionPrompt: '$4.8\\text{ g}$ of magnesium ribbon is reacted with $150\\text{ cm}^3$ of $2.0\\text{ mol/dm}^3$ hydrochloric acid:\n$$Mg(s) + 2HCl(aq) \\rightarrow MgCl_2(aq) + H_2(g)$$\n(i) Determine which reactant is in excess.\n(ii) Calculate the maximum volume of hydrogen gas produced at room temperature and pressure (r.t.p.).',
+    diagramOrMath: 'n = \\frac{m}{M_r} \\quad \\text{and} \\quad n = C \\times V',
+    marks: 5,
+    markScheme: [
+      { markType: '[M1]', requirement: '$\\text{Moles of } Mg = \\frac{4.8}{24} = 0.20\\text{ mol}$' },
+      { markType: '[M1]', requirement: '$\\text{Moles of } HCl = 2.0 \\times 0.150 = 0.30\\text{ mol}$' },
+      { markType: '[A1]', requirement: '$0.20\\text{ mol } Mg$ requires $0.40\\text{ mol } HCl$. Since only $0.30\\text{ mol}$ is present, $HCl$ is limiting and $Mg$ is in excess' },
+      { markType: '[M1]', requirement: '$\\text{Moles of } H_2 = \\frac{1}{2} \\times 0.30 = 0.15\\text{ mol}$' },
+      { markType: '[A1]', requirement: '$\\text{Volume of } H_2 = 0.15 \\times 24\\text{ dm}^3 = 3.6\\text{ dm}^3$ ($3600\\text{ cm}^3$)' }
+    ],
+    finalAnswer: '(i) Magnesium is in excess; (ii) $3.6\\text{ dm}^3$ of $H_2$ gas',
+    examinerReportSnippet: 'Candidates frequently based the gas volume on the excess reactant ($Mg$) rather than the limiting reactant ($HCl$), losing 2 marks.'
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // 4. PHYSICS (CIE 0625 & EDEXCEL 4PH1)
+  // ─────────────────────────────────────────────────────────────
+  {
     id: 'pp-phys-1',
     subjectId: 'cie-physics-0625',
     subjectName: 'Physics',
+    subjectCode: '0625',
     board: 'CIE',
     session: 'Oct/Nov 2023 Paper 42',
     paperCode: '0625/42',
@@ -152,6 +303,7 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
     id: 'pp-phys-2',
     subjectId: 'cie-physics-0625',
     subjectName: 'Physics',
+    subjectCode: '0625',
     board: 'CIE',
     session: 'May/June 2023 Paper 41',
     paperCode: '0625/41',
@@ -173,9 +325,40 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
     examinerReportSnippet: 'Candidates frequently inverted Snell’s formula or left the critical angle as $\\sin(c) = 0.65$ without performing the inverse sine $\\sin^{-1}$.'
   },
   {
+    id: 'pp-phys-3',
+    subjectId: 'cie-physics-0625',
+    subjectName: 'Physics',
+    subjectCode: '0625',
+    board: 'CIE',
+    session: 'May/June 2024 Paper 42',
+    paperCode: '0625/42',
+    year: 2024,
+    questionNumber: 'Q7',
+    topic: 'Electricity & Circuits',
+    difficultyTier: 'Grade 9 Challenge',
+    snippetQuery: 'potential divider thermistor ldr resistance voltage drop ratio ohm law',
+    questionPrompt: 'A potential divider circuit consists of a fixed $1200\\,\\Omega$ resistor in series with a thermistor across a $9.0\\text{ V}$ d.c. power supply.\n(i) At $20°\\text{C}$, the resistance of the thermistor is $2400\\,\\Omega$. Calculate the potential difference across the thermistor.\n(ii) The temperature of the thermistor increases to $80°\\text{C}$. State and explain what happens to the output voltage across the fixed $1200\\,\\Omega$ resistor.',
+    diagramOrMath: 'V_{\\text{out}} = V_{\\text{in}} \\times \\frac{R_2}{R_1 + R_2}',
+    marks: 5,
+    markScheme: [
+      { markType: '[M1]', requirement: 'Total resistance $R_{\\text{total}} = 1200 + 2400 = 3600\\,\\Omega$' },
+      { markType: '[M1]', requirement: '$V_{\\text{thermistor}} = 9.0 \\times \\frac{2400}{3600} = 6.0\\text{ V}$' },
+      { markType: '[A1]', requirement: '$6.0\\text{ V}$' },
+      { markType: '[B1]', requirement: 'As temperature increases, thermistor resistance decreases' },
+      { markType: '[A1]', requirement: 'Total circuit resistance decreases $\\implies$ current increases $\\implies$ voltage across fixed resistor increases' }
+    ],
+    finalAnswer: '(i) $6.0\\text{ V}$; (ii) Output voltage across fixed resistor increases because thermistor resistance drops.',
+    examinerReportSnippet: 'Candidates regularly confuse LDRs and thermistors with standard resistors, incorrectly stating that thermistor resistance increases when heated.'
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // 5. BIOLOGY (CIE 0610 & EDEXCEL 4BI1)
+  // ─────────────────────────────────────────────────────────────
+  {
     id: 'pp-bio-1',
     subjectId: 'cie-bio-0610',
     subjectName: 'Biology',
+    subjectCode: '0610',
     board: 'CIE',
     session: 'May/June 2023 Paper 41',
     paperCode: '0610/41',
@@ -197,9 +380,40 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
     examinerReportSnippet: 'Examiners noted that many candidates stated potometers measure "photosynthesis" rather than transpiration/water uptake.'
   },
   {
+    id: 'pp-bio-2',
+    subjectId: 'cie-bio-0610',
+    subjectName: 'Biology',
+    subjectCode: '0610',
+    board: 'CIE',
+    session: 'Oct/Nov 2023 Paper 42',
+    paperCode: '0610/42',
+    year: 2023,
+    questionNumber: 'Q5(b)',
+    topic: 'Genetics & Inheritance',
+    difficultyTier: 'Grade 9 Challenge',
+    snippetQuery: 'codominance blood groups ABO genotype phenotype alleles IA IB IO Punnett square',
+    questionPrompt: 'A woman with blood group A whose father had blood group O marries a man with blood group B whose mother had blood group O.\n(i) State the genotypes of both parents.\n(ii) Draw a genetic diagram (Punnett square) to determine the probability that their first child will have blood group O.',
+    diagramOrMath: 'I^A I^O \\times I^B I^O \\implies I^A I^B, I^A I^O, I^B I^O, I^O I^O',
+    marks: 5,
+    markScheme: [
+      { markType: '[B1]', requirement: 'Woman genotype: $I^A I^O$ (received $I^O$ from father)' },
+      { markType: '[B1]', requirement: 'Man genotype: $I^B I^O$ (received $I^O$ from mother)' },
+      { markType: '[M1]', requirement: 'Correct gametes: $I^A, I^O$ and $I^B, I^O$' },
+      { markType: '[M1]', requirement: 'Offspring genotypes: $I^A I^B$ (AB), $I^A I^O$ (A), $I^B I^O$ (B), $I^O I^O$ (O)' },
+      { markType: '[A1]', requirement: 'Probability of blood group O = $1/4$ ($25\\%$ or $0.25$)' }
+    ],
+    finalAnswer: 'Genotypes: $I^A I^O$ and $I^B I^O$; Probability of child having blood group O is $25\\%$.',
+    examinerReportSnippet: 'Candidates lost marks for incorrect allele notation (e.g. writing "AO" and "BO" instead of official Cambridge codominant notation $I^A I^O$).'
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // 6. COMPUTER SCIENCE (CIE 0478 & EDEXCEL 4CP0)
+  // ─────────────────────────────────────────────────────────────
+  {
     id: 'pp-cs-1',
     subjectId: 'cie-cs-0478',
     subjectName: 'Computer Science',
+    subjectCode: '0478',
     board: 'CIE',
     session: 'Oct/Nov 2023 Paper 12',
     paperCode: '0478/12',
@@ -221,9 +435,39 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
     examinerReportSnippet: 'Candidates often identified that the result did not fit, but failed to mention the flip in the most significant bit (MSB) indicating an overflow error.'
   },
   {
+    id: 'pp-cs-2',
+    subjectId: 'cie-cs-0478',
+    subjectName: 'Computer Science',
+    subjectCode: '0478',
+    board: 'CIE',
+    session: 'May/June 2024 Paper 22',
+    paperCode: '0478/22',
+    year: 2024,
+    questionNumber: 'Q4',
+    topic: 'Algorithms & Logic Gates',
+    difficultyTier: 'Grade 9 Challenge',
+    snippetQuery: 'trace table logic gates boolean expression XOR NAND truth table bubble sort',
+    questionPrompt: 'A security system activates an alarm ($X = 1$) if:\n- The motion sensor ($A = 1$) is active AND the system is armed ($B = 1$),\nOR\n- The door sensor ($C = 1$) is triggered while the bypass switch ($D = 0$) is NOT set.\n(i) Write the Boolean logic expression for $X$.\n(ii) Complete the truth table row for inputs $A=1, B=1, C=0, D=1$.',
+    diagramOrMath: 'X = (A \\land B) \\lor (C \\land \\neg D)',
+    marks: 4,
+    markScheme: [
+      { markType: '[B1]', requirement: 'Expression part 1: $(A \\text{ AND } B)$ or $A \\cdot B$' },
+      { markType: '[B1]', requirement: 'Expression part 2: $(C \\text{ AND NOT } D)$ or $C \\cdot \\overline{D}$' },
+      { markType: '[B1]', requirement: 'Full expression: $X = (A \\text{ AND } B) \\text{ OR } (C \\text{ AND NOT } D)$' },
+      { markType: '[A1]', requirement: 'Evaluation: $(1 \\cdot 1) + (0 \\cdot 0) = 1 + 0 = 1$. Alarm activates ($X = 1$)' }
+    ],
+    finalAnswer: '$X = (A \\text{ AND } B) \\text{ OR } (C \\text{ AND NOT } D)$; Output $X = 1$',
+    examinerReportSnippet: 'A common mistake was misinterpreting the bypass switch condition, writing $C \\text{ AND } D$ rather than testing for $D = 0$ ($NOT D$).'
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // 7. ENGLISH AS A SECOND LANGUAGE (CIE 0510 & EDEXCEL 4ES1)
+  // ─────────────────────────────────────────────────────────────
+  {
     id: 'pp-esl-1',
     subjectId: 'cie-esl-0510',
     subjectName: 'English as a Second Language',
+    subjectCode: '0510',
     board: 'CIE',
     session: 'May/June 2023 Paper 22',
     paperCode: '0510/22',
@@ -243,9 +487,37 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
     examinerReportSnippet: 'Exceeding the 120-word limit resulted in examiners stopping reading after line 120, costing candidates valuable content marks.'
   },
   {
+    id: 'pp-esl-2',
+    subjectId: 'cie-esl-0510',
+    subjectName: 'English as a Second Language',
+    subjectCode: '0510',
+    board: 'CIE',
+    session: 'Oct/Nov 2023 Paper 22',
+    paperCode: '0510/22',
+    year: 2023,
+    questionNumber: 'Exercise 6',
+    topic: 'Formal Article & Report Writing',
+    difficultyTier: 'Grade 9 Challenge',
+    snippetQuery: 'formal article school magazine youth volunteering community benefits register idioms',
+    questionPrompt: 'Your school principal wants to encourage more students to take part in community volunteering projects.\nWrite an article for your school magazine about the benefits of volunteering for young people.\nIn your article, discuss:\n- The practical skills and confidence students gain\n- The positive impact on local residents and charities\n- Ways students can get involved during term time.\nWrite about 150 to 200 words in an appropriate formal yet engaging tone.',
+    diagramOrMath: '150 - 200 \\text{ words} \\implies 8 \\text{ Content} + 8 \\text{ Language}',
+    marks: 16,
+    markScheme: [
+      { markType: '[Content 1-8]', requirement: 'Fully addresses all 3 prompt bullets with convincing details, persuasive arguments, and realistic recommendations.' },
+      { markType: '[Language 1-8]', requirement: 'Band 4 (7-8 marks): Broad range of sophisticated vocabulary, precise collocations, varied complex sentences, clear paragraphing, and flawless formal register.' }
+    ],
+    finalAnswer: 'A high-scoring formal school magazine article with sophisticated discourse markers (furthermore, conversely, fundamentally).',
+    examinerReportSnippet: 'Candidates who wrote in an overly informal email register (using slang or contracted forms like "gonna/wanna") were penalized in the Language mark band.'
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // 8. ECONOMICS (CIE 0455 & EDEXCEL 4EC1)
+  // ─────────────────────────────────────────────────────────────
+  {
     id: 'pp-econ-1',
     subjectId: 'cie-econ-0455',
     subjectName: 'Economics',
+    subjectCode: '0455',
     board: 'CIE',
     session: 'May/June 2023 Paper 22',
     paperCode: '0455/22',
@@ -267,9 +539,37 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
     examinerReportSnippet: 'Many students calculated PED without percentage changes (using raw differences instead), leading to inaccurate values.'
   },
   {
+    id: 'pp-econ-2',
+    subjectId: 'cie-econ-0455',
+    subjectName: 'Economics',
+    subjectCode: '0455',
+    board: 'CIE',
+    session: 'May/June 2024 Paper 22',
+    paperCode: '0455/22',
+    year: 2024,
+    questionNumber: 'Q4(d)',
+    topic: 'Monetary & Fiscal Policy',
+    difficultyTier: 'Grade 9 Challenge',
+    snippetQuery: 'monetary policy interest rates inflation unemployment economic growth central bank',
+    questionPrompt: 'Discuss whether an increase in central bank interest rates will always reduce the rate of inflation in an economy.\n[8 marks]',
+    diagramOrMath: 'r \\uparrow \\implies I \\downarrow, C \\downarrow \\implies AD \\downarrow \\implies \\text{Inflation } \\downarrow',
+    marks: 8,
+    markScheme: [
+      { markType: '[Analysis 1-4]', requirement: 'Why it reduces inflation: Higher borrowing costs lower consumer credit and firm investment; higher savings reward lowers aggregate demand ($AD$); currency appreciation lowers import costs.' },
+      { markType: '[Evaluation 1-4]', requirement: 'Why it might NOT work: Cost-push inflation (rising energy/raw material prices) is unaffected by interest rates; time lags (up to 18 months); if consumer confidence is buoyant, spending continues.' }
+    ],
+    finalAnswer: 'Balanced evaluative response concluding interest rates curb demand-pull inflation effectively but fail against external cost-push shocks.',
+    examinerReportSnippet: 'One-sided answers that only explained why interest rates reduce inflation were restricted to a maximum of 4 out of 8 marks.'
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // 9. EDEXCEL MATHEMATICS A (4MA1)
+  // ─────────────────────────────────────────────────────────────
+  {
     id: 'pp-edx-math-1',
     subjectId: 'edx-math-4ma1',
     subjectName: 'Mathematics A',
+    subjectCode: '4MA1',
     board: 'Edexcel',
     session: 'Jan 2024 Paper 1H',
     paperCode: '4MA1/1H',
@@ -290,9 +590,209 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
     ],
     finalAnswer: '$(1, 10)$ is a local maximum; $(2, 9)$ is a local minimum.',
     examinerReportSnippet: 'Students frequently found the x-coordinates but forgot to substitute back into original equation to find the corresponding y-coordinates.'
+  },
+  {
+    id: 'pp-edx-math-2',
+    subjectId: 'edx-math-4ma1',
+    subjectName: 'Mathematics A',
+    subjectCode: '4MA1',
+    board: 'Edexcel',
+    session: 'June 2023 Paper 2H',
+    paperCode: '4MA1/2H',
+    year: 2023,
+    questionNumber: 'Q21',
+    topic: 'Algebra & Quadratics',
+    difficultyTier: 'Grade 9 Challenge',
+    snippetQuery: 'algebraic fraction simultaneous non linear circle line intersection',
+    questionPrompt: 'Solve the simultaneous equations:\n$$x^2 + y^2 = 34$$\n$$2x - y = 1$$',
+    diagramOrMath: 'y = 2x - 1 \\implies x^2 + (2x - 1)^2 = 34',
+    marks: 5,
+    markScheme: [
+      { markType: '[M1]', requirement: 'Rearrange linear equation: $y = 2x - 1$' },
+      { markType: '[M1]', requirement: 'Substitute into circle equation: $x^2 + (2x - 1)^2 = 34 \\implies x^2 + 4x^2 - 4x + 1 = 34$' },
+      { markType: '[M1]', requirement: 'Simplify quadratic: $5x^2 - 4x - 33 = 0 \\implies (5x + 11)(x - 3) = 0$' },
+      { markType: '[A1]', requirement: '$x = 3 \\text{ or } x = -2.2$' },
+      { markType: '[A1]', requirement: 'Corresponding y-values: $(3, 5)$ and $(-2.2, -5.4)$' }
+    ],
+    finalAnswer: '$x = 3, y = 5$ and $x = -2.2, y = -5.4$',
+    examinerReportSnippet: 'A common expansion error was $(2x - 1)^2 = 4x^2 + 1$, completely dropping the middle $-4x$ term.'
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // 10. BUSINESS STUDIES (CIE 0450 & EDEXCEL 4BS1)
+  // ─────────────────────────────────────────────────────────────
+  {
+    id: 'pp-bus-1',
+    subjectId: 'cie-business-0450',
+    subjectName: 'Business Studies',
+    subjectCode: '0450',
+    board: 'CIE',
+    session: 'May/June 2023 Paper 22',
+    paperCode: '0450/22',
+    year: 2023,
+    questionNumber: 'Q3(a)',
+    topic: 'Financial Decisions: Break-Even',
+    difficultyTier: 'Standard Extended',
+    snippetQuery: 'break even margin of safety contribution fixed costs variable cost price',
+    questionPrompt: 'Apex Bakery produces artisan sourdough bread. The following financial data is provided:\n- Fixed costs per month: $6,000\n- Variable cost per loaf: $1.50\n- Selling price per loaf: $4.50\n- Current monthly production: 2,500 loaves\n(i) Calculate the monthly break-even level of output in loaves.\n(ii) Calculate the monthly margin of safety at current production.',
+    diagramOrMath: '\\text{Break-Even} = \\frac{\\text{Fixed Costs}}{\\text{Selling Price} - \\text{Variable Cost}}',
+    marks: 4,
+    markScheme: [
+      { markType: '[M1]', requirement: 'Contribution per unit = $\\$4.50 - \\$1.50 = \\$3.00$' },
+      { markType: '[A1]', requirement: 'Break-even output = $\\frac{\\$6000}{\\$3.00} = 2,000\\text{ loaves}$' },
+      { markType: '[M1]', requirement: 'Margin of safety = Current output - Break-even output = $2500 - 2000$' },
+      { markType: '[A1]', requirement: 'Margin of safety = $500\\text{ loaves}$' }
+    ],
+    finalAnswer: '(i) $2,000\\text{ loaves}$; (ii) Margin of safety = $500\\text{ loaves}$',
+    examinerReportSnippet: 'Candidates often wrote the margin of safety as a dollar amount ($\\$500) rather than in units produced (500 loaves).'
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // 11. HISTORY (CIE 0470)
+  // ─────────────────────────────────────────────────────────────
+  {
+    id: 'pp-hist-1',
+    subjectId: 'cie-history-0470',
+    subjectName: 'History',
+    subjectCode: '0470',
+    board: 'CIE',
+    session: 'May/June 2023 Paper 12',
+    paperCode: '0470/12',
+    year: 2023,
+    questionNumber: 'Q6(c)',
+    topic: 'The Cold War: Cuban Missile Crisis',
+    difficultyTier: 'Grade 9 Challenge',
+    snippetQuery: 'cuban missile crisis kennedy khrushchev blockade brinkmanship success failure',
+    questionPrompt: 'How far was the Cuban Missile Crisis a victory for President Kennedy? Explain your answer.\n[10 marks]',
+    diagramOrMath: '\\text{Victory (Missile removal, public image) vs Compromise (Secret Turkey removal, Cuba sovereign)}',
+    marks: 10,
+    markScheme: [
+      { markType: '[L3 (4-6)]', requirement: 'Explains Kennedy victory: Khrushchev backed down publicly; Soviet missiles removed from Cuba; restored Kennedy prestige after Bay of Pigs; demonstrated strength of US naval quarantine.' },
+      { markType: '[L4 (7-9)]', requirement: 'Explains compromises/Khrushchev gains: Kennedy pledged USA would never invade Cuba (Castro remained in power on US doorstep); secret deal to remove US Jupiter missiles from Turkey within 6 months.' },
+      { markType: '[L5 (10)]', requirement: 'Nuanced judgement evaluating long-term geopolitical outcomes: Kennedy achieved immediate PR triumph and averted nuclear war, but at the cost of secret concessions.' }
+    ],
+    finalAnswer: 'Well-structured comparative evaluation demonstrating Kennedy achieved tactical public triumph while making critical private strategic concessions.',
+    examinerReportSnippet: 'Unbalanced answers that merely narrated the events of October 1962 without weighing the criteria of "victory" were capped at Level 2 (3 marks).'
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // 12. GEOGRAPHY (CIE 0460)
+  // ─────────────────────────────────────────────────────────────
+  {
+    id: 'pp-geog-1',
+    subjectId: 'cie-geography-0460',
+    subjectName: 'Geography',
+    subjectCode: '0460',
+    board: 'CIE',
+    session: 'Oct/Nov 2023 Paper 12',
+    paperCode: '0460/12',
+    year: 2023,
+    questionNumber: 'Q3(c)',
+    topic: 'Rivers: Meander & Oxbow Lake Formation',
+    difficultyTier: 'Standard Extended',
+    snippetQuery: 'river meander oxbow lake hydraulic action abrasion thalweg deposition neck cut off',
+    questionPrompt: 'Explain how an oxbow lake is formed from a meandering river. You may include labeled diagrams in your answer.\n[7 marks]',
+    diagramOrMath: '\\text{Erosion on outer bend} \\rightarrow \\text{Deposition on inner bend} \\rightarrow \\text{Narrow neck breached in flood}',
+    marks: 7,
+    markScheme: [
+      { markType: '[Level 1 (1-2)]', requirement: 'Basic statements: Water flows around a bend; water cuts through during a flood; lake is left behind.' },
+      { markType: '[Level 2 (3-5)]', requirement: 'Detailed processes: Fast flow (thalweg) on outer bend causes hydraulic action and abrasion, forming river cliff. Slow flow on inner bend causes friction and deposition of slip-off slope. Meander neck narrows over time.' },
+      { markType: '[Level 3 (6-7)]', requirement: 'Comprehensive sequence: During flooding, high discharge breaches the narrow neck creating a straight cutoff. Deposition of alluvium seals off the old loop, forming an isolated oxbow lake.' }
+    ],
+    finalAnswer: 'Complete sequential explanation showing hydraulic action on outer bank, inner deposition, flood breach of neck, and alluvium sealing.',
+    examinerReportSnippet: 'Candidates who did not explain WHY the neck was breached (neglecting to mention flood conditions or maximum hydraulic energy) could not achieve Level 3.'
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // 13. ACCOUNTING (CIE 0452)
+  // ─────────────────────────────────────────────────────────────
+  {
+    id: 'pp-acc-1',
+    subjectId: 'cie-accounting-0452',
+    subjectName: 'Accounting',
+    subjectCode: '0452',
+    board: 'CIE',
+    session: 'May/June 2023 Paper 22',
+    paperCode: '0452/22',
+    year: 2023,
+    questionNumber: 'Q2',
+    topic: 'Correction of Errors & Suspense Account',
+    difficultyTier: 'Grade 9 Challenge',
+    snippetQuery: 'suspense account error of commission omission reversal trial balance journal entries',
+    questionPrompt: 'A trial balance failed to agree, with total debits exceeding credits by $480. A suspense account was opened.\nThe following errors were subsequently discovered:\n1. Cash sales of $350 had been entered in the sales account as $530.\n2. Motor expenses of $120 had been debited to the motor vehicles account.\n3. No entry had been made for bank interest received of $80.\nPrepare the journal entries to correct errors 1, 2, and 3. Narratives are not required.',
+    diagramOrMath: '\\text{Debit: Sales } \\$180, \\text{ Credit: Suspense } \\$180',
+    marks: 6,
+    markScheme: [
+      { markType: '[M1]', requirement: 'Error 1 Debit: Sales account $180' },
+      { markType: '[A1]', requirement: 'Error 1 Credit: Suspense account $180' },
+      { markType: '[M1]', requirement: 'Error 2 Debit: Motor expenses account $120' },
+      { markType: '[A1]', requirement: 'Error 2 Credit: Motor vehicles account $120 (Principle error, does not affect suspense)' },
+      { markType: '[M1]', requirement: 'Error 3 Debit: Bank account $80' },
+      { markType: '[A1]', requirement: 'Error 3 Credit: Bank interest received account $80 (Omission error)' }
+    ],
+    finalAnswer: 'Error 1: Dr Sales $180, Cr Suspense $180; Error 2: Dr Motor Expenses $120, Cr Motor Vehicles $120; Error 3: Dr Bank $80, Cr Interest Received $80',
+    examinerReportSnippet: 'Many candidates incorrectly put Error 2 (error of principle) through the suspense account, even though the trial balance balanced for that transaction.'
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // 14. ENVIRONMENTAL MANAGEMENT (CIE 0680)
+  // ─────────────────────────────────────────────────────────────
+  {
+    id: 'pp-env-1',
+    subjectId: 'cie-environ-0680',
+    subjectName: 'Environmental Management',
+    subjectCode: '0680',
+    board: 'CIE',
+    session: 'Oct/Nov 2023 Paper 12',
+    paperCode: '0680/12',
+    year: 2023,
+    questionNumber: 'Q4',
+    topic: 'Managing Water Resources',
+    difficultyTier: 'Standard Extended',
+    snippetQuery: 'desalination reverse osmosis water security environmental impacts brine marine life',
+    questionPrompt: 'An arid coastal country relies on reverse osmosis desalination plants for its potable water supply.\n(i) Describe the process of reverse osmosis in desalination.\n(ii) Discuss two environmental problems associated with the large-scale discharge of waste brine back into the ocean.',
+    diagramOrMath: '\\text{Salt water pushed under high pressure across semi-permeable membrane}',
+    marks: 5,
+    markScheme: [
+      { markType: '[B1]', requirement: 'High pressure is applied to saline seawater' },
+      { markType: '[B1]', requirement: 'Water molecules are forced across a semi-permeable membrane that blocks dissolved salts and ions' },
+      { markType: '[B1]', requirement: 'Problem 1: Hyper-saline brine is denser than regular seawater, sinking to the seabed and suffocating benthic marine organisms.' },
+      { markType: '[B1]', requirement: 'Problem 2: Waste brine contains chemical treatment residues (chlorine, anti-scalants, heavy metals) toxic to local reef and fish species.' },
+      { markType: '[B1]', requirement: 'Thermal pollution: Warm brine reduces dissolved oxygen concentration in shallow coastal waters.' }
+    ],
+    finalAnswer: 'Pressure forces water through semi-permeable membrane; Dense sinking brine creates anoxic zones and chemical toxicity for coral reefs.',
+    examinerReportSnippet: 'Candidates often wrote "it makes the sea too salty" without specifying that hyper-saline brine sinks to the seabed and kills bottom-dwelling organisms.'
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // 15. SOCIOLOGY (CIE 0495)
+  // ─────────────────────────────────────────────────────────────
+  {
+    id: 'pp-soc-1',
+    subjectId: 'cie-sociology-0495',
+    subjectName: 'Sociology',
+    subjectCode: '0495',
+    board: 'CIE',
+    session: 'May/June 2023 Paper 12',
+    paperCode: '0495/12',
+    year: 2023,
+    questionNumber: 'Q1(f)',
+    topic: 'Research Methods & Theory',
+    difficultyTier: 'Grade 9 Challenge',
+    snippetQuery: 'participant observation overt covert positivism interpretivism hawthorne effect validity',
+    questionPrompt: 'Explain two advantages and two limitations of using covert participant observation in sociological research.\n[8 marks]',
+    diagramOrMath: '\\text{Covert Observation: High validity, no Hawthorne effect vs Ethical consent & Danger}',
+    marks: 8,
+    markScheme: [
+      { markType: '[Advantage 1 (2)]', requirement: 'High ecological validity / avoids Hawthorne effect: Subjects behave completely naturally in their real environment because they are unaware of being observed.' },
+      { markType: '[Advantage 2 (2)]', requirement: 'Access to closed or deviant groups: Allows researchers to observe criminal gangs, religious cults, or secretive institutions that would reject overt researchers.' },
+      { markType: '[Limitation 1 (2)]', requirement: 'Severe ethical issues: Involves deception and lack of informed consent; participants\' privacy and rights are violated.' },
+      { markType: '[Limitation 2 (2)]', requirement: 'Difficulty in recording data: Fieldnotes cannot be taken openly, relying on memory which introduces recall bias; potential physical danger if researcher\'s cover is blown.' }
+    ],
+    finalAnswer: 'Advantages: Eliminates Hawthorne effect, accesses closed groups. Limitations: Lack of informed consent (deception), unreliable retrospective note-taking.',
+    examinerReportSnippet: 'Candidates who confused "overt" (open) with "covert" (hidden) lost all credit for the explanation.'
   }
 ];
-
 export function getCustomPastPapers(): PastPaperItem[] {
   try {
     const raw = localStorage.getItem('simply_igcse_custom_past_papers');

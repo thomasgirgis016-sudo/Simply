@@ -26,7 +26,9 @@ import {
   Maximize2,
   BarChart2,
   TrendingUp,
-  RefreshCw
+  RefreshCw,
+  Copy,
+  Check
 } from 'lucide-react';
 import { Subject, UserProfile, PastPaperItem, BookmarkItem, OfficialPaperPdf } from '../types';
 import { getAllPastPapers, getPaperDownloadUrl, OFFICIAL_PAST_PAPER_PDFS } from '../data/pastPapersData';
@@ -83,11 +85,18 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBoard, setSelectedBoard] = useState<'All' | 'CIE' | 'Edexcel'>('All');
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>(activeSubject.id);
+  const [selectedTopic, setSelectedTopic] = useState<string>('All');
   const [selectedYear, setSelectedYear] = useState<string>('All');
   const [selectedSession, setSelectedSession] = useState<string>('All');
   const [selectedPaperNumber, setSelectedPaperNumber] = useState<string>('All');
   const [selectedVariant, setSelectedVariant] = useState<string>('All');
   const [selectedTier, setSelectedTier] = useState<string>('All');
+  const [copiedQuestionId, setCopiedQuestionId] = useState<string | null>(null);
+
+  // Reset topic whenever active subject or board changes
+  useEffect(() => {
+    setSelectedTopic('All');
+  }, [selectedSubjectId, selectedBoard]);
 
   // Pagination / Page Limit for rendering performance
   const [pageLimit, setPageLimit] = useState<number>(24);
@@ -98,6 +107,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
   }, [
     selectedBoard,
     selectedSubjectId,
+    selectedTopic,
     selectedYear,
     selectedSession,
     selectedPaperNumber,
@@ -242,6 +252,27 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
     return filteredPdfs.slice(0, pageLimit);
   }, [filteredPdfs, pageLimit]);
 
+  // Available topics for active subject & board filters
+  const availableTopics = useMemo(() => {
+    const allPapers = getAllPastPapers();
+    const filtered = allPapers.filter((paper) => {
+      if (selectedBoard !== 'All' && paper.board !== selectedBoard) return false;
+      if (selectedSubjectId !== 'all') {
+        const matchesSub =
+          paper.subjectId === selectedSubjectId ||
+          paper.subjectCode?.toLowerCase() === selectedSubjectId.toLowerCase();
+        if (!matchesSub) return false;
+      }
+      return true;
+    });
+
+    const topicSet = new Set<string>();
+    filtered.forEach((p) => {
+      if (p.topic) topicSet.add(p.topic);
+    });
+    return Array.from(topicSet).sort();
+  }, [selectedBoard, selectedSubjectId]);
+
   // ==========================================
   // 2. FILTERING FOR QUESTION SNIPPETS
   // ==========================================
@@ -256,8 +287,13 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
       if (selectedSubjectId !== 'all') {
         const matchesSub =
           paper.subjectId === selectedSubjectId ||
-          isSubjectMatch(paper.subjectId, activeSubject);
+          paper.subjectCode?.toLowerCase() === selectedSubjectId.toLowerCase();
         if (!matchesSub) return false;
+      }
+
+      // Topic filter
+      if (selectedTopic !== 'All' && paper.topic !== selectedTopic) {
+        return false;
       }
 
       // Year filter
@@ -296,7 +332,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
   }, [
     selectedBoard,
     selectedSubjectId,
-    activeSubject,
+    selectedTopic,
     selectedYear,
     selectedSession,
     selectedTier,
@@ -307,6 +343,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
     setSearchQuery('');
     setSelectedBoard('All');
     setSelectedSubjectId('all');
+    setSelectedTopic('All');
     setSelectedYear('All');
     setSelectedSession('All');
     setSelectedPaperNumber('All');
@@ -343,6 +380,17 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
       subtitle,
       type
     });
+  };
+
+  const handleCopyQuestion = (paper: PastPaperItem) => {
+    const msLines = paper.markScheme?.map((m) => `${m.markType}: ${m.requirement}`).join('\n') || '';
+    const textToCopy = `[${paper.paperCode} ${paper.session} - ${paper.questionNumber}] (${paper.marks} Marks)\nTopic: ${paper.topic} | Tier: ${paper.difficultyTier}\n\nQUESTION:\n${paper.questionPrompt || paper.questionText}\n\nMARK SCHEME & EXPLANATION:\n${msLines}\n\nFinal Answer: ${paper.finalAnswer || 'N/A'}${paper.examinerReportSnippet ? `\n\nPrincipal Examiner Report Advice:\n${paper.examinerReportSnippet}` : ''}`;
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(textToCopy).catch(() => {});
+    }
+    setCopiedQuestionId(paper.id);
+    setTimeout(() => setCopiedQuestionId(null), 2500);
   };
 
   // Active URL in modal (considering backup mirror toggle)
@@ -528,45 +576,165 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             </select>
           </div>
 
-          {/* 5. Paper Component Filter (Paper 1, 2, 3, 4, 5, 6) */}
-          <div>
-            <label className="text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center justify-between">
-              <span>Paper Number</span>
-              {selectedPaperNumber !== 'All' && <span className="text-[9px] text-sky-300">Active</span>}
-            </label>
-            <select
-              value={selectedPaperNumber}
-              onChange={(e) => setSelectedPaperNumber(e.target.value)}
-              className="w-full rounded-xl border border-sky-500/40 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
-            >
-              <option value="All">All Papers</option>
-              <option value="1">Paper 1 (MCQ / Short / Foundation)</option>
-              <option value="2">Paper 2 (Extended / Theory / Calculator)</option>
-              <option value="3">Paper 3 (Core Structured)</option>
-              <option value="4">Paper 4 (Extended Theory / Calc)</option>
-              <option value="5">Paper 5 (Practical Test)</option>
-              <option value="6">Paper 6 (Alternative to Practical)</option>
-            </select>
-          </div>
+          {/* 5 & 6: Context-Sensitive Filters depending on active tab */}
+          {activeTab === 'pdf-library' ? (
+            <>
+              {/* 5. Paper Component Filter (Paper 1, 2, 3, 4, 5, 6) */}
+              <div>
+                <label className="text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center justify-between">
+                  <span>Paper Number</span>
+                  {selectedPaperNumber !== 'All' && <span className="text-[9px] text-sky-300">Active</span>}
+                </label>
+                <select
+                  value={selectedPaperNumber}
+                  onChange={(e) => setSelectedPaperNumber(e.target.value)}
+                  className="w-full rounded-xl border border-sky-500/40 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
+                >
+                  <option value="All">All Papers</option>
+                  <option value="1">Paper 1 (MCQ / Short / Foundation)</option>
+                  <option value="2">Paper 2 (Extended / Theory / Calculator)</option>
+                  <option value="3">Paper 3 (Core Structured)</option>
+                  <option value="4">Paper 4 (Extended Theory / Calc)</option>
+                  <option value="5">Paper 5 (Practical Test)</option>
+                  <option value="6">Paper 6 (Alternative to Practical)</option>
+                </select>
+              </div>
 
-          {/* 6. Variant Filter (1, 2, 3 & Regional) */}
-          <div>
-            <label className="text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center justify-between">
-              <span>Variant</span>
-              {selectedVariant !== 'All' && <span className="text-[9px] text-sky-300">Active</span>}
-            </label>
-            <select
-              value={selectedVariant}
-              onChange={(e) => setSelectedVariant(e.target.value)}
-              className="w-full rounded-xl border border-sky-500/40 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
-            >
-              <option value="All">All Variants (1, 2, 3 & Regional)</option>
-              <option value="1">Variant 1 (e.g. 11, 21, 41 / Standard)</option>
-              <option value="2">Variant 2 (e.g. 12, 22, 42 / Regional "R")</option>
-              <option value="3">Variant 3 (e.g. 13, 23, 43)</option>
-            </select>
-          </div>
+              {/* 6. Variant Filter (1, 2, 3 & Regional) */}
+              <div>
+                <label className="text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center justify-between">
+                  <span>Variant</span>
+                  {selectedVariant !== 'All' && <span className="text-[9px] text-sky-300">Active</span>}
+                </label>
+                <select
+                  value={selectedVariant}
+                  onChange={(e) => setSelectedVariant(e.target.value)}
+                  className="w-full rounded-xl border border-sky-500/40 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
+                >
+                  <option value="All">All Variants (1, 2, 3 & Regional)</option>
+                  <option value="1">Variant 1 (e.g. 11, 21, 41 / Standard)</option>
+                  <option value="2">Variant 2 (e.g. 12, 22, 42 / Regional "R")</option>
+                  <option value="3">Variant 3 (e.g. 13, 23, 43)</option>
+                </select>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* 5. Classified Topic Filter */}
+              <div>
+                <label className="text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center justify-between">
+                  <span>Classified Topic</span>
+                  {selectedTopic !== 'All' && <span className="text-[9px] text-sky-300">Active</span>}
+                </label>
+                <select
+                  value={selectedTopic}
+                  onChange={(e) => setSelectedTopic(e.target.value)}
+                  className="w-full rounded-xl border border-sky-500/40 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
+                >
+                  <option value="All">All Topics ({availableTopics.length})</option>
+                  {availableTopics.map((topic) => (
+                    <option key={topic} value={topic}>
+                      {topic}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 6. Difficulty Tier Filter */}
+              <div>
+                <label className="text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center justify-between">
+                  <span>Difficulty Tier</span>
+                  {selectedTier !== 'All' && <span className="text-[9px] text-sky-300">Active</span>}
+                </label>
+                <select
+                  value={selectedTier}
+                  onChange={(e) => setSelectedTier(e.target.value)}
+                  className="w-full rounded-xl border border-sky-500/40 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
+                >
+                  <option value="All">All Difficulty Tiers</option>
+                  <option value="Grade 9 Challenge">Grade 9 Challenge / Hard</option>
+                  <option value="Extended">Extended</option>
+                  <option value="Standard Extended">Standard Extended</option>
+                  <option value="Core">Core / Foundation</option>
+                </select>
+              </div>
+            </>
+          )}
         </div>
+
+        {/* Quick Topic Pills Bar (when viewing Classified Question Finder) */}
+        {activeTab === 'questions' && availableTopics.length > 0 && (
+          <div className="pt-3 border-t border-slate-800/80">
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <Tag className="h-3.5 w-3.5 text-sky-400" />
+                Quick Filter by Topic ({availableTopics.length} topics):
+              </span>
+              {selectedTopic !== 'All' && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedTopic('All')}
+                  className="text-[11px] text-sky-400 hover:text-sky-300 underline font-medium cursor-pointer"
+                >
+                  Clear topic filter
+                </button>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto pr-1">
+              <button
+                type="button"
+                onClick={() => setSelectedTopic('All')}
+                className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+                  selectedTopic === 'All'
+                    ? 'bg-sky-500 text-white shadow-sm ring-1 ring-sky-400'
+                    : 'bg-slate-800/70 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700/60'
+                }`}
+              >
+                <span>All Topics</span>
+                <span className={`rounded-full px-1.5 py-0.2 text-[10px] font-mono ${selectedTopic === 'All' ? 'bg-sky-900/90 text-sky-100' : 'bg-slate-900 text-slate-400'}`}>
+                  {getAllPastPapers().filter((p) => {
+                    if (selectedBoard !== 'All' && p.board !== selectedBoard) return false;
+                    if (selectedSubjectId !== 'all') {
+                      const matches = p.subjectId === selectedSubjectId || p.subjectCode?.toLowerCase() === selectedSubjectId.toLowerCase();
+                      if (!matches) return false;
+                    }
+                    return true;
+                  }).length}
+                </span>
+              </button>
+              {availableTopics.map((top) => {
+                const count = getAllPastPapers().filter(
+                  (p) =>
+                    (selectedBoard === 'All' || p.board === selectedBoard) &&
+                    (selectedSubjectId === 'all' || p.subjectId === selectedSubjectId || p.subjectCode?.toLowerCase() === selectedSubjectId.toLowerCase()) &&
+                    p.topic === top
+                ).length;
+                const isSelected = selectedTopic === top;
+                return (
+                  <button
+                    key={top}
+                    type="button"
+                    onClick={() => setSelectedTopic(isSelected ? 'All' : top)}
+                    className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+                      isSelected
+                        ? 'bg-sky-500 text-white shadow-sm ring-1 ring-sky-400'
+                        : 'bg-slate-800/70 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700/60'
+                    }`}
+                  >
+                    <span>{top}</span>
+                    <span
+                      className={`rounded-full px-1.5 py-0.2 text-[10px] font-mono ${
+                        isSelected ? 'bg-sky-900/90 text-sky-100' : 'bg-slate-900 text-slate-400'
+                      }`}
+                    >
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Action & Results count bar */}
         <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-800 text-xs">
@@ -581,9 +749,12 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             ) : (
               <span>
                 Showing <strong className="text-white">{filteredPapers.length}</strong> official past paper questions
+                {selectedTopic !== 'All' && (
+                  <span className="ml-1 text-sky-400 font-medium">in topic "{selectedTopic}"</span>
+                )}
               </span>
             )}
-            {(selectedBoard !== 'All' || selectedSubjectId !== 'all' || selectedYear !== 'All' || selectedSession !== 'All' || selectedPaperNumber !== 'All' || selectedVariant !== 'All' || selectedTier !== 'All' || searchQuery) && (
+            {(selectedBoard !== 'All' || selectedSubjectId !== 'all' || selectedTopic !== 'All' || selectedYear !== 'All' || selectedSession !== 'All' || selectedPaperNumber !== 'All' || selectedVariant !== 'All' || selectedTier !== 'All' || searchQuery) && (
               <button
                 onClick={handleResetFilters}
                 className="flex items-center gap-1 text-sky-400 hover:text-sky-300 font-semibold cursor-pointer underline ml-2"
@@ -914,15 +1085,27 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               <FileText className="mx-auto h-12 w-12 text-slate-600 mb-3" />
               <h4 className="text-base font-bold text-slate-300">No past paper questions matched these filter criteria.</h4>
               <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-                Try switching Exam Board to "All Boards", clearing the search term, or selecting "All Subjects".
+                {selectedTopic !== 'All' 
+                  ? `No questions found under topic "${selectedTopic}". Try choosing "All Topics" or resetting filters.`
+                  : 'Try switching Exam Board to "All Boards", clearing the search term, or selecting "All Subjects".'}
               </p>
-              <button
-                onClick={handleResetFilters}
-                className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-sky-600 px-4 py-2 text-xs font-bold text-white hover:bg-sky-500 transition cursor-pointer"
-              >
-                <RotateCcw className="h-3.5 w-3.5" />
-                Reset All Filters
-              </button>
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+                {selectedTopic !== 'All' && (
+                  <button
+                    onClick={() => setSelectedTopic('All')}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-sky-500/30 bg-sky-500/10 px-3.5 py-2 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition cursor-pointer"
+                  >
+                    Clear Topic: "{selectedTopic}"
+                  </button>
+                )}
+                <button
+                  onClick={handleResetFilters}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-sky-600 px-4 py-2 text-xs font-bold text-white hover:bg-sky-500 transition cursor-pointer"
+                >
+                  <RotateCcw className="h-3.5 w-3.5" />
+                  Reset All Filters
+                </button>
+              </div>
             </div>
           ) : (
             filteredPapers.map((paper) => {
@@ -948,14 +1131,49 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                       <span className="text-slate-500">•</span>
                       <span className="text-xs text-slate-300 font-semibold">{paper.subjectName}</span>
                       <span className="text-slate-500">•</span>
-                      <span className="text-xs text-slate-400 font-medium">{paper.topic}</span>
-                      <span className={`rounded-md px-2 py-0.5 text-[10px] font-bold border ${getTierBadge(paper.difficultyTier)}`}>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedTopic(paper.topic)}
+                        className="text-xs text-sky-400 hover:text-sky-300 hover:underline font-medium transition cursor-pointer"
+                        title={`Filter questions by topic: ${paper.topic}`}
+                      >
+                        {paper.topic}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedTier(paper.difficultyTier)}
+                        className={`rounded-md px-2 py-0.5 text-[10px] font-bold border cursor-pointer hover:opacity-85 transition ${getTierBadge(paper.difficultyTier)}`}
+                        title={`Filter questions by tier: ${paper.difficultyTier}`}
+                      >
                         {paper.difficultyTier}
-                      </span>
+                      </button>
                     </div>
 
                     {/* Top Right Actions */}
                     <div className="flex items-center gap-2 self-end md:self-auto flex-wrap">
+                      {/* Copy Question & Mark Scheme */}
+                      <button
+                        onClick={() => handleCopyQuestion(paper)}
+                        className={`p-2 rounded-xl border transition cursor-pointer flex items-center gap-1 text-xs font-semibold ${
+                          copiedQuestionId === paper.id
+                            ? 'border-emerald-500/40 bg-emerald-500/20 text-emerald-300'
+                            : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
+                        }`}
+                        title="Copy Question & Mark Scheme text to clipboard"
+                      >
+                        {copiedQuestionId === paper.id ? (
+                          <>
+                            <Check className="h-4 w-4 text-emerald-400" />
+                            <span className="text-[11px] font-semibold text-emerald-300">Copied!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="h-4 w-4" />
+                            <span className="hidden sm:inline text-[11px] font-semibold">Copy</span>
+                          </>
+                        )}
+                      </button>
+
                       {/* Bookmark Toggle */}
                       <button
                         onClick={() => toggleBookmark(paper)}

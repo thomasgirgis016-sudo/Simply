@@ -209,6 +209,7 @@ export interface HandwrittenReviewResult {
 export interface PastPaperItem {
   id: string;
   subjectId: string;
+  subjectCode?: string;
   subjectName: string;
   board: ExamBoard;
   session: string; // e.g. "May/June 2023 Paper 42"
