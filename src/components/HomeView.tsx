@@ -32,6 +32,7 @@ import { Subject, UserProfile, BookmarkItem, UserAccount } from '../types';
 import { PAST_PAPERS_DATABASE } from '../data/pastPapersData';
 import { INITIAL_REVISION_NOTES, INITIAL_FORMULAS } from '../data/initialData';
 import { ActiveTab } from './Navbar';
+import { SimplyLogo } from './SimplyLogo';
 
 interface HomeViewProps {
   subjects: Subject[];
@@ -203,6 +204,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <div className="absolute left-1/3 bottom-0 -mb-24 h-64 w-64 rounded-full bg-pink-500/10 blur-3xl pointer-events-none" />
 
         <div className="relative z-10 max-w-4xl">
+          {/* Brand Logo Header */}
+          <div className="mb-4">
+            <SimplyLogo size="lg" />
+          </div>
+
           {/* Trust Badges */}
           <div className="flex flex-wrap items-center gap-2 mb-4">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-500/15 px-3 py-1 text-xs font-bold text-indigo-300 border border-indigo-500/30 shadow-sm">

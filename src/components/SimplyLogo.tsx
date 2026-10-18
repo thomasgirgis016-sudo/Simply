@@ -4,7 +4,7 @@ interface SimplyLogoProps {
   className?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl';
   showText?: boolean;
-  variant?: 'full' | 'icon';
+  variant?: 'full' | 'icon' | 'mark';
 }
 
 export const SimplyLogo: React.FC<SimplyLogoProps> = ({
@@ -16,23 +16,37 @@ export const SimplyLogo: React.FC<SimplyLogoProps> = ({
   const [imgError, setImgError] = useState(false);
 
   const sizeMap = {
-    sm: { img: 'h-7 w-7', text: 'text-base', sub: 'text-[9px]' },
-    md: { img: 'h-9 w-9', text: 'text-xl', sub: 'text-[10px]' },
-    lg: { img: 'h-12 w-12', text: 'text-2xl', sub: 'text-xs' },
-    xl: { img: 'h-16 w-16', text: 'text-3xl', sub: 'text-sm' },
+    sm: { img: 'h-8 w-8 sm:h-10 sm:w-10', text: 'text-lg sm:text-xl', sub: 'text-[10px]' },
+    md: { img: 'h-12 w-12 sm:h-14 sm:w-14', text: 'text-2xl sm:text-3xl', sub: 'text-xs' },
+    lg: { img: 'h-20 w-20 sm:h-24 sm:w-24', text: 'text-3xl sm:text-4xl', sub: 'text-sm' },
+    xl: { img: 'h-28 w-28 sm:h-36 sm:w-36', text: 'text-4xl sm:text-5xl', sub: 'text-base' },
   };
 
   const currentSize = sizeMap[size];
 
+  // If user requests the complete mark (icon + text from the transparent image directly)
+  if (variant === 'mark' && !imgError) {
+    return (
+      <div className={`inline-flex items-center select-none ${className}`}>
+        <img
+          src="/simply-full-white.png"
+          alt="Simply IGCSE"
+          className={`${currentSize.img} h-auto object-contain drop-shadow-lg`}
+          onError={() => setImgError(true)}
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className={`inline-flex items-center gap-2.5 select-none ${className}`}>
-      {/* Official Graduation Cap "S" Icon */}
+    <div className={`inline-flex items-center gap-3 select-none ${className}`}>
+      {/* Official Graduation Cap "S" Icon with Background Removed */}
       <div className="relative shrink-0 flex items-center justify-center">
         {!imgError ? (
           <img
             src="/simply-logo.png"
             alt="Simply IGCSE"
-            className={`${currentSize.img} object-contain rounded-xl drop-shadow-md`}
+            className={`${currentSize.img} object-contain drop-shadow-md transition-transform hover:scale-105 duration-200`}
             onError={() => setImgError(true)}
           />
         ) : (
@@ -92,18 +106,18 @@ export const SimplyLogo: React.FC<SimplyLogoProps> = ({
 
       {/* Typography: "Simply" */}
       {showText && variant === 'full' && (
-        <div className="flex flex-col leading-none">
-          <div className="flex items-center gap-1.5">
+        <div className="flex flex-col leading-none justify-center">
+          <div className="flex items-center gap-2">
             <span
               className={`font-black tracking-tight text-white ${currentSize.text} font-['Plus_Jakarta_Sans',sans-serif]`}
             >
               Simply
             </span>
-            <span className="rounded-md bg-gradient-to-r from-[#FF5E62] to-[#FFA63A] px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-slate-950 shadow-sm">
+            <span className="rounded-md bg-gradient-to-r from-[#FF5E62] to-[#FFA63A] px-2 py-0.5 text-[10px] sm:text-xs font-black uppercase tracking-wider text-slate-950 shadow-md">
               IGCSE
             </span>
           </div>
-          <span className={`font-semibold tracking-wide text-slate-400 mt-0.5 ${currentSize.sub}`}>
+          <span className={`font-semibold tracking-wide text-slate-400 mt-1 ${currentSize.sub}`}>
             AI Examination Suite
           </span>
         </div>

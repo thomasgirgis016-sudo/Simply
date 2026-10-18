@@ -155,7 +155,7 @@ export const AccountGate: React.FC<AccountGateProps> = ({
 
         {/* Brand Logo */}
         <div className="flex justify-center mb-6">
-          <SimplyLogo size="lg" />
+          <SimplyLogo size="xl" />
         </div>
 
         <span className="inline-block rounded-full bg-[#FF5E62]/15 px-3.5 py-1 text-xs font-bold text-[#FFA63A] border border-[#FF5E62]/30 mb-3">
