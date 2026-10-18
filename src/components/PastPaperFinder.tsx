@@ -23,7 +23,10 @@ import {
   Eye,
   X,
   FileDown,
-  Maximize2
+  Maximize2,
+  BarChart2,
+  TrendingUp,
+  RefreshCw
 } from 'lucide-react';
 import { Subject, UserProfile, PastPaperItem, BookmarkItem, OfficialPaperPdf } from '../types';
 import { getAllPastPapers, getPaperDownloadUrl, OFFICIAL_PAST_PAPER_PDFS } from '../data/pastPapersData';
@@ -53,10 +56,17 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
   // Modal PDF Previewer
   const [previewModal, setPreviewModal] = useState<{
     url: string;
+    backupUrl?: string;
     title: string;
     subtitle?: string;
-    type: 'qp' | 'ms' | 'er';
+    paperCode?: string;
+    type: 'qp' | 'ms' | 'er' | 'gt';
   } | null>(null);
+
+  // Viewer Engine in Modal: 'gdocs' (Universal Embed) vs 'direct'
+  const [viewerEngine, setViewerEngine] = useState<'gdocs' | 'direct'>('gdocs');
+  // Mirror toggle: primary CDN vs backup CDN
+  const [useBackupMirror, setUseBackupMirror] = useState<boolean>(false);
 
   // Close modal on Escape
   useEffect(() => {
@@ -69,12 +79,33 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [previewModal]);
 
+  // Filters State
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBoard, setSelectedBoard] = useState<'All' | 'CIE' | 'Edexcel'>('All');
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>(activeSubject.id);
   const [selectedYear, setSelectedYear] = useState<string>('All');
   const [selectedSession, setSelectedSession] = useState<string>('All');
+  const [selectedPaperNumber, setSelectedPaperNumber] = useState<string>('All');
+  const [selectedVariant, setSelectedVariant] = useState<string>('All');
   const [selectedTier, setSelectedTier] = useState<string>('All');
+
+  // Pagination / Page Limit for rendering performance
+  const [pageLimit, setPageLimit] = useState<number>(24);
+
+  // Reset page limit whenever filters change
+  useEffect(() => {
+    setPageLimit(24);
+  }, [
+    selectedBoard,
+    selectedSubjectId,
+    selectedYear,
+    selectedSession,
+    selectedPaperNumber,
+    selectedVariant,
+    selectedTier,
+    searchQuery
+  ]);
+
   const [viewMode, setViewMode] = useState<'stacked' | 'side-by-side'>('stacked');
   const [expandedPaperId, setExpandedPaperId] = useState<string | null>(null);
 
@@ -119,14 +150,14 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
   // Quick prompt suggestions
   const suggestedSearches = [
-    '0580 May June 2024 Paper 41',
-    'two cyclists bearing 040',
-    '0625 Physics Theory Extended',
-    'iron extraction blast furnace',
-    '0610 Biology Theory Extended',
-    'two complement 8 bit overflow',
-    '0455 Economics Specimen',
-    '0510 ESL Reading and Writing'
+    '0580/42 May/June 2023',
+    '0580/22 May/June 2024',
+    '0625/41 May/June 2023',
+    '0620/42 Oct/Nov 2022',
+    '0610/41 May/June 2023',
+    '0478/12 May/June 2023',
+    '0455/22 May/June 2023',
+    '0510/12 May/June 2023'
   ];
 
   // ==========================================
@@ -150,6 +181,27 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
       // Year filter
       if (selectedYear !== 'All' && pdf.year.toString() !== selectedYear) {
         return false;
+      }
+
+      // Session / Series filter
+      if (selectedSession !== 'All') {
+        if (!pdf.session.toLowerCase().includes(selectedSession.toLowerCase())) {
+          return false;
+        }
+      }
+
+      // Paper Number filter
+      if (selectedPaperNumber !== 'All' && pdf.paperNumber !== undefined) {
+        if (pdf.paperNumber.toString() !== selectedPaperNumber) {
+          return false;
+        }
+      }
+
+      // Variant filter
+      if (selectedVariant !== 'All' && pdf.variant !== undefined) {
+        if (pdf.variant.toString() !== selectedVariant) {
+          return false;
+        }
       }
 
       // Tier filter
@@ -178,9 +230,17 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
     selectedSubjectId,
     activeSubject,
     selectedYear,
+    selectedSession,
+    selectedPaperNumber,
+    selectedVariant,
     selectedTier,
     searchQuery,
   ]);
+
+  // Paginated slice
+  const displayedPdfs = useMemo(() => {
+    return filteredPdfs.slice(0, pageLimit);
+  }, [filteredPdfs, pageLimit]);
 
   // ==========================================
   // 2. FILTERING FOR QUESTION SNIPPETS
@@ -249,7 +309,10 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
     setSelectedSubjectId('all');
     setSelectedYear('All');
     setSelectedSession('All');
+    setSelectedPaperNumber('All');
+    setSelectedVariant('All');
     setSelectedTier('All');
+    setPageLimit(24);
   };
 
   const getTierBadge = (tier: string) => {
@@ -270,20 +333,37 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
     window.print();
   };
 
+  // Helper to open PDF in a new window or trigger viewer
+  const handleOpenPdf = (url: string, title: string, subtitle?: string, backupUrl?: string, type: 'qp' | 'ms' | 'er' | 'gt' = 'qp') => {
+    setUseBackupMirror(false);
+    setPreviewModal({
+      url,
+      backupUrl,
+      title,
+      subtitle,
+      type
+    });
+  };
+
+  // Active URL in modal (considering backup mirror toggle)
+  const currentModalUrl = previewModal
+    ? (useBackupMirror && previewModal.backupUrl ? previewModal.backupUrl : previewModal.url)
+    : '';
+
   return (
-    <div className="mx-auto max-w-6xl space-y-6 animate-fadeIn pb-12">
+    <div className="mx-auto max-w-6xl space-y-6 animate-fadeIn pb-16">
       {/* Top Banner */}
       <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900/90 to-sky-950/30 p-6 md:p-8 shadow-xl">
         <div className="relative z-10 max-w-3xl">
           <div className="inline-flex items-center gap-2 rounded-full bg-sky-500/10 px-3 py-1 text-xs font-semibold text-sky-300 border border-sky-500/20 mb-3">
             <Search className="h-3.5 w-3.5" />
-            <span>Official Past Papers & Question Classification Hub</span>
+            <span>Complete Exam Archive: 2018–2024 (All Papers & All Variants)</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
             Cambridge & Edexcel Past Paper PDF Library
           </h1>
           <p className="mt-2 text-sm text-slate-300 leading-relaxed">
-            Download genuine full exam Question Papers (QP), official Mark Schemes (MS), and Examiner Reports as PDFs. Or use the natural-language question finder to study classified questions by topic with method marks ($M1, A1, B1$).
+            Instant 1-click access to thousands of authentic past examination papers from <strong>2018 to 2024</strong>. Filter by <strong>Year, Exam Series, Paper Component, and Variant</strong> to get exact Question Papers (QP), official Mark Schemes (MS), Principal Examiner Reports, and Grade Thresholds.
           </p>
         </div>
 
@@ -298,9 +378,9 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             }`}
           >
             <FileDown className="h-4 w-4" />
-            <span>📑 Full Paper PDFs & Official Downloads</span>
+            <span>📑 Full Paper PDFs & Multi-Year Archive (2018–2024)</span>
             <span className="rounded-full bg-sky-950/80 px-2 py-0.5 text-[10px] font-mono text-sky-200 border border-sky-400/30">
-              {OFFICIAL_PAST_PAPER_PDFS.length} Papers
+              {OFFICIAL_PAST_PAPER_PDFS.length}+ Papers
             </span>
           </button>
 
@@ -313,7 +393,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             }`}
           >
             <Search className="h-4 w-4" />
-            <span>🔍 Question & Mark Scheme Finder</span>
+            <span>🔍 Classified Topic & Question Finder</span>
             <span className="rounded-full bg-slate-900 px-2 py-0.5 text-[10px] font-mono text-slate-400 border border-slate-700">
               {getAllPastPapers().length} Qs
             </span>
@@ -324,7 +404,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
         <div className="mt-4 pt-3 border-t border-slate-800/50">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-1.5">
             <Sparkles className="h-3 w-3 text-sky-400" />
-            Quick Shortcuts:
+            Popular Exam Papers:
           </p>
           <div className="flex flex-wrap gap-1.5">
             {suggestedSearches.map((s, idx) => (
@@ -341,7 +421,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
         </div>
       </div>
 
-      {/* Comprehensive Search & Multi-Filter Bar */}
+      {/* Comprehensive Search & Multi-Filter Bar with Year, Paper, Variant */}
       <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4 sm:p-5 shadow-xl space-y-4">
         {/* Search Input */}
         <div className="relative">
@@ -352,7 +432,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={
               activeTab === 'pdf-library'
-                ? "Search past paper code (0580/41), subject name, session (May/June 2024), or component..."
+                ? "Search paper code (0580/42), subject name, session (May/June 2023), variant..."
                 : "Search keywords, bearings, chemical formulas, or paper ref (e.g. 0580/42 May 2023)..."
             }
             className="w-full rounded-xl border border-slate-700 bg-slate-950 py-3 pl-10 pr-10 text-sm text-white placeholder-slate-500 focus:border-sky-500 focus:outline-none"
@@ -367,8 +447,8 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
           )}
         </div>
 
-        {/* Filter Rows */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5 text-xs">
+        {/* Detailed 6-Column Filter Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 text-xs">
           {/* 1. Exam Board */}
           <div>
             <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 block">
@@ -379,7 +459,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               onChange={(e) => setSelectedBoard(e.target.value as any)}
               className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
             >
-              <option value="All">All Exam Boards</option>
+              <option value="All">All Boards</option>
               <option value="CIE">Cambridge (CIE)</option>
               <option value="Edexcel">Pearson Edexcel</option>
             </select>
@@ -404,27 +484,30 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             </select>
           </div>
 
-          {/* 3. Year Filter */}
+          {/* 3. Year Filter (2018 - 2025) */}
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 block">
-              Exam Year
+            <label className="text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center justify-between">
+              <span>Exam Year</span>
+              {selectedYear !== 'All' && <span className="text-[9px] text-sky-300">Active</span>}
             </label>
             <select
               value={selectedYear}
               onChange={(e) => setSelectedYear(e.target.value)}
-              className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
+              className="w-full rounded-xl border border-sky-500/40 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
             >
-              <option value="All">All Years</option>
-              <option value="2027">2027 Specimen</option>
+              <option value="All">All Years (2018–2024)</option>
               <option value="2025">2025 Specimen</option>
               <option value="2024">2024 Series</option>
               <option value="2023">2023 Series</option>
               <option value="2022">2022 Series</option>
               <option value="2021">2021 Series</option>
+              <option value="2020">2020 Series</option>
+              <option value="2019">2019 Series</option>
+              <option value="2018">2018 Series</option>
             </select>
           </div>
 
-          {/* 4. Session / Series */}
+          {/* 4. Session / Series Filter */}
           <div>
             <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 block">
               Exam Series
@@ -435,45 +518,69 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
             >
               <option value="All">All Series</option>
-              <option value="May/June">May / June</option>
-              <option value="Oct/Nov">Oct / Nov</option>
-              <option value="Feb/March">Feb / March</option>
+              <option value="May/June">May / June (Summer - s)</option>
+              <option value="Oct/Nov">Oct / Nov (Winter - w)</option>
+              <option value="Feb/March">Feb / March (Spring - m)</option>
               <option value="Specimen">Specimen Series</option>
             </select>
           </div>
 
-          {/* 5. Difficulty Tier */}
+          {/* 5. Paper Component Filter (Paper 1, 2, 3, 4, 5, 6) */}
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 block">
-              Tier / Syllabus Level
+            <label className="text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center justify-between">
+              <span>Paper Number</span>
+              {selectedPaperNumber !== 'All' && <span className="text-[9px] text-sky-300">Active</span>}
             </label>
             <select
-              value={selectedTier}
-              onChange={(e) => setSelectedTier(e.target.value)}
-              className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
+              value={selectedPaperNumber}
+              onChange={(e) => setSelectedPaperNumber(e.target.value)}
+              className="w-full rounded-xl border border-sky-500/40 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
             >
-              <option value="All">All Tiers</option>
-              <option value="Extended">Extended Tier</option>
-              <option value="Core">Core Tier</option>
-              <option value="General">General / Single Tier</option>
-              <option value="Grade 9 Challenge">Grade 9 Challenge</option>
+              <option value="All">All Papers</option>
+              <option value="1">Paper 1 (Core / MCQ / CS)</option>
+              <option value="2">Paper 2 (Ext MCQ / Short / Structured)</option>
+              <option value="3">Paper 3 (Core Structured)</option>
+              <option value="4">Paper 4 (Ext Theory / Calc)</option>
+              <option value="5">Paper 5 (Practical Test)</option>
+              <option value="6">Paper 6 (Alt to Practical)</option>
+            </select>
+          </div>
+
+          {/* 6. Variant Filter (1, 2, 3) */}
+          <div>
+            <label className="text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center justify-between">
+              <span>Variant</span>
+              {selectedVariant !== 'All' && <span className="text-[9px] text-sky-300">Active</span>}
+            </label>
+            <select
+              value={selectedVariant}
+              onChange={(e) => setSelectedVariant(e.target.value)}
+              className="w-full rounded-xl border border-sky-500/40 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
+            >
+              <option value="All">All Variants (1, 2, 3)</option>
+              <option value="1">Variant 1 (e.g. 21, 41)</option>
+              <option value="2">Variant 2 (e.g. 22, 42)</option>
+              <option value="3">Variant 3 (e.g. 23, 43)</option>
             </select>
           </div>
         </div>
 
         {/* Action & Results count bar */}
         <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-800 text-xs">
-          <div className="flex items-center gap-2 text-slate-400">
+          <div className="flex items-center gap-2 text-slate-400 flex-wrap">
             {activeTab === 'pdf-library' ? (
               <span>
-                Showing <strong className="text-white">{filteredPdfs.length}</strong> official past paper PDF documents
+                Found <strong className="text-white">{filteredPdfs.length}</strong> past paper PDFs across 2018–2024
+                {filteredPdfs.length > displayedPdfs.length && (
+                  <span className="text-sky-400 ml-1.5">(Showing first {displayedPdfs.length})</span>
+                )}
               </span>
             ) : (
               <span>
                 Showing <strong className="text-white">{filteredPapers.length}</strong> official past paper questions
               </span>
             )}
-            {(selectedBoard !== 'All' || selectedSubjectId !== 'all' || selectedYear !== 'All' || selectedSession !== 'All' || selectedTier !== 'All' || searchQuery) && (
+            {(selectedBoard !== 'All' || selectedSubjectId !== 'all' || selectedYear !== 'All' || selectedSession !== 'All' || selectedPaperNumber !== 'All' || selectedVariant !== 'All' || selectedTier !== 'All' || searchQuery) && (
               <button
                 onClick={handleResetFilters}
                 className="flex items-center gap-1 text-sky-400 hover:text-sky-300 font-semibold cursor-pointer underline ml-2"
@@ -530,12 +637,14 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
           {/* Information callout banner */}
           <div className="rounded-2xl border border-sky-500/30 bg-gradient-to-r from-sky-950/40 to-slate-900/60 p-4 flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-sky-500/20 text-sky-300">
+              <div className="p-2 rounded-xl bg-sky-500/20 text-sky-300 shrink-0">
                 <FileDown className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs font-bold text-white">Genuine Cambridge & Edexcel PDFs Directly Available</p>
-                <p className="text-[11px] text-slate-400">All PDFs are hosted locally for zero wait time, guaranteed 100% uptime, and direct in-browser inspection.</p>
+                <p className="text-xs font-bold text-white">Full Exam Library: 2018 to 2024 (Every Paper & Variant)</p>
+                <p className="text-[11px] text-slate-400">
+                  Click <strong>Open Fullscreen</strong> to open in native viewer, or <strong>View</strong> to inspect in-app with Google Docs & direct mirrors.
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-2 text-xs">
@@ -543,7 +652,10 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                 <CheckCircle className="h-3.5 w-3.5" /> QP + MS Paired
               </span>
               <span className="rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-1 font-semibold flex items-center gap-1">
-                <Eye className="h-3.5 w-3.5" /> In-Browser Preview
+                <Award className="h-3.5 w-3.5" /> Examiner Reports
+              </span>
+              <span className="rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2 py-1 font-semibold flex items-center gap-1">
+                <TrendingUp className="h-3.5 w-3.5" /> Grade Thresholds
               </span>
             </div>
           </div>
@@ -553,7 +665,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               <FileText className="mx-auto h-12 w-12 text-slate-600 mb-3" />
               <h4 className="text-base font-bold text-slate-300">No past paper PDFs match your current filters.</h4>
               <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-                Try setting Exam Board to "All Exam Boards", clearing search keywords, or selecting "All Subjects".
+                Try setting Exam Board to "All Boards", setting Variant or Paper Number to "All", or resetting filters.
               </p>
               <button
                 onClick={handleResetFilters}
@@ -564,178 +676,227 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {filteredPdfs.map((pdf) => {
-                const isCie = pdf.board === 'CIE';
-                return (
-                  <div
-                    key={pdf.id}
-                    className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl hover:border-slate-700 transition flex flex-col justify-between"
-                  >
-                    <div>
-                      {/* Top Badges */}
-                      <div className="flex items-center justify-between gap-2 flex-wrap mb-3">
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={`rounded-lg px-2 py-0.5 text-[10px] font-bold border uppercase tracking-wider ${
-                              isCie
-                                ? 'bg-sky-500/15 text-sky-300 border-sky-500/30'
-                                : 'bg-amber-500/15 text-amber-300 border-amber-500/30'
-                            }`}
-                          >
-                            {pdf.board}
-                          </span>
-                          <span className="rounded-lg bg-slate-800 px-2 py-0.5 text-[10px] font-mono font-bold text-slate-200 border border-slate-700">
-                            {pdf.paperCode}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center gap-1.5">
-                          {pdf.fileSizeBytes && (
-                            <span className="text-[10px] text-slate-400 font-mono">
-                              {pdf.fileSizeBytes}
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {displayedPdfs.map((pdf) => {
+                  const isCie = pdf.board === 'CIE';
+                  return (
+                    <div
+                      key={pdf.id}
+                      className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl hover:border-slate-700 transition flex flex-col justify-between"
+                    >
+                      <div>
+                        {/* Top Badges */}
+                        <div className="flex items-center justify-between gap-2 flex-wrap mb-3">
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`rounded-lg px-2 py-0.5 text-[10px] font-bold border uppercase tracking-wider ${
+                                isCie
+                                  ? 'bg-sky-500/15 text-sky-300 border-sky-500/30'
+                                  : 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+                              }`}
+                            >
+                              {pdf.board}
                             </span>
-                          )}
-                          <span className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold border ${getTierBadge(pdf.tier)}`}>
-                            {pdf.tier}
-                          </span>
+                            <span className="rounded-lg bg-slate-800 px-2 py-0.5 text-[10px] font-mono font-bold text-white border border-slate-700">
+                              {pdf.paperCode}
+                            </span>
+                            {pdf.variant && (
+                              <span className="rounded-lg bg-sky-950/60 text-sky-300 px-2 py-0.5 text-[10px] font-semibold border border-sky-500/30">
+                                Variant {pdf.variant}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-1.5">
+                            <span className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold border ${getTierBadge(pdf.tier)}`}>
+                              {pdf.tier}
+                            </span>
+                            <span className="text-[10px] text-slate-400 font-mono">
+                              {pdf.year}
+                            </span>
+                          </div>
                         </div>
+
+                        {/* Title & Component */}
+                        <h3 className="text-base font-extrabold text-white flex items-center gap-2">
+                          <span>{pdf.subjectName}</span>
+                          <span className="text-xs text-slate-400 font-normal">({pdf.subjectCode})</span>
+                        </h3>
+                        <p className="text-xs text-sky-300 font-semibold mt-1">
+                          {pdf.session}
+                        </p>
+                        <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                          {pdf.paperComponent}
+                        </p>
                       </div>
 
-                      {/* Title & Component */}
-                      <h3 className="text-base font-extrabold text-white flex items-center gap-2">
-                        <span>{pdf.subjectName}</span>
-                        <span className="text-xs text-slate-400 font-normal">({pdf.subjectCode})</span>
-                      </h3>
-                      <p className="text-xs text-sky-300 font-semibold mt-1">
-                        {pdf.session}
-                      </p>
-                      <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                        {pdf.paperComponent}
-                      </p>
-                    </div>
-
-                    {/* Action Buttons: QP, MS, ER */}
-                    <div className="mt-5 pt-4 border-t border-slate-800/80 space-y-2">
-                      {/* Question Paper Row */}
-                      <div className="flex items-center justify-between gap-2 bg-slate-950/60 rounded-xl p-2.5 border border-slate-800">
-                        <div className="flex items-center gap-2 text-xs font-bold text-slate-200">
-                          <FileText className="h-4 w-4 text-sky-400 shrink-0" />
-                          <span>Question Paper (QP)</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setPreviewModal({
-                                url: pdf.qpPdfUrl,
-                                title: `${pdf.paperCode} ${pdf.subjectName} Question Paper`,
-                                subtitle: `${pdf.session} • ${pdf.paperComponent}`,
-                                type: 'qp'
-                              })
-                            }
-                            className="inline-flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition cursor-pointer"
-                            title="Preview Question Paper PDF in browser"
-                          >
-                            <Eye className="h-3.5 w-3.5 text-sky-400" />
-                            <span>Preview</span>
-                          </button>
-                          <a
-                            href={pdf.qpPdfUrl}
-                            download
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 rounded-lg bg-sky-600 px-2.5 py-1 text-xs font-bold text-white hover:bg-sky-500 transition shadow-sm"
-                            title="Download official Question Paper PDF"
-                          >
-                            <Download className="h-3.5 w-3.5" />
-                            <span>Download</span>
-                          </a>
-                        </div>
-                      </div>
-
-                      {/* Mark Scheme Row (if available) */}
-                      {pdf.msPdfUrl && (
-                        <div className="flex items-center justify-between gap-2 bg-emerald-950/20 rounded-xl p-2.5 border border-emerald-500/20">
-                          <div className="flex items-center gap-2 text-xs font-bold text-emerald-300">
-                            <CheckCircle className="h-4 w-4 text-emerald-400 shrink-0" />
-                            <span>Mark Scheme (MS)</span>
+                      {/* Action Buttons: QP, MS, ER, GT */}
+                      <div className="mt-5 pt-4 border-t border-slate-800/80 space-y-2">
+                        {/* Question Paper Row */}
+                        <div className="flex items-center justify-between gap-2 bg-slate-950/60 rounded-xl p-2.5 border border-slate-800">
+                          <div className="flex items-center gap-2 text-xs font-bold text-slate-200">
+                            <FileText className="h-4 w-4 text-sky-400 shrink-0" />
+                            <span>Question Paper (QP)</span>
                           </div>
                           <div className="flex items-center gap-1.5">
                             <button
                               type="button"
                               onClick={() =>
-                                setPreviewModal({
-                                  url: pdf.msPdfUrl!,
-                                  title: `${pdf.paperCode} ${pdf.subjectName} Mark Scheme`,
-                                  subtitle: `${pdf.session} • ${pdf.paperComponent}`,
-                                  type: 'ms'
-                                })
+                                handleOpenPdf(
+                                  pdf.qpPdfUrl,
+                                  `${pdf.paperCode} Question Paper`,
+                                  `${pdf.subjectName} • ${pdf.session}`,
+                                  pdf.backupQpUrl,
+                                  'qp'
+                                )
                               }
-                              className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-950/40 px-2.5 py-1 text-xs font-semibold text-emerald-300 hover:bg-emerald-900/60 transition cursor-pointer"
-                              title="Preview Mark Scheme PDF in browser"
+                              className="inline-flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-800 px-2 py-1 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition cursor-pointer"
+                              title="Preview in-app viewer"
                             >
-                              <Eye className="h-3.5 w-3.5 text-emerald-400" />
-                              <span>Preview</span>
+                              <Eye className="h-3.5 w-3.5 text-sky-400" />
+                              <span className="hidden sm:inline">View</span>
                             </button>
                             <a
-                              href={pdf.msPdfUrl}
+                              href={pdf.qpPdfUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 rounded-lg border border-sky-500/40 bg-sky-500/10 px-2 py-1 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition"
+                              title="Open PDF in new tab"
+                            >
+                              <ExternalLink className="h-3.5 w-3.5" />
+                              <span className="hidden sm:inline">Open</span>
+                            </a>
+                            <a
+                              href={pdf.qpPdfUrl}
                               download
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-2.5 py-1 text-xs font-bold text-white hover:bg-emerald-500 transition shadow-sm"
-                              title="Download official Mark Scheme PDF"
+                              className="inline-flex items-center gap-1 rounded-lg bg-sky-600 px-2.5 py-1 text-xs font-bold text-white hover:bg-sky-500 transition shadow-sm"
+                              title="Download official Question Paper PDF"
                             >
                               <Download className="h-3.5 w-3.5" />
                               <span>Download</span>
                             </a>
                           </div>
                         </div>
-                      )}
 
-                      {/* Examiner Report Row (if available) */}
-                      {pdf.examinerReportUrl && (
-                        <div className="flex items-center justify-between gap-2 bg-indigo-950/20 rounded-xl p-2.5 border border-indigo-500/20">
-                          <div className="flex items-center gap-2 text-xs font-bold text-indigo-300">
-                            <Award className="h-4 w-4 text-indigo-400 shrink-0" />
-                            <span>Examiner Report (ER)</span>
+                        {/* Mark Scheme Row */}
+                        {pdf.msPdfUrl && (
+                          <div className="flex items-center justify-between gap-2 bg-emerald-950/20 rounded-xl p-2.5 border border-emerald-500/20">
+                            <div className="flex items-center gap-2 text-xs font-bold text-emerald-300">
+                              <CheckCircle className="h-4 w-4 text-emerald-400 shrink-0" />
+                              <span>Mark Scheme (MS)</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleOpenPdf(
+                                    pdf.msPdfUrl!,
+                                    `${pdf.paperCode} Mark Scheme`,
+                                    `${pdf.subjectName} • ${pdf.session}`,
+                                    pdf.backupMsUrl,
+                                    'ms'
+                                  )
+                                }
+                                className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-950/40 px-2 py-1 text-xs font-semibold text-emerald-300 hover:bg-emerald-900/60 transition cursor-pointer"
+                                title="Preview Mark Scheme in-app"
+                              >
+                                <Eye className="h-3.5 w-3.5 text-emerald-400" />
+                                <span className="hidden sm:inline">View</span>
+                              </button>
+                              <a
+                                href={pdf.msPdfUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20 transition"
+                                title="Open Mark Scheme in new tab"
+                              >
+                                <ExternalLink className="h-3.5 w-3.5" />
+                                <span className="hidden sm:inline">Open</span>
+                              </a>
+                              <a
+                                href={pdf.msPdfUrl}
+                                download
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-2.5 py-1 text-xs font-bold text-white hover:bg-emerald-500 transition shadow-sm"
+                                title="Download official Mark Scheme PDF"
+                              >
+                                <Download className="h-3.5 w-3.5" />
+                                <span>Download</span>
+                              </a>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-1.5">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setPreviewModal({
-                                  url: pdf.examinerReportUrl!,
-                                  title: `${pdf.paperCode} ${pdf.subjectName} Examiner Report`,
-                                  subtitle: `${pdf.session} • Official Cambridge Insights`,
-                                  type: 'er'
-                                })
-                              }
-                              className="inline-flex items-center gap-1 rounded-lg border border-indigo-500/30 bg-indigo-950/40 px-2.5 py-1 text-xs font-semibold text-indigo-300 hover:bg-indigo-900/60 transition cursor-pointer"
-                              title="Preview Examiner Report in browser"
-                            >
-                              <Eye className="h-3.5 w-3.5 text-indigo-400" />
-                              <span>Preview</span>
-                            </button>
-                            <a
-                              href={pdf.examinerReportUrl}
-                              download
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 rounded-lg bg-indigo-600 px-2.5 py-1 text-xs font-bold text-white hover:bg-indigo-500 transition shadow-sm"
-                              title="Download Examiner Report PDF"
-                            >
-                              <Download className="h-3.5 w-3.5" />
-                              <span>Download</span>
-                            </a>
+                        )}
+
+                        {/* Extra Session Materials: Examiner Report & Grade Thresholds */}
+                        {(pdf.examinerReportUrl || pdf.gradeThresholdsUrl) && (
+                          <div className="flex items-center justify-between gap-2 pt-1 text-[11px]">
+                            {pdf.examinerReportUrl && (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleOpenPdf(
+                                    pdf.examinerReportUrl!,
+                                    `${pdf.subjectName} (${pdf.subjectCode}) Examiner Report`,
+                                    `${pdf.session} • Cambridge Principal Examiner Report`,
+                                    undefined,
+                                    'er'
+                                  )
+                                }
+                                className="text-indigo-400 hover:text-indigo-300 hover:underline flex items-center gap-1 cursor-pointer font-semibold"
+                              >
+                                <Award className="h-3.5 w-3.5" />
+                                <span>Examiner Report</span>
+                              </button>
+                            )}
+                            {pdf.gradeThresholdsUrl && (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleOpenPdf(
+                                    pdf.gradeThresholdsUrl!,
+                                    `${pdf.subjectName} (${pdf.subjectCode}) Grade Thresholds`,
+                                    `${pdf.session} • Official Grade Boundaries`,
+                                    undefined,
+                                    'gt'
+                                  )
+                                }
+                                className="text-purple-400 hover:text-purple-300 hover:underline flex items-center gap-1 cursor-pointer font-semibold ml-auto"
+                              >
+                                <TrendingUp className="h-3.5 w-3.5" />
+                                <span>Grade Thresholds</span>
+                              </button>
+                            )}
                           </div>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+
+              {/* Load More Button if results exceed pageLimit */}
+              {filteredPdfs.length > pageLimit && (
+                <div className="pt-6 pb-2 text-center">
+                  <button
+                    onClick={() => setPageLimit((prev) => prev + 36)}
+                    className="inline-flex items-center gap-2 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-slate-700 px-6 py-3 text-xs font-bold text-white transition shadow-lg cursor-pointer"
+                  >
+                    <RefreshCw className="h-4 w-4 text-sky-400" />
+                    <span>Load More Papers (Showing {displayedPdfs.length} of {filteredPdfs.length})</span>
+                  </button>
+                  <button
+                    onClick={() => setPageLimit(filteredPdfs.length)}
+                    className="ml-3 inline-flex items-center gap-1 rounded-2xl border border-slate-700/60 bg-slate-900/80 px-4 py-3 text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer"
+                  >
+                    <span>Show All ({filteredPdfs.length})</span>
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       )}
@@ -750,7 +911,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               <FileText className="mx-auto h-12 w-12 text-slate-600 mb-3" />
               <h4 className="text-base font-bold text-slate-300">No past paper questions matched these filter criteria.</h4>
               <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-                Try switching Exam Board to "All Exam Boards", clearing the search term, or selecting "All Subjects".
+                Try switching Exam Board to "All Boards", clearing the search term, or selecting "All Subjects".
               </p>
               <button
                 onClick={handleResetFilters}
@@ -809,7 +970,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                       {viewMode === 'stacked' && (
                         <button
                           onClick={() => setExpandedPaperId(isExpanded ? null : paper.id)}
-                          className="rounded-xl border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition cursor-pointer"
+                          className="rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition cursor-pointer"
                         >
                           {isExpanded ? 'Hide Mark Scheme' : 'Reveal Mark Scheme'}
                         </button>
@@ -819,7 +980,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                       {onOpenSolverWithQuestion && (
                         <button
                           onClick={() => onOpenSolverWithQuestion(paper.questionPrompt)}
-                          className="rounded-xl bg-gradient-to-r from-pink-600 to-indigo-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm hover:from-pink-500 hover:to-indigo-500 transition cursor-pointer flex items-center gap-1.5"
+                          className="rounded-xl bg-gradient-to-r from-pink-600 to-indigo-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:from-pink-500 hover:to-indigo-500 transition cursor-pointer flex items-center gap-1.5"
                         >
                           <Sparkles className="h-3.5 w-3.5" />
                           <span>Solve in AI</span>
@@ -838,35 +999,35 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                         </button>
                       )}
 
-                      {/* Preview or Download Original PDF */}
-                      {downloadUrl.startsWith('/past-papers/') ? (
-                        <button
-                          onClick={() =>
-                            setPreviewModal({
-                              url: downloadUrl,
-                              title: `${paper.paperCode} ${paper.subjectName} Full Paper`,
-                              subtitle: `${paper.session} • Question ${paper.questionNumber}`,
-                              type: 'qp'
-                            })
-                          }
-                          className="rounded-xl border border-slate-700 bg-slate-800/90 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition flex items-center gap-1.5 cursor-pointer"
-                          title="Preview full paper PDF in browser"
-                        >
-                          <Eye className="h-3.5 w-3.5 text-sky-400" />
-                          <span className="hidden sm:inline">PDF</span>
-                        </button>
-                      ) : (
-                        <a
-                          href={downloadUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="rounded-xl border border-slate-700 bg-slate-800/90 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition flex items-center gap-1.5"
-                          title="Download official examination question paper PDF"
-                        >
-                          <Download className="h-3.5 w-3.5 text-indigo-400" />
-                          <span className="hidden sm:inline">Download</span>
-                        </a>
-                      )}
+                      {/* Preview PDF */}
+                      <button
+                        onClick={() =>
+                          handleOpenPdf(
+                            downloadUrl,
+                            `${paper.paperCode} Question Paper`,
+                            `${paper.subjectName} • ${paper.session}`,
+                            undefined,
+                            'qp'
+                          )
+                        }
+                        className="rounded-xl border border-slate-700 bg-slate-800/90 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition flex items-center gap-1.5 cursor-pointer"
+                        title="Preview authentic Question Paper PDF"
+                      >
+                        <Eye className="h-3.5 w-3.5 text-sky-400" />
+                        <span className="hidden sm:inline">View PDF</span>
+                      </button>
+
+                      {/* Open Fullscreen PDF */}
+                      <a
+                        href={downloadUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="rounded-xl border border-sky-500/30 bg-sky-500/10 px-3 py-1.5 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition flex items-center gap-1.5"
+                        title="Open PDF directly in new window"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                        <span className="hidden sm:inline">Open</span>
+                      </a>
                     </div>
                   </div>
 
@@ -906,35 +1067,32 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                             </span>
                             <div className="flex items-center gap-3">
                               <span className="text-xs font-mono font-bold text-white">Final: {paper.finalAnswer}</span>
-                              {msDownloadUrl.startsWith('/past-papers/') ? (
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    setPreviewModal({
-                                      url: msDownloadUrl,
-                                      title: `${paper.paperCode} ${paper.subjectName} Mark Scheme`,
-                                      subtitle: `${paper.session} • ${paper.questionNumber}`,
-                                      type: 'ms'
-                                    })
-                                  }
-                                  className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-bold text-emerald-300 hover:bg-emerald-500/20 transition cursor-pointer"
-                                  title="Preview official mark scheme PDF"
-                                >
-                                  <Eye className="h-3 w-3" />
-                                  <span>MS PDF</span>
-                                </button>
-                              ) : (
-                                <a
-                                  href={msDownloadUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-bold text-emerald-300 hover:bg-emerald-500/20 transition cursor-pointer"
-                                  title="Download official mark scheme PDF"
-                                >
-                                  <Download className="h-3 w-3" />
-                                  <span>MS PDF</span>
-                                </a>
-                              )}
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleOpenPdf(
+                                    msDownloadUrl,
+                                    `${paper.paperCode} Mark Scheme`,
+                                    `${paper.subjectName} • ${paper.session}`,
+                                    undefined,
+                                    'ms'
+                                  )
+                                }
+                                className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-bold text-emerald-300 hover:bg-emerald-500/20 transition cursor-pointer"
+                                title="Preview official mark scheme PDF"
+                              >
+                                <Eye className="h-3 w-3" />
+                                <span>MS PDF</span>
+                              </button>
+                              <a
+                                href={msDownloadUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-950/40 px-2 py-0.5 text-[11px] font-bold text-emerald-300 hover:bg-emerald-900/60 transition"
+                                title="Open MS directly"
+                              >
+                                <ExternalLink className="h-3 w-3" />
+                              </a>
                             </div>
                           </div>
 
@@ -969,19 +1127,19 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
       )}
 
       {/* ==================================================== */}
-      {/* IN-BROWSER PDF PREVIEW MODAL                         */}
+      {/* FOOLPROOF IN-BROWSER PDF PREVIEW MODAL               */}
       {/* ==================================================== */}
       {previewModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-4 md:p-6 animate-fadeIn"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-2 sm:p-4 md:p-6 animate-fadeIn"
           onClick={() => setPreviewModal(null)}
         >
           <div
-            className="flex flex-col w-full max-w-5xl h-[90vh] bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden"
+            className="flex flex-col w-full max-w-5xl h-[92vh] bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Top Bar */}
-            <div className="flex items-center justify-between gap-3 p-3 sm:p-4 bg-slate-950 border-b border-slate-800">
+            <div className="flex items-center justify-between gap-3 p-3 sm:p-4 bg-slate-950 border-b border-slate-800 flex-wrap">
               <div className="flex items-center gap-2.5 min-w-0">
                 <div
                   className={`p-2 rounded-xl shrink-0 ${
@@ -989,6 +1147,8 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                       ? 'bg-emerald-500/20 text-emerald-400'
                       : previewModal.type === 'er'
                       ? 'bg-indigo-500/20 text-indigo-400'
+                      : previewModal.type === 'gt'
+                      ? 'bg-purple-500/20 text-purple-400'
                       : 'bg-sky-500/20 text-sky-400'
                   }`}
                 >
@@ -1006,10 +1166,60 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                 </div>
               </div>
 
-              {/* Top Right Controls */}
-              <div className="flex items-center gap-2 shrink-0">
+              {/* Controls: Engine Switcher, Open Fullscreen, Download, Close */}
+              <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                {/* Engine Switcher */}
+                <div className="hidden sm:flex items-center rounded-lg border border-slate-700 bg-slate-800 p-0.5 text-[11px]">
+                  <button
+                    type="button"
+                    onClick={() => setViewerEngine('gdocs')}
+                    className={`rounded px-2 py-1 font-semibold transition cursor-pointer ${
+                      viewerEngine === 'gdocs' ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-white'
+                    }`}
+                    title="Universal Google Docs Embed Viewer (Recommended on mobile/tablets)"
+                  >
+                    Google Viewer
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setViewerEngine('direct')}
+                    className={`rounded px-2 py-1 font-semibold transition cursor-pointer ${
+                      viewerEngine === 'direct' ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-white'
+                    }`}
+                    title="Direct PDF Embed"
+                  >
+                    Direct Frame
+                  </button>
+                </div>
+
+                {/* Mirror Switcher if backup exists */}
+                {previewModal.backupUrl && (
+                  <button
+                    type="button"
+                    onClick={() => setUseBackupMirror(!useBackupMirror)}
+                    className="inline-flex items-center gap-1 rounded-xl border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer"
+                    title="Switch between Primary CDN and Backup CDN"
+                  >
+                    <RefreshCw className="h-3 w-3" />
+                    <span className="hidden md:inline">{useBackupMirror ? 'Mirror 2 (Active)' : 'Switch Mirror'}</span>
+                  </button>
+                )}
+
+                {/* Open in Fullscreen / New Tab (Guaranteed to work 100% on phones and desktops) */}
                 <a
-                  href={previewModal.url}
+                  href={currentModalUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-sky-500/40 bg-sky-500/10 px-3 py-1.5 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition"
+                  title="Open PDF directly in full browser window"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  <span>Open Fullscreen</span>
+                </a>
+
+                {/* Direct Download */}
+                <a
+                  href={currentModalUrl}
                   download
                   className="inline-flex items-center gap-1.5 rounded-xl bg-sky-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-sky-500 transition shadow-sm"
                   title="Download PDF to computer"
@@ -1017,16 +1227,8 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                   <Download className="h-3.5 w-3.5" />
                   <span className="hidden sm:inline">Download</span>
                 </a>
-                <a
-                  href={previewModal.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition"
-                  title="Open in new window"
-                >
-                  <ExternalLink className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">New Tab</span>
-                </a>
+
+                {/* Close Button */}
                 <button
                   type="button"
                   onClick={() => setPreviewModal(null)}
@@ -1038,25 +1240,48 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               </div>
             </div>
 
-            {/* Modal Body: PDF Iframe */}
+            {/* Helper notice for phone users */}
+            <div className="bg-sky-950/40 border-b border-sky-500/20 px-4 py-2 text-[11px] text-sky-200 flex items-center justify-between gap-2 flex-wrap">
+              <span>
+                💡 <strong>Mobile / Tablet tip:</strong> If the PDF appears small or doesn't display inline, tap <strong>Open Fullscreen</strong> above for your browser's native PDF reader with pinch-to-zoom.
+              </span>
+              <a
+                href={currentModalUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline font-bold text-sky-300 hover:text-white ml-auto"
+              >
+                Launch Direct PDF ↗
+              </a>
+            </div>
+
+            {/* Modal Body: PDF Iframe / Google Docs Viewer */}
             <div className="relative flex-1 w-full bg-slate-950 overflow-hidden">
               <iframe
-                src={previewModal.url}
+                src={
+                  viewerEngine === 'gdocs' && !currentModalUrl.startsWith('/past-papers/')
+                    ? `https://docs.google.com/viewer?url=${encodeURIComponent(currentModalUrl)}&embedded=true`
+                    : currentModalUrl
+                }
                 className="w-full h-full border-0 bg-white"
                 title={previewModal.title}
               />
             </div>
 
-            {/* Modal Footer (fallback note for devices with restrictive PDF handling) */}
-            <div className="p-2 sm:p-2.5 bg-slate-950 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 px-4">
-              <span>Press <kbd className="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-300 font-mono">Esc</kbd> to close</span>
+            {/* Modal Footer */}
+            <div className="p-2 sm:p-2.5 bg-slate-950 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 px-4 flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <span>Press <kbd className="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-300 font-mono">Esc</kbd> to close</span>
+                <span className="text-slate-600">•</span>
+                <span className="text-[10px] text-slate-500 font-mono truncate max-w-xs">{currentModalUrl}</span>
+              </div>
               <a
-                href={previewModal.url}
+                href={currentModalUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sky-400 hover:underline flex items-center gap-1 font-semibold"
               >
-                <span>Trouble viewing? Open original PDF</span>
+                <span>Trouble viewing inline? Open original document</span>
                 <ExternalLink className="h-3 w-3" />
               </a>
             </div>

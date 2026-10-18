@@ -240,13 +240,19 @@ export interface OfficialPaperPdf {
   subjectCode: string;
   board: ExamBoard;
   year: number;
-  session: string; // e.g. "June 2024", "2025 Specimen", "2023 Specimen"
-  paperComponent: string; // e.g. "Paper 4 (Extended)", "Paper 2 (Core/Ext)"
-  paperCode: string; // e.g. "0580/41", "0625/4", "0620/4"
+  session: string; // e.g. "May/June 2024", "Oct/Nov 2023", "Feb/March 2022"
+  seasonCode?: 's' | 'w' | 'm' | 'sp';
+  paperNumber?: number; // 1, 2, 3, 4, 5, 6
+  variant?: number; // 1, 2, 3
+  paperComponent: string; // e.g. "Paper 4 (Extended Theory Calculator)"
+  paperCode: string; // e.g. "0580/42"
   tier: 'Core' | 'Extended' | 'General';
   qpPdfUrl: string;
   msPdfUrl?: string;
   examinerReportUrl?: string;
+  gradeThresholdsUrl?: string;
+  backupQpUrl?: string;
+  backupMsUrl?: string;
   fileSizeBytes?: string; // e.g. "1.2 MB"
 }
 

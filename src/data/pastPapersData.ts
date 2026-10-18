@@ -314,301 +314,384 @@ export function getAllPastPapers(): PastPaperItem[] {
   return [...getCustomPastPapers(), ...PAST_PAPERS_DATABASE];
 }
 
-export const OFFICIAL_PAST_PAPER_PDFS: OfficialPaperPdf[] = [
-  // ==========================================================
-  // CAMBRIDGE IGCSE MATHEMATICS (0580)
-  // ==========================================================
-  {
-    id: 'pdf-0580-s24-41',
-    subjectId: 'cie-math-0580',
-    subjectName: 'Mathematics',
-    subjectCode: '0580',
-    board: 'CIE',
-    year: 2024,
-    session: 'May/June 2024',
-    paperComponent: 'Paper 41 (Extended Theory Calculator)',
-    paperCode: '0580/41',
-    tier: 'Extended',
-    qpPdfUrl: '/past-papers/0580_s24_qp_41.pdf',
-    msPdfUrl: '/past-papers/0580_s24_ms_41.pdf',
-    examinerReportUrl: '/past-papers/0580_s24_er.pdf',
-    fileSizeBytes: '1.24 MB'
-  },
-  {
-    id: 'pdf-0580-s24-21',
-    subjectId: 'cie-math-0580',
-    subjectName: 'Mathematics',
-    subjectCode: '0580',
-    board: 'CIE',
-    year: 2024,
-    session: 'May/June 2024',
-    paperComponent: 'Paper 21 (Extended Short-Answer)',
-    paperCode: '0580/21',
-    tier: 'Extended',
-    qpPdfUrl: '/past-papers/0580_s24_qp_21.pdf',
-    msPdfUrl: '/past-papers/0580_s24_ms_21.pdf',
-    fileSizeBytes: '1.18 MB'
-  },
-  {
-    id: 'pdf-0580-sp25-4',
-    subjectId: 'cie-math-0580',
-    subjectName: 'Mathematics',
-    subjectCode: '0580',
-    board: 'CIE',
-    year: 2025,
-    session: '2025 Specimen Series',
-    paperComponent: 'Paper 4 (Extended Calculator)',
-    paperCode: '0580/04',
-    tier: 'Extended',
-    qpPdfUrl: '/past-papers/0580_sp25_qp_4.pdf',
-    msPdfUrl: '/past-papers/0580_sp25_ms_4.pdf',
-    fileSizeBytes: '1.64 MB'
-  },
-  {
-    id: 'pdf-0580-sp25-2',
-    subjectId: 'cie-math-0580',
-    subjectName: 'Mathematics',
-    subjectCode: '0580',
-    board: 'CIE',
-    year: 2025,
-    session: '2025 Specimen Series',
-    paperComponent: 'Paper 2 (Extended Non-Calculator)',
-    paperCode: '0580/02',
-    tier: 'Extended',
-    qpPdfUrl: '/past-papers/0580_sp25_qp_2.pdf',
-    msPdfUrl: '/past-papers/0580_sp25_ms_2.pdf',
-    fileSizeBytes: '1.65 MB'
-  },
+// ==========================================================
+// LOCAL VERIFIED OFFLINE PAST PAPERS
+// ==========================================================
+export const LOCAL_VERIFIED_PDFS: Record<string, string> = {
+  '0580_s24_qp_41.pdf': '/past-papers/0580_s24_qp_41.pdf',
+  '0580_s24_ms_41.pdf': '/past-papers/0580_s24_ms_41.pdf',
+  '0580_s24_qp_21.pdf': '/past-papers/0580_s24_qp_21.pdf',
+  '0580_s24_ms_21.pdf': '/past-papers/0580_s24_ms_21.pdf',
+  '0580_s24_er.pdf': '/past-papers/0580_s24_er.pdf',
+  '0580_sp25_qp_4.pdf': '/past-papers/0580_sp25_qp_4.pdf',
+  '0580_sp25_ms_4.pdf': '/past-papers/0580_sp25_ms_4.pdf',
+  '0580_sp25_qp_2.pdf': '/past-papers/0580_sp25_qp_2.pdf',
+  '0580_sp25_ms_2.pdf': '/past-papers/0580_sp25_ms_2.pdf',
+  '0625_sp23_qp_4.pdf': '/past-papers/0625_sp23_qp_4.pdf',
+  '0625_sp23_ms_4.pdf': '/past-papers/0625_sp23_ms_4.pdf',
+  '0625_sp23_qp_2.pdf': '/past-papers/0625_sp23_qp_2.pdf',
+  '0620_sp23_qp_4.pdf': '/past-papers/0620_sp23_qp_4.pdf',
+  '0620_sp23_ms_4.pdf': '/past-papers/0620_sp23_ms_4.pdf',
+  '0610_sp23_qp_4.pdf': '/past-papers/0610_sp23_qp_4.pdf',
+  '0610_sp23_ms_4.pdf': '/past-papers/0610_sp23_ms_4.pdf',
+  '0478_sp23_qp_1.pdf': '/past-papers/0478_sp23_qp_1.pdf',
+  '0478_sp23_qp_2.pdf': '/past-papers/0478_sp23_qp_2.pdf',
+};
 
-  // ==========================================================
-  // CAMBRIDGE IGCSE PHYSICS (0625)
-  // ==========================================================
-  {
-    id: 'pdf-0625-sp23-4',
-    subjectId: 'cie-physics-0625',
-    subjectName: 'Physics',
-    subjectCode: '0625',
-    board: 'CIE',
-    year: 2023,
-    session: '2023-2025 Specimen Series',
-    paperComponent: 'Paper 4 (Theory Extended)',
-    paperCode: '0625/04',
-    tier: 'Extended',
-    qpPdfUrl: '/past-papers/0625_sp23_qp_4.pdf',
-    msPdfUrl: '/past-papers/0625_sp23_ms_4.pdf',
-    fileSizeBytes: '1.39 MB'
-  },
-  {
-    id: 'pdf-0625-sp23-2',
-    subjectId: 'cie-physics-0625',
-    subjectName: 'Physics',
-    subjectCode: '0625',
-    board: 'CIE',
-    year: 2023,
-    session: '2023-2025 Specimen Series',
-    paperComponent: 'Paper 2 (Multiple Choice Extended)',
-    paperCode: '0625/02',
-    tier: 'Extended',
-    qpPdfUrl: '/past-papers/0625_sp23_qp_2.pdf',
-    fileSizeBytes: '1.53 MB'
-  },
+interface SubjectConfig {
+  id: string;
+  name: string;
+  code: string;
+  slug: string;
+  board: 'CIE';
+  papers: {
+    paperNumber: number;
+    title: string;
+    tier: 'Core' | 'Extended' | 'General';
+    variants: number[];
+  }[];
+}
 
-  // ==========================================================
-  // CAMBRIDGE IGCSE CHEMISTRY (0620)
-  // ==========================================================
+const CAMBRIDGE_SUBJECT_CONFIGS: SubjectConfig[] = [
   {
-    id: 'pdf-0620-sp23-4',
-    subjectId: 'cie-chem-0620',
-    subjectName: 'Chemistry',
-    subjectCode: '0620',
+    id: 'cie-math-0580',
+    name: 'Mathematics',
+    code: '0580',
+    slug: 'mathematics-0580',
     board: 'CIE',
-    year: 2023,
-    session: '2023-2025 Specimen Series',
-    paperComponent: 'Paper 4 (Theory Extended)',
-    paperCode: '0620/04',
-    tier: 'Extended',
-    qpPdfUrl: '/past-papers/0620_sp23_qp_4.pdf',
-    msPdfUrl: '/past-papers/0620_sp23_ms_4.pdf',
-    fileSizeBytes: '1.21 MB'
+    papers: [
+      { paperNumber: 2, title: 'Paper 2 (Extended Short-Answer)', tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 4, title: 'Paper 4 (Extended Structured Calculator)', tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 1, title: 'Paper 1 (Core Short-Answer)', tier: 'Core', variants: [1, 2, 3] },
+      { paperNumber: 3, title: 'Paper 3 (Core Structured)', tier: 'Core', variants: [1, 2, 3] }
+    ]
   },
-
-  // ==========================================================
-  // CAMBRIDGE IGCSE BIOLOGY (0610)
-  // ==========================================================
   {
-    id: 'pdf-0610-sp23-4',
-    subjectId: 'cie-bio-0610',
-    subjectName: 'Biology',
-    subjectCode: '0610',
+    id: 'cie-physics-0625',
+    name: 'Physics',
+    code: '0625',
+    slug: 'physics-0625',
     board: 'CIE',
-    year: 2023,
-    session: '2023-2025 Specimen Series',
-    paperComponent: 'Paper 4 (Theory Extended)',
-    paperCode: '0610/04',
-    tier: 'Extended',
-    qpPdfUrl: '/past-papers/0610_sp23_qp_4.pdf',
-    msPdfUrl: '/past-papers/0610_sp23_ms_4.pdf',
-    fileSizeBytes: '3.57 MB'
+    papers: [
+      { paperNumber: 2, title: 'Paper 2 (Multiple Choice Extended)', tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 4, title: 'Paper 4 (Theory Extended)', tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 6, title: 'Paper 6 (Alternative to Practical)', tier: 'General', variants: [1, 2, 3] },
+      { paperNumber: 1, title: 'Paper 1 (Multiple Choice Core)', tier: 'Core', variants: [1, 2, 3] },
+      { paperNumber: 3, title: 'Paper 3 (Theory Core)', tier: 'Core', variants: [1, 2, 3] }
+    ]
   },
-
-  // ==========================================================
-  // CAMBRIDGE IGCSE COMPUTER SCIENCE (0478)
-  // ==========================================================
   {
-    id: 'pdf-0478-sp23-1',
-    subjectId: 'cie-cs-0478',
-    subjectName: 'Computer Science',
-    subjectCode: '0478',
+    id: 'cie-chem-0620',
+    name: 'Chemistry',
+    code: '0620',
+    slug: 'chemistry-0620',
     board: 'CIE',
-    year: 2023,
-    session: '2023-2025 Specimen Series',
-    paperComponent: 'Paper 1 (Computer Systems)',
-    paperCode: '0478/01',
-    tier: 'General',
-    qpPdfUrl: '/past-papers/0478_sp23_qp_1.pdf',
-    fileSizeBytes: '1.01 MB'
+    papers: [
+      { paperNumber: 2, title: 'Paper 2 (Multiple Choice Extended)', tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 4, title: 'Paper 4 (Theory Extended)', tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 6, title: 'Paper 6 (Alternative to Practical)', tier: 'General', variants: [1, 2, 3] },
+      { paperNumber: 1, title: 'Paper 1 (Multiple Choice Core)', tier: 'Core', variants: [1, 2, 3] },
+      { paperNumber: 3, title: 'Paper 3 (Theory Core)', tier: 'Core', variants: [1, 2, 3] }
+    ]
   },
   {
-    id: 'pdf-0478-sp23-2',
-    subjectId: 'cie-cs-0478',
-    subjectName: 'Computer Science',
-    subjectCode: '0478',
+    id: 'cie-bio-0610',
+    name: 'Biology',
+    code: '0610',
+    slug: 'biology-0610',
     board: 'CIE',
-    year: 2023,
-    session: '2023-2025 Specimen Series',
-    paperComponent: 'Paper 2 (Algorithms, Programming & Logic)',
-    paperCode: '0478/02',
-    tier: 'General',
-    qpPdfUrl: '/past-papers/0478_sp23_qp_2.pdf',
-    fileSizeBytes: '1.23 MB'
+    papers: [
+      { paperNumber: 2, title: 'Paper 2 (Multiple Choice Extended)', tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 4, title: 'Paper 4 (Theory Extended)', tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 6, title: 'Paper 6 (Alternative to Practical)', tier: 'General', variants: [1, 2, 3] },
+      { paperNumber: 1, title: 'Paper 1 (Multiple Choice Core)', tier: 'Core', variants: [1, 2, 3] },
+      { paperNumber: 3, title: 'Paper 3 (Theory Core)', tier: 'Core', variants: [1, 2, 3] }
+    ]
   },
-
-  // ==========================================================
-  // CAMBRIDGE IGCSE ECONOMICS (0455)
-  // ==========================================================
   {
-    id: 'pdf-0455-sp27-1',
-    subjectId: 'cie-econ-0455',
-    subjectName: 'Economics',
-    subjectCode: '0455',
+    id: 'cie-cs-0478',
+    name: 'Computer Science',
+    code: '0478',
+    slug: 'computer-science-0478',
     board: 'CIE',
-    year: 2027,
-    session: 'Specimen Assessment Series',
-    paperComponent: 'Paper 1 (Multiple Choice)',
-    paperCode: '0455/01',
-    tier: 'General',
-    qpPdfUrl: '/past-papers/0455_sp27_qp_1.pdf',
-    msPdfUrl: '/past-papers/0455_sp27_ms_1.pdf',
-    fileSizeBytes: '520 KB'
+    papers: [
+      { paperNumber: 1, title: 'Paper 1 (Theory of Computer Systems)', tier: 'General', variants: [1, 2, 3] },
+      { paperNumber: 2, title: 'Paper 2 (Algorithms, Programming & Logic)', tier: 'General', variants: [1, 2, 3] }
+    ]
   },
   {
-    id: 'pdf-0455-sp27-2',
-    subjectId: 'cie-econ-0455',
-    subjectName: 'Economics',
-    subjectCode: '0455',
+    id: 'cie-econ-0455',
+    name: 'Economics',
+    code: '0455',
+    slug: 'economics-0455',
     board: 'CIE',
-    year: 2027,
-    session: 'Specimen Assessment Series',
-    paperComponent: 'Paper 2 (Structured Questions)',
-    paperCode: '0455/02',
-    tier: 'General',
-    qpPdfUrl: '/past-papers/0455_sp27_qp_2.pdf',
-    fileSizeBytes: '520 KB'
+    papers: [
+      { paperNumber: 1, title: 'Paper 1 (Multiple Choice)', tier: 'General', variants: [1, 2, 3] },
+      { paperNumber: 2, title: 'Paper 2 (Structured Questions)', tier: 'General', variants: [1, 2, 3] }
+    ]
   },
-
-  // ==========================================================
-  // CAMBRIDGE IGCSE ENGLISH AS A SECOND LANGUAGE (0510)
-  // ==========================================================
   {
-    id: 'pdf-0510-sp24-1',
-    subjectId: 'cie-esl-0510',
-    subjectName: 'English as a Second Language',
-    subjectCode: '0510',
+    id: 'cie-esl-0510',
+    name: 'English as a Second Language',
+    code: '0510',
+    slug: 'english-second-language-0510',
     board: 'CIE',
-    year: 2024,
-    session: '2024-2026 Specimen Series',
-    paperComponent: 'Paper 1 (Reading & Writing)',
-    paperCode: '0510/01',
-    tier: 'General',
-    qpPdfUrl: '/past-papers/0510_sp24_qp_1.pdf',
-    msPdfUrl: '/past-papers/0510_sp24_ms_1.pdf',
-    fileSizeBytes: '520 KB'
-  },
-  {
-    id: 'pdf-0510-sp24-2',
-    subjectId: 'cie-esl-0510',
-    subjectName: 'English as a Second Language',
-    subjectCode: '0510',
-    board: 'CIE',
-    year: 2024,
-    session: '2024-2026 Specimen Series',
-    paperComponent: 'Paper 2 (Listening Comprehension)',
-    paperCode: '0510/02',
-    tier: 'General',
-    qpPdfUrl: '/past-papers/0510_sp24_qp_2.pdf',
-    fileSizeBytes: '520 KB'
-  },
-
-  // ==========================================================
-  // PEARSON EDEXCEL INTERNATIONAL GCSES
-  // ==========================================================
-  {
-    id: 'pdf-edx-math-4ma1',
-    subjectId: 'edx-math-4ma1',
-    subjectName: 'Mathematics A',
-    subjectCode: '4MA1',
-    board: 'Edexcel',
-    year: 2024,
-    session: 'Exam Series Archive',
-    paperComponent: 'Paper 1H & 2H Specimen Assessment Materials',
-    paperCode: '4MA1/1H',
-    tier: 'Extended',
-    qpPdfUrl: 'https://qualifications.pearson.com/content/dam/pdf/International%20GCSE/Mathematics%20A/2016/Specification%20and%20sample%20assessments/International%20GCSE_Mathematics_%20Specification_A-4MA1.pdf',
-    fileSizeBytes: '2.4 MB'
-  },
-  {
-    id: 'pdf-edx-phys-4ph1',
-    subjectId: 'edx-physics-4ph1',
-    subjectName: 'Physics',
-    subjectCode: '4PH1',
-    board: 'Edexcel',
-    year: 2024,
-    session: 'Exam Series Archive',
-    paperComponent: 'Paper 1P & 2P Specimen Assessment Materials',
-    paperCode: '4PH1/1P',
-    tier: 'Extended',
-    qpPdfUrl: 'https://qualifications.pearson.com/content/dam/pdf/International%20GCSE/Physics/2017/Specification%20and%20sample%20assessments/International_GCSE_Physics_4PH1_Spec.pdf',
-    fileSizeBytes: '1.9 MB'
-  },
-  {
-    id: 'pdf-edx-chem-4ch1',
-    subjectId: 'edx-chem-4ch1',
-    subjectName: 'Chemistry',
-    subjectCode: '4CH1',
-    board: 'Edexcel',
-    year: 2024,
-    session: 'Exam Series Archive',
-    paperComponent: 'Paper 1C & 2C Specimen Assessment Materials',
-    paperCode: '4CH1/1C',
-    tier: 'Extended',
-    qpPdfUrl: 'https://qualifications.pearson.com/content/dam/pdf/International%20GCSE/Chemistry/2017/Specification%20and%20sample%20assessments/International_GCSE_Chemistry_4CH1_Spec.pdf',
-    fileSizeBytes: '1.8 MB'
+    papers: [
+      { paperNumber: 1, title: 'Paper 1 (Reading & Writing)', tier: 'General', variants: [1, 2, 3] },
+      { paperNumber: 2, title: 'Paper 2 (Listening Comprehension)', tier: 'General', variants: [1, 2, 3] }
+    ]
   }
 ];
+
+function generateOfficialPastPapers(): OfficialPaperPdf[] {
+  const result: OfficialPaperPdf[] = [];
+  const years = [2024, 2023, 2022, 2021, 2020, 2019, 2018];
+
+  const seriesList: { code: 's' | 'w' | 'm'; name: string }[] = [
+    { code: 's', name: 'May/June' },
+    { code: 'w', name: 'Oct/Nov' },
+    { code: 'm', name: 'Feb/March' }
+  ];
+
+  // 1. Cambridge IGCSE 2018 - 2024 Full Variants & Papers
+  for (const sub of CAMBRIDGE_SUBJECT_CONFIGS) {
+    for (const yr of years) {
+      const yy = String(yr).slice(-2);
+
+      for (const series of seriesList) {
+        // Feb/March series only runs in India with variant 2
+        const variantsForSeries = series.code === 'm' ? [2] : [1, 2, 3];
+
+        for (const p of sub.papers) {
+          for (const v of p.variants) {
+            if (!variantsForSeries.includes(v)) continue;
+
+            const compCode = `${p.paperNumber}${v}`;
+            const paperCode = `${sub.code}/${compCode}`;
+            const qpFilename = `${sub.code}_${series.code}${yy}_qp_${compCode}.pdf`;
+            const msFilename = `${sub.code}_${series.code}${yy}_ms_${compCode}.pdf`;
+            const erFilename = `${sub.code}_${series.code}${yy}_er.pdf`;
+            const gtFilename = `${sub.code}_${series.code}${yy}_gt.pdf`;
+
+            const qpUrl = LOCAL_VERIFIED_PDFS[qpFilename] ||
+              `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${qpFilename}`;
+            const backupQp = `https://bestexamhelp.com/exam/cambridge-igcse/${sub.slug}/${yr}/${qpFilename}`;
+
+            const msUrl = LOCAL_VERIFIED_PDFS[msFilename] ||
+              `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${msFilename}`;
+            const backupMs = `https://bestexamhelp.com/exam/cambridge-igcse/${sub.slug}/${yr}/${msFilename}`;
+
+            const erUrl = LOCAL_VERIFIED_PDFS[erFilename] ||
+              `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${erFilename}`;
+            const gtUrl = `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${gtFilename}`;
+
+            result.push({
+              id: `pdf-${sub.code}-${series.code}${yy}-${compCode}`,
+              subjectId: sub.id,
+              subjectName: sub.name,
+              subjectCode: sub.code,
+              board: sub.board,
+              year: yr,
+              session: `${series.name} ${yr}`,
+              seasonCode: series.code,
+              paperNumber: p.paperNumber,
+              variant: v,
+              paperComponent: `${p.title} (Variant ${v})`,
+              paperCode,
+              tier: p.tier,
+              qpPdfUrl: qpUrl,
+              backupQpUrl: backupQp,
+              msPdfUrl: msUrl,
+              backupMsUrl: backupMs,
+              examinerReportUrl: erUrl,
+              gradeThresholdsUrl: gtUrl,
+              fileSizeBytes: 'Official PDF'
+            });
+          }
+        }
+      }
+    }
+  }
+
+  // 2. Specimen 2025 Assessment Papers
+  result.unshift(
+    {
+      id: 'pdf-0580-sp25-4',
+      subjectId: 'cie-math-0580',
+      subjectName: 'Mathematics',
+      subjectCode: '0580',
+      board: 'CIE',
+      year: 2025,
+      session: '2025 Specimen Series',
+      seasonCode: 'sp',
+      paperNumber: 4,
+      variant: 2,
+      paperComponent: 'Paper 4 (Extended Calculator Specimen)',
+      paperCode: '0580/04',
+      tier: 'Extended',
+      qpPdfUrl: '/past-papers/0580_sp25_qp_4.pdf',
+      msPdfUrl: '/past-papers/0580_sp25_ms_4.pdf',
+      fileSizeBytes: '1.64 MB'
+    },
+    {
+      id: 'pdf-0580-sp25-2',
+      subjectId: 'cie-math-0580',
+      subjectName: 'Mathematics',
+      subjectCode: '0580',
+      board: 'CIE',
+      year: 2025,
+      session: '2025 Specimen Series',
+      seasonCode: 'sp',
+      paperNumber: 2,
+      variant: 2,
+      paperComponent: 'Paper 2 (Extended Non-Calculator Specimen)',
+      paperCode: '0580/02',
+      tier: 'Extended',
+      qpPdfUrl: '/past-papers/0580_sp25_qp_2.pdf',
+      msPdfUrl: '/past-papers/0580_sp25_ms_2.pdf',
+      fileSizeBytes: '1.65 MB'
+    },
+    {
+      id: 'pdf-0625-sp23-4',
+      subjectId: 'cie-physics-0625',
+      subjectName: 'Physics',
+      subjectCode: '0625',
+      board: 'CIE',
+      year: 2023,
+      session: '2023-2025 Specimen Series',
+      seasonCode: 'sp',
+      paperNumber: 4,
+      variant: 2,
+      paperComponent: 'Paper 4 (Theory Extended Specimen)',
+      paperCode: '0625/04',
+      tier: 'Extended',
+      qpPdfUrl: '/past-papers/0625_sp23_qp_4.pdf',
+      msPdfUrl: '/past-papers/0625_sp23_ms_4.pdf',
+      fileSizeBytes: '1.39 MB'
+    },
+    {
+      id: 'pdf-0620-sp23-4',
+      subjectId: 'cie-chem-0620',
+      subjectName: 'Chemistry',
+      subjectCode: '0620',
+      board: 'CIE',
+      year: 2023,
+      session: '2023-2025 Specimen Series',
+      seasonCode: 'sp',
+      paperNumber: 4,
+      variant: 2,
+      paperComponent: 'Paper 4 (Theory Extended Specimen)',
+      paperCode: '0620/04',
+      tier: 'Extended',
+      qpPdfUrl: '/past-papers/0620_sp23_qp_4.pdf',
+      msPdfUrl: '/past-papers/0620_sp23_ms_4.pdf',
+      fileSizeBytes: '1.21 MB'
+    },
+    {
+      id: 'pdf-0610-sp23-4',
+      subjectId: 'cie-bio-0610',
+      subjectName: 'Biology',
+      subjectCode: '0610',
+      board: 'CIE',
+      year: 2023,
+      session: '2023-2025 Specimen Series',
+      seasonCode: 'sp',
+      paperNumber: 4,
+      variant: 2,
+      paperComponent: 'Paper 4 (Theory Extended Specimen)',
+      paperCode: '0610/04',
+      tier: 'Extended',
+      qpPdfUrl: '/past-papers/0610_sp23_qp_4.pdf',
+      msPdfUrl: '/past-papers/0610_sp23_ms_4.pdf',
+      fileSizeBytes: '3.57 MB'
+    },
+    {
+      id: 'pdf-0478-sp23-1',
+      subjectId: 'cie-cs-0478',
+      subjectName: 'Computer Science',
+      subjectCode: '0478',
+      board: 'CIE',
+      year: 2023,
+      session: '2023-2025 Specimen Series',
+      seasonCode: 'sp',
+      paperNumber: 1,
+      variant: 1,
+      paperComponent: 'Paper 1 (Computer Systems Specimen)',
+      paperCode: '0478/01',
+      tier: 'General',
+      qpPdfUrl: '/past-papers/0478_sp23_qp_1.pdf',
+      fileSizeBytes: '1.01 MB'
+    },
+    {
+      id: 'pdf-0478-sp23-2',
+      subjectId: 'cie-cs-0478',
+      subjectName: 'Computer Science',
+      subjectCode: '0478',
+      board: 'CIE',
+      year: 2023,
+      session: '2023-2025 Specimen Series',
+      seasonCode: 'sp',
+      paperNumber: 2,
+      variant: 2,
+      paperComponent: 'Paper 2 (Algorithms & Logic Specimen)',
+      paperCode: '0478/02',
+      tier: 'General',
+      qpPdfUrl: '/past-papers/0478_sp23_qp_2.pdf',
+      fileSizeBytes: '1.23 MB'
+    }
+  );
+
+  // 3. Pearson Edexcel International GCSEs (2018 - 2024 Archive)
+  const edexcelSubjects = [
+    { id: 'edx-math-4ma1', name: 'Mathematics A', code: '4MA1', specUrl: 'https://qualifications.pearson.com/en/qualifications/edexcel-international-gcses/international-gcse-mathematics-a-2016.coursematerials.html#%2FfilterQuery=category:Pearson-UK:Category%2FExam-materials' },
+    { id: 'edx-physics-4ph1', name: 'Physics', code: '4PH1', specUrl: 'https://qualifications.pearson.com/en/qualifications/edexcel-international-gcses/international-gcse-physics-2017.coursematerials.html#%2FfilterQuery=category:Pearson-UK:Category%2FExam-materials' },
+    { id: 'edx-chem-4ch1', name: 'Chemistry', code: '4CH1', specUrl: 'https://qualifications.pearson.com/en/qualifications/edexcel-international-gcses/international-gcse-chemistry-2017.coursematerials.html#%2FfilterQuery=category:Pearson-UK:Category%2FExam-materials' },
+    { id: 'edx-bio-4bi1', name: 'Biology', code: '4BI1', specUrl: 'https://qualifications.pearson.com/en/qualifications/edexcel-international-gcses/international-gcse-biology-2017.coursematerials.html#%2FfilterQuery=category:Pearson-UK:Category%2FExam-materials' },
+    { id: 'edx-econ-4ec1', name: 'Economics', code: '4EC1', specUrl: 'https://qualifications.pearson.com/en/qualifications/edexcel-international-gcses/international-gcse-economics-2017.coursematerials.html#%2FfilterQuery=category:Pearson-UK:Category%2FExam-materials' },
+  ];
+
+  for (const edx of edexcelSubjects) {
+    for (const yr of [2024, 2023, 2022, 2021, 2020, 2019, 2018]) {
+      for (const sess of ['June', 'January']) {
+        for (const pNum of [1, 2]) {
+          const tierSuffix = edx.code === '4MA1' ? 'H' : (pNum === 1 ? '1P' : '2P');
+          const paperCode = `${edx.code}/${pNum}${tierSuffix}`;
+          const qpUrl = `https://qualifications.pearson.com/en/support/support-topics/exams/past-papers.html?q=${encodeURIComponent(edx.code + ' ' + yr + ' ' + sess + ' Paper ' + pNum)}`;
+          const msUrl = `https://qualifications.pearson.com/en/support/support-topics/exams/past-papers.html?q=${encodeURIComponent(edx.code + ' ' + yr + ' ' + sess + ' Mark Scheme')}`;
+
+          result.push({
+            id: `pdf-edx-${edx.code}-${yr}-${sess.toLowerCase()}-${pNum}`,
+            subjectId: edx.id,
+            subjectName: edx.name,
+            subjectCode: edx.code,
+            board: 'Edexcel',
+            year: yr,
+            session: `${sess} ${yr}`,
+            seasonCode: sess === 'June' ? 's' : 'm',
+            paperNumber: pNum,
+            variant: 1,
+            paperComponent: `Paper ${pNum}${tierSuffix} (Higher Tier Assessment)`,
+            paperCode,
+            tier: 'Extended',
+            qpPdfUrl: qpUrl,
+            backupQpUrl: edx.specUrl,
+            msPdfUrl: msUrl,
+            fileSizeBytes: 'Official Exam Pack'
+          });
+        }
+      }
+    }
+  }
+
+  return result;
+}
+
+export const OFFICIAL_PAST_PAPER_PDFS: OfficialPaperPdf[] = generateOfficialPastPapers();
 
 // Generate official Cambridge/Edexcel paper archive download URL or local static fallback
 export function getPaperDownloadUrl(paper: PastPaperItem, type: 'qp' | 'ms'): string {
   if (type === 'qp' && paper.pdfUrl) return paper.pdfUrl;
   if (type === 'ms' && paper.markSchemePdfUrl) return paper.markSchemePdfUrl;
-
-  // Check if we have an official static PDF file for this subject
-  const match = OFFICIAL_PAST_PAPER_PDFS.find(
-    (p) => p.subjectId === paper.subjectId
-  );
-  if (match) {
-    if (type === 'qp' && match.qpPdfUrl) return match.qpPdfUrl;
-    if (type === 'ms' && match.msPdfUrl) return match.msPdfUrl;
-  }
 
   const rawCode = paper.paperCode.replace(/[^0-9a-zA-Z]/g, '');
   const syllabusMatch = paper.paperCode.match(/(\d{4}|\w{4})/);
@@ -616,11 +699,15 @@ export function getPaperDownloadUrl(paper: PastPaperItem, type: 'qp' | 'ms'): st
   const year = paper.year || 2023;
   const isMayJune = paper.session.toLowerCase().includes('may') || paper.session.toLowerCase().includes('june');
   const isOctNov = paper.session.toLowerCase().includes('oct') || paper.session.toLowerCase().includes('nov');
-  const seasonCode = isMayJune ? `s${String(year).slice(-2)}` : isOctNov ? `w${String(year).slice(-2)}` : `m${String(year).slice(-2)}`;
-  const paperComponent = rawCode.replace(syllabus, '') || '42';
+  const seasonCode = isMayJune ? 's' : isOctNov ? 'w' : 'm';
+  const yy = String(year).slice(-2);
+  const compMatch = paper.paperCode.match(/\/(\d{2})/);
+  const comp = compMatch ? compMatch[1] : '42';
+  const filename = `${syllabus}_${seasonCode}${yy}_${type}_${comp}.pdf`;
 
-  if (paper.board === 'CIE') {
-    return `https://www.cambridgeinternational.org/programmes-and-qualifications/`;
+  if (LOCAL_VERIFIED_PDFS[filename]) {
+    return LOCAL_VERIFIED_PDFS[filename];
   }
-  return `https://qualifications.pearson.com/en/support/support-topics/exams/past-papers.html?q=${encodeURIComponent(paper.paperCode)}`;
+
+  return `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${filename}`;
 }
