@@ -22,9 +22,30 @@ import {
   Database,
   Upload,
   Plus,
-  BookOpen
+  BookOpen,
+  Receipt,
+  CheckCircle2,
+  Copy,
+  ExternalLink,
+  Activity,
+  Cpu,
+  Send,
+  Zap,
+  ArrowRight
 } from 'lucide-react';
-import { UserAccount, AccountStatus, UserRole, GradeLevel, ExamBoard, TargetGrade, Flashcard, PastPaperItem } from '../types';
+import {
+  UserAccount,
+  AccountStatus,
+  UserRole,
+  GradeLevel,
+  ExamBoard,
+  TargetGrade,
+  Flashcard,
+  PastPaperItem,
+  BankTransaction,
+  PastPaperQaSummaryReport,
+  PastPaperQaItemIssue
+} from '../types';
 import {
   getAllUsers,
   approveUser,
@@ -33,10 +54,21 @@ import {
   deleteUser,
   approveAllPendingUsers,
   rejectAllPendingUsers,
-  createPreApprovedUser
+  createPreApprovedUser,
+  grantUserProSubscription
 } from '../services/auth';
 import { IGCSE_SUBJECTS } from '../data/subjects';
 import { getCustomPastPapers, saveCustomPastPapers } from '../data/pastPapersData';
+import {
+  getBankTransactions,
+  addBankTransaction,
+  saveBankTransactions,
+  parseBdcSmsText,
+  SUBSCRIPTION_PRICE_EGP,
+  BDC_ACCOUNT_NUMBER_MASKED,
+  OFFICIAL_INSTAPAY_IPA
+} from '../services/paymentAutomation';
+import { runPastPaperQaAgent, validateKatexSyntax } from '../services/pastPaperQaAgent';
 import { SimplyLogo } from './SimplyLogo';
 
 interface AdminDashboardProps {
@@ -172,8 +204,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }
   };
 
-  // CMS State
-  const [adminActiveTab, setAdminActiveTab] = useState<'accounts' | 'cms'>('accounts');
+  // CMS & Admin Sections State
+  const [adminActiveTab, setAdminActiveTab] = useState<'accounts' | 'cms' | 'payments' | 'qa'>('accounts');
   const [cmsSection, setCmsSection] = useState<'flashcards' | 'pastpapers'>('flashcards');
 
   // Flashcards CMS form state
@@ -374,6 +406,140 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }
   };
 
+  // ─────────────────────────────────────────────────────────────
+  // Module 1: BDC Bank Feed & Reconciliation State & Handlers
+  // ─────────────────────────────────────────────────────────────
+  const [bankTxs, setBankTxs] = useState<BankTransaction[]>(() => getBankTransactions());
+  const [smsSimulatorText, setSmsSimulatorText] = useState('');
+  const [isSimulatingSms, setIsSimulatingSms] = useState(false);
+  const [txFilter, setTxFilter] = useState<'all' | 'unclaimed' | 'claimed'>('all');
+  const [manualMatchTx, setManualMatchTx] = useState<BankTransaction | null>(null);
+  const [manualMatchEmail, setManualMatchEmail] = useState('');
+
+  // Module 4: Past Paper QA Verification Agent State
+  const [qaReport, setQaReport] = useState<PastPaperQaSummaryReport>(() => runPastPaperQaAgent());
+  const [isScanningQa, setIsScanningQa] = useState(false);
+  const [testKatexInput, setTestKatexInput] = useState('\\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}');
+  const [testKatexResult, setTestKatexResult] = useState<{ isValid: boolean; error?: string }>(() =>
+    validateKatexSyntax('\\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}')
+  );
+
+  const reloadBankTxs = () => {
+    setBankTxs(getBankTransactions());
+  };
+
+  const handleSimulateSms = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!smsSimulatorText.trim()) return;
+    setIsSimulatingSms(true);
+    try {
+      const parsed = parseBdcSmsText(smsSimulatorText);
+      if (!parsed) {
+        alert('Could not parse transaction reference or amount from the provided SMS text. Please verify the format.');
+        return;
+      }
+      const res = addBankTransaction({
+        txNumber: parsed.txNumber,
+        amount: parsed.amount,
+        source: 'BDC',
+        status: 'unclaimed',
+        receivedAt: parsed.timestamp || new Date().toISOString(),
+        rawSmsText: parsed.rawText,
+      });
+
+      if (res.success) {
+        reloadBankTxs();
+        setSmsSimulatorText('');
+        showToast(`BDC Inbound SMS Ingested: Tx #${parsed.txNumber} (EGP ${parsed.amount.toFixed(2)}) recorded!`);
+      } else {
+        alert(res.error || 'Failed to add bank transaction.');
+      }
+    } finally {
+      setIsSimulatingSms(false);
+    }
+  };
+
+  const handleQuickSmsTemplate = (type: 'arabic' | 'english') => {
+    const randomRef = Math.floor(100000000000 + Math.random() * 900000000000).toString();
+    if (type === 'arabic') {
+      setSmsSimulatorText(
+        `تم تحويل مبلغ 250.00 جم إلى حسابك رقم **4812 طرف بنك القاهرة. الرقم المرجعي للعملية: ${randomRef}. بنك القاهرة`
+      );
+    } else {
+      setSmsSimulatorText(
+        `Credit Alert: EGP 250.00 received in your BDC account **4812 via InstaPay. Transaction Ref: ${randomRef}. Banque Du Caire`
+      );
+    }
+  };
+
+  const handleManualClaim = (tx: BankTransaction) => {
+    if (!manualMatchEmail.trim()) {
+      alert('Please enter or select a student email.');
+      return;
+    }
+    const targetEmail = manualMatchEmail.trim().toLowerCase();
+    const current = getBankTransactions();
+    const updated = current.map((t) => {
+      if (t.id === tx.id || t.txNumber === tx.txNumber) {
+        return {
+          ...t,
+          status: 'claimed' as const,
+          claimedBy: targetEmail,
+          claimedAt: new Date().toISOString(),
+        };
+      }
+      return t;
+    });
+    saveBankTransactions(updated);
+    reloadBankTxs();
+
+    const grantRes = grantUserProSubscription(targetEmail, 30);
+    reloadUsers();
+    setManualMatchTx(null);
+    setManualMatchEmail('');
+
+    if (grantRes.success) {
+      showToast(`Matched Tx #${tx.txNumber} with ${targetEmail}! 30-day Pro granted.`);
+    } else {
+      showToast(`Matched Tx #${tx.txNumber}. (Account will receive Pro upon signup).`);
+    }
+  };
+
+  const handleDeleteBankTx = (id: string) => {
+    if (confirm('Delete this bank ledger record?')) {
+      const current = getBankTransactions().filter((t) => t.id !== id);
+      saveBankTransactions(current);
+      reloadBankTxs();
+      showToast('Bank transaction removed from ledger.');
+    }
+  };
+
+  const handleRunQaScan = () => {
+    setIsScanningQa(true);
+    setTimeout(() => {
+      const report = runPastPaperQaAgent();
+      setQaReport(report);
+      setIsScanningQa(false);
+      showToast(`QA Scan complete: ${report.totalQuestionsScanned} questions scanned, ${report.issues.length} issues.`);
+    }, 400);
+  };
+
+  const filteredBankTxs = useMemo(() => {
+    return bankTxs.filter((t) => {
+      if (txFilter === 'all') return true;
+      return t.status === txFilter;
+    });
+  }, [bankTxs, txFilter]);
+
+  const bankMetrics = useMemo(() => {
+    const total = bankTxs.length;
+    const unclaimed = bankTxs.filter((t) => t.status === 'unclaimed').length;
+    const claimed = bankTxs.filter((t) => t.status === 'claimed').length;
+    const totalEgp = bankTxs.reduce((sum, t) => sum + (t.amount || 0), 0);
+    const unclaimedEgp = bankTxs.filter((t) => t.status === 'unclaimed').reduce((sum, t) => sum + (t.amount || 0), 0);
+    return { total, unclaimed, claimed, totalEgp, unclaimedEgp };
+  }, [bankTxs]);
+
   return (
     <div className="mx-auto max-w-6xl space-y-6 animate-fadeIn pb-12">
       {/* Toast Alert */}
@@ -426,7 +592,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       </div>
 
       {/* Admin Mode Tab Switcher */}
-      <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
+      <div className="flex items-center gap-2 border-b border-slate-800 pb-3 flex-wrap">
         <button
           onClick={() => setAdminActiveTab('accounts')}
           className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
@@ -453,12 +619,42 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <BookOpen className="h-4 w-4" />
           <span>Question & Flashcard CMS</span>
           <span className="rounded-full bg-purple-500/20 px-2 py-0.5 text-[10px] text-purple-300 border border-purple-500/30">
-            Authoring Tool
+            Authoring
+          </span>
+        </button>
+
+        <button
+          onClick={() => setAdminActiveTab('payments')}
+          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
+            adminActiveTab === 'payments'
+              ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30'
+              : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
+          }`}
+        >
+          <Receipt className="h-4 w-4" />
+          <span>BDC Bank Feed & InstaPay</span>
+          <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-300 border border-emerald-500/30">
+            {bankMetrics.unclaimed} Unclaimed
+          </span>
+        </button>
+
+        <button
+          onClick={() => setAdminActiveTab('qa')}
+          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
+            adminActiveTab === 'qa'
+              ? 'bg-sky-600 text-white shadow-lg shadow-sky-600/30'
+              : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
+          }`}
+        >
+          <ShieldCheck className="h-4 w-4" />
+          <span>Past Paper QA Agent</span>
+          <span className="rounded-full bg-sky-500/20 px-2 py-0.5 text-[10px] text-sky-300 border border-sky-500/30">
+            {qaReport.failedCount === 0 ? '100% Passed' : `${qaReport.issues.length} Issues`}
           </span>
         </button>
       </div>
 
-      {adminActiveTab === 'accounts' ? (
+      {adminActiveTab === 'accounts' && (
         <>
           {/* Overview Metric Cards */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
@@ -756,7 +952,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         )}
       </div>
         </>
-      ) : (
+      )}
+
+      {adminActiveTab === 'cms' && (
         /* CMS (Content Management System) Section */
         <div className="space-y-6">
           {/* CMS Sub-navigation */}
@@ -1230,6 +1428,556 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               )}
             </div>
           )}
+        </div>
+      )}
+
+      {/* ───────────────────────────────────────────────────────── */}
+      {/* Module 1: BDC Bank Feed & InstaPay Reconciliation Tab     */}
+      {/* ───────────────────────────────────────────────────────── */}
+      {adminActiveTab === 'payments' && (
+        <div className="space-y-6">
+          {/* Bank Ledger Header Banner */}
+          <div className="rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-emerald-950/60 via-slate-900 to-slate-900 p-5 shadow-xl">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <div className="rounded-lg bg-emerald-500/20 p-1.5 text-emerald-400 border border-emerald-500/30">
+                    <Receipt className="h-4 w-4" />
+                  </div>
+                  <h2 className="text-lg font-bold text-white">Banque Du Caire (BDC) & InstaPay Feed</h2>
+                  <span className="rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-[10px] font-black text-emerald-300 border border-emerald-500/30">
+                    Live Ledger
+                  </span>
+                </div>
+                <p className="text-xs text-slate-300">
+                  Automated two-way reconciliation pipeline matching official BDC inbound bank SMS with student InstaPay transaction numbers.
+                </p>
+                <div className="flex items-center gap-4 text-xs font-mono text-slate-400 pt-1 flex-wrap">
+                  <span>Bank: <strong className="text-emerald-300">Banque Du Caire (BDC) {BDC_ACCOUNT_NUMBER_MASKED}</strong></span>
+                  <span>•</span>
+                  <span>InstaPay IPA: <strong className="text-amber-300">{OFFICIAL_INSTAPAY_IPA}</strong></span>
+                  <span>•</span>
+                  <span>Standard Pro Price: <strong className="text-white">EGP {SUBSCRIPTION_PRICE_EGP}</strong></span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={reloadBankTxs}
+                  className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition cursor-pointer"
+                >
+                  <RefreshCw className="h-3.5 w-3.5" />
+                  <span>Sync Feed</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Metric Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4">
+              <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
+                <span>Total BDC Credits</span>
+                <Receipt className="h-4 w-4 text-emerald-400" />
+              </div>
+              <div className="text-2xl font-black text-white mt-1 font-mono">{bankMetrics.total}</div>
+              <span className="text-[10px] text-slate-500">Total SMS records</span>
+            </div>
+
+            <div className="rounded-2xl border border-emerald-500/40 bg-emerald-950/20 p-4 ring-1 ring-emerald-500/30">
+              <div className="flex items-center justify-between text-xs text-emerald-300 font-bold">
+                <span>Unclaimed Transfers</span>
+                <Zap className="h-4 w-4 text-emerald-400" />
+              </div>
+              <div className="text-2xl font-black text-emerald-300 mt-1 font-mono">{bankMetrics.unclaimed}</div>
+              <span className="text-[10px] text-emerald-400 font-semibold">EGP {bankMetrics.unclaimedEgp.toFixed(2)} ready to match</span>
+            </div>
+
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4">
+              <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
+                <span>Claimed / Pro Granted</span>
+                <CheckCircle2 className="h-4 w-4 text-indigo-400" />
+              </div>
+              <div className="text-2xl font-black text-indigo-300 mt-1 font-mono">{bankMetrics.claimed}</div>
+              <span className="text-[10px] text-slate-500">Matched student accounts</span>
+            </div>
+
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4">
+              <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
+                <span>Total Volume</span>
+                <Crown className="h-4 w-4 text-amber-400" />
+              </div>
+              <div className="text-2xl font-black text-amber-300 mt-1 font-mono">EGP {bankMetrics.totalEgp.toFixed(0)}</div>
+              <span className="text-[10px] text-slate-500">Gross subscription inflow</span>
+            </div>
+          </div>
+
+          {/* iPhone Shortcut Inbound SMS Webhook Simulator */}
+          <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="rounded-lg bg-indigo-500/20 p-1.5 text-indigo-400 border border-indigo-500/30">
+                  <Send className="h-4 w-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white">iPhone Shortcut Webhook Simulator</h3>
+                  <p className="text-[11px] text-slate-400">
+                    Endpoint: <code className="text-indigo-300 font-mono">POST /api/webhooks/bdc-sms</code> (Extracts Bank Ref # and EGP)
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => handleQuickSmsTemplate('arabic')}
+                  className="rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1 text-[11px] font-semibold text-slate-300 hover:text-white hover:border-slate-600 transition cursor-pointer"
+                >
+                  Template: Arabic BDC SMS
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickSmsTemplate('english')}
+                  className="rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1 text-[11px] font-semibold text-slate-300 hover:text-white hover:border-slate-600 transition cursor-pointer"
+                >
+                  Template: English Alert
+                </button>
+              </div>
+            </div>
+
+            <form onSubmit={handleSimulateSms} className="space-y-3">
+              <textarea
+                value={smsSimulatorText}
+                onChange={(e) => setSmsSimulatorText(e.target.value)}
+                rows={3}
+                placeholder="Paste incoming SMS text from Banque Du Caire (BDC) or click one of the quick templates above..."
+                className="w-full rounded-xl border border-slate-700 bg-slate-950 p-3 text-xs text-slate-200 placeholder-slate-500 focus:border-indigo-500 focus:outline-none font-mono"
+              />
+
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] text-slate-400">
+                  Parses Reference Number (الرقم المرجعي) and Amount (جم / EGP) automatically.
+                </span>
+
+                <button
+                  type="submit"
+                  disabled={!smsSimulatorText.trim() || isSimulatingSms}
+                  className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-4 py-2 text-xs font-bold text-slate-950 hover:opacity-95 shadow-lg shadow-emerald-500/20 disabled:opacity-50 transition cursor-pointer"
+                >
+                  <Send className="h-3.5 w-3.5" />
+                  <span>{isSimulatingSms ? 'Parsing...' : 'Ingest to Bank Ledger'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* Bank Ledger Table */}
+          <div className="rounded-2xl border border-slate-800 bg-slate-900/90 shadow-xl overflow-hidden">
+            <div className="p-4 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Receipt className="h-4 w-4 text-emerald-400" />
+                <h3 className="text-sm font-bold text-white">Bank Transactions Ledger ({filteredBankTxs.length})</h3>
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                {(['all', 'unclaimed', 'claimed'] as const).map((filter) => (
+                  <button
+                    key={filter}
+                    onClick={() => setTxFilter(filter)}
+                    className={`rounded-lg px-2.5 py-1 text-xs font-semibold capitalize transition cursor-pointer ${
+                      txFilter === filter
+                        ? 'bg-slate-700 text-white shadow-sm'
+                        : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    {filter}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {filteredBankTxs.length === 0 ? (
+              <div className="p-8 text-center text-slate-400 text-xs">
+                No bank transactions found in this view.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="border-b border-slate-800 bg-slate-950/60 text-slate-400 text-[11px] font-semibold">
+                      <th className="p-3">Reference / Tx #</th>
+                      <th className="p-3">Amount</th>
+                      <th className="p-3">Status</th>
+                      <th className="p-3">Source & Bank</th>
+                      <th className="p-3">Received Time</th>
+                      <th className="p-3">Claimed By</th>
+                      <th className="p-3 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60 font-mono">
+                    {filteredBankTxs.map((tx) => (
+                      <tr key={tx.id} className="hover:bg-slate-800/40 transition">
+                        <td className="p-3">
+                          <div className="flex items-center gap-1.5 font-bold text-white">
+                            <span>#{tx.txNumber}</span>
+                            <button
+                              onClick={() => {
+                                navigator.clipboard.writeText(tx.txNumber);
+                                showToast(`Copied #${tx.txNumber}`);
+                              }}
+                              className="text-slate-500 hover:text-slate-300 p-0.5"
+                              title="Copy Reference"
+                            >
+                              <Copy className="h-3 w-3" />
+                            </button>
+                          </div>
+                        </td>
+
+                        <td className="p-3 font-bold text-emerald-400">
+                          EGP {tx.amount.toFixed(2)}
+                        </td>
+
+                        <td className="p-3">
+                          {tx.status === 'unclaimed' ? (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-bold text-emerald-300 border border-emerald-500/30 animate-pulse">
+                              <Zap className="h-2.5 w-2.5" />
+                              <span>Unclaimed</span>
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-indigo-500/20 px-2 py-0.5 text-[10px] font-bold text-indigo-300 border border-indigo-500/30">
+                              <CheckCircle2 className="h-2.5 w-2.5" />
+                              <span>Claimed</span>
+                            </span>
+                          )}
+                        </td>
+
+                        <td className="p-3 text-slate-400 text-[11px]">
+                          BDC Bank Alert
+                        </td>
+
+                        <td className="p-3 text-slate-400 text-[11px]">
+                          {new Date(tx.receivedAt).toLocaleString()}
+                        </td>
+
+                        <td className="p-3 text-[11px]">
+                          {tx.claimedBy ? (
+                            <span className="text-indigo-300 font-semibold">{tx.claimedBy}</span>
+                          ) : (
+                            <span className="text-slate-500 italic">None (Ready to match)</span>
+                          )}
+                        </td>
+
+                        <td className="p-3 text-right">
+                          <div className="flex items-center justify-end gap-1.5">
+                            {tx.status === 'unclaimed' && (
+                              <button
+                                onClick={() => {
+                                  setManualMatchTx(tx);
+                                  setManualMatchEmail('');
+                                }}
+                                className="flex items-center gap-1 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/40 px-2 py-1 text-[11px] font-bold text-emerald-300 transition cursor-pointer"
+                              >
+                                <CheckCheck className="h-3 w-3" />
+                                <span>Match / Grant Pro</span>
+                              </button>
+                            )}
+
+                            <button
+                              onClick={() => handleDeleteBankTx(tx.id)}
+                              className="rounded-lg p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition cursor-pointer"
+                              title="Delete record"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ───────────────────────────────────────────────────────── */}
+      {/* Module 4: Past Paper QA Verification Agent Tab           */}
+      {/* ───────────────────────────────────────────────────────── */}
+      {adminActiveTab === 'qa' && (
+        <div className="space-y-6">
+          {/* Header Banner */}
+          <div className="rounded-2xl border border-sky-500/30 bg-gradient-to-r from-sky-950/60 via-slate-900 to-slate-900 p-5 shadow-xl">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <div className="rounded-lg bg-sky-500/20 p-1.5 text-sky-400 border border-sky-500/30">
+                    <ShieldCheck className="h-4 w-4" />
+                  </div>
+                  <h2 className="text-lg font-bold text-white">Past Paper QA Verification Agent</h2>
+                  <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-black border ${
+                    qaReport.failedCount === 0
+                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                      : 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+                  }`}>
+                    {qaReport.failedCount === 0 ? '100% Passed (0 Errors)' : `${qaReport.issues.length} Issues Detected`}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-300">
+                  Internal verification engine scanning every question, sub-part, step mark scheme rubric, examiner report, and KaTeX math expression.
+                </p>
+                <div className="text-[11px] font-mono text-slate-400">
+                  Last Scanned: {new Date(qaReport.scannedAt).toLocaleTimeString()} • Verified Against Cambridge (CIE) & Pearson Edexcel Syllabuses
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={handleRunQaScan}
+                  disabled={isScanningQa}
+                  className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 px-4 py-2.5 text-xs font-bold text-slate-950 shadow-lg shadow-sky-500/20 hover:opacity-95 transition cursor-pointer disabled:opacity-50"
+                >
+                  <RefreshCw className={`h-3.5 w-3.5 ${isScanningQa ? 'animate-spin' : ''}`} />
+                  <span>{isScanningQa ? 'Running QA Agent...' : 'Run Comprehensive Scan'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* QA Metrics */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4">
+              <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
+                <span>Total Questions</span>
+                <Database className="h-4 w-4 text-sky-400" />
+              </div>
+              <div className="text-2xl font-black text-white mt-1 font-mono">{qaReport.totalQuestionsScanned}</div>
+              <span className="text-[10px] text-slate-500">Across all subjects</span>
+            </div>
+
+            <div className="rounded-2xl border border-emerald-500/30 bg-emerald-950/20 p-4">
+              <div className="flex items-center justify-between text-xs text-emerald-300 font-bold">
+                <span>KaTeX Math Syntax</span>
+                <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+              </div>
+              <div className="text-2xl font-black text-emerald-300 mt-1 font-mono">
+                {qaReport.katexSyntaxErrors === 0 ? 'PERFECT' : `${qaReport.katexSyntaxErrors} Errors`}
+              </div>
+              <span className="text-[10px] text-emerald-400">All braces & dollar signs closed</span>
+            </div>
+
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4">
+              <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
+                <span>Mark Scheme Steps</span>
+                <Layers className="h-4 w-4 text-purple-400" />
+              </div>
+              <div className="text-2xl font-black text-purple-300 mt-1 font-mono">
+                {qaReport.missingMarkSchemes === 0 ? 'COMPLETE' : `${qaReport.missingMarkSchemes} Missing`}
+              </div>
+              <span className="text-[10px] text-slate-500">[M1], [A1], [B1] rubrics present</span>
+            </div>
+
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4">
+              <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
+                <span>Official PDF Links</span>
+                <FileText className="h-4 w-4 text-amber-400" />
+              </div>
+              <div className="text-2xl font-black text-amber-300 mt-1 font-mono">{qaReport.totalPdfsScanned} Papers</div>
+              <span className="text-[10px] text-slate-500">Linked to official PDFs</span>
+            </div>
+          </div>
+
+          {/* Interactive KaTeX Syntax Test Bed */}
+          <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl space-y-4">
+            <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
+              <div className="rounded-lg bg-sky-500/20 p-1.5 text-sky-400 border border-sky-500/30">
+                <Cpu className="h-4 w-4" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-white">Interactive KaTeX Math Syntax Test Bed</h3>
+                <p className="text-[11px] text-slate-400">
+                  Test mathematical formulas, command tokens, and delimiter pairs before publishing.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={testKatexInput}
+                  onChange={(e) => {
+                    setTestKatexInput(e.target.value);
+                    setTestKatexResult(validateKatexSyntax(e.target.value));
+                  }}
+                  placeholder="Enter KaTeX expression (e.g. \int_{0}^{\pi} \sin(x) dx)"
+                  className="flex-1 rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-xs text-slate-200 font-mono focus:border-sky-500 focus:outline-none"
+                />
+              </div>
+
+              <div className="flex items-center justify-between text-xs font-mono">
+                <div className="flex items-center gap-2">
+                  <span className="text-slate-400">Validation Status:</span>
+                  {testKatexResult.isValid ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold text-emerald-300 border border-emerald-500/30">
+                      <CheckCircle2 className="h-3 w-3" />
+                      <span>Valid KaTeX & Balanced Braces</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-rose-500/20 px-2.5 py-0.5 text-[10px] font-bold text-rose-300 border border-rose-500/30">
+                      <AlertTriangle className="h-3 w-3" />
+                      <span>{testKatexResult.error}</span>
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2 text-slate-500 text-[11px]">
+                  <span>Currency signs: use <code className="text-amber-300">\$</code> to avoid math delimiter traps.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* QA Scan Results Details */}
+          <div className="rounded-2xl border border-slate-800 bg-slate-900/90 shadow-xl overflow-hidden">
+            <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Activity className="h-4 w-4 text-sky-400" />
+                <h3 className="text-sm font-bold text-white">Database Verification Report</h3>
+              </div>
+              <span className="text-xs text-slate-400 font-mono">
+                {qaReport.issues.length === 0 ? 'Status: 0 Issues Found' : `${qaReport.issues.length} Issues Found`}
+              </span>
+            </div>
+
+            {qaReport.issues.length === 0 ? (
+              <div className="p-8 text-center space-y-2">
+                <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 mb-1">
+                  <CheckCircle2 className="h-6 w-6" />
+                </div>
+                <h4 className="text-sm font-bold text-white">All Database Past Papers Verified</h4>
+                <p className="text-xs text-slate-400 max-w-md mx-auto">
+                  Every past paper component has valid KaTeX math formatting, complete mark schemes, step criteria rubrics, and valid PDF examiner resources.
+                </p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="border-b border-slate-800 bg-slate-950/60 text-slate-400 text-[11px] font-semibold">
+                      <th className="p-3">Paper Code</th>
+                      <th className="p-3">Question</th>
+                      <th className="p-3">Issue Type</th>
+                      <th className="p-3">Details</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60 font-mono">
+                    {qaReport.issues.map((issue, idx) => (
+                      <tr key={idx} className="hover:bg-slate-800/40">
+                        <td className="p-3 text-white font-bold">{issue.paperCode}</td>
+                        <td className="p-3 text-slate-300">{issue.questionNumber}</td>
+                        <td className="p-3 text-amber-300">{issue.issueType}</td>
+                        <td className="p-3 text-slate-400 text-[11px]">
+                          <div>{issue.details}</div>
+                          {issue.snippet && (
+                            <code className="block mt-1 text-[10px] text-amber-200 bg-slate-950 p-1 rounded">
+                              {issue.snippet}
+                            </code>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Manual Match & Grant Pro Modal for BDC Transactions */}
+      {manualMatchTx && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-fadeIn">
+          <div className="relative w-full max-w-md rounded-2xl border border-emerald-500/40 bg-slate-900 p-6 shadow-2xl space-y-4">
+            <button
+              onClick={() => setManualMatchTx(null)}
+              className="absolute right-4 top-4 rounded-lg p-1 text-slate-400 hover:bg-slate-800 hover:text-white"
+            >
+              ✕
+            </button>
+
+            <div className="flex items-center gap-2">
+              <div className="rounded-xl bg-emerald-500/20 p-2 text-emerald-400 border border-emerald-500/30">
+                <Receipt className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-white">Match BDC Bank Transfer</h3>
+                <p className="text-xs text-slate-400">Grant 30-Day Pro Subscription Access</p>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-slate-800 bg-slate-950 p-3 space-y-1.5 text-xs font-mono">
+              <div className="flex justify-between">
+                <span className="text-slate-400">Bank Ref #:</span>
+                <span className="text-white font-bold">#{manualMatchTx.txNumber}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Amount:</span>
+                <span className="text-emerald-400 font-bold">EGP {manualMatchTx.amount.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Received:</span>
+                <span className="text-slate-300">{new Date(manualMatchTx.receivedAt).toLocaleString()}</span>
+              </div>
+            </div>
+
+            <div className="space-y-2 text-xs">
+              <label className="text-[11px] font-bold text-slate-300 block">
+                Assign to Student Account Email:
+              </label>
+              <input
+                type="email"
+                required
+                value={manualMatchEmail}
+                onChange={(e) => setManualMatchEmail(e.target.value)}
+                placeholder="student@school.edu"
+                className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white focus:border-emerald-500 focus:outline-none"
+              />
+
+              <div className="pt-1">
+                <span className="text-[10px] text-slate-400 block mb-1">Or pick from registered waitlist:</span>
+                <div className="flex flex-wrap gap-1 max-h-24 overflow-y-auto">
+                  {users.slice(0, 6).map((u) => (
+                    <button
+                      key={u.id}
+                      type="button"
+                      onClick={() => setManualMatchEmail(u.email)}
+                      className="rounded-lg border border-slate-800 bg-slate-950/80 px-2 py-0.5 text-[10px] text-slate-300 hover:text-white hover:border-slate-700"
+                    >
+                      {u.name} ({u.email})
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+              <button
+                type="button"
+                onClick={() => setManualMatchTx(null)}
+                className="rounded-xl border border-slate-800 px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => handleManualClaim(manualMatchTx)}
+                className="rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-4 py-2 text-xs font-bold text-slate-950 hover:opacity-95 shadow-md shadow-emerald-500/20"
+              >
+                Confirm Match & Grant 30-Day Pro
+              </button>
+            </div>
+          </div>
         </div>
       )}
       {isAddModalOpen && (

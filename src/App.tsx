@@ -30,13 +30,15 @@ import { EslSpeakingSimulator } from './components/EslSpeakingSimulator';
 import { HomeView } from './components/HomeView';
 import { AdminDashboard } from './components/AdminDashboard';
 import { AccountGate } from './components/AccountGate';
+import { TeacherAnalyticsDashboard } from './components/TeacherAnalyticsDashboard';
+import { PaymentModal } from './components/PaymentModal';
 import { SettingsModal } from './components/SettingsModal';
 import { ProfileModal } from './components/ProfileModal';
 import { AuthModal } from './components/AuthModal';
 import { ScientificCalculator } from './components/ScientificCalculator';
 import { SecretAdminModal } from './components/SecretAdminModal';
 import { SimplyLogo } from './components/SimplyLogo';
-import { getActiveUser, setActiveUser } from './services/auth';
+import { getActiveUser, setActiveUser, grantUserProSubscription } from './services/auth';
 import {
   Camera,
   Layers,
@@ -107,6 +109,7 @@ export function App() {
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
   const [isSecretAdminOpen, setIsSecretAdminOpen] = useState(false);
+  const [isPaymentOpen, setIsPaymentOpen] = useState(false);
 
   // 4b. Theme & Accessibility State
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
@@ -464,6 +467,7 @@ export function App() {
       case 'esl-speaking': return 'the ESL Speaking Oral Exam Simulator';
       case 'boundaries': return 'the Grade Boundaries Calculator';
       case 'split': return 'the Split-Screen Exam Viewer';
+      case 'analytics': return 'the School & Teacher Analytics Diagnostics';
       case 'admin': return 'the Administrative Control Console';
       default: return 'this study resource';
     }
@@ -488,6 +492,7 @@ export function App() {
         onLogout={handleLogout}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onOpenCalculator={() => setIsCalculatorOpen(true)}
+        onOpenPayment={() => setIsPaymentOpen(true)}
         theme={theme}
         onToggleTheme={handleToggleTheme}
         onOpenSecretAdmin={() => setIsSecretAdminOpen(true)}
@@ -511,6 +516,7 @@ export function App() {
               }}
               onRefreshStatus={handleRefreshStatus}
               onLogout={handleLogout}
+              onOpenPayment={() => setIsPaymentOpen(true)}
               featureName={getTabFeatureName('admin')}
             />
           )
@@ -524,6 +530,7 @@ export function App() {
             }}
             onRefreshStatus={handleRefreshStatus}
             onLogout={handleLogout}
+            onOpenPayment={() => setIsPaymentOpen(true)}
             featureName={getTabFeatureName(activeTab)}
           />
         ) : (
@@ -641,6 +648,21 @@ export function App() {
               <SplitScreenPaperViewer
                 activeSubject={activeSubject}
                 profile={profile}
+              />
+            )}
+
+            {activeTab === 'analytics' && (
+              <TeacherAnalyticsDashboard
+                currentUser={currentUser}
+                subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
+                onOpenQuizWithDrill={(drillQuestions) => {
+                  handleAddQuizzes(drillQuestions as any);
+                  setActiveTab('quiz');
+                }}
+                onOpenChatWithTopic={(topic) => {
+                  setChatInitialQuestion(`Please create an urgent 5-question diagnostic exam drill with official Cambridge mark scheme rubrics targeting: "${topic}".`);
+                  setActiveTab('chat');
+                }}
               />
             )}
           </>
@@ -774,6 +796,21 @@ export function App() {
       <ScientificCalculator
         isOpen={isCalculatorOpen}
         onClose={() => setIsCalculatorOpen(false)}
+      />
+
+      {/* Payment Modal (InstaPay & BDC SMS Two-Way Matcher) */}
+      <PaymentModal
+        isOpen={isPaymentOpen}
+        onClose={() => setIsPaymentOpen(false)}
+        currentUser={currentUser}
+        profile={profile}
+        onPaymentSuccess={() => {
+          if (currentUser) {
+            grantUserProSubscription(currentUser.id, 30);
+          }
+          handleRefreshStatus();
+          setIsPaymentOpen(false);
+        }}
       />
     </div>
   );

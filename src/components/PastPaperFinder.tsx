@@ -31,11 +31,12 @@ import {
   Check,
   Edit3
 } from 'lucide-react';
-import { Subject, UserProfile, PastPaperItem, BookmarkItem, OfficialPaperPdf } from '../types';
+import { Subject, UserProfile, PastPaperItem, BookmarkItem, OfficialPaperPdf, PastPaperSubPart } from '../types';
 import { getAllPastPapers, getPaperDownloadUrl, OFFICIAL_PAST_PAPER_PDFS } from '../data/pastPapersData';
 import { evaluateStudentAnswerAgainstMarkScheme, ExamGradingResult } from '../services/examQuestionEngine';
 import { MathRenderer } from './MathRenderer';
 import { isSubjectMatch } from '../utils/subjectMatcher';
+import { parseExamCodeString, ParsedExamCode } from '../utils/examCodeParser';
 
 interface PastPaperFinderProps {
   activeSubject: Subject;
@@ -56,6 +57,11 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 }) => {
   // Main View Switcher: Official PDFs vs Question Finder
   const [activeTab, setActiveTab] = useState<'pdf-library' | 'questions'>('pdf-library');
+
+  // Dual Search Mode for Questions (Mode A: Exam Code Bar vs Mode B: Visual Filter Layout)
+  const [searchMode, setSearchMode] = useState<'modeA' | 'modeB'>('modeA');
+  const [selectedQuestionPill, setSelectedQuestionPill] = useState<string>('All');
+  const [activeSubPartMap, setActiveSubPartMap] = useState<Record<string, number | 'all'>>({});
 
   // Modal PDF Previewer
   const [previewModal, setPreviewModal] = useState<{
@@ -94,6 +100,12 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
   const [selectedVariant, setSelectedVariant] = useState<string>('All');
   const [selectedTier, setSelectedTier] = useState<string>('All');
   const [copiedQuestionId, setCopiedQuestionId] = useState<string | null>(null);
+
+  // Real-time Parsed Exam Code from Mode A input
+  const parsedExamCode = useMemo(() => {
+    if (!searchQuery.trim()) return null;
+    return parseExamCodeString(searchQuery);
+  }, [searchQuery]);
 
   // Interactive Answer Grading State
   const [testingPaperId, setTestingPaperId] = useState<string | null>(null);
@@ -327,18 +339,69 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
         return false;
       }
 
-      // Search Query
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const matchesQuery =
-          paper.snippetQuery.toLowerCase().includes(q) ||
-          (paper.questionPrompt || paper.questionText || '').toLowerCase().includes(q) ||
-          paper.topic.toLowerCase().includes(q) ||
-          paper.session.toLowerCase().includes(q) ||
-          paper.paperCode.toLowerCase().includes(q) ||
-          paper.questionNumber.toLowerCase().includes(q);
+      // Mode B: Question Number Pill filter (e.g. Q4 or Q12)
+      if (searchMode === 'modeB' && selectedQuestionPill !== 'All') {
+        const matchesPill =
+          paper.questionNumber.toLowerCase().includes(selectedQuestionPill.toLowerCase()) ||
+          paper.questionNumber.toLowerCase().startsWith(selectedQuestionPill.toLowerCase());
+        if (!matchesPill) return false;
+      }
 
-        if (!matchesQuery) return false;
+      // Search Query / Mode A parsed exam code filter
+      if (searchQuery.trim()) {
+        // If parsed as an exam code with high confidence, apply smart structural match
+        if (searchMode === 'modeA' && parsedExamCode && parsedExamCode.confidence >= 0.4) {
+          if (parsedExamCode.subjectCode) {
+            const code = parsedExamCode.subjectCode.toLowerCase();
+            const matchesCode =
+              paper.paperCode.toLowerCase().includes(code) ||
+              paper.subjectCode?.toLowerCase().includes(code) ||
+              paper.subjectId.toLowerCase().includes(code);
+            if (!matchesCode) return false;
+          }
+
+          if (parsedExamCode.paperNumber) {
+            const pNum = parsedExamCode.paperNumber.toString();
+            if (!paper.paperCode.includes(`/${pNum}`) && !paper.session.includes(`Paper ${pNum}`)) {
+              // Also allow variant match e.g. 42
+              if (parsedExamCode.variant && !paper.paperCode.includes(`/${pNum}${parsedExamCode.variant}`)) {
+                return false;
+              }
+            }
+          }
+
+          if (parsedExamCode.year && paper.year !== parsedExamCode.year) {
+            return false;
+          }
+
+          if (parsedExamCode.sessionName) {
+            if (!paper.session.toLowerCase().includes(parsedExamCode.sessionName.toLowerCase())) {
+              return false;
+            }
+          }
+
+          if (parsedExamCode.questionNumber) {
+            const targetQ = parsedExamCode.questionNumber.toLowerCase();
+            const matchesQ =
+              paper.questionNumber.toLowerCase().includes(targetQ) ||
+              paper.questionNumber.toLowerCase().startsWith(`q${parsedExamCode.baseQuestionNum}`) ||
+              paper.subParts?.some(sp => sp.part.toLowerCase() === parsedExamCode.subPart?.toLowerCase());
+            if (!matchesQ) return false;
+          }
+        } else {
+          // Standard text search
+          const q = searchQuery.toLowerCase();
+          const matchesQuery =
+            paper.snippetQuery.toLowerCase().includes(q) ||
+            (paper.questionPrompt || paper.questionText || '').toLowerCase().includes(q) ||
+            paper.topic.toLowerCase().includes(q) ||
+            paper.session.toLowerCase().includes(q) ||
+            paper.paperCode.toLowerCase().includes(q) ||
+            paper.questionNumber.toLowerCase().includes(q) ||
+            paper.subParts?.some(sp => sp.prompt.toLowerCase().includes(q));
+
+          if (!matchesQuery) return false;
+        }
       }
 
       return true;
@@ -350,6 +413,9 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
     selectedYear,
     selectedSession,
     selectedTier,
+    selectedQuestionPill,
+    searchMode,
+    parsedExamCode,
     searchQuery,
   ]);
 
@@ -485,57 +551,259 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
       {/* Comprehensive Search & Multi-Filter Bar with Year, Paper, Variant */}
       <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4 sm:p-5 shadow-xl space-y-4">
-        {/* Search Input */}
-        <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={
-              activeTab === 'pdf-library'
-                ? "Search paper code (0580/42), subject name, session (May/June 2023), variant..."
-                : "Search by Exam Code & Q# (e.g. 0580/42 Q6, 0620/42 Q7, 4MA1 Q12) or topic..."
-            }
-            className="w-full rounded-xl border border-slate-700 bg-slate-950 py-3 pl-10 pr-10 text-sm text-white placeholder-slate-500 focus:border-sky-500 focus:outline-none"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-white"
-            >
-              ✕
-            </button>
-          )}
-        </div>
-
-        {/* Quick Exam Code & Q# Lookup shortcuts */}
+        {/* Dual Search Mode Switcher (Active on Questions Tab) */}
         {activeTab === 'questions' && (
-          <div className="flex flex-wrap items-center gap-1.5 pt-0.5 text-xs">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1 shrink-0">
-              <Sparkles className="h-3 w-3" />
-              Quick Exam Q Lookup:
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-slate-400">Search Engine Mode:</span>
+              <div className="flex items-center rounded-xl bg-slate-950 p-1 border border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setSearchMode('modeA')}
+                  className={`rounded-lg px-3 py-1.5 text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                    searchMode === 'modeA'
+                      ? 'bg-sky-500 text-white shadow-md'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Search className="h-3.5 w-3.5" />
+                  <span>Mode A: Exam Code Bar</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSearchMode('modeB')}
+                  className={`rounded-lg px-3 py-1.5 text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                    searchMode === 'modeB'
+                      ? 'bg-sky-500 text-white shadow-md'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Filter className="h-3.5 w-3.5" />
+                  <span>Mode B: Visual Filter Layout</span>
+                </button>
+              </div>
+            </div>
+
+            <span className="text-[11px] text-slate-400">
+              {searchMode === 'modeA'
+                ? 'Type full exam code (e.g. 0580/42/M/J/23 Q4(b))'
+                : 'Select Subject, Year, Variant, Series & Question Pills'}
             </span>
-            {[
-              { label: '0580/42 Q6(b) (Bearings)', query: '0580/42 Q6' },
-              { label: '0580/42 Q7(c) (Sequences)', query: '0580/42 Q7' },
-              { label: '0580/22 Q14 (Circle Theorems)', query: '0580/22 Q14' },
-              { label: '0620/42 Q7 (Redox)', query: '0620/42 Q7' },
-              { label: '0625/41 Q2 (Momentum)', query: '0625/41 Q2' },
-              { label: '0610/41 Q3 (Osmosis)', query: '0610/41 Q3' },
-              { label: '4MA1/1H Q12 (Functions)', query: '4MA1/1H Q12' },
-              { label: '0478/12 Q5 (RLE)', query: '0478/12 Q5' },
-              { label: '0510/12 Q4 (Summary)', query: '0510/12 Q4' },
-            ].map((shortcut, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => setSearchQuery(shortcut.query)}
-                className="rounded-lg border border-sky-500/30 bg-sky-950/40 px-2 py-0.5 text-[11px] text-sky-200 hover:border-sky-400 hover:bg-sky-900/60 transition cursor-pointer"
-              >
-                {shortcut.label}
-              </button>
-            ))}
+          </div>
+        )}
+
+        {/* Search Input (Mode A or Default PDF search) */}
+        {(activeTab === 'pdf-library' || searchMode === 'modeA') && (
+          <div className="space-y-2">
+            <div className="relative">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={
+                  activeTab === 'pdf-library'
+                    ? "Search paper code (0580/42), subject name, session (May/June 2023), variant..."
+                    : "Enter exam code: e.g. 0580/42/M/J/23 Q4(b) or 0625/21/O/N/22 Q12 or 0620/41/M/J/21 Q3(a)..."
+                }
+                className="w-full rounded-xl border border-slate-700 bg-slate-950 py-3 pl-10 pr-10 text-sm text-white placeholder-slate-500 font-mono focus:border-sky-500 focus:outline-none"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-white"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            {/* Mode A Real-time Parsed Exam Code Breakdown Chips */}
+            {activeTab === 'questions' && searchMode === 'modeA' && parsedExamCode && parsedExamCode.confidence >= 0.4 && (
+              <div className="flex flex-wrap items-center gap-1.5 p-2.5 rounded-xl border border-sky-500/30 bg-sky-950/40 text-xs animate-fadeIn">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-sky-400 mr-1 flex items-center gap-1">
+                  <CheckCircle className="h-3 w-3" />
+                  Code Parsed:
+                </span>
+                {parsedExamCode.subjectCode && (
+                  <span className="rounded-md bg-indigo-500/20 px-2 py-0.5 font-mono font-bold text-indigo-300 border border-indigo-500/30">
+                    Subject: {parsedExamCode.subjectCode}
+                  </span>
+                )}
+                {parsedExamCode.paperNumber && (
+                  <span className="rounded-md bg-sky-500/20 px-2 py-0.5 font-mono font-bold text-sky-300 border border-sky-500/30">
+                    Paper {parsedExamCode.paperNumber}{parsedExamCode.variant ? ` (Var ${parsedExamCode.variant})` : ''}
+                  </span>
+                )}
+                {parsedExamCode.seasonCode && (
+                  <span className="rounded-md bg-purple-500/20 px-2 py-0.5 font-mono font-bold text-purple-300 border border-purple-500/30">
+                    Series: {parsedExamCode.seasonCode} ({parsedExamCode.sessionName})
+                  </span>
+                )}
+                {parsedExamCode.year && (
+                  <span className="rounded-md bg-amber-500/20 px-2 py-0.5 font-mono font-bold text-amber-300 border border-amber-500/30">
+                    Year: {parsedExamCode.year}
+                  </span>
+                )}
+                {parsedExamCode.questionNumber && (
+                  <span className="rounded-md bg-emerald-500/20 px-2 py-0.5 font-mono font-bold text-emerald-300 border border-emerald-500/30">
+                    Target: {parsedExamCode.questionNumber}
+                  </span>
+                )}
+                {parsedExamCode.isMultipleChoice && (
+                  <span className="rounded-md bg-pink-500/20 px-2 py-0.5 text-[10px] font-bold text-pink-300 border border-pink-500/30">
+                    MCQ 40 Discrete Items
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* Quick Exam Code & Q# Lookup shortcuts */}
+            {activeTab === 'questions' && (
+              <div className="flex flex-wrap items-center gap-1.5 pt-0.5 text-xs">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1 shrink-0">
+                  <Sparkles className="h-3 w-3" />
+                  Sample Exam Codes:
+                </span>
+                {[
+                  { label: '0580/42/M/J/23 Q6(b)', query: '0580/42/M/J/23 Q6(b)' },
+                  { label: '0580/42/O/N/22 Q7(c)', query: '0580/42/O/N/22 Q7(c)' },
+                  { label: '0580/22/O/N/23 Q14', query: '0580/22/O/N/23 Q14' },
+                  { label: '0580/41/M/J/24 Q5(a)', query: '0580/41/M/J/24 Q5(a)' },
+                  { label: '0620/42/O/N/22 Q5(b)', query: '0620/42/O/N/22 Q5(b)' },
+                  { label: '0606/12/M/J/23 Q7', query: '0606/12/M/J/23 Q7' },
+                ].map((shortcut, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setSearchQuery(shortcut.query)}
+                    className="rounded-lg border border-sky-500/30 bg-sky-950/40 px-2 py-0.5 text-[11px] text-sky-200 hover:border-sky-400 hover:bg-sky-900/60 transition cursor-pointer font-mono"
+                  >
+                    {shortcut.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Mode B: Visual Filter Layout (Horizontal Rows: Row 1 Filters + Row 2 Question Pills) */}
+        {activeTab === 'questions' && searchMode === 'modeB' && (
+          <div className="space-y-4 p-4 rounded-2xl border border-sky-500/30 bg-slate-950/60">
+            {/* Row 1: [ Subject ] [ Year ] [ Variant (1, 2, 3) ] [ Month/Series (M/J, O/N, F/M) ] */}
+            <div>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-2">
+                Row 1: Sketched Exam Filter Blocks
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                {/* 1. Subject */}
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 mb-1 block">Subject</label>
+                  <select
+                    value={selectedSubjectId}
+                    onChange={(e) => setSelectedSubjectId(e.target.value)}
+                    className="w-full rounded-xl border border-slate-700 bg-slate-900 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none truncate"
+                  >
+                    <option value="all">All Subjects</option>
+                    {subjects.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.code} - {s.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* 2. Year */}
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 mb-1 block">Year</label>
+                  <select
+                    value={selectedYear}
+                    onChange={(e) => setSelectedYear(e.target.value)}
+                    className="w-full rounded-xl border border-slate-700 bg-slate-900 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
+                  >
+                    <option value="All">All Years</option>
+                    {['2024', '2023', '2022', '2021', '2020', '2019', '2018'].map((y) => (
+                      <option key={y} value={y}>{y}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* 3. Variant (1, 2, 3) */}
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 mb-1 block">Variant</label>
+                  <select
+                    value={selectedVariant}
+                    onChange={(e) => setSelectedVariant(e.target.value)}
+                    className="w-full rounded-xl border border-slate-700 bg-slate-900 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
+                  >
+                    <option value="All">All Variants (1, 2, 3)</option>
+                    <option value="1">Variant 1</option>
+                    <option value="2">Variant 2</option>
+                    <option value="3">Variant 3</option>
+                  </select>
+                </div>
+
+                {/* 4. Month / Series */}
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 mb-1 block">Month / Series</label>
+                  <select
+                    value={selectedSession}
+                    onChange={(e) => setSelectedSession(e.target.value)}
+                    className="w-full rounded-xl border border-slate-700 bg-slate-900 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
+                  >
+                    <option value="All">All Series</option>
+                    <option value="May/June">May / June (M/J)</option>
+                    <option value="Oct/Nov">Oct / Nov (O/N)</option>
+                    <option value="Feb/March">Feb / March (F/M)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Row 2: [ Question Number ] visual pill selector */}
+            <div className="pt-2 border-t border-slate-800">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-sky-400">
+                  Row 2: Select Question Number (Visual Grid Selector)
+                </span>
+                <span className="text-[10px] text-slate-500">
+                  {selectedPaperNumber === '1' || selectedPaperNumber === '2' ? '40 Discrete MCQ Items' : '12 Theory Questions'}
+                </span>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-1.5 max-h-36 overflow-y-auto no-scrollbar p-1">
+                <button
+                  type="button"
+                  onClick={() => setSelectedQuestionPill('All')}
+                  className={`rounded-lg px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
+                    selectedQuestionPill === 'All'
+                      ? 'bg-sky-500 text-white shadow-sm ring-1 ring-sky-300'
+                      : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                  }`}
+                >
+                  All Questions
+                </button>
+
+                {/* Question Pills: Q1 to Q12 or Q40 */}
+                {Array.from({ length: selectedPaperNumber === '1' || selectedPaperNumber === '2' ? 40 : 12 }, (_, i) => `Q${i + 1}`).map((q) => {
+                  const isSelected = selectedQuestionPill === q;
+                  return (
+                    <button
+                      key={q}
+                      type="button"
+                      onClick={() => setSelectedQuestionPill(q)}
+                      className={`rounded-lg px-2.5 py-1 text-xs font-mono font-bold transition cursor-pointer ${
+                        isSelected
+                          ? 'bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow-md ring-1 ring-sky-400'
+                          : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
+                      }`}
+                    >
+                      {q}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         )}
 
@@ -1314,24 +1582,110 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                   <div className={`${viewMode === 'side-by-side' ? 'grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-800' : ''}`}>
                     {/* Question Paper Pane */}
                     <div className="p-4 sm:p-5 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                          Official Question Paper:
-                        </span>
+                      <div className="flex items-center justify-between flex-wrap gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                            Official Question Paper:
+                          </span>
+                          {/* Exam Anatomy Component Badge */}
+                          <span className="rounded-md bg-slate-800 px-2 py-0.5 text-[10px] font-bold text-slate-300 border border-slate-700">
+                            {paper.componentType || (paper.paperCode.includes('/1') || paper.paperCode.includes('/2') ? 'MCQ (40 Discrete Items)' : 'Theory & Extended (Sub-Part Structured)')}
+                          </span>
+                        </div>
                         <span className="text-xs font-bold text-amber-400">
-                          [{paper.marks} Marks Available]
+                          {typeof activeSubPartMap[paper.id] === 'number' && paper.subParts?.[activeSubPartMap[paper.id] as number]
+                            ? `[${paper.subParts[activeSubPartMap[paper.id] as number].marks} Marks in Part ${paper.subParts[activeSubPartMap[paper.id] as number].part}]`
+                            : `[${paper.marks} Marks Available]`}
                         </span>
                       </div>
 
-                      <MathRenderer
-                        content={paper.questionPrompt}
-                        className="text-sm text-slate-100 leading-relaxed font-medium"
-                      />
-
-                      {paper.diagramOrMath && (
-                        <div className="rounded-xl border border-slate-800 bg-slate-950 p-3 text-center overflow-x-auto">
-                          <MathRenderer content={`$$${paper.diagramOrMath}$$`} className="text-sm font-bold text-sky-300" />
+                      {/* Sub-Part Hierarchy Tabs */}
+                      {paper.subParts && paper.subParts.length > 0 && (
+                        <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-2.5 space-y-2">
+                          <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1">
+                            <span>Exam Anatomy Sub-Part Hierarchy:</span>
+                            <span className="text-sky-400 font-mono">
+                              {typeof activeSubPartMap[paper.id] === 'number' ? `Viewing Part ${paper.subParts[activeSubPartMap[paper.id] as number].part}` : 'Viewing All Parts'}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <button
+                              type="button"
+                              onClick={() => setActiveSubPartMap(prev => ({ ...prev, [paper.id]: 'all' }))}
+                              className={`rounded-lg px-2.5 py-1 text-xs font-bold transition cursor-pointer ${
+                                (activeSubPartMap[paper.id] ?? 'all') === 'all'
+                                  ? 'bg-sky-500 text-white shadow-sm ring-1 ring-sky-300'
+                                  : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                              }`}
+                            >
+                              All Sub-Parts ({paper.marks}M)
+                            </button>
+                            {paper.subParts.map((sp, spIdx) => {
+                              const isSpActive = activeSubPartMap[paper.id] === spIdx;
+                              return (
+                                <button
+                                  key={sp.part}
+                                  type="button"
+                                  onClick={() => setActiveSubPartMap(prev => ({ ...prev, [paper.id]: spIdx }))}
+                                  className={`rounded-lg px-2.5 py-1 text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                                    isSpActive
+                                      ? 'bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow-md ring-1 ring-sky-400'
+                                      : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
+                                  }`}
+                                >
+                                  <span>Part {sp.part}</span>
+                                  <span className="rounded bg-black/40 px-1.5 py-0.2 text-[10px] font-mono text-sky-200">
+                                    [{sp.marks}M]
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
                         </div>
+                      )}
+
+                      {/* Display Question Prompt (Specific Subpart vs Full Question) */}
+                      {typeof activeSubPartMap[paper.id] === 'number' && paper.subParts?.[activeSubPartMap[paper.id] as number] ? (
+                        <div className="space-y-2.5 rounded-xl border border-sky-500/30 bg-sky-950/20 p-4 animate-fadeIn">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="font-bold text-sky-300 font-mono text-sm">
+                              Part {paper.subParts[activeSubPartMap[paper.id] as number].part}
+                            </span>
+                            <span className="rounded-md bg-sky-500/20 px-2.5 py-0.5 text-[11px] font-bold text-sky-200 border border-sky-500/30">
+                              Allocated: [{paper.subParts[activeSubPartMap[paper.id] as number].marks} Marks]
+                            </span>
+                          </div>
+                          <MathRenderer
+                            content={paper.subParts[activeSubPartMap[paper.id] as number].prompt}
+                            className="text-sm text-slate-100 leading-relaxed font-medium"
+                          />
+                          {paper.subParts[activeSubPartMap[paper.id] as number].diagramOrMath && (
+                            <div className="rounded-xl border border-slate-800 bg-slate-950 p-3 text-center overflow-x-auto">
+                              <MathRenderer
+                                content={`$$${paper.subParts[activeSubPartMap[paper.id] as number].diagramOrMath}$$`}
+                                className="text-sm font-bold text-sky-300"
+                              />
+                            </div>
+                          )}
+                          {paper.subParts[activeSubPartMap[paper.id] as number].examinerTip && (
+                            <p className="text-[11px] text-amber-300/90 pt-1 border-t border-sky-900/40">
+                              💡 Examiner Tip: {paper.subParts[activeSubPartMap[paper.id] as number].examinerTip}
+                            </p>
+                          )}
+                        </div>
+                      ) : (
+                        <>
+                          <MathRenderer
+                            content={paper.questionPrompt}
+                            className="text-sm text-slate-100 leading-relaxed font-medium"
+                          />
+
+                          {paper.diagramOrMath && (
+                            <div className="rounded-xl border border-slate-800 bg-slate-950 p-3 text-center overflow-x-auto">
+                              <MathRenderer content={`$$${paper.diagramOrMath}$$`} className="text-sm font-bold text-sky-300" />
+                            </div>
+                          )}
+                        </>
                       )}
 
                       {/* Interactive Student Answer Grading Drawer */}
@@ -1435,10 +1789,16 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                           <div className="flex flex-wrap items-center justify-between gap-2">
                             <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
                               <CheckCircle className="h-4 w-4" />
-                              Official Mark Scheme:
+                              {typeof activeSubPartMap[paper.id] === 'number' && paper.subParts?.[activeSubPartMap[paper.id] as number]
+                                ? `Mark Scheme: Part ${paper.subParts[activeSubPartMap[paper.id] as number].part} [${paper.subParts[activeSubPartMap[paper.id] as number].marks}M]`
+                                : 'Official Mark Scheme:'}
                             </span>
                             <div className="flex items-center gap-3">
-                              <span className="text-xs font-mono font-bold text-white">Final: {paper.finalAnswer}</span>
+                              <span className="text-xs font-mono font-bold text-white">
+                                Final: {typeof activeSubPartMap[paper.id] === 'number' && paper.subParts?.[activeSubPartMap[paper.id] as number]?.finalAnswer
+                                  ? paper.subParts[activeSubPartMap[paper.id] as number].finalAnswer
+                                  : paper.finalAnswer}
+                              </span>
                               <button
                                 type="button"
                                 onClick={() =>
@@ -1468,13 +1828,23 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                             </div>
                           </div>
 
+                          {/* Specific Subpart Mark Scheme vs Full Mark Scheme */}
                           <div className="space-y-1.5 pt-1">
-                            {paper.markScheme.map((item, idx) => (
-                              <div key={idx} className="flex items-start gap-2 text-xs text-slate-200">
-                                <span className="font-bold text-indigo-400 font-mono shrink-0">{item.markType}</span>
-                                <MathRenderer content={item.requirement} />
-                              </div>
-                            ))}
+                            {typeof activeSubPartMap[paper.id] === 'number' && paper.subParts?.[activeSubPartMap[paper.id] as number] ? (
+                              paper.subParts[activeSubPartMap[paper.id] as number].markScheme.map((item, idx) => (
+                                <div key={idx} className="flex items-start gap-2 text-xs text-slate-200">
+                                  <span className="font-bold text-emerald-400 font-mono shrink-0">{item.markType}</span>
+                                  <MathRenderer content={item.requirement} />
+                                </div>
+                              ))
+                            ) : (
+                              paper.markScheme.map((item, idx) => (
+                                <div key={idx} className="flex items-start gap-2 text-xs text-slate-200">
+                                  <span className="font-bold text-indigo-400 font-mono shrink-0">{item.markType}</span>
+                                  <MathRenderer content={item.requirement} />
+                                </div>
+                              ))
+                            )}
                           </div>
                         </div>
 

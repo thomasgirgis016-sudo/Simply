@@ -16,6 +16,34 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
     questionNumber: 'Q6(b)',
     topic: 'Trigonometry & Bearings',
     difficultyTier: 'Grade 9 Challenge',
+    componentType: 'Theory',
+    subParts: [
+      {
+        part: '(a)',
+        marks: 2,
+        prompt: 'A marker buoy M is anchored such that the bearing of M from town P is 040°. State the three-figure bearing of town P from buoy M.',
+        markScheme: [
+          { markType: '[B2]', requirement: 'Back-bearing = 040° + 180° = 220° (allow [B1] for 220 without leading zero)' }
+        ],
+        finalAnswer: '220°',
+        examinerTip: 'Add 180° to forward bearings less than 180° to find the back-bearing.'
+      },
+      {
+        part: '(b)',
+        marks: 5,
+        prompt: 'Cyclist A leaves town P and travels on a bearing of 040° at a constant speed of 18 km/h.\nAt the same time, Cyclist B leaves P and travels on a bearing of 115° at a constant speed of 24 km/h.\nCalculate the distance between the two cyclists after 1.5 hours.',
+        diagramOrMath: 'c^2 = a^2 + b^2 - 2ab\\cos(C)',
+        markScheme: [
+          { markType: '[B1]', requirement: 'Distance for A = 18 × 1.5 = 27 km; Distance for B = 24 × 1.5 = 36 km' },
+          { markType: '[B1]', requirement: 'Angle between courses = 115° - 040° = 75°' },
+          { markType: '[M1]', requirement: 'Correct application of cosine rule: $d^2 = 27^2 + 36^2 - 2(27)(36)\\cos(75°)$' },
+          { markType: '[M1]', requirement: 'Evaluation of expression: $d^2 = 729 + 1296 - 1944(0.2588) = 1521.85$' },
+          { markType: '[A1]', requirement: 'Distance $d = 39.0$ km (accept 39 or 39.01)' }
+        ],
+        finalAnswer: '$39.0\\text{ km}$',
+        examinerTip: 'Remember to multiply speed by time before applying the cosine rule.'
+      }
+    ],
     snippetQuery: 'two cyclists bearing 040 cosine rule triangle bearings distance',
     questionPrompt: 'Cyclist A leaves town P and travels on a bearing of 040° at a constant speed of 18 km/h.\nAt the same time, Cyclist B leaves P and travels on a bearing of 115° at a constant speed of 24 km/h.\nCalculate the distance between the two cyclists after 1.5 hours.',
     diagramOrMath: 'c^2 = a^2 + b^2 - 2ab\\cos(C)',
@@ -42,6 +70,31 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
     questionNumber: 'Q7(c)',
     topic: 'Algebra & Sequences',
     difficultyTier: 'Standard Extended',
+    componentType: 'Theory',
+    subParts: [
+      {
+        part: '(a)',
+        marks: 2,
+        prompt: 'The first four terms of a linear sequence are $3, 7, 11, 15$. Find an expression for the $n$th term.',
+        markScheme: [
+          { markType: '[B2]', requirement: 'Common difference = 4 $\\implies 4n - 1$' }
+        ],
+        finalAnswer: '$4n - 1$'
+      },
+      {
+        part: '(c)',
+        marks: 4,
+        prompt: 'Find the $n$th term of the quadratic sequence:\n$4, \\quad 11, \\quad 22, \\quad 37, \\quad 56, \\dots$',
+        diagramOrMath: 'an^2 + bn + c',
+        markScheme: [
+          { markType: '[M1]', requirement: 'Finding first differences (7, 11, 15, 19) and constant second difference = 4' },
+          { markType: '[M1]', requirement: '$2a = 4 \\implies a = 2$, identifying $2n^2$ component' },
+          { markType: '[M1]', requirement: 'Subtracting $2n^2$ from terms (4 - 2 = 2, 11 - 8 = 3, 22 - 18 = 4) gives linear sequence $n + 1$' },
+          { markType: '[A1]', requirement: 'Final $n$th term = $2n^2 + n + 1$' }
+        ],
+        finalAnswer: '$2n^2 + n + 1$'
+      }
+    ],
     snippetQuery: 'quadratic sequence nth term 2a 3a+b differences second difference',
     questionPrompt: 'Find the $n$th term of the quadratic sequence:\n$4, \\quad 11, \\quad 22, \\quad 37, \\quad 56, \\dots$',
     diagramOrMath: 'an^2 + bn + c',
@@ -67,6 +120,32 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
     questionNumber: 'Q9(b)',
     topic: 'Vectors & Proof',
     difficultyTier: 'Grade 9 Challenge',
+    componentType: 'Theory',
+    subParts: [
+      {
+        part: '(a)',
+        marks: 2,
+        prompt: 'Express $\\vec{AB}$ in terms of $\\mathbf{a}$ and $\\mathbf{b}$.',
+        markScheme: [
+          { markType: '[B1]', requirement: '$\\vec{AB} = \\mathbf{b} - \\mathbf{a}$' }
+        ],
+        finalAnswer: '$\\mathbf{b} - \\mathbf{a}$'
+      },
+      {
+        part: '(b)',
+        marks: 6,
+        prompt: 'In triangle $OAB$, $\\vec{OA} = \\mathbf{a}$ and $\\vec{OB} = \\mathbf{b}$. Point $M$ lies on $AB$ such that $AM : MB = 1 : 2$.\nPoint $N$ lies on $OB$ such that $ON = \\frac{1}{3}\\mathbf{b}$.\nShow that $\\vec{OM} = \\frac{2}{3}\\mathbf{a} + \\frac{1}{3}\\mathbf{b}$ and prove that $M, N$ and the point $P(2\\mathbf{a})$ lie on a straight line.',
+        diagramOrMath: '\\vec{OM} = \\mathbf{a} + \\frac{1}{3}(\\mathbf{b} - \\mathbf{a})',
+        markScheme: [
+          { markType: '[B1]', requirement: '$\\vec{AB} = \\mathbf{b} - \\mathbf{a}$' },
+          { markType: '[M1]', requirement: '$\\vec{OM} = \\vec{OA} + \\frac{1}{3}\\vec{AB} = \\mathbf{a} + \\frac{1}{3}(\\mathbf{b} - \\mathbf{a}) = \\frac{2}{3}\\mathbf{a} + \\frac{1}{3}\\mathbf{b}$' },
+          { markType: '[M1]', requirement: 'Find vector $\\vec{NM} = \\vec{OM} - \\vec{ON} = \\frac{2}{3}\\mathbf{a} + \\frac{1}{3}\\mathbf{b} - \\frac{1}{3}\\mathbf{b} = \\frac{2}{3}\\mathbf{a}$' },
+          { markType: '[M1]', requirement: 'Find vector $\\vec{NP} = \\vec{OP} - \\vec{ON} = 2\\mathbf{a} - \\frac{1}{3}\\mathbf{b}$ or vector $\\vec{MP}$' },
+          { markType: '[A1]', requirement: 'Demonstrating collinearity via parallel scalar multiple and common point' }
+        ],
+        finalAnswer: 'Proof shown: $\\vec{NM}$ is a scalar multiple of $\\vec{a}$ and points share common origin'
+      }
+    ],
     snippetQuery: 'vector proof parallel straight line collinear scalar multiple vector OA OB',
     questionPrompt: 'In triangle $OAB$, $\\vec{OA} = \\mathbf{a}$ and $\\vec{OB} = \\mathbf{b}$. Point $M$ lies on $AB$ such that $AM : MB = 1 : 2$.\nPoint $N$ lies on $OB$ such that $ON = \\frac{1}{3}\\mathbf{b}$.\nShow that $\\vec{OM} = \\frac{2}{3}\\mathbf{a} + \\frac{1}{3}\\mathbf{b}$ and prove that $M, N$ and the point $P(2\\mathbf{a})$ lie on a straight line.',
     diagramOrMath: '\\vec{OM} = \\mathbf{a} + \\frac{1}{3}(\\mathbf{b} - \\mathbf{a})',
@@ -93,6 +172,40 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
     questionNumber: 'Q5(a)',
     topic: 'Mensuration: Cones & Frustums',
     difficultyTier: 'Grade 9 Challenge',
+    componentType: 'Theory',
+    subParts: [
+      {
+        part: '(a)(i)',
+        marks: 2,
+        prompt: 'Show that the radius of the smaller cut cone is $4\\text{ cm}$.',
+        markScheme: [
+          { markType: '[B1]', requirement: 'Similar triangles ratio $\\frac{r}{12} = \\frac{10}{30}$' },
+          { markType: '[A1]', requirement: '$r = 12 \\times \\frac{1}{3} = 4\\text{ cm}$' }
+        ],
+        finalAnswer: '$4\\text{ cm}$'
+      },
+      {
+        part: '(a)(ii)',
+        marks: 3,
+        prompt: 'Calculate the volume of the remaining frustum. Give your answer in terms of $\\pi$.',
+        markScheme: [
+          { markType: '[M1]', requirement: 'Volume of original cone = $\\frac{1}{3}\\pi (12)^2 (30) = 1440\\pi$' },
+          { markType: '[M1]', requirement: 'Volume of cut cone = $\\frac{1}{3}\\pi (4)^2 (10) = \\frac{160}{3}\\pi$' },
+          { markType: '[A1]', requirement: 'Frustum volume = $1440\\pi - \\frac{160}{3}\\pi = \\frac{4160}{3}\\pi\\text{ cm}^3$' }
+        ],
+        finalAnswer: '$\\frac{4160}{3}\\pi\\text{ cm}^3$'
+      },
+      {
+        part: '(b)',
+        marks: 3,
+        prompt: 'The frustum is melted and recast into a solid sphere of radius $R$. Calculate $R$ to 3 significant figures.',
+        markScheme: [
+          { markType: '[M1]', requirement: '$\\frac{4}{3}\\pi R^3 = \\frac{4160}{3}\\pi$' },
+          { markType: '[A1]', requirement: '$R = \\sqrt[3]{1040} = 10.1\\text{ cm}$' }
+        ],
+        finalAnswer: '$10.1\\text{ cm}$'
+      }
+    ],
     snippetQuery: 'frustum cone volume water depth radius similar triangles ratio',
     questionPrompt: 'A solid cone has radius $12\\text{ cm}$ and height $30\\text{ cm}$. A smaller cone of height $10\\text{ cm}$ is cut from the top to form a frustum.\n(i) Show that the radius of the smaller cone is $4\\text{ cm}$.\n(ii) Calculate the volume of the remaining frustum. Give your answer in terms of $\\pi$.',
     diagramOrMath: 'V_{\\text{frustum}} = \\frac{1}{3}\\pi R^2 H - \\frac{1}{3}\\pi r^2 h',
@@ -119,6 +232,29 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
     questionNumber: 'Q14',
     topic: 'Circle Theorems',
     difficultyTier: 'Standard Extended',
+    componentType: 'Theory',
+    subParts: [
+      {
+        part: '(i)',
+        marks: 2,
+        prompt: 'State angle $ADB$ and give a geometrical reason.',
+        markScheme: [
+          { markType: '[B1]', requirement: '$\\angle ADB = 62°$' },
+          { markType: '[B1]', requirement: 'Reason: Alternate segment theorem' }
+        ],
+        finalAnswer: '$62°$ (Alternate segment theorem)'
+      },
+      {
+        part: '(ii)',
+        marks: 2,
+        prompt: 'Find angle $BCD$.',
+        markScheme: [
+          { markType: '[M1]', requirement: 'In cyclic quadrilateral $ABCD$, opposite angles sum to $180°$' },
+          { markType: '[A1]', requirement: '$\\angle BCD = 180° - 62° = 118°$' }
+        ],
+        finalAnswer: '$118°$'
+      }
+    ],
     snippetQuery: 'circle theorem tangent radius cyclic quadrilateral alternate segment theorem',
     questionPrompt: '$A, B, C$ and $D$ lie on the circumference of a circle, center $O$. Line $TAT\\prime$ is a tangent to the circle at $A$.\nAngle $TAB = 62°$ and angle $CBD = 34°$.\n(i) State angle $ADB$ and give a geometrical reason.\n(ii) Find angle $BCD$.',
     diagramOrMath: '\\angle ADB = \\angle TAB = 62° \\quad (\\text{Alternate Segment Theorem})',
@@ -526,16 +662,16 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
     topic: 'The Allocation of Resources',
     difficultyTier: 'Standard Extended',
     snippetQuery: 'price elasticity of demand PED cross elasticity revenue price increase inelastic',
-    questionPrompt: 'A cinema increases ticket prices from $10 to $12. As a result, weekly attendance falls from 2,000 to 1,800 patrons.\n(i) Calculate the price elasticity of demand (PED) for cinema tickets.\n(ii) Explain the effect of this price change on the cinema\'s total revenue.',
+    questionPrompt: 'A cinema increases ticket prices from \\$10 to \\$12. As a result, weekly attendance falls from 2,000 to 1,800 patrons.\n(i) Calculate the price elasticity of demand (PED) for cinema tickets.\n(ii) Explain the effect of this price change on the cinema\'s total revenue.',
     diagramOrMath: '\\text{PED} = \\frac{\\% \\Delta Q_d}{\\% \\Delta P}',
     marks: 4,
     markScheme: [
       { markType: '[M1]', requirement: '% Change in Q = (1800 - 2000)/2000 = -10%; % Change in P = (12 - 10)/10 = +20%' },
       { markType: '[A1]', requirement: 'PED = -10% / +20% = -0.5 (or 0.5)' },
       { markType: '[B1]', requirement: 'Demand is price inelastic (|PED| < 1)' },
-      { markType: '[A1]', requirement: 'Initial revenue = $20,000; New revenue = 1,800 × $12 = $21,600. Total revenue increases.' }
+      { markType: '[A1]', requirement: 'Initial revenue = \\$20,000; New revenue = 1,800 × \\$12 = \\$21,600. Total revenue increases.' }
     ],
-    finalAnswer: 'PED = -0.5; Demand is inelastic, so total revenue increases by $1,600.',
+    finalAnswer: 'PED = -0.5; Demand is inelastic, so total revenue increases by \\$1,600.',
     examinerReportSnippet: 'Many students calculated PED without percentage changes (using raw differences instead), leading to inaccurate values.'
   },
   {
@@ -634,7 +770,7 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
     topic: 'Financial Decisions: Break-Even',
     difficultyTier: 'Standard Extended',
     snippetQuery: 'break even margin of safety contribution fixed costs variable cost price',
-    questionPrompt: 'Apex Bakery produces artisan sourdough bread. The following financial data is provided:\n- Fixed costs per month: $6,000\n- Variable cost per loaf: $1.50\n- Selling price per loaf: $4.50\n- Current monthly production: 2,500 loaves\n(i) Calculate the monthly break-even level of output in loaves.\n(ii) Calculate the monthly margin of safety at current production.',
+    questionPrompt: 'Apex Bakery produces artisan sourdough bread. The following financial data is provided:\n- Fixed costs per month: \\$6,000\n- Variable cost per loaf: \\$1.50\n- Selling price per loaf: \\$4.50\n- Current monthly production: 2,500 loaves\n(i) Calculate the monthly break-even level of output in loaves.\n(ii) Calculate the monthly margin of safety at current production.',
     diagramOrMath: '\\text{Break-Even} = \\frac{\\text{Fixed Costs}}{\\text{Selling Price} - \\text{Variable Cost}}',
     marks: 4,
     markScheme: [
@@ -644,7 +780,7 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
       { markType: '[A1]', requirement: 'Margin of safety = $500\\text{ loaves}$' }
     ],
     finalAnswer: '(i) $2,000\\text{ loaves}$; (ii) Margin of safety = $500\\text{ loaves}$',
-    examinerReportSnippet: 'Candidates often wrote the margin of safety as a dollar amount ($\\$500) rather than in units produced (500 loaves).'
+    examinerReportSnippet: 'Candidates often wrote the margin of safety as a dollar amount (\\$500) rather than in units produced (500 loaves).',
   },
 
   // ─────────────────────────────────────────────────────────────
@@ -719,18 +855,18 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
     topic: 'Correction of Errors & Suspense Account',
     difficultyTier: 'Grade 9 Challenge',
     snippetQuery: 'suspense account error of commission omission reversal trial balance journal entries',
-    questionPrompt: 'A trial balance failed to agree, with total debits exceeding credits by $480. A suspense account was opened.\nThe following errors were subsequently discovered:\n1. Cash sales of $350 had been entered in the sales account as $530.\n2. Motor expenses of $120 had been debited to the motor vehicles account.\n3. No entry had been made for bank interest received of $80.\nPrepare the journal entries to correct errors 1, 2, and 3. Narratives are not required.',
+    questionPrompt: 'A trial balance failed to agree, with total debits exceeding credits by \\$480. A suspense account was opened.\nThe following errors were subsequently discovered:\n1. Cash sales of \\$350 had been entered in the sales account as \\$530.\n2. Motor expenses of \\$120 had been debited to the motor vehicles account.\n3. No entry had been made for bank interest received of \\$80.\nPrepare the journal entries to correct errors 1, 2, and 3. Narratives are not required.',
     diagramOrMath: '\\text{Debit: Sales } \\$180, \\text{ Credit: Suspense } \\$180',
     marks: 6,
     markScheme: [
-      { markType: '[M1]', requirement: 'Error 1 Debit: Sales account $180' },
-      { markType: '[A1]', requirement: 'Error 1 Credit: Suspense account $180' },
-      { markType: '[M1]', requirement: 'Error 2 Debit: Motor expenses account $120' },
-      { markType: '[A1]', requirement: 'Error 2 Credit: Motor vehicles account $120 (Principle error, does not affect suspense)' },
-      { markType: '[M1]', requirement: 'Error 3 Debit: Bank account $80' },
-      { markType: '[A1]', requirement: 'Error 3 Credit: Bank interest received account $80 (Omission error)' }
+      { markType: '[M1]', requirement: 'Error 1 Debit: Sales account \\$180' },
+      { markType: '[A1]', requirement: 'Error 1 Credit: Suspense account \\$180' },
+      { markType: '[M1]', requirement: 'Error 2 Debit: Motor expenses account \\$120' },
+      { markType: '[A1]', requirement: 'Error 2 Credit: Motor vehicles account \\$120 (Principle error, does not affect suspense)' },
+      { markType: '[M1]', requirement: 'Error 3 Debit: Bank account \\$80' },
+      { markType: '[A1]', requirement: 'Error 3 Credit: Bank interest received account \\$80 (Omission error)' }
     ],
-    finalAnswer: 'Error 1: Dr Sales $180, Cr Suspense $180; Error 2: Dr Motor Expenses $120, Cr Motor Vehicles $120; Error 3: Dr Bank $80, Cr Interest Received $80',
+    finalAnswer: 'Error 1: Dr Sales \\$180, Cr Suspense \\$180; Error 2: Dr Motor Expenses \\$120, Cr Motor Vehicles \\$120; Error 3: Dr Bank \\$80, Cr Interest Received \\$80',
     examinerReportSnippet: 'Many candidates incorrectly put Error 2 (error of principle) through the suspense account, even though the trial balance balanced for that transaction.'
   },
 

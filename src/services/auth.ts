@@ -446,3 +446,25 @@ export async function loginAsMasterAdmin(): Promise<UserAccount> {
   setActiveUser(admin);
   return admin;
 }
+
+export function grantUserProSubscription(emailOrId: string, days: number = 30): { success: boolean; user?: UserAccount; error?: string } {
+  const users = getAllUsers();
+  const normalized = emailOrId.trim().toLowerCase();
+  const idx = users.findIndex(u => u.id === emailOrId || u.email.toLowerCase() === normalized);
+  if (idx === -1) {
+    return { success: false, error: 'User account not found' };
+  }
+  const expiry = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
+  users[idx].isPro = true;
+  users[idx].proExpiresAt = expiry;
+  users[idx].status = 'approved';
+  saveAllUsers(users);
+
+  const active = getActiveUser();
+  if (active && (active.id === users[idx].id || active.email.toLowerCase() === users[idx].email.toLowerCase())) {
+    setActiveUser(users[idx]);
+  }
+
+  return { success: true, user: users[idx] };
+}
+

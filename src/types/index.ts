@@ -18,6 +18,9 @@ export interface UserAccount {
   selectedSubjectIds: string[];
   role?: UserRole;
   status?: AccountStatus;
+  isPro?: boolean;
+  proExpiresAt?: string;
+  classCohortIds?: string[];
   approvedAt?: string;
   approvedBy?: string;
   createdAt: string;
@@ -50,6 +53,9 @@ export interface UserProfile {
   selectedSubjectIds: string[];
   role?: UserRole;
   status?: AccountStatus;
+  isPro?: boolean;
+  proExpiresAt?: string;
+  classCohortIds?: string[];
   geminiApiKey?: string; // Optional admin override
   selectedModel: string;
 }
@@ -246,6 +252,19 @@ export interface HandwrittenReviewResult {
   examinerTipsToRegainMarks: string[];
 }
 
+export interface PastPaperSubPart {
+  part: string; // e.g. "(a)", "(b)(i)", "(b)(ii)", "(c)"
+  marks: number;
+  prompt: string;
+  diagramOrMath?: string;
+  markScheme: {
+    markType: string; // e.g. "[M1]", "[A1]", "[B1]"
+    requirement: string;
+  }[];
+  finalAnswer?: string;
+  examinerTip?: string;
+}
+
 // 2. Past Paper Finder & Topic Classification Types
 export interface PastPaperItem {
   id: string;
@@ -256,7 +275,7 @@ export interface PastPaperItem {
   session: string; // e.g. "May/June 2023 Paper 42"
   paperCode: string; // e.g. "0580/42"
   year: number;
-  questionNumber: string; // e.g. "Q4(b)"
+  questionNumber: string; // e.g. "Q4(b)", "Q12"
   topic: string;
   difficultyTier: 'Core' | 'Standard Extended' | 'Grade 9 Challenge';
   snippetQuery: string; // memorable keywords e.g. "two cyclists bearing 040"
@@ -265,6 +284,8 @@ export interface PastPaperItem {
   diagramSnippet?: string;
   diagramOrMath?: string;
   marks: number;
+  componentType?: 'MCQ' | 'Theory' | 'Alternative to Practical' | 'Coursework';
+  subParts?: PastPaperSubPart[];
   markScheme: {
     markType: string;
     requirement: string;
@@ -369,5 +390,128 @@ export interface EslSpeakingEvaluation {
   suggestedUpgradedPhrases?: { original: string; upgraded: string }[];
   followUpQuestion?: string;
   examinerRecommendations?: string[];
+}
+
+// ─────────────────────────────────────────────────────────────
+// Module 1: Two-Way Payment Automation (BDC SMS + InstaPay)
+// ─────────────────────────────────────────────────────────────
+
+export interface BankTransaction {
+  id: string;
+  txNumber: string; // official BDC reference / رقم العملية (unique)
+  amount: number; // in EGP
+  source: 'BDC';
+  status: 'unclaimed' | 'claimed' | 'flagged';
+  receivedAt: string; // ISO date
+  rawSmsText?: string;
+  senderPhone?: string;
+  claimedBy?: string; // studentId or studentEmail
+  claimedAt?: string;
+  studentReceiptId?: string;
+}
+
+export interface InstaPayReceiptExtraction {
+  rawText?: string;
+  txNumber: string; // Transaction reference number (رقم العملية)
+  amount: number;
+  recipient: string;
+  sender?: string;
+  date: string;
+  confidenceScore: number;
+  isConfirmedInstapay: boolean;
+  notes?: string;
+  flaggedAmbiguity?: string;
+}
+
+export interface PaymentVerificationResult {
+  success: boolean;
+  message: string;
+  txNumber?: string;
+  amount?: number;
+  status: 'verified' | 'pending_bank_feed' | 'already_claimed' | 'amount_mismatch' | 'invalid_receipt';
+  proGrantedUntil?: string;
+  bankTx?: BankTransaction;
+  errorDetails?: string;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Module 2: School & Teacher Analytics ("Google Classroom" for IGCSE)
+// ─────────────────────────────────────────────────────────────
+
+export interface ClassroomCohort {
+  id: string;
+  name: string; // e.g. "Year 11 Biology Set 1"
+  subjectId: string;
+  subjectCode: string;
+  subjectName: string;
+  teacherId: string;
+  teacherName: string;
+  teacherEmail: string;
+  inviteCode: string; // e.g. "BIO-Y11-S1"
+  schoolDomain?: string; // e.g. "cairoschool.edu.eg"
+  studentIds: string[];
+  createdAt: string;
+}
+
+export interface ClassAssignment {
+  id: string;
+  classId: string;
+  title: string;
+  type: 'quiz' | 'past-paper' | 'syllabus-topic' | 'remedial-drill';
+  topic: string;
+  targetPaperOrQuizId?: string;
+  dueDate: string;
+  assignedAt: string;
+  totalSubmissions: number;
+  averageScore: number;
+}
+
+export interface DiagnosticErrorItem {
+  id: string;
+  questionRef: string; // e.g. "0580/42 May/June 2023 Q4(b)"
+  topic: string;
+  chapter: string;
+  failureRatePercent: number; // e.g. 74
+  totalAttempts: number;
+  errorPatternSummary: string; // e.g. "74% of students missed Question 4(b) on Vector Bearings due to angle calculation slips"
+  scientificKeywordOmissions?: string[]; // e.g. ["active site denatures", "loss of electrons"]
+  remedialRecommendation: string;
+  tier: 'Core' | 'Extended' | 'Grade 9 Challenge';
+}
+
+export interface ClassRemedialDrill {
+  id: string;
+  classId: string;
+  className: string;
+  generatedAt: string;
+  focusTopics: string[];
+  targetedQuestions: PastPaperItem[];
+  instructions: string;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Module 4: Past Paper QA Verification Agent Types
+// ─────────────────────────────────────────────────────────────
+
+export interface PastPaperQaItemIssue {
+  paperId: string;
+  paperCode: string;
+  questionNumber: string;
+  issueType: 'missing_diagram' | 'invalid_katex' | 'missing_markscheme' | 'zero_marks' | 'count_mismatch' | 'broken_link';
+  details: string;
+  snippet?: string;
+}
+
+export interface PastPaperQaSummaryReport {
+  scannedAt: string;
+  totalQuestionsScanned: number;
+  totalPdfsScanned: number;
+  passedCount: number;
+  failedCount: number;
+  katexSyntaxErrors: number;
+  missingMarkSchemes: number;
+  formatMismatches: number;
+  issues: PastPaperQaItemIssue[];
+  healthScorePercent: number;
 }
 

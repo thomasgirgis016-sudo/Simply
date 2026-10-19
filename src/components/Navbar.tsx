@@ -26,7 +26,8 @@ import {
   Crown,
   ShieldCheck,
   Sun,
-  Moon
+  Moon,
+  Users
 } from 'lucide-react';
 import { UserProfile, Subject, UserAccount } from '../types';
 import { SimplyLogo } from './SimplyLogo';
@@ -44,6 +45,7 @@ export type ActiveTab =
   | 'chat'
   | 'boundaries'
   | 'split'
+  | 'analytics'
   | 'admin';
 
 interface NavbarProps {
@@ -59,6 +61,7 @@ interface NavbarProps {
   onLogout: () => void;
   onOpenSettings: () => void;
   onOpenCalculator?: () => void;
+  onOpenPayment?: () => void;
   theme?: 'dark' | 'light';
   onToggleTheme?: () => void;
   onOpenSecretAdmin?: () => void;
@@ -77,6 +80,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onLogout,
   onOpenSettings,
   onOpenCalculator,
+  onOpenPayment,
   theme = 'dark',
   onToggleTheme,
   onOpenSecretAdmin,
@@ -128,6 +132,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'flashcards', label: 'Flashcards', icon: Layers, color: 'text-indigo-400' },
     { id: 'formulas', label: 'Formulas & Commands', icon: BookmarkCheck, color: 'text-amber-400' },
     { id: 'chat', label: 'AI Examiner Chat', icon: MessageSquare, color: 'text-purple-400' },
+    { id: 'analytics', label: 'Teacher Diagnostics', icon: Users, color: 'text-violet-400' },
     { id: 'boundaries', label: 'Grade Boundaries', icon: TrendingUp, color: 'text-teal-400' },
     { id: 'split', label: 'Split-Screen Papers', icon: Columns, color: 'text-sky-400' },
   ];
@@ -193,9 +198,24 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Right side actions: Desktop Auth & Settings */}
           <div className="hidden sm:flex items-center gap-2">
+            {/* Pro Upgrade / Badge Action */}
+            {onOpenPayment && (
+              <button
+                onClick={onOpenPayment}
+                className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
+                  currentUser?.isPro
+                    ? 'border border-amber-500/50 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 shadow-sm'
+                    : 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-extrabold shadow-md shadow-amber-500/20 hover:from-amber-400 active:scale-95'
+                }`}
+                title={currentUser?.isPro ? '30-Day Pro Subscription Active' : 'Upgrade to 30-Day Pro via InstaPay / BDC'}
+              >
+                <Crown className={`h-3.5 w-3.5 ${currentUser?.isPro ? 'text-amber-400' : 'text-slate-950'}`} />
+                <span>{currentUser?.isPro ? 'PRO ACTIVE' : 'Get 30d Pro'}</span>
+              </button>
+            )}
+
             {currentUser ? (
               <div className="flex items-center gap-2">
-
                 {currentUser.status === 'pending' && (
                   <span className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-[10px] font-bold text-amber-300 animate-pulse">
                     Pending Approval
@@ -265,6 +285,21 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Mobile Right: Quick Action & Hamburger Menu */}
           <div className="flex sm:hidden items-center gap-1.5">
+            {onOpenPayment && (
+              <button
+                onClick={onOpenPayment}
+                className={`flex items-center gap-1 rounded-xl px-2 py-1 text-[11px] font-extrabold transition cursor-pointer ${
+                  currentUser?.isPro
+                    ? 'border border-amber-500/40 bg-amber-500/10 text-amber-300'
+                    : 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-sm'
+                }`}
+                title="Pro Subscription"
+              >
+                <Crown className="h-3 w-3" />
+                <span>{currentUser?.isPro ? 'PRO' : 'PRO'}</span>
+              </button>
+            )}
+
             {onToggleTheme && (
               <button
                 onClick={onToggleTheme}
@@ -443,6 +478,23 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             {/* Drawer Bottom Actions: Auth & Settings */}
             <div className="border-t border-slate-800/80 pt-4 mt-6 space-y-2">
+              {onOpenPayment && (
+                <button
+                  onClick={() => {
+                    onOpenPayment();
+                    setIsMobileDrawerOpen(false);
+                  }}
+                  className={`w-full flex items-center justify-center gap-2 rounded-xl py-2.5 px-3 text-xs font-bold transition cursor-pointer ${
+                    currentUser?.isPro
+                      ? 'border border-amber-500/40 bg-amber-500/10 text-amber-300'
+                      : 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/20'
+                  }`}
+                >
+                  <Crown className="h-4 w-4" />
+                  <span>{currentUser?.isPro ? 'Pro Subscription (Active)' : 'Upgrade to 30-Day Pro (InstaPay / BDC)'}</span>
+                </button>
+              )}
+
               {currentUser ? (
                 <div className="space-y-2">
                   <div className="text-xs text-emerald-400 font-semibold px-1">

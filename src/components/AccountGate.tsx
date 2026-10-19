@@ -10,7 +10,8 @@ import {
   CheckCircle,
   Sparkles,
   Layers,
-  BookOpen
+  BookOpen,
+  Zap
 } from 'lucide-react';
 import { UserAccount } from '../types';
 import { SimplyLogo } from './SimplyLogo';
@@ -20,6 +21,7 @@ interface AccountGateProps {
   onOpenAuth: (mode?: 'signin' | 'signup') => void;
   onRefreshStatus?: () => void;
   onLogout?: () => void;
+  onOpenPayment?: () => void;
   featureName?: string;
 }
 
@@ -28,6 +30,7 @@ export const AccountGate: React.FC<AccountGateProps> = ({
   onOpenAuth,
   onRefreshStatus,
   onLogout,
+  onOpenPayment,
   featureName = 'Simply IGCSE study tools',
 }) => {
   // Case 1: User is logged in, but their account status is 'pending' (On Waitlist)
@@ -105,6 +108,22 @@ export const AccountGate: React.FC<AccountGateProps> = ({
               </button>
             )}
           </div>
+
+          {/* Fast-Track Pro Option via InstaPay / BDC */}
+          {onOpenPayment && (
+            <div className="mt-6 pt-5 border-t border-slate-800/80">
+              <p className="text-[11px] text-amber-300 font-medium mb-2.5">
+                Need urgent access for homework or mocks?
+              </p>
+              <button
+                onClick={onOpenPayment}
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-4 py-2.5 text-xs font-black text-slate-950 shadow-lg shadow-emerald-500/20 hover:opacity-95 active:scale-95 transition cursor-pointer"
+              >
+                <Zap className="h-4 w-4" />
+                <span>Fast-Track Instant Access with InstaPay (BDC 30-Day Pro)</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
     );
