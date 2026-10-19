@@ -1,4 +1,4 @@
-import { UserAccount, GradeLevel, ExamBoard, TargetGrade, UserRole, AccountStatus } from '../types';
+import { UserAccount, GradeLevel, ExamBoard, TargetGrade, UserRole, AccountStatus, SubscriptionPlan, BillingCycle, MAX_STUDENT_SUBJECTS } from '../types';
 
 const STORAGE_USERS_KEY = 'simply_igcse_users';
 const STORAGE_ACTIVE_USER_ID = 'simply_igcse_active_user_id';
@@ -144,9 +144,13 @@ export async function registerStudent(params: {
     grade: params.grade,
     board: params.board,
     targetGrade: params.targetGrade,
-    selectedSubjectIds: params.selectedSubjectIds.length > 0 ? params.selectedSubjectIds : ['cie-math-0580', 'cie-esl-0510'],
+    selectedSubjectIds: params.selectedSubjectIds.length > 0 
+      ? params.selectedSubjectIds.slice(0, 5) 
+      : ['cie-math-0580', 'cie-esl-0510'],
     role,
     status,
+    plan: 'free',
+    billingCycle: 'monthly',
     createdAt: new Date().toISOString(),
   };
 
@@ -456,6 +460,37 @@ export function grantUserProSubscription(emailOrId: string, days: number = 30): 
   }
   const expiry = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
   users[idx].isPro = true;
+  users[idx].proExpiresAt = expiry;
+  users[idx].status = 'approved';
+  saveAllUsers(users);
+
+  const active = getActiveUser();
+  if (active && (active.id === users[idx].id || active.email.toLowerCase() === users[idx].email.toLowerCase())) {
+    setActiveUser(users[idx]);
+  }
+
+  return { success: true, user: users[idx] };
+}
+
+export function updateUserSubscriptionPlan(
+  emailOrId: string,
+  plan: SubscriptionPlan,
+  billingCycle: BillingCycle = 'monthly',
+  days?: number
+): { success: boolean; user?: UserAccount; error?: string } {
+  const users = getAllUsers();
+  const normalized = emailOrId.trim().toLowerCase();
+  const idx = users.findIndex(u => u.id === emailOrId || u.email.toLowerCase() === normalized);
+  if (idx === -1) {
+    return { success: false, error: 'User account not found' };
+  }
+
+  const durationDays = days || (billingCycle === 'annual' ? 365 : 30);
+  const expiry = plan === 'free' ? undefined : new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000).toISOString();
+
+  users[idx].plan = plan;
+  users[idx].billingCycle = billingCycle;
+  users[idx].isPro = plan === 'pro';
   users[idx].proExpiresAt = expiry;
   users[idx].status = 'approved';
   saveAllUsers(users);

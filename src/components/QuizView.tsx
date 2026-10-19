@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import confetti from 'canvas-confetti';
 import {
   GraduationCap,
@@ -16,9 +16,10 @@ import {
   History,
   X,
   Copy,
-  Check
+  Check,
+  Printer
 } from 'lucide-react';
-import { Subject, QuizQuestion, UserProfile, QuizHistoryEntry } from '../types';
+import { Subject, QuizQuestion, QuizOption, UserProfile, QuizHistoryEntry } from '../types';
 import { MathRenderer } from './MathRenderer';
 import { generateQuizWithGemini } from '../services/gemini';
 import { isSubjectMatch } from '../utils/subjectMatcher';
@@ -74,6 +75,14 @@ export const QuizView: React.FC<QuizViewProps> = ({
   const [isDrillMode, setIsDrillMode] = useState(false);
   const [drillQuestions, setDrillQuestions] = useState<QuizQuestion[]>([]);
 
+  // Question count limit & Printable Exam Paper state
+  const [questionCountLimit, setQuestionCountLimit] = useState<number | 'all'>(10);
+  const [isPrintMode, setIsPrintMode] = useState(false);
+  const [candidateName, setCandidateName] = useState(profile.name || 'Candidate Name');
+  const [centreNumber, setCentreNumber] = useState('EG921');
+  const [candidateNumber, setCandidateNumber] = useState('1024');
+  const [includeMarkSchemeInPrint, setIncludeMarkSchemeInPrint] = useState(true);
+
   // Filter quizzes by subject, topic, tier, paper component, or paper code query
   const subjectQuizzes = quizzes.filter(q => isSubjectMatch(q.subjectId, subject));
   const standardFiltered = subjectQuizzes.filter((q) => {
@@ -90,13 +99,19 @@ export const QuizView: React.FC<QuizViewProps> = ({
     return matchesTopic && matchesTier && matchesPaper && matchesPaperCode;
   });
 
-  const filteredQuizzes = isDrillMode ? drillQuestions : standardFiltered;
-  const currentQuestion = filteredQuizzes[currentIdx];
+  const activeQuizzes = useMemo(() => {
+    const base = isDrillMode ? drillQuestions : standardFiltered;
+    if (questionCountLimit === 'all') return base;
+    return base.slice(0, questionCountLimit);
+  }, [isDrillMode, drillQuestions, standardFiltered, questionCountLimit]);
+
+  const currentQuestion = activeQuizzes[currentIdx];
 
   const handleStartMixedPaperDrill = () => {
     if (subjectQuizzes.length === 0) return;
     const shuffled = [...subjectQuizzes].sort(() => Math.random() - 0.5);
-    const selected = shuffled.slice(0, Math.min(10, shuffled.length));
+    const limit = questionCountLimit === 'all' ? 10 : questionCountLimit;
+    const selected = shuffled.slice(0, Math.min(limit, shuffled.length));
     setDrillQuestions(selected);
     setIsDrillMode(true);
     setIsTimerEnabled(true);
@@ -134,7 +149,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
     setSelectedOptionId(optionId);
   };
 
-  const totalPossibleMarks = filteredQuizzes.reduce((sum, q) => sum + q.marks, 0);
+  const totalPossibleMarks = activeQuizzes.reduce((sum: number, q: QuizQuestion) => sum + (q.marks || 1), 0);
   const percentage = totalPossibleMarks > 0
     ? Math.round((totalMarksEarned / totalPossibleMarks) * 100)
     : 0;
@@ -151,7 +166,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
   };
 
   const handleNextQuestion = () => {
-    if (currentIdx + 1 < filteredQuizzes.length) {
+    if (currentIdx + 1 < activeQuizzes.length) {
       setCurrentIdx(prev => prev + 1);
       setSelectedOptionId(null);
       setIsAnswerSubmitted(false);
@@ -177,7 +192,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
         subjectName: subject.name,
         topic: selectedTopic,
         score: userScore,
-        totalQuestions: filteredQuizzes.length,
+        totalQuestions: activeQuizzes.length,
         marksEarned: totalMarksEarned,
         totalMarks: totalPossibleMarks,
         percentage: percentage,
@@ -293,6 +308,20 @@ export const QuizView: React.FC<QuizViewProps> = ({
           </div>
 
           <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+            {/* Printable Exam Paper Toggle */}
+            <button
+              onClick={() => setIsPrintMode(!isPrintMode)}
+              className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-bold transition cursor-pointer active:scale-95 ${
+                isPrintMode
+                  ? 'border-sky-500 bg-sky-500/20 text-sky-300 ring-1 ring-sky-500'
+                  : 'border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white'
+              }`}
+              title="Toggle authentic Cambridge/Edexcel printable exam paper worksheet"
+            >
+              <Printer className="h-4 w-4 text-sky-400" />
+              <span>{isPrintMode ? 'Exit Print View' : '🖨️ Printable Paper'}</span>
+            </button>
+
             {/* Pacing Timer Toggle */}
             <button
               onClick={() => setIsTimerEnabled(!isTimerEnabled)}
@@ -321,7 +350,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
             <button
               onClick={handleStartMixedPaperDrill}
               className="flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 px-3 py-2 text-xs font-bold text-white shadow-md hover:from-amber-400 hover:to-orange-500 transition cursor-pointer active:scale-95"
-              title="Start a 10-question randomized exam drill across years, seasons, and variants"
+              title="Start a randomized exam drill across years, seasons, and variants"
             >
               <span>🎲 Mixed Paper Drill</span>
             </button>
@@ -343,7 +372,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
             <div className="flex items-center gap-2">
               <span className="flex h-2 w-2 rounded-full bg-amber-400 animate-ping" />
               <span className="font-bold">Mixed Paper Exam Drill Active:</span>
-              <span>10 randomized questions from multiple years & variants with strict mark schemes.</span>
+              <span>{activeQuizzes.length} randomized questions from multiple years & variants with strict mark schemes.</span>
             </div>
             <button
               onClick={handleExitMixedPaperDrill}
@@ -381,13 +410,31 @@ export const QuizView: React.FC<QuizViewProps> = ({
               )}
             </div>
 
-            <span className="text-xs text-slate-400 shrink-0">
-              {filteredQuizzes.length} questions found
+            <span className="text-xs text-slate-400 shrink-0 font-mono">
+              {activeQuizzes.length} of {standardFiltered.length} Qs selected
             </span>
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-3">
+              {/* Question Count Selector */}
+              <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
+                <span className="px-2 text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Count:</span>
+                {([5, 10, 15, 25, 'all'] as const).map((cnt) => (
+                  <button
+                    key={cnt}
+                    onClick={() => { setQuestionCountLimit(cnt); handleRestart(); }}
+                    className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
+                      questionCountLimit === cnt
+                        ? 'bg-emerald-600 text-white shadow-sm'
+                        : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    {cnt === 'all' ? 'All' : `${cnt} Qs`}
+                  </button>
+                ))}
+              </div>
+
               {/* Core vs Extended */}
               <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
                 <span className="px-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tier:</span>
@@ -397,7 +444,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
                     onClick={() => { setSelectedTier(tier); handleRestart(); }}
                     className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
                       selectedTier === tier
-                        ? 'bg-emerald-600 text-white shadow-sm'
+                        ? 'bg-indigo-600 text-white shadow-sm'
                         : 'text-slate-400 hover:text-slate-200'
                     }`}
                   >
@@ -459,8 +506,221 @@ export const QuizView: React.FC<QuizViewProps> = ({
         </div>
       </div>
 
-      {/* Finished Summary Screen */}
-      {isQuizFinished ? (
+      {/* PRINTABLE EXAM PAPER MODE VIEW */}
+      {isPrintMode ? (
+        <div className="space-y-6 animate-fadeIn">
+          {/* Non-Printing Action Toolbar */}
+          <div className="no-print rounded-2xl border border-sky-500/30 bg-sky-950/40 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <Printer className="h-5 w-5 text-sky-400" />
+                <h3 className="text-base font-bold text-white">Printable Cambridge / Edexcel Mock Examination</h3>
+              </div>
+              <p className="text-xs text-slate-300 mt-0.5">
+                Authentic exam worksheet with lined student working space, candidate information boxes & official mark schemes.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <label className="flex items-center gap-2 text-xs text-slate-300 bg-slate-900 px-3 py-2 rounded-xl border border-slate-800 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={includeMarkSchemeInPrint}
+                  onChange={(e) => setIncludeMarkSchemeInPrint(e.target.checked)}
+                  className="rounded text-emerald-500 focus:ring-0"
+                />
+                <span>Include Mark Scheme at End</span>
+              </label>
+
+              <button
+                onClick={() => window.print()}
+                className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-sky-500/25 hover:opacity-95 transition cursor-pointer"
+              >
+                <Printer className="h-4 w-4" />
+                <span>Print Exam Paper (PDF)</span>
+              </button>
+
+              <button
+                onClick={() => setIsPrintMode(false)}
+                className="rounded-xl border border-slate-700 bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer"
+              >
+                Back to Quiz
+              </button>
+            </div>
+          </div>
+
+          {/* Printable Exam Paper Container (Paper Page) */}
+          <div className="exam-paper-page bg-white text-slate-900 rounded-3xl p-6 sm:p-10 shadow-2xl border border-slate-200">
+            {/* Official Exam Board Header */}
+            <div className="border-b-2 border-black pb-5 mb-6 text-center space-y-2">
+              <div className="flex items-center justify-between text-xs font-mono font-bold uppercase text-slate-700 border-b border-slate-300 pb-2">
+                <span>{subject.board === 'Edexcel' ? 'PEARSON EDEXCEL INTERNATIONAL' : 'CAMBRIDGE ASSESSMENT INTERNATIONAL EDUCATION'}</span>
+                <span>CLASSIFIED TOPIC DRILL</span>
+              </div>
+
+              <h1 className="text-xl sm:text-2xl font-black tracking-tight text-black pt-1">
+                {subject.name} ({subject.code})
+              </h1>
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-600">
+                {subject.level || 'IGCSE'} • Paper Component Practice
+              </p>
+
+              {/* Candidate Details Grid */}
+              <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 border border-black p-3 text-left text-xs bg-slate-50">
+                <div>
+                  <span className="font-bold block text-[10px] text-slate-500 uppercase">Candidate Name:</span>
+                  <input
+                    type="text"
+                    value={candidateName}
+                    onChange={(e) => setCandidateName(e.target.value)}
+                    placeholder="Full Name..."
+                    className="w-full bg-transparent border-b border-slate-400 font-bold text-slate-900 text-sm focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <span className="font-bold block text-[10px] text-slate-500 uppercase">Centre Number:</span>
+                  <div className="flex gap-1 mt-1 font-mono font-bold">
+                    {['E', 'G', '9', '2', '1'].map((c, i) => (
+                      <span key={i} className="h-6 w-6 border border-black flex items-center justify-center text-xs bg-white">{c}</span>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <span className="font-bold block text-[10px] text-slate-500 uppercase">Candidate Number:</span>
+                  <div className="flex gap-1 mt-1 font-mono font-bold">
+                    {['1', '0', '2', '4'].map((c, i) => (
+                      <span key={i} className="h-6 w-6 border border-black flex items-center justify-center text-xs bg-white">{c}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Exam Specifications & Instructions */}
+              <div className="mt-4 text-left border border-slate-400 p-3 text-[11px] space-y-1 bg-white">
+                <div className="flex justify-between font-bold text-black border-b border-slate-200 pb-1">
+                  <span>TIME ALLOWED: {Math.max(15, Math.round(totalPossibleMarks * 1.5))} minutes</span>
+                  <span>TOTAL MARKS: {totalPossibleMarks} Marks</span>
+                </div>
+                <p className="font-bold pt-1">INSTRUCTIONS TO CANDIDATES:</p>
+                <ul className="list-disc pl-4 space-y-0.5 text-slate-700">
+                  <li>Answer all questions. Write your answers in the spaces provided below.</li>
+                  <li>Use black or dark blue pen. You may use an HB pencil for diagrams or graphs.</li>
+                  <li>Show all necessary working clearly. Marks may be awarded for correct working methods.</li>
+                  <li>Calculators are allowed according to syllabus regulations.</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Questions List */}
+            <div className="space-y-8 divide-y divide-slate-200">
+              {activeQuizzes.map((q: QuizQuestion, idx: number) => (
+                <div key={q.id} className="pt-6 first:pt-0 space-y-4">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <span className="font-black text-base text-black font-serif">
+                      Question {idx + 1}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      {q.paperReference && (
+                        <span className="text-[10px] font-mono text-slate-500 border border-slate-300 px-1.5 py-0.5 rounded">
+                          {q.paperReference}
+                        </span>
+                      )}
+                      <span className="font-bold text-xs font-mono text-black">
+                        [{q.marks} Mark{q.marks === 1 ? '' : 's'}]
+                      </span>
+                      <span className="border border-black px-2 py-0.5 text-xs font-mono font-bold text-slate-400">
+                        / {q.marks}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="text-sm font-medium text-black leading-relaxed font-serif">
+                    <MathRenderer content={q.questionText} className="text-black" />
+                  </div>
+
+                  {/* Multiple Choice Options Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    {q.options.map((opt: QuizOption, optIdx: number) => (
+                      <div key={opt.id} className="flex items-center gap-2 p-2 border border-slate-300 rounded-lg bg-slate-50">
+                        <span className="h-5 w-5 border border-black rounded flex items-center justify-center font-bold text-[11px] bg-white">
+                          {String.fromCharCode(65 + optIdx)}
+                        </span>
+                        <MathRenderer content={opt.text} className="text-black font-medium" />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Ruled Student Working Space */}
+                  <div className="pt-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                      Working Area / Answer Space:
+                    </span>
+                    <div className="border border-slate-300 rounded-lg p-3 bg-white space-y-3.5">
+                      <div className="border-b border-dashed border-slate-300 h-2" />
+                      <div className="border-b border-dashed border-slate-300 h-2" />
+                      <div className="border-b border-dashed border-slate-300 h-2" />
+                      <div className="flex justify-end pt-1">
+                        <span className="text-xs font-bold font-serif text-slate-800">
+                          Final Answer: [ ___________________________ ]
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Official Mark Scheme Appendix */}
+            {includeMarkSchemeInPrint && (
+              <div className="mt-12 pt-8 border-t-4 border-black page-break">
+                <div className="text-center border-b-2 border-black pb-3 mb-6">
+                  <h2 className="text-lg font-black uppercase text-black">
+                    Official Mark Scheme & Worked Solutions
+                  </h2>
+                  <p className="text-xs text-slate-600 font-bold">
+                    For Candidate Self-Assessment & Examiner Verification
+                  </p>
+                </div>
+
+                <div className="space-y-4 text-xs font-serif">
+                  {activeQuizzes.map((q: QuizQuestion, idx: number) => {
+                    const correctOpt = q.options.find((o: QuizOption) => o.id === q.correctOptionId);
+                    const correctLetter = String.fromCharCode(65 + Math.max(0, q.options.findIndex((o: QuizOption) => o.id === q.correctOptionId)));
+                    return (
+                      <div key={q.id} className="p-3 border border-slate-300 rounded-xl bg-slate-50 space-y-1">
+                        <div className="flex justify-between font-bold text-black border-b border-slate-200 pb-1">
+                          <span>Question {idx + 1}: Correct Answer: <strong className="text-emerald-700 font-mono text-sm">[{correctLetter}]</strong></span>
+                          <span className="font-mono">[{q.marks} Marks Awarded]</span>
+                        </div>
+                        {correctOpt && (
+                          <div className="text-slate-800 pt-0.5">
+                            <MathRenderer content={correctOpt.text} className="text-slate-900 font-semibold" />
+                          </div>
+                        )}
+                        {(q.markSchemeExplanation || (q as any).explanation) && (
+                          <div className="text-[11px] text-slate-600 pt-1 italic">
+                            <strong>Mark Scheme Note:</strong> {q.markSchemeExplanation || (q as any).explanation}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Print-specific CSS */}
+          <style dangerouslySetInnerHTML={{ __html: `
+            @media print {
+              body { background: white !important; color: black !important; }
+              .no-print, nav, header, aside, button { display: none !important; }
+              .exam-paper-page { border: none !important; box-shadow: none !important; padding: 0 !important; width: 100% !important; max-width: 100% !important; }
+              .page-break { page-break-before: always; }
+            }
+          `}} />
+        </div>
+      ) : isQuizFinished ? (
         <div className="rounded-3xl border border-slate-700/80 bg-gradient-to-b from-slate-900 to-indigo-950/40 p-8 text-center shadow-2xl animate-fadeIn">
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 shadow-xl shadow-emerald-500/20 mb-4">
             <Award className="h-10 w-10" />
@@ -507,7 +767,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
             </button>
           </div>
         </div>
-      ) : filteredQuizzes.length === 0 ? (
+      ) : activeQuizzes.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-800 bg-slate-900/40 p-12 text-center">
           <FileText className="mx-auto h-12 w-12 text-slate-600 mb-3" />
           <h3 className="text-base font-bold text-slate-300">No mock questions for these filter criteria</h3>
@@ -571,7 +831,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
                   [{currentQuestion?.marks} Marks]
                 </span>
                 <span className="text-xs font-semibold text-slate-400">
-                  Question {currentIdx + 1} of {filteredQuizzes.length}
+                  Question {currentIdx + 1} of {activeQuizzes.length}
                 </span>
               </div>
             </div>
@@ -586,7 +846,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
 
             {/* Options List */}
             <div className="space-y-3">
-              {currentQuestion?.options.map((opt) => {
+              {currentQuestion?.options.map((opt: QuizOption) => {
                 const isSelected = selectedOptionId === opt.id;
                 const isCorrect = opt.id === currentQuestion.correctOptionId;
 
@@ -604,7 +864,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
                   optClass = 'border-indigo-500 bg-indigo-950/40 text-white ring-1 ring-indigo-500';
                 }
 
-                const optionIndex = currentQuestion.options.findIndex(o => o.id === opt.id);
+                const optionIndex = currentQuestion.options.findIndex((o: QuizOption) => o.id === opt.id);
                 const letter = String.fromCharCode(65 + Math.max(0, optionIndex));
                 const num = Math.max(0, optionIndex) + 1;
 
@@ -661,7 +921,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
                   onClick={handleNextQuestion}
                   className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-3 sm:py-2.5 text-xs sm:text-sm font-bold text-white shadow-md hover:from-indigo-400 hover:to-purple-500 transition active:scale-95 cursor-pointer"
                 >
-                  <span>{currentIdx + 1 === filteredQuizzes.length ? 'Finish Quiz' : 'Next Question'}</span>
+                  <span>{currentIdx + 1 === activeQuizzes.length ? 'Finish Quiz' : 'Next Question'}</span>
                   <ArrowRight className="h-4 w-4" />
                 </button>
               )}
@@ -681,7 +941,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
                 <div className="space-y-2">
                   <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Mark Allocation:</p>
                   <div className="space-y-1.5">
-                    {currentQuestion.markingBreakdown.map((pt, pIdx) => (
+                    {currentQuestion.markingBreakdown.map((pt: string, pIdx: number) => (
                       <div
                         key={pIdx}
                         className="flex items-start gap-2.5 rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-slate-300"

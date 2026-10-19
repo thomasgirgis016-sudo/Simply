@@ -1,6 +1,6 @@
 import { Subject, CommandWord } from '../types';
 
-export const IGCSE_SUBJECTS: Subject[] = [
+const BASE_SUBJECTS: Subject[] = [
   // Languages (including English as a Second Language!)
   {
     id: 'cie-esl-0510',
@@ -449,6 +449,7 @@ export const IGCSE_SUBJECTS: Subject[] = [
     name: 'Accounting',
     code: 'CIE 0452',
     board: 'CIE',
+    level: 'O Level / IGCSE',
     category: 'Commercial',
     icon: 'Receipt',
     color: '#84cc16', // lime
@@ -460,8 +461,262 @@ export const IGCSE_SUBJECTS: Subject[] = [
       'Financial Statements (Income Statement & Statement of Financial Position)',
       'Interpretation and Ratio Analysis (Liquidity, Profitability, ROE)'
     ]
+  },
+
+  // ═════════════════════════════════════════════════════════════
+  // CAMBRIDGE (CIE) AS LEVEL SUBJECTS
+  // ═════════════════════════════════════════════════════════════
+  {
+    id: 'cie-as-math-9709',
+    name: 'Mathematics (AS Level)',
+    code: 'CIE 9709 AS',
+    board: 'CIE',
+    level: 'AS Level',
+    category: 'Mathematics',
+    icon: 'Calculator',
+    color: '#2563eb',
+    topics: [
+      'Pure Mathematics 1 (P1): Quadratics & Functions',
+      'Pure Mathematics 1 (P1): Coordinate Geometry & Circles',
+      'Pure Mathematics 1 (P1): Circular Measure (Radians)',
+      'Pure Mathematics 1 (P1): Trigonometry & Identities',
+      'Pure Mathematics 1 (P1): Series & Binomial Theorem',
+      'Pure Mathematics 1 (P1): Differentiation & Tangents/Normals',
+      'Pure Mathematics 1 (P1): Integration & Area Under Curves',
+      'Mechanics (P4): Kinematics of Constant Acceleration',
+      'Mechanics (P4): Newton Laws of Motion & Friction',
+      'Mechanics (P4): Energy, Work & Power',
+      'Probability & Statistics 1 (P5): Representation of Data',
+      'Probability & Statistics 1 (P5): Permutations & Combinations',
+      'Probability & Statistics 1 (P5): Probability & Binomial Distribution',
+      'Probability & Statistics 1 (P5): The Normal Distribution'
+    ]
+  },
+  {
+    id: 'cie-as-physics-9702',
+    name: 'Physics (AS Level)',
+    code: 'CIE 9702 AS',
+    board: 'CIE',
+    level: 'AS Level',
+    category: 'Sciences',
+    icon: 'Zap',
+    color: '#f59e0b',
+    topics: [
+      'Physical Quantities and Units (SI Base & Vector Resolution)',
+      'Kinematics (Equations of Motion & Projectile Motion)',
+      'Dynamics (Linear Momentum, Collisions & Newton Laws)',
+      'Forces, Density & Pressure (Turning Effects & Archimedes)',
+      'Work, Energy & Power (Conservation & Efficiency)',
+      'Deformation of Solids (Hooke Law & Stress/Strain)',
+      'Waves (Transverse, Longitudinal & Doppler Effect)',
+      'Superposition (Stationary Waves, Diffraction & Interference)',
+      'Electricity (Current, Potential Difference & Kirchhoff Laws)',
+      'Particle Physics (Quarks, Leptons, Radioactive Decay & β-emission)'
+    ]
+  },
+  {
+    id: 'cie-as-chem-9701',
+    name: 'Chemistry (AS Level)',
+    code: 'CIE 9701 AS',
+    board: 'CIE',
+    level: 'AS Level',
+    category: 'Sciences',
+    icon: 'FlaskConical',
+    color: '#0284c7',
+    topics: [
+      'Atoms, Molecules & Stoichiometry (Mole, Empirical Formula)',
+      'Atomic Structure (Subshells, Ionisation Energies & Trends)',
+      'Chemical Bonding (Shapes of Molecules, Hybridisation & Intermolecular)',
+      'States of Matter (Ideal Gas Equation & Kinetic Theory)',
+      'Chemical Energetics (Hess Law & Enthalpy Cycles)',
+      'Electrochemistry & Redox Numbers',
+      'Equilibria (Kc, Kp & Le Chatelier Principle)',
+      'Reaction Kinetics (Collision Theory & Activation Energy)',
+      'The Periodic Table: Period 3 Trends & Group 2/17',
+      'Organic Chemistry: Hydrocarbons (Alkanes, Alkenes & Free Radicals)',
+      'Halogenoalkanes (Nucleophilic Substitution SN1/SN2)',
+      'Alcohols, Carbonyl Compounds & Carboxylic Acids'
+    ]
+  },
+  {
+    id: 'cie-as-bio-9700',
+    name: 'Biology (AS Level)',
+    code: 'CIE 9700 AS',
+    board: 'CIE',
+    level: 'AS Level',
+    category: 'Sciences',
+    icon: 'Dna',
+    color: '#10b981',
+    topics: [
+      'Cell Structure (Electron Microscopy & Organelles)',
+      'Biological Molecules (Carbohydrates, Lipids & Proteins)',
+      'Enzymes (Kinetics, Vmax & Enzyme Inhibitors)',
+      'Cell Membranes & Transport (Fluid Mosaic & Water Potential)',
+      'The Mitotic Cell Cycle & Chromosome Replication',
+      'Nucleic Acids & Protein Synthesis (DNA Replication & Translation)',
+      'Transport in Plants (Transpiration Stream & Phloem Translocation)',
+      'Transport in Mammals (Cardiac Cycle & Oxygen Dissociation)',
+      'Gas Exchange and Smoking (Alveoli & Pathologies)',
+      'Infectious Diseases & Immunity (Antibodies, B & T Lymphocytes)'
+    ]
+  },
+  {
+    id: 'cie-as-econ-9708',
+    name: 'Economics (AS Level)',
+    code: 'CIE 9708 AS',
+    board: 'CIE',
+    level: 'AS Level',
+    category: 'Commercial',
+    icon: 'TrendingUp',
+    color: '#ea580c',
+    topics: [
+      'Basic Economic Ideas (PPC, Opportunity Cost & Resource Allocation)',
+      'The Price System & Microeconomy (PED, PES, YED & XED)',
+      'Government Microeconomic Intervention (Maximum/Minimum Prices, Taxes)',
+      'The Macroeconomy (Circular Flow, Aggregate Demand & Aggregate Supply)',
+      'Government Macroeconomic Policy (Inflation, Balance of Payments, Exchange Rates)'
+    ]
+  },
+
+  // ═════════════════════════════════════════════════════════════
+  // CAMBRIDGE (CIE) A LEVEL SUBJECTS
+  // ═════════════════════════════════════════════════════════════
+  {
+    id: 'cie-a2-math-9709',
+    name: 'Mathematics (A Level / A2)',
+    code: 'CIE 9709 A2',
+    board: 'CIE',
+    level: 'A Level',
+    category: 'Mathematics',
+    icon: 'Calculator',
+    color: '#1d4ed8',
+    topics: [
+      'Pure Mathematics 3 (P3): Polynomials, Modulus & Logarithmic Functions',
+      'Pure Mathematics 3 (P3): Trigonometric Identities (Double Angle & R-addition)',
+      'Pure Mathematics 3 (P3): Advanced Differentiation (Product, Quotient, Implicit & Parametric)',
+      'Pure Mathematics 3 (P3): Integration by Parts & Partial Fractions',
+      'Pure Mathematics 3 (P3): Differential Equations & Real-world Models',
+      'Pure Mathematics 3 (P3): Vectors in 3D (Vector Equations of Lines & Angles)',
+      'Pure Mathematics 3 (P3): Complex Numbers (Argand Diagrams, Modulus-Argument & Roots)',
+      'Probability & Statistics 2 (P6): Poisson Distribution',
+      'Probability & Statistics 2 (P6): Linear Combinations of Random Variables',
+      'Probability & Statistics 2 (P6): Continuous Random Variables',
+      'Probability & Statistics 2 (P6): Hypothesis Testing (Normal & Poisson)'
+    ]
+  },
+  {
+    id: 'cie-a2-physics-9702',
+    name: 'Physics (A Level / A2)',
+    code: 'CIE 9702 A2',
+    board: 'CIE',
+    level: 'A Level',
+    category: 'Sciences',
+    icon: 'Zap',
+    color: '#d97706',
+    topics: [
+      'Motion in a Circle (Centripetal Force & Angular Velocity)',
+      'Gravitational Fields (Gravitational Potential & Orbital Motion)',
+      'Ideal Gases (Gas Laws & Molecular Kinetic Theory)',
+      'Thermodynamics (First Law & Specific Heat Capacity)',
+      'Oscillations (Simple Harmonic Motion, Damping & Resonance)',
+      'Electric Fields (Coulomb Law & Electric Potential)',
+      'Capacitance (Dielectrics & Exponential Discharge)',
+      'Magnetic Fields & Electromagnetic Induction (Faraday & Lenz Laws)',
+      'Alternating Currents (Transformers & Rectification)',
+      'Quantum Physics (Photons, Photoelectric Effect & De Broglie)',
+      'Nuclear Physics (Mass Defect, Binding Energy & Radioactive Decay)',
+      'Medical Physics (X-rays, Ultrasound & PET Scans)',
+      'Astronomy & Cosmology (Standard Candles, Hubble Law & Big Bang)'
+    ]
+  },
+  {
+    id: 'cie-a2-chem-9701',
+    name: 'Chemistry (A Level / A2)',
+    code: 'CIE 9701 A2',
+    board: 'CIE',
+    level: 'A Level',
+    category: 'Sciences',
+    icon: 'FlaskConical',
+    color: '#0369a1',
+    topics: [
+      'Chemical Energetics (Born-Haber Cycles, Lattice Energy & Entropy ΔS)',
+      'Electrochemistry (Electrode Potentials E°, Nernst Equation & Fuel Cells)',
+      'Equilibria (Buffer Solutions, Ksp Solubility Product & Partition Coefficients)',
+      'Reaction Kinetics (Rate Equations, Half-Life & Arrhenius Equation)',
+      'Transition Elements (Complex Ions, Ligand Exchange & Colorimetry)',
+      'Organic Chemistry: Arenes & Benzene Electrophilic Substitution',
+      'Carboxylic Acids Derivatives (Acyl Chlorides & Esters)',
+      'Nitrogen Compounds (Amines, Amides & Amino Acids)',
+      'Polymerisation (Addition & Condensation Polymers)',
+      'Analytical Chemistry (NMR Spectroscopy & Chromatography)'
+    ]
+  },
+  {
+    id: 'cie-a2-bio-9700',
+    name: 'Biology (A Level / A2)',
+    code: 'CIE 9700 A2',
+    board: 'CIE',
+    level: 'A Level',
+    category: 'Sciences',
+    icon: 'Dna',
+    color: '#059669',
+    topics: [
+      'Energy and Respiration (Glycolysis, Krebs Cycle & Oxidative Phosphorylation)',
+      'Photosynthesis (Light-Dependent & Light-Independent Calvin Cycle)',
+      'Homeostasis (Thermoregulation, Osmoregulation & Blood Glucose Regulation)',
+      'Control and Coordination (Action Potentials, Synapses & Muscle Contraction)',
+      'Inheritance (Monohybrid, Dihybrid, Epistasis & Chi-Squared Test)',
+      'Selection and Evolution (Hardy-Weinberg Principle & Speciation)',
+      'Classification, Biodiversity and Conservation',
+      'Genetic Technology (PCR, Gel Electrophoresis, Recombinant DNA & CRISPR)'
+    ]
+  },
+
+  // ═════════════════════════════════════════════════════════════
+  // EDEXCEL INTERNATIONAL AS & A LEVEL (IAL)
+  // ═════════════════════════════════════════════════════════════
+  {
+    id: 'edx-ial-math-wma',
+    name: 'Mathematics (Edexcel IAL AS/A2)',
+    code: 'Edexcel WMA11-14',
+    board: 'Edexcel',
+    level: 'A Level',
+    category: 'Mathematics',
+    icon: 'Calculator',
+    color: '#2563eb',
+    topics: [
+      'Pure Mathematics P1 (WMA11): Algebra, Graphs, Calculus',
+      'Pure Mathematics P2 (WMA12): Sequences, Exponentials, Trigonometry',
+      'Pure Mathematics P3 (WMA13): Functions, Numerical Methods, Integration',
+      'Pure Mathematics P4 (WMA14): Parametric Equations, Vectors, Differential Equations',
+      'Mechanics M1 (WME01): Kinematics, Dynamics, Statics & Moments',
+      'Statistics S1 (WST01): Data Representation, Probability, Normal Distribution'
+    ]
+  },
+  {
+    id: 'edx-ial-physics-wph',
+    name: 'Physics (Edexcel IAL AS/A2)',
+    code: 'Edexcel WPH11-15',
+    board: 'Edexcel',
+    level: 'A Level',
+    category: 'Sciences',
+    icon: 'Zap',
+    color: '#ea580c',
+    topics: [
+      'Unit 1 (WPH11): Mechanics and Materials',
+      'Unit 2 (WPH12): Waves and Electricity',
+      'Unit 3 (WPH13): Practical Skills in Physics I',
+      'Unit 4 (WPH14): Further Mechanics, Fields and Particles',
+      'Unit 5 (WPH15): Thermodynamics, Radiation, Oscillations and Cosmology',
+      'Unit 6 (WPH16): Practical Skills in Physics II'
+    ]
   }
 ];
+
+export const IGCSE_SUBJECTS: Subject[] = BASE_SUBJECTS.map((s) => ({
+  ...s,
+  level: s.level || 'O Level / IGCSE',
+}));
 
 export const IGCSE_COMMAND_WORDS: CommandWord[] = [
   {

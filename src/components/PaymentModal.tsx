@@ -15,13 +15,13 @@ import {
   RefreshCw,
   FileText
 } from 'lucide-react';
-import { UserAccount, UserProfile } from '../types';
+import { UserAccount, UserProfile, SubscriptionPlan, BillingCycle } from '../types';
 import {
   parseInstaPayReceiptImage,
   reconcileStudentPayment,
   OFFICIAL_INSTAPAY_IPA,
   OFFICIAL_RECEIVER_PHONE,
-  SUBSCRIPTION_PRICE_EGP
+  PLAN_PRICING
 } from '../services/paymentAutomation';
 import confetti from 'canvas-confetti';
 
@@ -40,6 +40,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
   profile,
   onPaymentSuccess
 }) => {
+  const [selectedPlan, setSelectedPlan] = useState<'plus' | 'pro'>('pro');
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [manualTxNumber, setManualTxNumber] = useState('');
@@ -50,10 +52,14 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
   const [successResult, setSuccessResult] = useState<{
     txNumber: string;
     amount: number;
+    plan: SubscriptionPlan;
+    billingCycle: BillingCycle;
     proExpiresAt: string;
   } | null>(null);
 
   if (!isOpen) return null;
+
+  const currentPrice = PLAN_PRICING[selectedPlan][billingCycle];
 
   const handleCopy = (text: string, fieldName: string) => {
     navigator.clipboard.writeText(text);
@@ -85,7 +91,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
 
     try {
       let txToVerify = manualTxNumber.trim();
-      let extractedAmount = SUBSCRIPTION_PRICE_EGP;
+      let extractedAmount: number = currentPrice;
 
       if (previewUrl) {
         setCurrentStepText('1/3 Analyzing InstaPay receipt with Gemini Vision OCR...');
@@ -96,7 +102,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
         }
 
         txToVerify = ocrResult.txNumber;
-        extractedAmount = ocrResult.amount || SUBSCRIPTION_PRICE_EGP;
+        extractedAmount = ocrResult.amount || currentPrice;
       }
 
       setCurrentStepText('2/3 Reconciling against Banque Du Caire (BDC) SMS inbound feed...');
@@ -111,7 +117,9 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
         studentReceiptAmount: extractedAmount,
         studentId,
         studentEmail,
-        minAmount: SUBSCRIPTION_PRICE_EGP
+        minAmount: currentPrice,
+        plan: selectedPlan,
+        billingCycle: billingCycle
       });
 
       if (!reconcileResult.success) {
@@ -120,20 +128,28 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
 
       // Success! Trigger celebratory confetti
       confetti({
-        particleCount: 120,
-        spread: 80,
+        particleCount: 130,
+        spread: 85,
         origin: { y: 0.6 }
       });
+
+      const grantedUntil = reconcileResult.proGrantedUntil || new Date(Date.now() + (billingCycle === 'annual' ? 365 : 30) * 24 * 3600 * 1000).toISOString();
+      const grantedPlan: SubscriptionPlan = reconcileResult.plan || selectedPlan;
+      const grantedCycle: BillingCycle = reconcileResult.billingCycle || billingCycle;
 
       setSuccessResult({
         txNumber: reconcileResult.txNumber || txToVerify,
         amount: reconcileResult.amount || extractedAmount,
-        proExpiresAt: reconcileResult.proGrantedUntil || new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString()
+        plan: grantedPlan,
+        billingCycle: grantedCycle,
+        proExpiresAt: grantedUntil
       });
 
       onPaymentSuccess({
-        isPro: true,
-        proExpiresAt: reconcileResult.proGrantedUntil
+        isPro: grantedPlan === 'pro',
+        plan: grantedPlan,
+        billingCycle: grantedCycle,
+        proExpiresAt: grantedUntil
       });
 
     } catch (err: any) {
@@ -156,19 +172,19 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
         </button>
 
         {/* Modal Header */}
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-3 mb-5">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-[#FF5E62] to-[#FFA63A] text-slate-950 shadow-lg shadow-amber-500/20">
             <Smartphone className="h-6 w-6" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-black text-white">InstaPay Payment Verification</h2>
+              <h2 className="text-xl font-black text-white">Choose Your IGCSE Plan</h2>
               <span className="rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold text-emerald-300 border border-emerald-500/30">
-                BDC Automated Feed
+                BDC Live Feed
               </span>
             </div>
             <p className="text-xs text-slate-400 mt-0.5">
-              Two-way bank reconciliation matched against Banque Du Caire official confirmation.
+              Select Plus or Pro • Instant bank reconciliation with Banque Du Caire via InstaPay.
             </p>
           </div>
         </div>
@@ -181,7 +197,9 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
             </div>
 
             <div className="space-y-2">
-              <h3 className="text-2xl font-black text-white">30-Day Pro Access Unlocked!</h3>
+              <h3 className="text-2xl font-black text-white">
+                {successResult.plan === 'pro' ? 'Pro Access Unlocked!' : 'Plus Access Activated!'}
+              </h3>
               <p className="text-xs text-slate-300 max-w-md mx-auto">
                 Your payment of <strong className="text-emerald-400">{successResult.amount} EGP</strong> was verified and reconciled with official Banque Du Caire transaction <code className="bg-slate-900 text-amber-300 px-1.5 py-0.5 rounded font-mono font-bold">#{successResult.txNumber}</code>.
               </p>
@@ -189,15 +207,15 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
 
             <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 text-left space-y-2 text-xs">
               <div className="flex justify-between text-slate-400">
-                <span>Account Status:</span>
-                <span className="font-bold text-emerald-400">Pro Student (Full Access)</span>
+                <span>Active Tier:</span>
+                <span className="font-bold text-white capitalize">{successResult.plan} ({successResult.billingCycle})</span>
               </div>
               <div className="flex justify-between text-slate-400">
                 <span>Reconciliation Status:</span>
-                <span className="font-bold text-white">BDC Inbound Match Confirmed</span>
+                <span className="font-bold text-emerald-400">BDC Inbound Match Confirmed</span>
               </div>
               <div className="flex justify-between text-slate-400">
-                <span>Pro Expiration Date:</span>
+                <span>Subscription Expiration:</span>
                 <span className="font-bold text-amber-300">
                   {new Date(successResult.proExpiresAt).toLocaleDateString(undefined, {
                     year: 'numeric',
@@ -212,19 +230,160 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
               onClick={onClose}
               className="w-full rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 py-3.5 text-sm font-black text-slate-950 shadow-xl shadow-emerald-500/25 hover:opacity-95 transition cursor-pointer"
             >
-              Start Using Pro Features Now
+              Start Studying Now
             </button>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-5">
+            {/* Billing Cycle Switcher */}
+            <div className="flex items-center justify-center">
+              <div className="flex items-center rounded-2xl bg-slate-900 p-1 border border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setBillingCycle('monthly')}
+                  className={`rounded-xl px-4 py-1.5 text-xs font-bold transition cursor-pointer ${
+                    billingCycle === 'monthly'
+                      ? 'bg-indigo-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  Monthly Billing
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setBillingCycle('annual')}
+                  className={`rounded-xl px-4 py-1.5 text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                    billingCycle === 'annual'
+                      ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 shadow-md font-black'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <span>Annual Billing</span>
+                  <span className="rounded-full bg-emerald-500/30 text-emerald-300 text-[10px] px-2 py-0.2 border border-emerald-500/40">
+                    Save 33%
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            {/* Plan Cards: Plus vs Pro */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Plus Plan Card */}
+              <div
+                onClick={() => setSelectedPlan('plus')}
+                className={`rounded-2xl border p-4 cursor-pointer transition select-none flex flex-col justify-between ${
+                  selectedPlan === 'plus'
+                    ? 'border-indigo-500 bg-indigo-950/40 ring-2 ring-indigo-500 shadow-xl'
+                    : 'border-slate-800 bg-slate-900/60 hover:border-slate-700'
+                }`}
+              >
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold uppercase tracking-wider text-indigo-300">Plus Tier</span>
+                    <span className="text-xs font-mono font-bold text-white">
+                      {PLAN_PRICING.plus[billingCycle]} EGP {billingCycle === 'annual' ? '/yr' : '/mo'}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-1">Core study suite for the 5 official subjects</p>
+
+                  <ul className="mt-3 space-y-1.5 text-[11px] text-slate-300">
+                    <li className="flex items-center gap-1.5">
+                      <Check className="h-3.5 w-3.5 text-indigo-400 shrink-0" />
+                      <span>5 Enrolled Subjects Cap</span>
+                    </li>
+                    <li className="flex items-center gap-1.5">
+                      <Check className="h-3.5 w-3.5 text-indigo-400 shrink-0" />
+                      <span>Classified Past Paper Finder</span>
+                    </li>
+                    <li className="flex items-center gap-1.5">
+                      <Check className="h-3.5 w-3.5 text-indigo-400 shrink-0" />
+                      <span>Topic Quizzes & Printable PDF Exams</span>
+                    </li>
+                    <li className="flex items-center gap-1.5">
+                      <Check className="h-3.5 w-3.5 text-indigo-400 shrink-0" />
+                      <span>Revision Notes & Formula Sheets</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
+                  <span className="text-slate-400 font-medium">Standard Study</span>
+                  <div className={`h-4 w-4 rounded-full border flex items-center justify-center ${
+                    selectedPlan === 'plus' ? 'bg-indigo-600 border-indigo-400' : 'border-slate-700'
+                  }`}>
+                    {selectedPlan === 'plus' && <div className="h-1.5 w-1.5 rounded-full bg-white" />}
+                  </div>
+                </div>
+              </div>
+
+              {/* Pro Plan Card */}
+              <div
+                onClick={() => setSelectedPlan('pro')}
+                className={`rounded-2xl border p-4 cursor-pointer transition select-none flex flex-col justify-between relative overflow-hidden ${
+                  selectedPlan === 'pro'
+                    ? 'border-amber-500 bg-gradient-to-b from-amber-950/40 via-slate-900 to-amber-950/20 ring-2 ring-amber-500 shadow-xl'
+                    : 'border-slate-800 bg-slate-900/60 hover:border-slate-700'
+                }`}
+              >
+                <div className="absolute top-0 right-0 bg-gradient-to-l from-amber-500 to-orange-500 px-3 py-0.5 text-[9px] font-black uppercase text-slate-950 tracking-wider rounded-bl-xl shadow-md">
+                  Most Popular
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1">
+                      <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+                      Pro Tier (All Features)
+                    </span>
+                    <span className="text-xs font-mono font-black text-amber-300">
+                      {PLAN_PRICING.pro[billingCycle]} EGP {billingCycle === 'annual' ? '/yr' : '/mo'}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-1">Full AI power, examiner tutor & school analytics</p>
+
+                  <ul className="mt-3 space-y-1.5 text-[11px] text-slate-300">
+                    <li className="flex items-center gap-1.5">
+                      <Check className="h-3.5 w-3.5 text-amber-400 shrink-0" />
+                      <span><strong>All Plus Features</strong> Included</span>
+                    </li>
+                    <li className="flex items-center gap-1.5">
+                      <Check className="h-3.5 w-3.5 text-amber-400 shrink-0" />
+                      <span>AI Multimodal Handwritten Solver</span>
+                    </li>
+                    <li className="flex items-center gap-1.5">
+                      <Check className="h-3.5 w-3.5 text-amber-400 shrink-0" />
+                      <span>Chief Examiner AI 24/7 Chat</span>
+                    </li>
+                    <li className="flex items-center gap-1.5">
+                      <Check className="h-3.5 w-3.5 text-amber-400 shrink-0" />
+                      <span>Timed Split-Screen Exam Workspace</span>
+                    </li>
+                    <li className="flex items-center gap-1.5">
+                      <Check className="h-3.5 w-3.5 text-amber-400 shrink-0" />
+                      <span>Teacher Analytics & Error Heatmaps</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
+                  <span className="text-amber-300 font-semibold">Recommended for Grade 9/A*</span>
+                  <div className={`h-4 w-4 rounded-full border flex items-center justify-center ${
+                    selectedPlan === 'pro' ? 'bg-amber-500 border-amber-300' : 'border-slate-700'
+                  }`}>
+                    {selectedPlan === 'pro' && <div className="h-1.5 w-1.5 rounded-full bg-slate-950" />}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Step 1: Transfer Destination Info Box */}
             <div className="rounded-2xl border border-indigo-500/30 bg-gradient-to-br from-indigo-950/40 via-slate-900 to-indigo-950/20 p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold uppercase tracking-wider text-indigo-300">
-                  Step 1: Transfer {SUBSCRIPTION_PRICE_EGP} EGP via InstaPay
+                  Step 1: Transfer {currentPrice} EGP via InstaPay
                 </span>
-                <span className="rounded-md bg-indigo-500/20 px-2 py-0.5 text-[10px] font-bold text-indigo-200">
-                  30 Days Pro
+                <span className="rounded-md bg-indigo-500/20 px-2 py-0.5 text-[10px] font-bold text-indigo-200 uppercase">
+                  {selectedPlan} • {billingCycle === 'annual' ? '1 Year Access' : '30 Days Access'}
                 </span>
               </div>
 

@@ -31,7 +31,12 @@ import {
   Cpu,
   Send,
   Zap,
-  ArrowRight
+  ArrowRight,
+  TrendingUp,
+  Smartphone,
+  Info,
+  ChevronDown,
+  Sparkles
 } from 'lucide-react';
 import {
   UserAccount,
@@ -44,7 +49,9 @@ import {
   PastPaperItem,
   BankTransaction,
   PastPaperQaSummaryReport,
-  PastPaperQaItemIssue
+  PastPaperQaItemIssue,
+  SubscriptionPlan,
+  BillingCycle
 } from '../types';
 import {
   getAllUsers,
@@ -55,7 +62,8 @@ import {
   approveAllPendingUsers,
   rejectAllPendingUsers,
   createPreApprovedUser,
-  grantUserProSubscription
+  grantUserProSubscription,
+  updateUserSubscriptionPlan
 } from '../services/auth';
 import { IGCSE_SUBJECTS } from '../data/subjects';
 import { getCustomPastPapers, saveCustomPastPapers } from '../data/pastPapersData';
@@ -84,6 +92,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | AccountStatus>('all');
   const [roleFilter, setRoleFilter] = useState<'all' | UserRole>('all');
+  const [planFilter, setPlanFilter] = useState<'all' | SubscriptionPlan>('all');
   const [actionSuccessMsg, setActionSuccessMsg] = useState('');
 
   // Add Account Modal State
@@ -112,6 +121,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setTimeout(() => setActionSuccessMsg(''), 4000);
   };
 
+  const handleSetUserPlan = (userId: string, plan: SubscriptionPlan, cycle: BillingCycle = 'monthly') => {
+    const res = updateUserSubscriptionPlan(userId, plan, cycle);
+    if (res.success) {
+      reloadUsers();
+      showToast(`Updated student subscription to ${plan.toUpperCase()} (${cycle})!`);
+    } else {
+      alert(res.error || 'Failed to update plan');
+    }
+  };
+
   // Metrics
   const metrics = useMemo(() => {
     const total = users.length;
@@ -119,6 +138,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     const approved = users.filter((u) => u.status === 'approved' || !u.status).length;
     const admins = users.filter((u) => u.role === 'admin').length;
     return { total, pending, approved, admins };
+  }, [users]);
+
+  // Financial Revenue Telemetry
+  const financialMetrics = useMemo(() => {
+    const plusUsers = users.filter(u => u.plan === 'plus');
+    const proUsers = users.filter(u => u.plan === 'pro' || u.isPro);
+    const plusMonthly = plusUsers.filter(u => u.billingCycle !== 'annual').length;
+    const plusAnnual = plusUsers.filter(u => u.billingCycle === 'annual').length;
+    const proMonthly = proUsers.filter(u => u.billingCycle !== 'annual').length;
+    const proAnnual = proUsers.filter(u => u.billingCycle === 'annual').length;
+
+    const estimatedMrr = (plusMonthly * 150) + (plusAnnual * 100) + (proMonthly * 250) + (proAnnual * 166.6);
+    const estimatedArr = estimatedMrr * 12;
+
+    return {
+      plusCount: plusUsers.length,
+      proCount: proUsers.length,
+      freeCount: users.filter(u => (!u.plan || u.plan === 'free') && !u.isPro).length,
+      estimatedMrr: Math.round(estimatedMrr),
+      estimatedArr: Math.round(estimatedArr),
+    };
   }, [users]);
 
   // Filtered users
@@ -140,9 +180,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         (roleFilter === 'student' && (!u.role || u.role === 'student')) ||
         u.role === roleFilter;
 
-      return matchesSearch && matchesStatus && matchesRole;
+      const matchesPlan =
+        planFilter === 'all' ||
+        (planFilter === 'free' && (!u.plan || u.plan === 'free') && !u.isPro) ||
+        (planFilter === 'pro' && (u.plan === 'pro' || u.isPro)) ||
+        u.plan === planFilter;
+
+      return matchesSearch && matchesStatus && matchesRole && matchesPlan;
     });
-  }, [users, searchQuery, statusFilter, roleFilter]);
+  }, [users, searchQuery, statusFilter, roleFilter, planFilter]);
 
   const handleApprove = (u: UserAccount) => {
     const ok = approveUser(u.id, currentUser.email);
@@ -699,6 +745,45 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
           </div>
 
+          {/* Subscription Revenue Telemetry Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-3">
+            <div className="rounded-2xl border border-indigo-500/30 bg-indigo-950/20 p-4 shadow-md">
+              <div className="flex items-center justify-between text-indigo-300 text-xs font-semibold">
+                <span>Plus Subscribers</span>
+                <span className="text-[10px] font-bold bg-indigo-500/20 px-1.5 py-0.5 rounded border border-indigo-500/30">150 EGP/mo</span>
+              </div>
+              <div className="text-2xl font-black text-indigo-300 mt-1 font-mono">{financialMetrics.plusCount}</div>
+              <span className="text-[10px] text-slate-400">Classified & quiz members</span>
+            </div>
+
+            <div className="rounded-2xl border border-amber-500/30 bg-amber-950/20 p-4 shadow-md">
+              <div className="flex items-center justify-between text-amber-300 text-xs font-semibold">
+                <span>Pro Subscribers</span>
+                <span className="text-[10px] font-bold bg-amber-500/20 px-1.5 py-0.5 rounded border border-amber-500/30">250 EGP/mo</span>
+              </div>
+              <div className="text-2xl font-black text-amber-300 mt-1 font-mono">{financialMetrics.proCount}</div>
+              <span className="text-[10px] text-slate-400">Full AI & solver access</span>
+            </div>
+
+            <div className="rounded-2xl border border-emerald-500/30 bg-emerald-950/20 p-4 shadow-md">
+              <div className="flex items-center justify-between text-emerald-300 text-xs font-semibold">
+                <span>Estimated MRR</span>
+                <TrendingUp className="h-4 w-4 text-emerald-400" />
+              </div>
+              <div className="text-2xl font-black text-emerald-300 mt-1 font-mono">EGP {financialMetrics.estimatedMrr.toLocaleString()}</div>
+              <span className="text-[10px] text-slate-400">Monthly recurring inflow</span>
+            </div>
+
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-md">
+              <div className="flex items-center justify-between text-slate-400 text-xs font-semibold">
+                <span>Projected ARR</span>
+                <Crown className="h-4 w-4 text-amber-400" />
+              </div>
+              <div className="text-2xl font-black text-white mt-1 font-mono">EGP {financialMetrics.estimatedArr.toLocaleString()}</div>
+              <span className="text-[10px] text-slate-400">Annualized subscription base</span>
+            </div>
+          </div>
+
           {/* Batch Approval Banner if Pending Accounts Exist */}
           {metrics.pending > 0 && (
             <div className="rounded-2xl border border-amber-500/40 bg-gradient-to-r from-amber-950/30 via-slate-900 to-amber-950/30 p-4 sm:p-5 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -763,6 +848,28 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 }`}
               >
                 {st === 'all' ? 'All' : st}
+              </button>
+            ))}
+          </div>
+
+          {/* Plan Filter */}
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar text-xs">
+            <span className="text-slate-400 font-semibold mr-1">Plan:</span>
+            {(['all', 'pro', 'plus', 'free'] as const).map((pl) => (
+              <button
+                key={pl}
+                onClick={() => setPlanFilter(pl)}
+                className={`rounded-lg px-2.5 py-1 text-xs font-semibold capitalize transition cursor-pointer shrink-0 ${
+                  planFilter === pl
+                    ? pl === 'pro'
+                      ? 'bg-amber-500 text-slate-950 font-black shadow-sm'
+                      : pl === 'plus'
+                      ? 'bg-indigo-600 text-white shadow-sm'
+                      : 'bg-slate-700 text-white shadow-sm'
+                    : 'bg-slate-800 text-slate-400 hover:text-white'
+                }`}
+              >
+                {pl === 'all' ? 'All Plans' : pl.toUpperCase()}
               </button>
             ))}
           </div>
@@ -853,6 +960,28 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           {isPending ? 'Pending Approval' : isApproved ? 'Active Student' : 'Suspended'}
                         </span>
 
+                        {/* Plan Badge */}
+                        {(u.plan === 'pro' || u.isPro) ? (
+                          <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1 shadow-sm">
+                            <Crown className="h-3 w-3 text-amber-400" />
+                            <span>PRO ({u.billingCycle === 'annual' ? 'Annual' : 'Monthly'})</span>
+                          </span>
+                        ) : u.plan === 'plus' ? (
+                          <span className="rounded-full px-2 py-0.5 text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 flex items-center gap-1 shadow-sm">
+                            <Sparkles className="h-3 w-3 text-indigo-400" />
+                            <span>PLUS ({u.billingCycle === 'annual' ? 'Annual' : 'Monthly'})</span>
+                          </span>
+                        ) : (
+                          <span className="rounded-full px-2 py-0.5 text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700">
+                            FREE TIER
+                          </span>
+                        )}
+
+                        {/* Subject Quota Badge */}
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-mono font-semibold bg-slate-800/80 text-slate-300 border border-slate-700/80" title="Enforced maximum: 5 subjects">
+                          {u.selectedSubjectIds?.length || 0}/5 Subjects
+                        </span>
+
                         {/* Role Badge */}
                         <span
                           className={`rounded-full px-2 py-0.5 text-[10px] font-bold border ${
@@ -885,6 +1014,25 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
                   {/* Right: Actions */}
                   <div className="flex items-center gap-2 w-full md:w-auto justify-end flex-wrap pt-2 md:pt-0 border-t border-slate-800/60 md:border-t-0">
+                    {/* Quick Plan Switcher */}
+                    <div className="flex items-center gap-1">
+                      <select
+                        value={`${u.plan || (u.isPro ? 'pro' : 'free')}-${u.billingCycle || 'monthly'}`}
+                        onChange={(e) => {
+                          const [newPlan, newCycle] = e.target.value.split('-') as [SubscriptionPlan, BillingCycle];
+                          handleSetUserPlan(u.id, newPlan, newCycle);
+                        }}
+                        className="rounded-xl border border-slate-700 bg-slate-950 px-2.5 py-1.5 text-[11px] font-bold text-slate-200 hover:border-slate-500 focus:border-amber-500 focus:outline-none cursor-pointer"
+                        title="Change student subscription tier & billing cycle"
+                      >
+                        <option value="free-monthly">Plan: Free</option>
+                        <option value="plus-monthly">Plan: Plus (150 EGP/mo)</option>
+                        <option value="plus-annual">Plan: Plus (1,200 EGP/yr)</option>
+                        <option value="pro-monthly">Plan: Pro (250 EGP/mo)</option>
+                        <option value="pro-annual">Plan: Pro (2,000 EGP/yr)</option>
+                      </select>
+                    </div>
+
                     {/* Approve Button */}
                     {isPending && (
                       <button
@@ -1509,6 +1657,117 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
               <div className="text-2xl font-black text-amber-300 mt-1 font-mono">EGP {bankMetrics.totalEgp.toFixed(0)}</div>
               <span className="text-[10px] text-slate-500">Gross subscription inflow</span>
+            </div>
+          </div>
+
+          {/* 📱 How to Connect Your BDC Bank SMS Messages Automatically Guide */}
+          <div className="rounded-3xl border border-indigo-500/30 bg-gradient-to-br from-indigo-950/40 via-slate-900 to-slate-950 p-6 sm:p-7 shadow-2xl space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-indigo-500/20 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 shrink-0">
+                  <Smartphone className="h-6 w-6 text-indigo-400" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
+                    <span>How to Connect Your Banque Du Caire (BDC) SMS Messages</span>
+                    <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-bold text-emerald-300 border border-emerald-500/30">
+                      Zero Human Effort
+                    </span>
+                  </h3>
+                  <p className="text-xs text-slate-300">
+                    Follow this 60-second setup on your iPhone to forward BDC bank alert SMS automatically to Simply.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(`${window.location.origin}/api/webhooks/bdc-sms`);
+                    showToast('Copied Webhook URL to clipboard!');
+                  }}
+                  className="flex items-center gap-1.5 rounded-xl border border-indigo-500/40 bg-indigo-500/10 px-3.5 py-2 text-xs font-bold text-indigo-300 hover:bg-indigo-500/20 transition cursor-pointer"
+                >
+                  <Copy className="h-3.5 w-3.5" />
+                  <span>Copy Webhook URL</span>
+                </button>
+              </div>
+            </div>
+
+            {/* 4 Steps Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Step 1 */}
+              <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-600 font-mono text-xs font-black text-white">
+                    1
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-400">Shortcuts App</span>
+                </div>
+                <h4 className="text-xs font-black text-white">Open iPhone Shortcuts</h4>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Open the built-in <strong>Shortcuts (الاختصارات)</strong> app on your iPhone. Tap the <strong>Automation (التحكم التلقائي)</strong> tab at the bottom, then tap <strong>+ (New Automation)</strong>.
+                </p>
+              </div>
+
+              {/* Step 2 */}
+              <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-600 font-mono text-xs font-black text-white">
+                    2
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-400">Trigger Rule</span>
+                </div>
+                <h4 className="text-xs font-black text-white">Set Message Filter</h4>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Select <strong>Message</strong>. In <em>Sender</em>, choose or type <strong>BDC</strong>. In <em>Message Contains</em>, enter <strong>جم</strong> or <strong>EGP</strong>. Select <strong>Run Immediately</strong> (تشغيل فوراً).
+                </p>
+              </div>
+
+              {/* Step 3 */}
+              <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-600 font-mono text-xs font-black text-white">
+                    3
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-400">POST Action</span>
+                </div>
+                <h4 className="text-xs font-black text-white">Get Contents of URL</h4>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Add action: <strong>Get Contents of URL</strong>.<br />
+                  • Method: <code className="text-indigo-300 font-mono">POST</code><br />
+                  • Header: <code className="text-indigo-300 font-mono">Content-Type: application/json</code><br />
+                  • Body: JSON <code className="text-emerald-300 font-mono">{`{"smsText": ShortcutInput}`}</code>
+                </p>
+              </div>
+
+              {/* Step 4 */}
+              <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-600 font-mono text-xs font-black text-white">
+                    4
+                  </span>
+                  <span className="text-[10px] font-mono text-emerald-400">Instant Match</span>
+                </div>
+                <h4 className="text-xs font-black text-white">Instant Pro Access</h4>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Every time BDC sends a deposit SMS, your phone sends it here. When the student uploads their InstaPay receipt, Gemini matches the Reference # and activates Pro in under 2 seconds!
+                </p>
+              </div>
+            </div>
+
+            {/* Quick Copy Snippet */}
+            <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2">
+                <Info className="h-4 w-4 text-indigo-400 shrink-0" />
+                <span className="text-slate-300">
+                  Webhook Target: <code className="text-indigo-300 font-mono">{window.location.origin}/api/webhooks/bdc-sms</code>
+                </span>
+              </div>
+              <div className="text-[11px] text-slate-400 font-mono">
+                Payload format: <span className="text-emerald-400">{`{ "smsText": "..." }`}</span>
+              </div>
             </div>
           </div>
 

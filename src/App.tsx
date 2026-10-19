@@ -61,10 +61,7 @@ const DEFAULT_PROFILE: UserProfile = {
     'cie-esl-0510',
     'cie-physics-0625',
     'cie-chem-0620',
-    'cie-bio-0610',
-    'cie-cs-0478',
-    'cie-econ-0455',
-    'cie-history-0470'
+    'cie-bio-0610'
   ],
   geminiApiKey: '',
   selectedModel: 'gemini-2.5-flash',

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { User, Award, BookOpen, X, Check, School } from 'lucide-react';
-import { UserProfile, ExamBoard, GradeLevel, TargetGrade } from '../types';
+import { User, Award, BookOpen, X, Check, School, AlertCircle, Layers } from 'lucide-react';
+import { UserProfile, ExamBoard, GradeLevel, TargetGrade, SubjectLevel, MAX_STUDENT_SUBJECTS } from '../types';
 import { IGCSE_SUBJECTS } from '../data/subjects';
 
 interface ProfileModalProps {
@@ -20,14 +20,25 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const [board, setBoard] = useState<ExamBoard>(profile.board);
   const [grade, setGrade] = useState<GradeLevel>(profile.grade);
   const [targetGrade, setTargetGrade] = useState<TargetGrade>(profile.targetGrade);
-  const [selectedSubjects, setSelectedSubjects] = useState<string[]>(profile.selectedSubjectIds);
+  const [selectedSubjects, setSelectedSubjects] = useState<string[]>(profile.selectedSubjectIds.slice(0, MAX_STUDENT_SUBJECTS));
+  const [selectedLevel, setSelectedLevel] = useState<'All' | SubjectLevel>('All');
+  const [warningMsg, setWarningMsg] = useState('');
 
   if (!isOpen) return null;
 
   const toggleSubject = (id: string) => {
-    setSelectedSubjects(prev =>
-      prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
-    );
+    if (selectedSubjects.includes(id)) {
+      setSelectedSubjects(prev => prev.filter(s => s !== id));
+      setWarningMsg('');
+    } else {
+      if (selectedSubjects.length >= MAX_STUDENT_SUBJECTS) {
+        setWarningMsg(`Strict Limit: Only ${MAX_STUDENT_SUBJECTS} active subjects allowed under the IGCSE system.`);
+        setTimeout(() => setWarningMsg(''), 4000);
+        return;
+      }
+      setSelectedSubjects(prev => [...prev, id]);
+      setWarningMsg('');
+    }
   };
 
   const handleSave = () => {
@@ -36,14 +47,15 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
       board,
       grade,
       targetGrade,
-      selectedSubjectIds: selectedSubjects.length > 0 ? selectedSubjects : ['cie-math-0580', 'cie-physics-0625'],
+      selectedSubjectIds: selectedSubjects.length > 0 ? selectedSubjects.slice(0, MAX_STUDENT_SUBJECTS) : ['cie-math-0580', 'cie-physics-0625'],
     });
     onClose();
   };
 
   const filteredSubjects = IGCSE_SUBJECTS.filter(s => {
-    if (board === 'Both') return true;
-    return s.board === board || s.board === 'Both';
+    const matchesBoard = board === 'Both' || s.board === board || s.board === 'Both';
+    const matchesLevel = selectedLevel === 'All' || s.level === selectedLevel;
+    return matchesBoard && matchesLevel;
   });
 
   return (
@@ -124,6 +136,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                 <option value="Year 9 / Grade 8">Year 9 / Grade 8 (Foundations & Prep)</option>
                 <option value="Year 10 / Grade 9 (IGCSE Yr 1)">Year 10 / Grade 9 (IGCSE Year 1)</option>
                 <option value="Year 11 / Grade 10 (IGCSE Exam Yr)">Year 11 / Grade 10 (IGCSE Exam Year / Finals)</option>
+                <option value="Year 12 / Grade 11 (AS Level)">Year 12 / Grade 11 (Cambridge & Edexcel AS Level)</option>
+                <option value="Year 13 / Grade 12 (A Level)">Year 13 / Grade 12 (Cambridge & Edexcel A Level)</option>
               </select>
             </div>
 
@@ -151,46 +165,85 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             </div>
           </div>
 
-          {/* Subjects Selection */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300">
-                Enrolled Subjects ({selectedSubjects.length} selected)
-              </label>
-              <button
-                type="button"
-                onClick={() => setSelectedSubjects(filteredSubjects.map(s => s.id))}
-                className="text-xs text-indigo-400 hover:text-indigo-300 underline"
-              >
-                Select All
-              </button>
+          {/* Subjects Selection with Level Tabs & 5 Subject Maximum */}
+          <div className="space-y-2.5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+                  Enrolled Subjects ({selectedSubjects.length}/{MAX_STUDENT_SUBJECTS} selected)
+                </label>
+                <p className="text-[11px] text-slate-400">
+                  Strict IGCSE System Rule: Each student is capped at <strong className="text-amber-400 font-bold">{MAX_STUDENT_SUBJECTS} active subjects</strong>.
+                </p>
+              </div>
+
+              {/* Subject Level Filter Tabs */}
+              <div className="flex items-center gap-1 rounded-xl bg-slate-950 p-1 border border-slate-800 self-start sm:self-auto">
+                {(['All', 'O Level / IGCSE', 'AS Level', 'A Level'] as const).map((lvl) => (
+                  <button
+                    key={lvl}
+                    type="button"
+                    onClick={() => setSelectedLevel(lvl)}
+                    className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition cursor-pointer ${
+                      selectedLevel === lvl
+                        ? 'bg-indigo-600 text-white shadow-sm'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    {lvl === 'All' ? 'All Levels' : lvl.split(' / ')[0]}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-56 overflow-y-auto pr-1">
+            {/* Warning Message Banner */}
+            {warningMsg && (
+              <div className="flex items-center gap-2 rounded-xl border border-amber-500/40 bg-amber-500/10 p-2.5 text-xs text-amber-300 animate-fadeIn">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                <span>{warningMsg}</span>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-60 overflow-y-auto pr-1">
               {filteredSubjects.map((sub) => {
                 const isSelected = selectedSubjects.includes(sub.id);
+                const isCapped = !isSelected && selectedSubjects.length >= MAX_STUDENT_SUBJECTS;
+
                 return (
                   <div
                     key={sub.id}
-                    onClick={() => toggleSubject(sub.id)}
-                    className={`flex items-center justify-between rounded-xl border p-2.5 cursor-pointer transition select-none ${
-                      isSelected
-                        ? 'border-indigo-500 bg-indigo-950/30 text-white ring-1 ring-indigo-500'
-                        : 'border-slate-800 bg-slate-950/40 text-slate-400 hover:border-slate-700 hover:text-slate-300'
+                    onClick={() => !isCapped && toggleSubject(sub.id)}
+                    className={`flex items-center justify-between rounded-xl border p-2.5 transition select-none ${
+                      isCapped
+                        ? 'opacity-40 cursor-not-allowed border-slate-800 bg-slate-950/20 text-slate-500'
+                        : isSelected
+                        ? 'border-indigo-500 bg-indigo-950/30 text-white ring-1 ring-indigo-500 cursor-pointer'
+                        : 'border-slate-800 bg-slate-950/40 text-slate-400 hover:border-slate-700 hover:text-slate-300 cursor-pointer'
                     }`}
                   >
-                    <div className="flex items-center gap-2.5">
+                    <div className="flex items-center gap-2.5 min-w-0">
                       <div
-                        className="h-2.5 w-2.5 rounded-full"
+                        className="h-2.5 w-2.5 rounded-full shrink-0"
                         style={{ backgroundColor: sub.color }}
                       />
-                      <div>
-                        <p className="text-xs font-bold text-white leading-tight">{sub.name}</p>
-                        <p className="text-[10px] text-slate-400">{sub.code} • {sub.category}</p>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <p className="text-xs font-bold text-white leading-tight truncate">{sub.name}</p>
+                          <span className={`rounded px-1.5 py-0.2 text-[9px] font-bold border ${
+                            sub.level === 'A Level'
+                              ? 'bg-purple-500/20 text-purple-300 border-purple-500/30'
+                              : sub.level === 'AS Level'
+                              ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+                              : 'bg-sky-500/20 text-sky-300 border-sky-500/30'
+                          }`}>
+                            {sub.level || 'O Level'}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-slate-400 truncate mt-0.5">{sub.code} • {sub.category}</p>
                       </div>
                     </div>
                     <div
-                      className={`h-5 w-5 rounded-md flex items-center justify-center border transition ${
+                      className={`h-5 w-5 rounded-md flex items-center justify-center border transition shrink-0 ml-2 ${
                         isSelected
                           ? 'bg-indigo-600 border-indigo-500 text-white'
                           : 'border-slate-700 bg-slate-900'

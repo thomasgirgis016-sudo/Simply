@@ -1,10 +1,11 @@
 // Simply IGCSE Service Worker — Offline Revision Cache
-const CACHE_NAME = 'simply-igcse-v3';
+const CACHE_NAME = 'simply-igcse-v4';
 
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
+  '/favicon.svg',
   '/simply-logo.png',
   '/favicon.ico',
   '/favicon-32x32.png',

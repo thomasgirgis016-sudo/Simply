@@ -1,11 +1,17 @@
 export type ExamBoard = 'CIE' | 'Edexcel' | 'Both';
 
-export type GradeLevel = 'Year 9 / Grade 8' | 'Year 10 / Grade 9 (IGCSE Yr 1)' | 'Year 11 / Grade 10 (IGCSE Exam Yr)';
+export type GradeLevel = 'Year 9 / Grade 8' | 'Year 10 / Grade 9 (IGCSE Yr 1)' | 'Year 11 / Grade 10 (IGCSE Exam Yr)' | 'Year 12 / Grade 11 (AS Level)' | 'Year 13 / Grade 12 (A Level)';
 
 export type TargetGrade = '9 / A*' | '8 / A*' | '7 / A' | '6 / B' | '5 / C';
 
 export type AccountStatus = 'pending' | 'approved' | 'rejected' | 'suspended';
 export type UserRole = 'student' | 'admin';
+
+export type SubjectLevel = 'O Level / IGCSE' | 'AS Level' | 'A Level';
+export type SubscriptionPlan = 'free' | 'plus' | 'pro';
+export type BillingCycle = 'monthly' | 'annual';
+
+export const MAX_STUDENT_SUBJECTS = 5;
 
 export interface UserAccount {
   id: string;
@@ -15,9 +21,11 @@ export interface UserAccount {
   grade: GradeLevel;
   board: ExamBoard;
   targetGrade: TargetGrade;
-  selectedSubjectIds: string[];
+  selectedSubjectIds: string[]; // max 5 subjects
   role?: UserRole;
   status?: AccountStatus;
+  plan?: SubscriptionPlan;
+  billingCycle?: BillingCycle;
   isPro?: boolean;
   proExpiresAt?: string;
   classCohortIds?: string[];
@@ -35,8 +43,9 @@ export interface PasswordResetCode {
 export interface Subject {
   id: string;
   name: string;
-  code: string; // e.g. "0580", "0510", "4ES1"
+  code: string; // e.g. "0580", "9709", "4ES1"
   board: 'CIE' | 'Edexcel' | 'Both';
+  level?: SubjectLevel; // 'O Level / IGCSE' | 'AS Level' | 'A Level'
   category: 'Sciences' | 'Mathematics' | 'Humanities' | 'Languages' | 'Tech' | 'Commercial';
   icon: string;
   color: string;
@@ -50,9 +59,11 @@ export interface UserProfile {
   grade: GradeLevel;
   board: ExamBoard;
   targetGrade: TargetGrade;
-  selectedSubjectIds: string[];
+  selectedSubjectIds: string[]; // max 5 subjects
   role?: UserRole;
   status?: AccountStatus;
+  plan?: SubscriptionPlan;
+  billingCycle?: BillingCycle;
   isPro?: boolean;
   proExpiresAt?: string;
   classCohortIds?: string[];
@@ -428,6 +439,8 @@ export interface PaymentVerificationResult {
   message: string;
   txNumber?: string;
   amount?: number;
+  plan?: SubscriptionPlan;
+  billingCycle?: BillingCycle;
   status: 'verified' | 'pending_bank_feed' | 'already_claimed' | 'amount_mismatch' | 'invalid_receipt';
   proGrantedUntil?: string;
   bankTx?: BankTransaction;

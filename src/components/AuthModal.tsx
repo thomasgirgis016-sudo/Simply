@@ -12,7 +12,7 @@ import {
   Sparkles,
   ShieldCheck
 } from 'lucide-react';
-import { UserAccount, GradeLevel, ExamBoard, TargetGrade } from '../types';
+import { UserAccount, GradeLevel, ExamBoard, TargetGrade, MAX_STUDENT_SUBJECTS } from '../types';
 import { registerStudent, loginStudent, requestPasswordReset, completePasswordReset } from '../services/auth';
 import { IGCSE_SUBJECTS } from '../data/subjects';
 
@@ -144,9 +144,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   };
 
   const toggleSubject = (id: string) => {
-    setSelectedSubjects(prev =>
-      prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
-    );
+    if (selectedSubjects.includes(id)) {
+      setSelectedSubjects(prev => prev.filter(s => s !== id));
+      setErrorMsg('');
+    } else {
+      if (selectedSubjects.length >= MAX_STUDENT_SUBJECTS) {
+        setErrorMsg(`IGCSE System Limit: You can select up to ${MAX_STUDENT_SUBJECTS} subjects.`);
+        return;
+      }
+      setSelectedSubjects(prev => [...prev, id]);
+      setErrorMsg('');
+    }
   };
 
   return (
@@ -398,30 +406,44 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <option value="Year 9 / Grade 8">Year 9 / Grade 8 (Foundations)</option>
                 <option value="Year 10 / Grade 9 (IGCSE Yr 1)">Year 10 / Grade 9 (IGCSE Year 1)</option>
                 <option value="Year 11 / Grade 10 (IGCSE Exam Yr)">Year 11 / Grade 10 (IGCSE Exam Year / Finals)</option>
+                <option value="Year 12 / Grade 11 (AS Level)">Year 12 / Grade 11 (AS Level)</option>
+                <option value="Year 13 / Grade 12 (A Level)">Year 13 / Grade 12 (A Level)</option>
               </select>
             </div>
 
             {/* Quick Subjects Check */}
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-                Enrolled Subjects ({selectedSubjects.length} selected)
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+                  Enrolled Subjects ({selectedSubjects.length}/{MAX_STUDENT_SUBJECTS} selected)
+                </label>
+                <span className="text-[10px] text-amber-400 font-bold">Max 5 Capped</span>
+              </div>
               <div className="grid grid-cols-2 gap-2 max-h-36 overflow-y-auto pr-1">
                 {IGCSE_SUBJECTS.map((s) => {
                   const isSel = selectedSubjects.includes(s.id);
+                  const isCapped = !isSel && selectedSubjects.length >= MAX_STUDENT_SUBJECTS;
                   return (
                     <button
                       key={s.id}
                       type="button"
+                      disabled={isCapped}
                       onClick={() => toggleSubject(s.id)}
-                      className={`flex items-center gap-2 rounded-lg border p-2 text-left text-xs transition ${
-                        isSel
-                          ? 'border-indigo-500 bg-indigo-950/40 text-white'
-                          : 'border-slate-800 bg-slate-950 text-slate-400 hover:border-slate-700'
+                      className={`flex items-center justify-between gap-1.5 rounded-lg border p-2 text-left text-xs transition ${
+                        isCapped
+                          ? 'opacity-40 cursor-not-allowed border-slate-800 bg-slate-950 text-slate-500'
+                          : isSel
+                          ? 'border-indigo-500 bg-indigo-950/40 text-white cursor-pointer'
+                          : 'border-slate-800 bg-slate-950 text-slate-400 hover:border-slate-700 cursor-pointer'
                       }`}
                     >
-                      <div className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
-                      <span className="truncate">{s.name} ({s.code.split(' ')[1] || s.code})</span>
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <div className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
+                        <span className="truncate">{s.name}</span>
+                      </div>
+                      <span className="text-[9px] font-mono px-1 py-0.2 rounded border border-slate-700 text-slate-400 shrink-0">
+                        {s.level === 'A Level' ? 'A2' : s.level === 'AS Level' ? 'AS' : 'OL'}
+                      </span>
                     </button>
                   );
                 })}

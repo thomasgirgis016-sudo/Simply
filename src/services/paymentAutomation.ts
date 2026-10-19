@@ -1,6 +1,33 @@
 import { BankTransaction, InstaPayReceiptExtraction, PaymentVerificationResult, UserAccount } from '../types';
 
 export const SUBSCRIPTION_PRICE_EGP = 250; // Standard 30-day IGCSE Pro subscription
+export const PLAN_PRICING = {
+  plus: {
+    monthly: 150,
+    annual: 1200,
+    features: [
+      'Access to 5 selected IGCSE / AS / A-Level subjects',
+      'Classified past paper questions with official mark schemes',
+      'Interactive past paper quizzes with printable PDF exam papers',
+      'Revision notes, formula sheets & syllabus progress checklists',
+      'Grade boundaries calculator & threshold trends'
+    ]
+  },
+  pro: {
+    monthly: 250,
+    annual: 2000,
+    features: [
+      'Everything in Plus Tier included',
+      'AI Multimodal Handwritten Step-by-Step Question Solver',
+      'Chief Examiner AI 24/7 Personal Study Chat',
+      'Timed Split-Screen Exam Workspace (Paper + Mark Scheme)',
+      'School & Teacher Diagnostic Error Heatmap & Remedial Drill Generator',
+      'ESL Speaking Exam Voice Simulator with examiner feedback',
+      'Priority unlimited mock papers & exam predictions'
+    ]
+  }
+} as const;
+
 export const BDC_ACCOUNT_NUMBER_MASKED = '****4812';
 export const OFFICIAL_INSTAPAY_IPA = 'simply.igcse@instapay';
 export const OFFICIAL_RECEIVER_PHONE = '01023456789';
@@ -287,10 +314,12 @@ export interface ReconcileOptions {
   studentId: string;
   studentEmail: string;
   minAmount?: number;
+  plan?: 'plus' | 'pro';
+  billingCycle?: 'monthly' | 'annual';
 }
 
 export function reconcileStudentPayment(options: ReconcileOptions): PaymentVerificationResult {
-  const { studentTxNumber, studentReceiptAmount, studentId, studentEmail, minAmount = SUBSCRIPTION_PRICE_EGP } = options;
+  const { studentTxNumber, studentReceiptAmount, studentId, studentEmail, minAmount = 150 } = options;
 
   if (!studentTxNumber || studentTxNumber.trim() === '') {
     return {
@@ -341,13 +370,16 @@ export function reconcileStudentPayment(options: ReconcileOptions): PaymentVerif
       status: 'amount_mismatch',
       txNumber: matchedTx.txNumber,
       amount: matchedTx.amount,
-      message: `Transfer amount (${matchedTx.amount} EGP) is less than the required subscription price (${minAmount} EGP).`,
+      message: `Transfer amount (${matchedTx.amount} EGP) is less than the required tier price (${minAmount} EGP).`,
       errorDetails: `Required: ${minAmount} EGP, Actual Received at BDC: ${matchedTx.amount} EGP.`
     };
   }
 
-  // 5. Successful match! Update BankTransactions record to 'claimed'
-  const grantExpiry = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30-day access grant
+  // 5. Successful match! Compute plan, cycle, and duration
+  const resolvedPlan: 'plus' | 'pro' = options.plan || (amountToVerify >= 200 ? 'pro' : 'plus');
+  const resolvedCycle: 'monthly' | 'annual' = options.billingCycle || (amountToVerify >= 1000 ? 'annual' : 'monthly');
+  const durationDays = resolvedCycle === 'annual' ? 365 : 30;
+  const grantExpiry = new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000).toISOString();
 
   const updatedTxs = currentBankTxs.map(t => {
     if (t.txNumber.trim().toLowerCase() === cleanTxNumber) {
@@ -369,8 +401,10 @@ export function reconcileStudentPayment(options: ReconcileOptions): PaymentVerif
     status: 'verified',
     txNumber: matchedTx.txNumber,
     amount: matchedTx.amount,
+    plan: resolvedPlan,
+    billingCycle: resolvedCycle,
     proGrantedUntil: grantExpiry,
     bankTx: matchedTx,
-    message: `Payment of ${matchedTx.amount} EGP verified successfully via Banque Du Caire! 30-Day Pro access unlocked.`
+    message: `Payment of ${matchedTx.amount} EGP verified successfully via Banque Du Caire! ${resolvedPlan.toUpperCase()} (${resolvedCycle}) access unlocked.`
   };
 }
