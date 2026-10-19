@@ -1,16 +1,17 @@
 // Simply IGCSE Service Worker — Offline Revision Cache
-const CACHE_NAME = 'simply-igcse-v2';
+const CACHE_NAME = 'simply-igcse-v3';
 
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
+  '/simply-logo.png',
+  '/favicon.ico',
+  '/favicon-32x32.png',
+  '/favicon-16x16.png',
   '/apple-touch-icon.png',
   '/pwa-192x192.png',
-  '/pwa-512x512.png',
-  '/maskable-icon-512x512.png',
-  '/favicon-32x32.png',
-  '/favicon-16x16.png'
+  '/pwa-512x512.png'
 ];
 
 // Install: Cache critical app shell assets
