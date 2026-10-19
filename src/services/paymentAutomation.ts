@@ -1,4 +1,6 @@
-import { BankTransaction, InstaPayReceiptExtraction, PaymentVerificationResult, UserAccount } from '../types';
+import { BankTransaction, InstaPayReceiptExtraction, PaymentVerificationResult, UserAccount, SubscriptionPlan, BillingCycle } from '../types';
+import { enrollUserInSchoolOrClass } from './auth';
+import { getCohorts, saveCohorts, createCohort } from './teacherAnalytics';
 
 export const SUBSCRIPTION_PRICE_EGP = 250; // Standard 30-day IGCSE Pro subscription
 export const PLAN_PRICING = {
@@ -24,6 +26,28 @@ export const PLAN_PRICING = {
       'School & Teacher Diagnostic Error Heatmap & Remedial Drill Generator',
       'ESL Speaking Exam Voice Simulator with examiner feedback',
       'Priority unlimited mock papers & exam predictions'
+    ]
+  },
+  class: {
+    monthly: 599,
+    annual: 1499,
+    features: [
+      'Full Teacher Analytics & Diagnostic Error Heatmap',
+      'Generates unique Class Invite Code for up to 35 students',
+      '1-Click "Assign Remedial Quiz" to all 35 students',
+      'Real-time student mistake & keyword omission diagnostics',
+      'All 35 enrolled students automatically receive full Pro access'
+    ]
+  },
+  school: {
+    monthly: 1999,
+    annual: 4999,
+    features: [
+      'Multi-teacher & multi-cohort department access',
+      'Unlimited student enrollments across all year groups (Y9–Y13)',
+      'Custom school invite code (e.g. SCH-CAIRO-2026)',
+      'Department-wide diagnostic benchmarks & mock performance reporting',
+      'Dedicated Cambridge/Edexcel syllabus coordinator support'
     ]
   }
 } as const;
@@ -314,8 +338,8 @@ export interface ReconcileOptions {
   studentId: string;
   studentEmail: string;
   minAmount?: number;
-  plan?: 'plus' | 'pro';
-  billingCycle?: 'monthly' | 'annual';
+  plan?: SubscriptionPlan;
+  billingCycle?: BillingCycle;
 }
 
 export function reconcileStudentPayment(options: ReconcileOptions): PaymentVerificationResult {
@@ -376,10 +400,31 @@ export function reconcileStudentPayment(options: ReconcileOptions): PaymentVerif
   }
 
   // 5. Successful match! Compute plan, cycle, and duration
-  const resolvedPlan: 'plus' | 'pro' = options.plan || (amountToVerify >= 200 ? 'pro' : 'plus');
-  const resolvedCycle: 'monthly' | 'annual' = options.billingCycle || (amountToVerify >= 1000 ? 'annual' : 'monthly');
+  const resolvedPlan: SubscriptionPlan = options.plan || (amountToVerify >= 1400 ? 'class' : amountToVerify >= 200 ? 'pro' : 'plus');
+  const resolvedCycle: BillingCycle = options.billingCycle || (amountToVerify >= 1000 ? 'annual' : 'monthly');
   const durationDays = resolvedCycle === 'annual' ? 365 : 30;
   const grantExpiry = new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000).toISOString();
+
+  // If class or school plan, generate a classroom cohort with an invite code for students
+  if (resolvedPlan === 'class' || resolvedPlan === 'school') {
+    const classInviteCode = `${resolvedPlan === 'school' ? 'SCH' : 'CLS'}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+    const newCohort = createCohort({
+      name: `${studentEmail.split('@')[0]}'s ${resolvedPlan === 'school' ? 'School Department' : 'Classroom Cohort'}`,
+      subjectId: 'cie-math-0580',
+      subjectCode: resolvedPlan === 'school' ? 'SCH' : 'CLS',
+      subjectName: resolvedPlan === 'school' ? 'School Department' : 'Classroom Cohort',
+      teacherName: studentEmail.split('@')[0],
+      teacherEmail: studentEmail,
+      schoolDomain: studentEmail.includes('@') ? studentEmail.split('@')[1] : 'school.edu.eg'
+    });
+    newCohort.inviteCode = classInviteCode;
+    const cohorts = getCohorts();
+    const cIdx = cohorts.findIndex(c => c.id === newCohort.id);
+    if (cIdx >= 0) {
+      cohorts[cIdx].inviteCode = classInviteCode;
+      saveCohorts(cohorts);
+    }
+  }
 
   const updatedTxs = currentBankTxs.map(t => {
     if (t.txNumber.trim().toLowerCase() === cleanTxNumber) {
@@ -406,5 +451,54 @@ export function reconcileStudentPayment(options: ReconcileOptions): PaymentVerif
     proGrantedUntil: grantExpiry,
     bankTx: matchedTx,
     message: `Payment of ${matchedTx.amount} EGP verified successfully via Banque Du Caire! ${resolvedPlan.toUpperCase()} (${resolvedCycle}) access unlocked.`
+  };
+}
+
+export function redeemSchoolAccessCode(
+  studentEmail: string,
+  inviteCode: string
+): { success: boolean; message?: string; cohortName?: string; error?: string } {
+  if (!inviteCode || !inviteCode.trim()) {
+    return { success: false, error: 'Please enter an invite code.' };
+  }
+
+  const cleanCode = inviteCode.trim().toUpperCase();
+  const cohorts = getCohorts();
+  const matched = cohorts.find(c => c.inviteCode.toUpperCase() === cleanCode);
+
+  const knownMasterSchoolCodes: Record<string, string> = {
+    'SCH-CIE-9988': 'Cairo International British School (Cambridge Department)',
+    'SCH-EDX-4421': 'Alexandria British Academy (Edexcel Department)',
+    'CLS-BIO11-2026': 'Year 11 Biology Set 1 (Extended)',
+    'CLS-MTH11-2026': '0580 Mathematics Extended A* Cohort',
+    'BIO-Y11-S1': 'Year 11 Biology Set 1 (Extended)',
+    'MTH-0580-X': '0580 Mathematics Extended A* Cohort',
+    'CHM-0620-Y10': 'Year 10 Chemistry Core & Extended'
+  };
+
+  if (matched) {
+    if (!matched.studentIds.includes(studentEmail)) {
+      matched.studentIds.push(studentEmail);
+      saveCohorts(cohorts);
+    }
+    enrollUserInSchoolOrClass(studentEmail, cleanCode, matched.name);
+    return {
+      success: true,
+      message: `Enrolled successfully in ${matched.name}! Pro access unlocked for your account.`,
+      cohortName: matched.name
+    };
+  } else if (knownMasterSchoolCodes[cleanCode]) {
+    const schoolName = knownMasterSchoolCodes[cleanCode];
+    enrollUserInSchoolOrClass(studentEmail, cleanCode, schoolName);
+    return {
+      success: true,
+      message: `Enrolled successfully via ${schoolName}! Pro access unlocked.`,
+      cohortName: schoolName
+    };
+  }
+
+  return {
+    success: false,
+    error: `Invalid or expired access code "${inviteCode}". Please verify with your teacher or school administrator.`
   };
 }

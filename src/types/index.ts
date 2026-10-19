@@ -8,7 +8,7 @@ export type AccountStatus = 'pending' | 'approved' | 'rejected' | 'suspended';
 export type UserRole = 'student' | 'admin';
 
 export type SubjectLevel = 'O Level / IGCSE' | 'AS Level' | 'A Level';
-export type SubscriptionPlan = 'free' | 'plus' | 'pro';
+export type SubscriptionPlan = 'free' | 'plus' | 'pro' | 'class' | 'school';
 export type BillingCycle = 'monthly' | 'annual';
 
 export const MAX_STUDENT_SUBJECTS = 5;
@@ -29,6 +29,11 @@ export interface UserAccount {
   isPro?: boolean;
   proExpiresAt?: string;
   classCohortIds?: string[];
+  schoolCode?: string;
+  classCode?: string;
+  isEnrolledViaSchool?: boolean;
+  schoolName?: string;
+  isTeacher?: boolean;
   approvedAt?: string;
   approvedBy?: string;
   createdAt: string;
@@ -67,6 +72,11 @@ export interface UserProfile {
   isPro?: boolean;
   proExpiresAt?: string;
   classCohortIds?: string[];
+  schoolCode?: string;
+  classCode?: string;
+  isEnrolledViaSchool?: boolean;
+  schoolName?: string;
+  isTeacher?: boolean;
   geminiApiKey?: string; // Optional admin override
   selectedModel: string;
 }

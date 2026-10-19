@@ -15,54 +15,17 @@ export interface GeminiSolveParams {
   gradeLevel: string;
 }
 
-// Zero-Key Client-Side AI caller (Uses Puter.js in browser with zero keys required)
+// Zero-Key Client-Side AI caller (Deprecated: all requests now routed directly via internal /api/solve)
 export function isPuterAvailable(): boolean {
-  return typeof window !== 'undefined' && Boolean((window as any).puter?.ai?.chat);
+  return false;
 }
 
 export function isPuterSignedIn(): boolean {
-  if (typeof window === 'undefined') return false;
-  try {
-    return Boolean((window as any).puter?.auth?.isSignedIn?.());
-  } catch {
-    return false;
-  }
+  return false;
 }
 
 export async function connectPuterSession(): Promise<boolean> {
-  if (typeof window === 'undefined' || !(window as any).puter?.auth?.signIn) return false;
-  try {
-    await (window as any).puter.auth.signIn();
-    return isPuterSignedIn();
-  } catch (e: any) {
-    console.warn('Puter sign in cancelled or blocked:', e);
-    throw new Error('Browser popup blocker prevented Puter authentication. Please enable popups for this site or configure a Gemini API key in Settings.');
-  }
-}
-
-async function callZeroKeyAi(prompt: string, systemPrompt?: string): Promise<string> {
-  if (typeof window !== 'undefined' && (window as any).puter?.ai?.chat) {
-    try {
-      const puter = (window as any).puter;
-      const fullPrompt = systemPrompt ? `${systemPrompt}\n\nStudent Question:\n${prompt}` : prompt;
-
-      // Strict 6500ms timeout race to prevent infinite hanging if popup was closed or blocked
-      const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('Browser popup blocker prevented authentication. Please enable popups for this site or add a free Gemini API key in Settings.')), 6500)
-      );
-
-      const chatPromise = puter.ai.chat(fullPrompt, { model: 'gpt-4o-mini' });
-      const res = await Promise.race([chatPromise, timeoutPromise]);
-      const text = typeof res === 'string' ? res : res?.message?.content || res?.text || '';
-      if (text && text.trim() !== '') return text;
-    } catch (e: any) {
-      console.warn('Puter AI attempt bypassed or timed out:', e);
-      if (e?.message?.includes('popup') || e?.message?.includes('blocked') || e?.message?.includes('Settings')) {
-        throw e;
-      }
-    }
-  }
-  throw new Error('ZERO_KEY_AI_UNAVAILABLE');
+  return false;
 }
 
 // Unified Server-Side AI caller: sends requests directly to internal /api/solve route

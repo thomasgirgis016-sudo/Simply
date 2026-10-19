@@ -38,7 +38,7 @@ import { AuthModal } from './components/AuthModal';
 import { ScientificCalculator } from './components/ScientificCalculator';
 import { SecretAdminModal } from './components/SecretAdminModal';
 import { SimplyLogo } from './components/SimplyLogo';
-import { getActiveUser, setActiveUser, grantUserProSubscription } from './services/auth';
+import { getActiveUser, setActiveUser, grantUserProSubscription, hasActiveSubscription, updateUserAccount } from './services/auth';
 import {
   Camera,
   Layers,
@@ -448,7 +448,7 @@ export function App() {
   };
 
   const canAccessTools = Boolean(
-    currentUser && (currentUser.status === 'approved' || currentUser.role === 'admin')
+    currentUser && (currentUser.role === 'admin' || (currentUser.status === 'approved' && hasActiveSubscription(currentUser)))
   );
 
   const getTabFeatureName = (tab: ActiveTab): string => {
@@ -801,9 +801,9 @@ export function App() {
         onClose={() => setIsPaymentOpen(false)}
         currentUser={currentUser}
         profile={profile}
-        onPaymentSuccess={() => {
+        onPaymentSuccess={(updatedData) => {
           if (currentUser) {
-            grantUserProSubscription(currentUser.id, 30);
+            updateUserAccount(currentUser.id, updatedData);
           }
           handleRefreshStatus();
           setIsPaymentOpen(false);

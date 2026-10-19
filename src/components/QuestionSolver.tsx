@@ -23,7 +23,8 @@ import { Subject, UserProfile, SolverResult, FlaggedQuestionIssue, HandwrittenRe
 import { SAMPLE_SOLVER_QUESTIONS } from '../data/initialData';
 import { getAllPastPapers } from '../data/pastPapersData';
 import { findPastPaperQuestionByReference, evaluateStudentAnswerAgainstMarkScheme, ExamGradingResult } from '../services/examQuestionEngine';
-import { solveQuestionWithGemini, isPuterSignedIn, connectPuterSession, gradeHandwrittenWorkWithGemini } from '../services/gemini';
+import { solveQuestionWithGemini, gradeHandwrittenWorkWithGemini } from '../services/gemini';
+import { isSubjectMatch } from '../utils/subjectMatcher';
 import { MathRenderer } from './MathRenderer';
 
 interface QuestionSolverProps {
@@ -62,9 +63,14 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
     const all = getAllPastPapers();
     return all.filter((p) => {
       if (profile.board !== 'Both' && p.board !== profile.board) return false;
-      return true;
+      return isSubjectMatch(p.subjectId, subject);
     });
-  }, [profile.board]);
+  }, [profile.board, subject]);
+
+  const filteredSampleQuestions = useMemo(() => {
+    const list = SAMPLE_SOLVER_QUESTIONS.filter((s) => isSubjectMatch(s.subjectId, subject));
+    return list.length > 0 ? list : SAMPLE_SOLVER_QUESTIONS.slice(0, 2);
+  }, [subject]);
 
   const handleGradeExamAnswer = () => {
     if (!selectedExamPaper) return;
@@ -84,19 +90,6 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
   const [reportIssueType, setReportIssueType] = useState('Arithmetic or calculation slip');
   const [reportDetails, setReportDetails] = useState('');
   const [reportSuccess, setReportSuccess] = useState(false);
-  const [puterConnected, setPuterConnected] = useState<boolean>(() => isPuterSignedIn());
-
-  const handleConnectPuter = async () => {
-    try {
-      const success = await connectPuterSession();
-      setPuterConnected(success);
-    } catch (err: any) {
-      setErrorMessage(
-        err?.message ||
-        'Browser popup blocker prevented authentication. Please allow popups for this site or configure a Gemini API key in ⚙ Settings.'
-      );
-    }
-  };
 
   const handleReportSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -173,11 +166,9 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
     } catch (err: any) {
       console.error('Solve error:', err);
       setErrorMessage(
-        err?.message?.includes('popup') || err?.message?.includes('PUTER') || err?.message?.includes('blocked')
-          ? 'Browser popup blocker prevented guest AI authentication. Enable popups for this site or add a free Gemini API key in ⚙ Settings.'
-          : err?.message?.includes('network') || err?.message?.includes('fetch')
+        err?.message?.includes('network') || err?.message?.includes('fetch')
           ? 'Network connectivity interruption. Please verify your connection and tap Retry.'
-          : 'AI service busy or rate limit reached. Tap "Retry Solution" to re-attempt with fallback engine.'
+          : err?.message || 'AI service busy or rate limit reached. Tap "Retry Solution" to re-attempt.'
       );
     } finally {
       setLoading(false);
@@ -205,9 +196,9 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
     } catch (err: any) {
       console.error('Handwritten grade error:', err);
       setErrorMessage(
-        err?.message?.includes('popup') || err?.message?.includes('PUTER') || err?.message?.includes('blocked')
-          ? 'Browser popup blocker prevented guest AI authentication. Enable popups for this site or add a free Gemini API key in ⚙ Settings.'
-          : 'Could not complete handwritten grading. Please tap retry.'
+        err?.message?.includes('network') || err?.message?.includes('fetch')
+          ? 'Network connectivity interruption. Please verify your connection and tap Retry.'
+          : err?.message || 'Could not complete handwritten grading. Please tap retry.'
       );
     } finally {
       setLoading(false);
@@ -309,7 +300,7 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
               Try an IGCSE Past Paper Question:
             </p>
             <div className="flex flex-nowrap sm:flex-wrap gap-2 overflow-x-auto pb-1 no-scrollbar">
-              {SAMPLE_SOLVER_QUESTIONS.map((s, idx) => (
+              {filteredSampleQuestions.map((s, idx) => (
                 <button
                   key={idx}
                   type="button"
@@ -380,36 +371,16 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs font-bold text-white">Student Free AI Pass Active</span>
-                <span className="inline-block rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-400 border border-emerald-500/20">
-                  Zero-Config • No Personal API Keys Needed
+                <span className="text-xs font-bold text-white">Chief Examiner AI Engine Active</span>
+                <span className="inline-block rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-semibold text-emerald-400 border border-emerald-500/25">
+                  Cambridge & Edexcel Official Mark Scheme Rubrics
                 </span>
-                {puterConnected ? (
-                  <span className="inline-block rounded-full bg-indigo-500/20 px-2 py-0.5 text-[10px] font-semibold text-indigo-300 border border-indigo-500/30">
-                    Live Client Session Connected
-                  </span>
-                ) : (
-                  <span className="inline-block rounded-full bg-slate-800 px-2 py-0.5 text-[10px] font-semibold text-slate-400 border border-slate-700">
-                    Guest Mode • Instant Fallback Active
-                  </span>
-                )}
               </div>
               <p className="text-[11px] text-slate-400 mt-0.5">
-                Instant access to Cambridge & Edexcel mark schemes, photo solving, and examiner advice. Protected against pop-up hangs.
+                Full step-by-step method [M], accuracy [A], and syllabus keyword evaluation for {subject.name} ({subject.code}).
               </p>
             </div>
           </div>
-
-          {!puterConnected && (
-            <button
-              type="button"
-              onClick={handleConnectPuter}
-              className="shrink-0 flex items-center gap-1.5 rounded-xl border border-indigo-500/40 bg-indigo-600/30 hover:bg-indigo-600/50 px-3 py-1.5 text-xs font-bold text-indigo-200 transition active:scale-95 cursor-pointer"
-            >
-              <Sparkles className="h-3.5 w-3.5 text-indigo-300" />
-              <span>Connect Free AI Session (Optional)</span>
-            </button>
-          )}
         </div>
 
         {/* Input Section */}

@@ -503,3 +503,69 @@ export function updateUserSubscriptionPlan(
   return { success: true, user: users[idx] };
 }
 
+export function enrollUserInSchoolOrClass(
+  emailOrId: string,
+  code: string,
+  cohortName?: string
+): { success: boolean; user?: UserAccount; error?: string } {
+  const users = getAllUsers();
+  const normalized = emailOrId.trim().toLowerCase();
+  const idx = users.findIndex(u => u.id === emailOrId || u.email.toLowerCase() === normalized);
+  if (idx === -1) {
+    return { success: false, error: 'User account not found' };
+  }
+
+  const expiry = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
+  users[idx].plan = 'pro';
+  users[idx].isPro = true;
+  users[idx].proExpiresAt = expiry;
+  users[idx].status = 'approved';
+  users[idx].classCode = code.trim().toUpperCase();
+  users[idx].isEnrolledViaSchool = true;
+  if (cohortName) {
+    users[idx].schoolName = cohortName;
+  }
+  saveAllUsers(users);
+
+  const active = getActiveUser();
+  if (active && (active.id === users[idx].id || active.email.toLowerCase() === users[idx].email.toLowerCase())) {
+    setActiveUser(users[idx]);
+  }
+
+  return { success: true, user: users[idx] };
+}
+
+export function updateUserAccount(
+  userId: string,
+  updatedData: Partial<UserAccount>
+): UserAccount | null {
+  const users = getAllUsers();
+  const idx = users.findIndex(u => u.id === userId);
+  if (idx === -1) return null;
+
+  users[idx] = { ...users[idx], ...updatedData };
+  saveAllUsers(users);
+
+  const active = getActiveUser();
+  if (active && active.id === userId) {
+    setActiveUser(users[idx]);
+  }
+
+  return users[idx];
+}
+
+export function hasActiveSubscription(user: UserAccount | null): boolean {
+  if (!user) return false;
+  if (user.role === 'admin') return true;
+  if (user.isEnrolledViaSchool) return true;
+  if (user.isPro) {
+    if (!user.proExpiresAt) return true;
+    return new Date(user.proExpiresAt).getTime() > Date.now();
+  }
+  if (user.plan && user.plan !== 'free') {
+    if (!user.proExpiresAt) return true;
+    return new Date(user.proExpiresAt).getTime() > Date.now();
+  }
+  return false;
+}
+

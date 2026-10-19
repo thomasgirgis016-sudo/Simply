@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Lock,
   Clock,
@@ -11,10 +11,17 @@ import {
   Sparkles,
   Layers,
   BookOpen,
-  Zap
+  Zap,
+  Key,
+  School,
+  ArrowRight,
+  AlertTriangle
 } from 'lucide-react';
 import { UserAccount } from '../types';
 import { SimplyLogo } from './SimplyLogo';
+import { hasActiveSubscription } from '../services/auth';
+import { redeemSchoolAccessCode } from '../services/paymentAutomation';
+import confetti from 'canvas-confetti';
 
 interface AccountGateProps {
   currentUser: UserAccount | null;
@@ -33,6 +40,42 @@ export const AccountGate: React.FC<AccountGateProps> = ({
   onOpenPayment,
   featureName = 'Simply IGCSE study tools',
 }) => {
+  const [inlineCode, setInlineCode] = useState('');
+  const [inlineError, setInlineError] = useState('');
+  const [isRedeeming, setIsRedeeming] = useState(false);
+
+  const handleInlineRedeem = () => {
+    setInlineError('');
+    if (!inlineCode.trim()) {
+      setInlineError('Please enter your School or Class access code.');
+      return;
+    }
+    if (!currentUser) return;
+
+    setIsRedeeming(true);
+    try {
+      const res = redeemSchoolAccessCode(currentUser.email, inlineCode.trim());
+      if (!res.success) {
+        setInlineError(res.error || 'Invalid or expired code. Please verify with your teacher.');
+        return;
+      }
+
+      confetti({
+        particleCount: 150,
+        spread: 90,
+        origin: { y: 0.6 }
+      });
+
+      if (onRefreshStatus) {
+        onRefreshStatus();
+      }
+    } catch (e: any) {
+      setInlineError(e.message || 'Failed to redeem code.');
+    } finally {
+      setIsRedeeming(false);
+    }
+  };
+
   // Case 1: User is logged in, but their account status is 'pending' (On Waitlist)
   if (currentUser && currentUser.status === 'pending') {
     return (
@@ -82,12 +125,36 @@ export const AccountGate: React.FC<AccountGateProps> = ({
             </div>
           </div>
 
-          <p className="mt-4 text-xs text-slate-400 leading-relaxed max-w-md mx-auto">
-            Once approved by an administrator, full access to past papers, mark schemes, high-yield revision notes, and the AI Question Solver will unlock automatically.
-          </p>
+          {/* Inline School Code Entry */}
+          <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-4 text-left space-y-3">
+            <div className="flex items-center gap-2 text-xs font-bold text-white">
+              <Key className="h-4 w-4 text-amber-400" />
+              <span>Have a School / Class Invite Code?</span>
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={inlineCode}
+                onChange={(e) => setInlineCode(e.target.value.toUpperCase())}
+                placeholder="e.g. BIO-Y11-S1 or CLS-BIO11-2026"
+                className="flex-1 rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-xs font-mono font-bold text-amber-300 placeholder-slate-600 uppercase focus:border-amber-500 focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={handleInlineRedeem}
+                disabled={isRedeeming}
+                className="rounded-xl bg-amber-500 px-4 py-2 text-xs font-black text-slate-950 hover:bg-amber-400 transition cursor-pointer disabled:opacity-50"
+              >
+                {isRedeeming ? 'Redeeming...' : 'Redeem'}
+              </button>
+            </div>
+            {inlineError && (
+              <p className="text-[11px] text-rose-400">{inlineError}</p>
+            )}
+          </div>
 
           {/* Action buttons */}
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
             {onRefreshStatus && (
               <button
                 onClick={onRefreshStatus}
@@ -120,7 +187,7 @@ export const AccountGate: React.FC<AccountGateProps> = ({
                 className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-4 py-2.5 text-xs font-black text-slate-950 shadow-lg shadow-emerald-500/20 hover:opacity-95 active:scale-95 transition cursor-pointer"
               >
                 <Zap className="h-4 w-4" />
-                <span>Fast-Track Instant Access with InstaPay (BDC 30-Day Pro)</span>
+                <span>Fast-Track Instant Access with InstaPay / Telda (BDC Live Feed)</span>
               </button>
             </div>
           )}
@@ -154,7 +221,7 @@ export const AccountGate: React.FC<AccountGateProps> = ({
             {onLogout && (
               <button
                 onClick={onLogout}
-                className="flex items-center gap-2 rounded-xl bg-slate-800 px-5 py-2.5 text-xs font-bold text-white hover:bg-slate-700 transition"
+                className="flex items-center gap-2 rounded-xl bg-slate-800 px-5 py-2.5 text-xs font-bold text-white hover:bg-slate-700 transition cursor-pointer"
               >
                 <LogOut className="h-4 w-4" />
                 <span>Sign Out</span>
@@ -166,7 +233,111 @@ export const AccountGate: React.FC<AccountGateProps> = ({
     );
   }
 
-  // Case 3: Not logged in at all (Mandatory Account Gate)
+  // Case 3: Logged in, approved, but NO ACTIVE PAID SUBSCRIPTION (Paid-Only Wall)
+  if (currentUser && !hasActiveSubscription(currentUser)) {
+    return (
+      <div className="mx-auto max-w-xl py-12 px-4 animate-fadeIn">
+        <div className="relative overflow-hidden rounded-3xl border border-amber-500/40 bg-gradient-to-b from-slate-900 via-amber-950/20 to-slate-950 p-8 sm:p-10 text-center shadow-2xl backdrop-blur-xl">
+          <div className="absolute -top-12 -left-12 h-44 w-44 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
+
+          {/* Logo */}
+          <div className="flex justify-center mb-6">
+            <SimplyLogo size="xl" />
+          </div>
+
+          <span className="inline-block rounded-full bg-amber-500/15 px-3.5 py-1 text-xs font-bold text-amber-300 border border-amber-500/30 mb-3">
+            Active Paid Subscription Required
+          </span>
+
+          <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+            Unlock Full Access
+          </h2>
+
+          <p className="mt-3 text-sm text-slate-300 leading-relaxed max-w-md mx-auto">
+            Hello, <strong className="text-white">{currentUser.name}</strong>! Access to {featureName} requires an active individual subscription or an enrolled school/class seat.
+          </p>
+
+          {/* Option A: InstaPay / Telda Checkout */}
+          <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-950/80 p-5 text-left space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Zap className="h-4 w-4 text-emerald-400" />
+                <h4 className="text-xs font-bold uppercase tracking-wider text-white">Option 1: Individual Student Plan</h4>
+              </div>
+              <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-bold border border-emerald-500/30">
+                Instant BDC Inbound
+              </span>
+            </div>
+            <p className="text-xs text-slate-400">
+              Choose Plus or Pro tier. Instant automated bank verification via InstaPay or Telda receipt OCR.
+            </p>
+            {onOpenPayment && (
+              <button
+                type="button"
+                onClick={onOpenPayment}
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 py-3 text-xs font-black text-slate-950 shadow-lg shadow-emerald-500/20 hover:opacity-95 transition cursor-pointer"
+              >
+                <span>Select Plan & Pay via InstaPay / Telda</span>
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+
+          {/* Option B: Redeem School Access Code */}
+          <div className="mt-4 rounded-2xl border border-slate-800 bg-slate-950/80 p-5 text-left space-y-3">
+            <div className="flex items-center gap-2">
+              <School className="h-4 w-4 text-amber-400" />
+              <h4 className="text-xs font-bold uppercase tracking-wider text-white">Option 2: School / Class Access Code</h4>
+            </div>
+            <p className="text-xs text-slate-400">
+              Enrolled through your school or teacher? Enter the classroom code provided by your teacher.
+            </p>
+
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={inlineCode}
+                onChange={(e) => setInlineCode(e.target.value.toUpperCase())}
+                placeholder="e.g. BIO-Y11-S1 or CLS-BIO11-2026"
+                className="flex-1 rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2.5 text-xs font-mono font-bold text-amber-300 placeholder-slate-600 uppercase focus:border-amber-500 focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={handleInlineRedeem}
+                disabled={isRedeeming}
+                className="rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-2.5 text-xs font-black text-slate-950 hover:opacity-95 transition cursor-pointer disabled:opacity-50"
+              >
+                {isRedeeming ? 'Redeeming...' : 'Unlock'}
+              </button>
+            </div>
+
+            {inlineError && (
+              <p className="text-[11px] text-rose-400">{inlineError}</p>
+            )}
+
+            <p className="text-[10px] text-slate-500">
+              Demo sample codes: <code className="text-slate-400">BIO-Y11-S1</code>, <code className="text-slate-400">MTH-0580-X</code>, <code className="text-slate-400">SCH-CIE-9988</code>
+            </p>
+          </div>
+
+          {/* Sign Out Option */}
+          <div className="mt-6 flex justify-center">
+            {onLogout && (
+              <button
+                onClick={onLogout}
+                className="flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900 px-5 py-2.5 text-xs font-semibold text-slate-400 hover:text-white transition cursor-pointer"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Sign Out of Account</span>
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Case 4: Not logged in at all (Mandatory Account Gate)
   return (
     <div className="mx-auto max-w-xl py-12 px-4 animate-fadeIn">
       <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-950 p-8 sm:p-10 text-center shadow-2xl backdrop-blur-xl">
@@ -178,7 +349,7 @@ export const AccountGate: React.FC<AccountGateProps> = ({
         </div>
 
         <span className="inline-block rounded-full bg-[#FF5E62]/15 px-3.5 py-1 text-xs font-bold text-[#FFA63A] border border-[#FF5E62]/30 mb-3">
-          Verified Student Account Required
+          Verified Student Account & Subscription Required
         </span>
 
         <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
@@ -186,7 +357,7 @@ export const AccountGate: React.FC<AccountGateProps> = ({
         </h2>
 
         <p className="mt-3 text-sm text-slate-300 leading-relaxed max-w-md mx-auto">
-          To access {featureName}, past paper mark schemes, worked exam examples, and AI grading, please create an account or sign in.
+          To access {featureName}, past paper mark schemes, worked exam examples, and AI grading, please create an account or sign in with your active subscription.
         </p>
 
         {/* Value pills */}
@@ -225,7 +396,7 @@ export const AccountGate: React.FC<AccountGateProps> = ({
         </div>
 
         <p className="mt-5 text-[11px] text-slate-500">
-          Newly registered accounts are submitted for administrator approval to ensure dedicated exam board alignment.
+          Individual subscriptions and school/class licenses include access to all 5 Cambridge & Pearson Edexcel subjects.
         </p>
       </div>
     </div>

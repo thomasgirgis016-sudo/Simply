@@ -128,8 +128,7 @@ export const FormulaDictionary: React.FC<FormulaDictionaryProps> = ({
           {filteredFormulas.length === 0 ? (
             <div className="col-span-full rounded-2xl border border-dashed border-slate-800 p-8 text-center text-slate-400">
               <FileText className="mx-auto h-8 w-8 text-slate-600 mb-2" />
-              <p className="text-sm font-semibold">No formulas match your search.</p>
-              <p className="text-xs text-slate-500 mt-1">Try toggling "Showing All Subjects" or clear search filter.</p>
+              <p className="text-xs text-slate-500 mt-1">Check your keyword search or switch to another enrolled subject.</p>
             </div>
           ) : (
             filteredFormulas.map((f) => (
