@@ -25,7 +25,7 @@ async function seedAdminIfNone(users: UserAccount[]): Promise<UserAccount[]> {
       grade: 'Year 11 / Grade 10 (IGCSE Exam Yr)',
       board: 'Both',
       targetGrade: '9 / A*',
-      selectedSubjectIds: ['cie-math-0580', 'cie-esl-0510', 'cie-physics-0625', 'cie-chem-0620'],
+      selectedSubjectIds: ['cie-math-0580', 'cie-esl-0510', 'cie-physics-0625', 'cie-chem-0620', 'cie-bio-0610'],
       role: 'admin',
       status: 'approved',
       approvedAt: new Date().toISOString(),
@@ -146,16 +146,19 @@ export async function registerStudent(params: {
     targetGrade: params.targetGrade,
     selectedSubjectIds: params.selectedSubjectIds.length > 0 
       ? params.selectedSubjectIds.slice(0, 5) 
-      : ['cie-math-0580', 'cie-esl-0510'],
+      : ['cie-math-0580', 'cie-esl-0510', 'cie-physics-0625', 'cie-chem-0620', 'cie-bio-0610'],
     role,
     status,
     plan: 'free',
     billingCycle: 'monthly',
+    currentSessionToken: `sess_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+    lastActiveAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
   };
 
   users.push(newUser);
   saveAllUsers(users);
+  localStorage.setItem('simply_device_session_token', newUser.currentSessionToken || '');
   setActiveUser(newUser);
 
   return {
@@ -165,7 +168,7 @@ export async function registerStudent(params: {
   };
 }
 
-// Sign in existing student or admin
+// Sign in existing student or admin (Generates unique single-device session token)
 export async function loginStudent(email: string, password: string): Promise<{ success: boolean; user?: UserAccount; error?: string }> {
   const users = getAllUsers();
   const normalizedEmail = email.trim().toLowerCase();
@@ -179,6 +182,13 @@ export async function loginStudent(email: string, password: string): Promise<{ s
   if (user.passwordHash !== passwordHash) {
     return { success: false, error: 'Incorrect password. Click "Forgot Password?" below if you need to reset it.' };
   }
+
+  // Single Device Enforcement: Generate new active session token, superseding any previous device
+  const newSessionToken = `sess_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  user.currentSessionToken = newSessionToken;
+  user.lastActiveAt = new Date().toISOString();
+  saveAllUsers(users);
+  localStorage.setItem('simply_device_session_token', newSessionToken);
 
   setActiveUser(user);
   return { success: true, user };
@@ -404,9 +414,11 @@ export async function createPreApprovedUser(params: {
     targetGrade: params.targetGrade || '9 / A*',
     selectedSubjectIds: params.selectedSubjectIds && params.selectedSubjectIds.length > 0
       ? params.selectedSubjectIds
-      : ['cie-math-0580', 'cie-esl-0510'],
+      : ['cie-math-0580', 'cie-esl-0510', 'cie-physics-0625', 'cie-chem-0620', 'cie-bio-0610'],
     role: params.role,
     status: 'approved',
+    currentSessionToken: `sess_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+    lastActiveAt: new Date().toISOString(),
     approvedAt: new Date().toISOString(),
     approvedBy: params.adminEmail || 'Admin',
     createdAt: new Date().toISOString(),
@@ -567,5 +579,55 @@ export function hasActiveSubscription(user: UserAccount | null): boolean {
     return new Date(user.proExpiresAt).getTime() > Date.now();
   }
   return false;
+}
+
+export const DEVICE_SESSION_STORAGE_KEY = 'simply_device_session_token';
+
+/**
+ * Validates whether the currently active device session token matches the user's latest token.
+ * Strictly enforces that only 1 active device is logged into an account at any given moment.
+ */
+export function validateActiveSession(currentUser: UserAccount | null): { valid: boolean; reason?: string } {
+  if (!currentUser) return { valid: true };
+  try {
+    const localToken = localStorage.getItem(DEVICE_SESSION_STORAGE_KEY);
+    const allUsers = getAllUsers();
+    const freshUser = allUsers.find(u => u.id === currentUser.id || u.email.toLowerCase() === currentUser.email.toLowerCase());
+
+    if (!freshUser) {
+      return { valid: false, reason: 'User account record no longer exists.' };
+    }
+
+    // If the account has an active session token and this device's token doesn't match:
+    if (freshUser.currentSessionToken && localToken && freshUser.currentSessionToken !== localToken) {
+      return {
+        valid: false,
+        reason: 'You have been logged out because this account was logged into from another device. Only 1 active device is permitted per account.'
+      };
+    }
+
+    // Auto-seed session token for older sessions
+    if (!localToken && freshUser.currentSessionToken) {
+      localStorage.setItem(DEVICE_SESSION_STORAGE_KEY, freshUser.currentSessionToken);
+    } else if (localToken && !freshUser.currentSessionToken) {
+      freshUser.currentSessionToken = localToken;
+      saveAllUsers(allUsers);
+    }
+  } catch (e) {
+    console.warn('Session verification bypassed:', e);
+  }
+  return { valid: true };
+}
+
+/**
+ * Cleanly logs out the user and clears this device's session token.
+ */
+export function logoutUser(): void {
+  try {
+    localStorage.removeItem(STORAGE_ACTIVE_USER_ID);
+    localStorage.removeItem(DEVICE_SESSION_STORAGE_KEY);
+  } catch (e) {
+    console.warn('Logout cleanup bypassed:', e);
+  }
 }
 

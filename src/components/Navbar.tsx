@@ -132,7 +132,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'flashcards', label: 'Flashcards', icon: Layers, color: 'text-indigo-400' },
     { id: 'formulas', label: 'Formulas & Commands', icon: BookmarkCheck, color: 'text-amber-400' },
     { id: 'chat', label: 'AI Examiner Chat', icon: MessageSquare, color: 'text-purple-400' },
-    { id: 'analytics', label: 'Teacher Diagnostics', icon: Users, color: 'text-violet-400' },
+    { id: 'analytics', label: 'Teacher Classroom', icon: Users, color: 'text-violet-400' },
     { id: 'boundaries', label: 'Grade Boundaries', icon: TrendingUp, color: 'text-teal-400' },
     { id: 'split', label: 'Split-Screen Papers', icon: Columns, color: 'text-sky-400' },
   ];

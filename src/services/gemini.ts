@@ -177,9 +177,15 @@ DO NOT wrap your output in markdown code blocks like \`\`\`json. Return only raw
     }
   }
 
-  // 0b. Instant official question and marking scheme match
-  if (questionText && !imageBase64) {
-    const matchedPaper = findPastPaperQuestionByReference(questionText);
+  // 0b. Instant official question and marking scheme match (ONLY for explicit exam reference lookups)
+  const isLikelyExamCodeRef = questionText ? (
+    /\b(0580|0620|0625|0610|0510|4MA1|4CH1|4PH1|4BI1)\b/i.test(questionText) ||
+    /\b(paper\s*[1-6]|q\d{1,2}|variant|specimen|m\/j|o\/n|f\/m)\b/i.test(questionText) ||
+    questionText.trim().length < 40
+  ) : false;
+
+  if (questionText && !imageBase64 && isLikelyExamCodeRef) {
+    const matchedPaper = findPastPaperQuestionByReference(questionText, subjectName);
     if (matchedPaper) {
       const isSubmittingAnswer =
         questionText.toLowerCase().includes('my answer') ||
@@ -961,8 +967,285 @@ function generateSimulatedSolution(
     };
   }
 
+  // Chemistry: Stoichiometry, Moles, Gas Volumes or General Chemistry
+  if (
+    subjectName.toLowerCase().includes('chem') ||
+    subjectName.includes('0620') ||
+    subjectName.includes('4CH1') ||
+    lower.includes('mole') ||
+    lower.includes('hydrochloric') ||
+    lower.includes('magnesium') ||
+    lower.includes('concentration') ||
+    lower.includes('titrat') ||
+    lower.includes('precipitat') ||
+    lower.includes('stoichiometr')
+  ) {
+    const isGasOrVolume = lower.includes('volume') || lower.includes('gas') || lower.includes('dm3') || lower.includes('cm3');
+    const isAcidBase = lower.includes('acid') || lower.includes('base') || lower.includes('salt') || lower.includes('neutralis');
+
+    if (isAcidBase) {
+      return {
+        questionText: query,
+        subject: 'Chemistry (CIE 0620 / Edexcel 4CH1)',
+        topic: 'Acids, Bases & Salt Preparation',
+        totalMarks: 4,
+        coreConceptAndFormula: {
+          concept: 'Acid-base neutralization, ionic spectator elimination & crystallization of soluble salts',
+          formula: '\\text{Acid} + \\text{Base} \\rightarrow \\text{Salt} + \\text{Water} \\quad [\\text{Net Ionic: } H^+(aq) + OH^-(aq) \\rightarrow H_2O(l)]',
+        },
+        stepByStepSolution: [
+          {
+            stepNumber: 1,
+            title: 'Identify Reaction Type & Balanced Chemical Equation',
+            explanation: 'State the complete balanced chemical equation with correct state symbols for the reacting acid and base.',
+            mathOrCode: 'HCl(aq) + NaOH(aq) \\rightarrow NaCl(aq) + H_2O(l)',
+            markAwarded: '[M1] Balanced equation with state symbols',
+          },
+          {
+            stepNumber: 2,
+            title: 'Explain Neutralisation Mechanism or Indicator Endpoint',
+            explanation: 'Describe proton transfer: $H^+$ ions from the acid react with $OH^-$ ions from the alkali to form water molecules ($H_2O$).',
+            mathOrCode: 'H^+(aq) + OH^-(aq) \\rightarrow H_2O(l)',
+            markAwarded: '[B1] Proton transfer / ionic equation',
+          },
+          {
+            stepNumber: 3,
+            title: 'Salt Recovery Procedure (Crystallisation Method)',
+            explanation: 'Heat the salt solution gently to point of crystallisation (saturation test with glass rod), allow crystals to form slowly at room temperature, filter, and dry between filter papers.',
+            mathOrCode: '\\text{Evaporate to saturation} \\rightarrow \\text{Cool & Crystallise} \\rightarrow \\text{Filter & Pat Dry}',
+            markAwarded: '[A1] Correct crystallisation technique',
+          },
+        ],
+        finalAnswer: 'The acid and base react in a 1:1 molar ratio to produce salt and water. Pure, dry crystals are obtained by heating to saturation, cooling, and filtering.',
+        examinerTraps: [
+          'Drying crystals in a hot oven or with direct Bunsen flame, which removes water of crystallization and decomposes the salt.',
+          'Omitting state symbols ((s), (l), (g), (aq)) in Cambridge Paper 4 theory questions.',
+        ],
+        markSchemeBreakdown: [
+          '[M1] Balanced chemical equation with valid formulae',
+          '[B1] Identification of ionic species or indicator colour change at endpoint',
+          '[A1] Heating to saturation point (not to dryness)',
+          '[B1] Washing with minimal cold distilled water and drying with filter paper',
+        ],
+        examinerTips: [
+          'Never say "evaporate to dryness" when preparing hydrated crystals. Always state "heat to the point of crystallisation".',
+          'Ensure state symbols are written carefully: aqueous solutions are (aq), precipitate is (s).',
+        ],
+        commonMistakes: [
+          'Heating until all water is gone, forming anhydrous powder rather than hydrated crystals.',
+          'Writing the wrong formula for sulfate or nitrate ions.',
+        ],
+        relatedTopic: 'Acids, Bases, Salts and Quantitative Titration Analysis',
+      };
+    }
+
+    // Default Stoichiometry / Gas calculation for Chemistry
+    return {
+      questionText: query,
+      subject: 'Chemistry (CIE 0620 / Edexcel 4CH1)',
+      topic: 'Stoichiometry & Mole Calculations',
+      totalMarks: 4,
+      coreConceptAndFormula: {
+        concept: 'Quantitative Chemistry: Molar mass relationships, stoichiometric ratios, and molar gas volume',
+        formula: 'n = \\frac{m}{M_r} \\quad \\text{and} \\quad V = n \\times 24\\text{ dm}^3 \\text{ at r.t.p.}',
+      },
+      stepByStepSolution: [
+        {
+          stepNumber: 1,
+          title: 'Calculate Moles of Limiting Reactant',
+          explanation: 'Determine the relative formula mass ($M_r$) and calculate the number of moles using $n = \\frac{m}{M_r}$.',
+          mathOrCode: 'n = \\frac{\\text{mass in grams}}{M_r}',
+          markAwarded: '[M1] Calculation of moles',
+        },
+        {
+          stepNumber: 2,
+          title: 'Apply Stoichiometric Mole Ratio from Balanced Equation',
+          explanation: 'Use the stoichiometric coefficients in the balanced equation to determine the molar ratio between reactants and products.',
+          mathOrCode: '\\text{Mole ratio: } \\text{Reactant} : \\text{Product} = 1 : 1',
+          markAwarded: '[M1] Correct stoichiometric ratio applied',
+        },
+        {
+          stepNumber: 3,
+          title: isGasOrVolume ? 'Calculate Gas Volume at R.T.P.' : 'Calculate Mass or Concentration',
+          explanation: isGasOrVolume
+            ? 'Multiply moles of gas by the molar gas volume ($24\\text{ dm}^3$ or $24,000\\text{ cm}^3$ at room temperature and pressure).'
+            : 'Convert moles to required mass using $m = n \\times M_r$ or concentration using $c = \\frac{n}{V}$.',
+          mathOrCode: isGasOrVolume ? 'V = n \\times 24\\text{ dm}^3' : 'm = n \\times M_r',
+          markAwarded: '[A1] Final calculated numerical value',
+        },
+        {
+          stepNumber: 4,
+          title: 'Round to 3 Significant Figures and Quote Units',
+          explanation: 'Cambridge mark scheme convention: quote numerical quantities to 3 significant figures and include standard SI units.',
+          mathOrCode: '\\text{Final result with units: } \\text{cm}^3 \\text{ or } \\text{g}',
+          markAwarded: '[B1] Correct SI units and significant figures',
+        },
+      ],
+      finalAnswer: isGasOrVolume
+        ? 'Gas volume calculated from stoichiometric moles multiplied by 24 dm³ (or 24000 cm³) at room temperature and pressure.'
+        : 'Yield calculated accurately according to stoichiometric molar proportions.',
+      examinerTraps: [
+        'Confusing cm³ with dm³ (remember 1 dm³ = 1000 cm³).',
+        'Using atomic numbers ($Z$) instead of mass numbers ($A_r$) when calculating relative formula mass ($M_r$).',
+        'Prematurely rounding intermediate numbers in multi-step mole equations.',
+      ],
+      markSchemeBreakdown: [
+        '[M1] Moles calculated using correct formula: mass / Mr',
+        '[M1] Stoichiometric mole ratio from balanced equation applied',
+        '[A1] Correct numerical answer to 3 significant figures',
+        '[B1] Appropriate units stated (dm³, cm³, or g)',
+      ],
+      examinerTips: [
+        'Write out the formula you are using ($n = m / M_r$ or $c = n / V$) before putting numbers in. Method marks are awarded even if arithmetic slips occur.',
+        'At room temperature and pressure (r.t.p.), one mole of ANY gas occupies 24 dm³ (24,000 cm³).',
+      ],
+      commonMistakes: [
+        'Dividing volume by 24 when the volume was given in cm³ (must divide by 24,000 or convert cm³ to dm³ first).',
+        'Forgetting that diatomic gases (H₂, Cl₂, O₂) have molar masses double their atomic number ($M_r(H_2) = 2$, $M_r(Cl_2) = 71$).',
+      ],
+      relatedTopic: 'The Mole Concept, Chemical Calculations & Gas Volumes',
+    };
+  }
+
+  // Biology: Cell Biology, Enzymes, Photosynthesis or Human Physiology
+  if (
+    subjectName.toLowerCase().includes('bio') ||
+    subjectName.includes('0610') ||
+    subjectName.includes('4BI1') ||
+    lower.includes('cell') ||
+    lower.includes('enzyme') ||
+    lower.includes('photosynthesis') ||
+    lower.includes('diffusion') ||
+    lower.includes('osmosis')
+  ) {
+    return {
+      questionText: query,
+      subject: 'Biology (CIE 0610 / Edexcel 4BI1)',
+      topic: 'Cell Biology, Enzymes & Metabolic Pathways',
+      totalMarks: 4,
+      coreConceptAndFormula: {
+        concept: 'Structure-function relationships, kinetic energy of substrate-enzyme collisions, and selective permeability',
+        formula: '\\text{Rate} \\propto [\\text{Enzyme-Substrate Complexes}] \\quad \\text{and} \\quad \\text{Magnification } M = \\frac{\\text{Image Size } I}{\\text{Actual Size } A}',
+      },
+      stepByStepSolution: [
+        {
+          stepNumber: 1,
+          title: 'Identify the Biological Mechanism and Cell Organelle',
+          explanation: 'State the specific cellular structure or enzyme involved, naming precise biological terminology (e.g., active site, cell membrane, chloroplasts, mitochondria).',
+          markAwarded: '[B1] Precise biological identification',
+        },
+        {
+          stepNumber: 2,
+          title: 'Explain Kinetic Mechanism (Collision Theory or Transport)',
+          explanation: 'Explain the mechanism step-by-step: substrate molecules possess kinetic energy and collide with active sites with complementary lock-and-key fit to form enzyme-substrate complexes.',
+          markAwarded: '[M1] Cause-and-effect mechanism',
+        },
+        {
+          stepNumber: 3,
+          title: 'Deduce Environmental Factors or Physiological Consequence',
+          explanation: 'State the effect of temperature/pH or concentration changes: high temperatures cause active site denaturation (loss of 3D tertiary conformation), meaning substrate can no longer bind.',
+          markAwarded: '[A1] Accurate consequence described',
+        },
+      ],
+      finalAnswer: 'Biological mechanism explained using specific syllabus terminology: complementary active site binding, kinetic collisions, and organelle function.',
+      examinerTraps: [
+        'Saying an enzyme "dies" or is "killed" by heat — enzymes are proteins, they DENATURE, they do not die.',
+        'Writing "water concentration" instead of the official Cambridge term "water potential".',
+      ],
+      markSchemeBreakdown: [
+        '[B1] Correct biological keyword / organelle identification',
+        '[M1] Scientific mechanism explaining kinetic movement or gradient',
+        '[A1] Resulting consequence or rate alteration',
+        '[B1] Complementary shape / active site / lock-and-key terminology',
+      ],
+      examinerTips: [
+        'Always use the word "denatured" rather than "destroyed" or "dead" when discussing enzymes at high temperatures.',
+        'When discussing osmosis, ALWAYS refer to "water potential gradient" from higher (less negative) to lower (more negative) water potential.',
+      ],
+      commonMistakes: [
+        'Writing that enzymes are living organisms.',
+        'Confusing active transport (against concentration gradient requiring ATP) with facilitated diffusion.',
+      ],
+      relatedTopic: 'Enzymes, Biological Molecules & Transport Across Cell Membranes',
+    };
+  }
+
+  // Physics: Mechanics, Electricity, Waves or Thermal Physics
+  if (
+    subjectName.toLowerCase().includes('phys') ||
+    subjectName.includes('0625') ||
+    subjectName.includes('4PH1') ||
+    lower.includes('velocity') ||
+    lower.includes('acceleration') ||
+    lower.includes('resistance') ||
+    lower.includes('voltage') ||
+    lower.includes('current') ||
+    lower.includes('force')
+  ) {
+    return {
+      questionText: query,
+      subject: 'Physics (CIE 0625 / Edexcel 4PH1)',
+      topic: 'Forces, Energy & Physical Principles',
+      totalMarks: 4,
+      coreConceptAndFormula: {
+        concept: 'Newtonian mechanics, conservation of energy and electrical circuit principles',
+        formula: 'F = ma \\quad \\text{and} \\quad V = IR \\quad \\text{and} \\quad W = Fd',
+      },
+      stepByStepSolution: [
+        {
+          stepNumber: 1,
+          title: 'State the Governing Physical Law & Base Formula',
+          explanation: 'Identify the syllabus equation that connects the given physical quantities.',
+          mathOrCode: 'F = ma \\quad \\text{or} \\quad V = IR',
+          markAwarded: '[M1] Formula quoted',
+        },
+        {
+          stepNumber: 2,
+          title: 'Substitute Known Values with Standard SI Units',
+          explanation: 'Ensure all values are converted to base SI units ($m$, $s$, $kg$, $N$, $V$, $A$, $\\Omega$) before substituting into the equation.',
+          mathOrCode: '\\text{Substitution: maintain precision}',
+          markAwarded: '[M1] Unit conversion & substitution',
+        },
+        {
+          stepNumber: 3,
+          title: 'Evaluate Numerical Result to 3 Significant Figures',
+          explanation: 'Calculate the numerical answer and round to standard Cambridge IGCSE precision (3 s.f.).',
+          mathOrCode: '\\text{Answer calculated to 3 s.f.}',
+          markAwarded: '[A1] Accurate calculation',
+        },
+        {
+          stepNumber: 4,
+          title: 'State Final Answer with SI Units',
+          explanation: 'Affix the correct SI unit to secure the independent mark.',
+          mathOrCode: '\\text{State SI Unit (e.g. N, m/s}^2\\text{, J, W, }\\Omega\\text{)}',
+          markAwarded: '[B1] Correct SI unit',
+        },
+      ],
+      finalAnswer: 'Physical principle applied with full working, converted SI units, and final answer quoted to 3 significant figures.',
+      examinerTraps: [
+        'Forgetting to convert grams to kilograms ($1\\text{ kg} = 1000\\text{ g}$) or minutes to seconds ($1\\text{ min} = 60\\text{ s}$).',
+        'Confusing mass (scalar in kg) with weight (force vector in N: $W = mg$).',
+      ],
+      markSchemeBreakdown: [
+        '[M1] Correct physical formula stated',
+        '[M1] Proper substitution with SI unit conversion',
+        '[A1] Final answer accurate to 3 significant figures',
+        '[B1] Explicit correct SI unit stated',
+      ],
+      examinerTips: [
+        'Never write down only the final answer without working — if your calculator battery fails or you mistype a digit, you lose all marks unless method steps are visible.',
+        'Check that gravitational acceleration $g = 9.8\\text{ m/s}^2$ (or $10\\text{ m/s}^2$ depending on the front cover instruction of your paper).',
+      ],
+      commonMistakes: [
+        'Inverting formulas during rearrangement ($I = V/R$, not $R/V$).',
+        'Omitting units on the answer line.',
+      ],
+      relatedTopic: 'Kinematics, Dynamics, Energy Transfers & Electrical Circuits',
+    };
+  }
+
   // English as a Second Language Summary
-  if (lower.includes('vertical farming') || lower.includes('summary') || lower.includes('esl')) {
+  if (lower.includes('vertical farming') || lower.includes('summary') || lower.includes('esl') || subjectName.toLowerCase().includes('english') || subjectName.includes('0510')) {
     return {
       questionText: 'Summary Writing: Benefits and operational challenges of urban vertical farming (100-120 words).',
       subject: 'English as a Second Language (CIE 0510)',

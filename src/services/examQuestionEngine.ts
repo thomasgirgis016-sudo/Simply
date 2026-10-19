@@ -45,12 +45,28 @@ function normalizeStr(str: string): string {
  * - "0625/41 Q2"
  * - "4MA1 Q12"
  */
-export function findPastPaperQuestionByReference(query: string): PastPaperItem | null {
+export function findPastPaperQuestionByReference(query: string, subjectIdOrCode?: string): PastPaperItem | null {
   if (!query || !query.trim()) return null;
 
   const raw = query.trim();
   const qLower = raw.toLowerCase();
-  const allPapers = getAllPastPapers();
+  let allPapers = getAllPastPapers();
+
+  // If subject is provided, filter candidate papers strictly
+  if (subjectIdOrCode) {
+    const subClean = subjectIdOrCode.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const filtered = allPapers.filter((p) => {
+      const pSub = p.subjectId.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const pCode = (p.subjectCode || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      const pName = (p.subjectName || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      return pSub.includes(subClean) || subClean.includes(pSub) ||
+             pCode.includes(subClean) || subClean.includes(pCode) ||
+             pName.includes(subClean) || subClean.includes(pName);
+    });
+    if (filtered.length > 0) {
+      allPapers = filtered;
+    }
+  }
 
   // 1. Direct ID match
   const byId = allPapers.find((p) => p.id.toLowerCase() === qLower);
@@ -77,7 +93,7 @@ export function findPastPaperQuestionByReference(query: string): PastPaperItem |
     }
 
     const fullRef = `${paper.paperCode} ${paper.session} ${paper.questionNumber}`.toLowerCase();
-    if (fullRef.includes(qLower) || qLower.includes(paper.paperCode.toLowerCase()) && qLower.includes(paper.questionNumber.toLowerCase())) {
+    if (fullRef.includes(qLower) || (qLower.includes(paper.paperCode.toLowerCase()) && qLower.includes(paper.questionNumber.toLowerCase()))) {
       return paper;
     }
   }
@@ -91,13 +107,14 @@ export function findPastPaperQuestionByReference(query: string): PastPaperItem |
     if (matchedQ) return matchedQ;
   }
 
-  // 6. Fuzzy text snippet match
-  const bySnippet = allPapers.find(
-    (p) =>
-      p.snippetQuery.toLowerCase().split(' ').some((word) => word.length > 3 && qLower.includes(word)) ||
-      p.questionPrompt.toLowerCase().includes(qLower)
-  );
-  if (bySnippet) return bySnippet;
+  // 6. Substantial question prompt match (minimum 30 characters of exact text to avoid false positives)
+  if (qLower.length >= 30) {
+    const bySubstantialPrompt = allPapers.find((p) => {
+      const promptLower = p.questionPrompt.toLowerCase();
+      return promptLower.includes(qLower) || (qLower.length >= 40 && promptLower.slice(0, 50).includes(qLower.slice(0, 40)));
+    });
+    if (bySubstantialPrompt) return bySubstantialPrompt;
+  }
 
   return null;
 }

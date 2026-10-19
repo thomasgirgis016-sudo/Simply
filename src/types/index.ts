@@ -36,6 +36,8 @@ export interface UserAccount {
   isTeacher?: boolean;
   approvedAt?: string;
   approvedBy?: string;
+  currentSessionToken?: string; // Enforces strictly 1 active device/session per account
+  lastActiveAt?: string;
   createdAt: string;
 }
 

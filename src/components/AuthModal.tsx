@@ -42,7 +42,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     'cie-math-0580',
     'cie-esl-0510',
     'cie-physics-0625',
-    'cie-chem-0620'
+    'cie-chem-0620',
+    'cie-bio-0610'
   ]);
 
   // Forgot password flow state

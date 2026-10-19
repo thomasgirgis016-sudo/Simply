@@ -99,6 +99,8 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
   const [selectedPaperNumber, setSelectedPaperNumber] = useState<string>('All');
   const [selectedVariant, setSelectedVariant] = useState<string>('All');
   const [selectedTier, setSelectedTier] = useState<string>('All');
+  const [selectedQuestionFilter, setSelectedQuestionFilter] = useState<string>('All');
+  const [selectedSubPartFilter, setSelectedSubPartFilter] = useState<string>('All');
   const [copiedQuestionId, setCopiedQuestionId] = useState<string | null>(null);
 
   // Real-time Parsed Exam Code from Mode A input
@@ -139,6 +141,8 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
     selectedPaperNumber,
     selectedVariant,
     selectedTier,
+    selectedQuestionFilter,
+    selectedSubPartFilter,
     searchQuery
   ]);
 
@@ -206,12 +210,18 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
         return false;
       }
 
-      // Subject filter
+      // Subject filter (bypass if user entered an explicit exam code with a different subject)
       if (selectedSubjectId !== 'all') {
-        const matchesSub =
-          pdf.subjectId === selectedSubjectId ||
-          pdf.subjectCode.toLowerCase() === selectedSubjectId.toLowerCase();
-        if (!matchesSub) return false;
+        if (parsedExamCode?.subjectCode) {
+          const sc = parsedExamCode.subjectCode.toLowerCase();
+          const matchesParsedSub = pdf.subjectCode.toLowerCase().includes(sc) || pdf.paperCode.toLowerCase().includes(sc);
+          if (!matchesParsedSub) return false;
+        } else {
+          const matchesSub =
+            pdf.subjectId === selectedSubjectId ||
+            pdf.subjectCode.toLowerCase() === selectedSubjectId.toLowerCase();
+          if (!matchesSub) return false;
+        }
       }
 
       // Year filter
@@ -245,18 +255,48 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
         return false;
       }
 
-      // Search Query
+      // Search Query (Supports slash-codes e.g. 0580/42/M/J/23 or 0625/21/O/N/22)
       if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const matchesQuery =
-          pdf.paperCode.toLowerCase().includes(q) ||
-          pdf.paperComponent.toLowerCase().includes(q) ||
-          pdf.subjectName.toLowerCase().includes(q) ||
-          pdf.subjectCode.toLowerCase().includes(q) ||
-          pdf.session.toLowerCase().includes(q) ||
-          pdf.board.toLowerCase().includes(q);
+        if (parsedExamCode && parsedExamCode.confidence >= 0.4) {
+          if (parsedExamCode.subjectCode) {
+            const sc = parsedExamCode.subjectCode.toLowerCase();
+            const matchesSub = pdf.subjectCode.toLowerCase().includes(sc) || pdf.paperCode.toLowerCase().includes(sc);
+            if (!matchesSub) return false;
+          }
 
-        if (!matchesQuery) return false;
+          if (parsedExamCode.paperNumber) {
+            const pNum = parsedExamCode.paperNumber.toString();
+            if (parsedExamCode.variant) {
+              const fullPaperCode = `${parsedExamCode.paperNumber}${parsedExamCode.variant}`;
+              if (!pdf.paperCode.includes(`/${fullPaperCode}`) && !pdf.paperCode.endsWith(fullPaperCode)) {
+                return false;
+              }
+            } else if (!pdf.paperCode.includes(`/${pNum}`)) {
+              return false;
+            }
+          }
+
+          if (parsedExamCode.sessionName) {
+            if (!pdf.session.toLowerCase().includes(parsedExamCode.sessionName.toLowerCase())) {
+              return false;
+            }
+          }
+
+          if (parsedExamCode.year && pdf.year !== parsedExamCode.year) {
+            return false;
+          }
+        } else {
+          const q = searchQuery.toLowerCase();
+          const matchesQuery =
+            pdf.paperCode.toLowerCase().includes(q) ||
+            pdf.paperComponent.toLowerCase().includes(q) ||
+            pdf.subjectName.toLowerCase().includes(q) ||
+            pdf.subjectCode.toLowerCase().includes(q) ||
+            pdf.session.toLowerCase().includes(q) ||
+            pdf.board.toLowerCase().includes(q);
+
+          if (!matchesQuery) return false;
+        }
       }
 
       return true;
@@ -270,6 +310,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
     selectedPaperNumber,
     selectedVariant,
     selectedTier,
+    parsedExamCode,
     searchQuery,
   ]);
 
@@ -309,12 +350,21 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
         return false;
       }
 
-      // Subject filter
+      // Subject filter (bypass if user entered an explicit exam code with a different subject)
       if (selectedSubjectId !== 'all') {
-        const matchesSub =
-          paper.subjectId === selectedSubjectId ||
-          paper.subjectCode?.toLowerCase() === selectedSubjectId.toLowerCase();
-        if (!matchesSub) return false;
+        if (parsedExamCode?.subjectCode) {
+          const sc = parsedExamCode.subjectCode.toLowerCase();
+          const matchesParsedSub =
+            paper.paperCode.toLowerCase().includes(sc) ||
+            paper.subjectCode?.toLowerCase().includes(sc) ||
+            paper.subjectId.toLowerCase().includes(sc);
+          if (!matchesParsedSub) return false;
+        } else {
+          const matchesSub =
+            paper.subjectId === selectedSubjectId ||
+            paper.subjectCode?.toLowerCase() === selectedSubjectId.toLowerCase();
+          if (!matchesSub) return false;
+        }
       }
 
       // Topic filter
@@ -337,6 +387,22 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
       // Tier filter
       if (selectedTier !== 'All' && paper.difficultyTier !== selectedTier) {
         return false;
+      }
+
+      // Row 2 Filter: Question Number
+      if (selectedQuestionFilter !== 'All') {
+        const targetQ = selectedQuestionFilter.toLowerCase().replace(/[^0-9]/g, '');
+        const paperQ = paper.questionNumber.toLowerCase().replace(/[^0-9]/g, '');
+        const matchesQ = paperQ === targetQ || paper.questionNumber.toLowerCase().includes(selectedQuestionFilter.toLowerCase());
+        if (!matchesQ) return false;
+      }
+
+      // Row 2 Filter: Sub-Part
+      if (selectedSubPartFilter !== 'All') {
+        const targetPart = selectedSubPartFilter.toLowerCase().replace(/[\(\)]/g, '');
+        const matchesSubPart = paper.subParts?.some(sp => sp.part.toLowerCase().replace(/[\(\)]/g, '') === targetPart || sp.part.toLowerCase().includes(targetPart)) ||
+          paper.questionNumber.toLowerCase().includes(selectedSubPartFilter.toLowerCase());
+        if (!matchesSubPart) return false;
       }
 
       // Mode B: Question Number Pill filter (e.g. Q4 or Q12)
@@ -414,6 +480,8 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
     selectedSession,
     selectedTier,
     selectedQuestionPill,
+    selectedQuestionFilter,
+    selectedSubPartFilter,
     searchMode,
     parsedExamCode,
     searchQuery,
@@ -429,6 +497,9 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
     setSelectedPaperNumber('All');
     setSelectedVariant('All');
     setSelectedTier('All');
+    setSelectedQuestionFilter('All');
+    setSelectedSubPartFilter('All');
+    setSelectedQuestionPill('All');
     setPageLimit(24);
   };
 
@@ -972,6 +1043,84 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               </div>
             </>
           )}
+        </div>
+
+        {/* Row 2 Filter Controls: Question Number & Sub-Part */}
+        <div className="rounded-2xl border border-sky-500/30 bg-slate-950/70 p-3 sm:p-4 space-y-2.5 animate-fadeIn">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
+              <Filter className="h-3.5 w-3.5 text-sky-400" />
+              <span>Row 2: Question Number & Sub-Part Precision Filter</span>
+            </span>
+            {(selectedQuestionFilter !== 'All' || selectedSubPartFilter !== 'All') && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedQuestionFilter('All');
+                  setSelectedSubPartFilter('All');
+                }}
+                className="text-[11px] text-sky-400 hover:text-sky-300 underline font-medium cursor-pointer"
+              >
+                Reset Row 2
+              </button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            {/* Question Number Selector */}
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-[10px] font-bold text-slate-300">
+                  Question Number
+                </label>
+                {selectedQuestionFilter !== 'All' && (
+                  <span className="rounded bg-sky-500/20 px-1.5 py-0.2 text-[10px] font-mono text-sky-300">
+                    Active: {selectedQuestionFilter}
+                  </span>
+                )}
+              </div>
+              <select
+                value={selectedQuestionFilter}
+                onChange={(e) => setSelectedQuestionFilter(e.target.value)}
+                className="w-full rounded-xl border border-slate-700 bg-slate-900 p-2.5 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none font-mono"
+              >
+                <option value="All">All Question Numbers (Q1 – Q40)</option>
+                {Array.from({ length: 40 }, (_, i) => `Q${i + 1}`).map((q) => (
+                  <option key={q} value={q}>
+                    {q}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Sub-Part Selector */}
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-[10px] font-bold text-slate-300">
+                  Sub-Part (a, b, c, i, ii)
+                </label>
+                {selectedSubPartFilter !== 'All' && (
+                  <span className="rounded bg-sky-500/20 px-1.5 py-0.2 text-[10px] font-mono text-sky-300">
+                    Active: Part {selectedSubPartFilter}
+                  </span>
+                )}
+              </div>
+              <select
+                value={selectedSubPartFilter}
+                onChange={(e) => setSelectedSubPartFilter(e.target.value)}
+                className="w-full rounded-xl border border-slate-700 bg-slate-900 p-2.5 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none font-mono"
+              >
+                <option value="All">All Sub-Parts (Complete Question & All Parts)</option>
+                <option value="(a)">Part (a)</option>
+                <option value="(b)">Part (b)</option>
+                <option value="(c)">Part (c)</option>
+                <option value="(d)">Part (d)</option>
+                <option value="(i)">Sub-part (i)</option>
+                <option value="(ii)">Sub-part (ii)</option>
+                <option value="(iii)">Sub-part (iii)</option>
+              </select>
+            </div>
+          </div>
         </div>
 
         {/* Quick Topic Pills Bar (when viewing Classified Question Finder) */}

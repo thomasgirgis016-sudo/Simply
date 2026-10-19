@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   UserProfile,
   Subject,
@@ -38,7 +38,7 @@ import { AuthModal } from './components/AuthModal';
 import { ScientificCalculator } from './components/ScientificCalculator';
 import { SecretAdminModal } from './components/SecretAdminModal';
 import { SimplyLogo } from './components/SimplyLogo';
-import { getActiveUser, setActiveUser, grantUserProSubscription, hasActiveSubscription, updateUserAccount } from './services/auth';
+import { getActiveUser, setActiveUser, grantUserProSubscription, hasActiveSubscription, updateUserAccount, validateActiveSession, logoutUser } from './services/auth';
 import {
   Camera,
   Layers,
@@ -250,12 +250,21 @@ export function App() {
 
   const [formulas] = useState<FormulaItem[]>(INITIAL_FORMULAS);
 
-  // 6. Active Subject
-  const enrolledSubjects = IGCSE_SUBJECTS.filter(s =>
-    profile.selectedSubjectIds.includes(s.id)
-  );
+  // 5b. Single Device Session Conflict Alert
+  const [deviceConflictAlert, setDeviceConflictAlert] = useState<string | null>(null);
+
+  // 6. Active Subject (Guarantees CIE 0610 Biology is always available in header selector)
+  const enrolledSubjects = useMemo(() => {
+    let ids = profile.selectedSubjectIds || [];
+    if (!ids.includes('cie-bio-0610') && ids.length < 5) {
+      ids = [...ids, 'cie-bio-0610'];
+    }
+    const filtered = IGCSE_SUBJECTS.filter(s => ids.includes(s.id));
+    return filtered.length > 0 ? filtered : IGCSE_SUBJECTS.slice(0, 5);
+  }, [profile.selectedSubjectIds]);
+
   const [activeSubject, setActiveSubject] = useState<Subject>(
-    enrolledSubjects[0] || IGCSE_SUBJECTS[0]
+    () => enrolledSubjects[0] || IGCSE_SUBJECTS[0]
   );
 
   // Cross-component question passing to chat
@@ -278,6 +287,32 @@ export function App() {
     localStorage.setItem('simply_igcse_revision', JSON.stringify(revisionNotes));
   }, [revisionNotes]);
 
+  // Single Device Enforcement Heartbeat: logs out if logged in elsewhere
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const checkSessionIntegrity = () => {
+      const validation = validateActiveSession(currentUser);
+      if (!validation.valid) {
+        setDeviceConflictAlert(
+          validation.reason ||
+          'You have been logged out because this account was logged into from another device. Only 1 device is allowed at a time.'
+        );
+        handleLogout();
+      }
+    };
+
+    const interval = setInterval(checkSessionIntegrity, 4000);
+    window.addEventListener('focus', checkSessionIntegrity);
+    window.addEventListener('storage', checkSessionIntegrity);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', checkSessionIntegrity);
+      window.removeEventListener('storage', checkSessionIntegrity);
+    };
+  }, [currentUser]);
+
   // URL Query Parameters Routing (?tab=...&subject=...)
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -299,9 +334,13 @@ export function App() {
         'chat',
         'boundaries',
         'split',
+        'analytics',
         'admin'
       ];
-      if (tabParam && validTabs.includes(tabParam as ActiveTab)) {
+
+      if (tabParam === 'classroom' || tabParam === 'analytics') {
+        setActiveTab('analytics');
+      } else if (tabParam && validTabs.includes(tabParam as ActiveTab)) {
         setActiveTab(tabParam as ActiveTab);
       }
 
@@ -368,6 +407,7 @@ export function App() {
   };
 
   const handleLogout = () => {
+    logoutUser();
     setActiveUser(null);
     setCurrentUser(null);
     setProfile(DEFAULT_PROFILE);
@@ -497,6 +537,22 @@ export function App() {
 
       {/* Main Container */}
       <main className={`flex-1 px-3 py-3 sm:px-6 sm:py-8 max-w-7xl mx-auto w-full ${activeTab === 'chat' ? 'pb-20 md:pb-8' : 'pb-24 md:pb-8'}`}>
+        {/* Single Device Session Conflict Banner */}
+        {deviceConflictAlert && (
+          <div className="mb-6 rounded-2xl border border-rose-500/50 bg-rose-950/80 p-4 text-xs font-semibold text-rose-200 shadow-2xl flex items-center justify-between gap-3 animate-fadeIn">
+            <div className="flex items-center gap-2.5">
+              <span className="text-base">⚠️</span>
+              <span>{deviceConflictAlert}</span>
+            </div>
+            <button
+              onClick={() => setDeviceConflictAlert(null)}
+              className="rounded-lg bg-rose-900/60 px-2.5 py-1 text-[11px] font-bold text-rose-300 hover:bg-rose-800 transition"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
+
         {/* Admin Dashboard (Only when activeTab is admin and current user has admin role) */}
         {activeTab === 'admin' ? (
           currentUser?.role === 'admin' ? (

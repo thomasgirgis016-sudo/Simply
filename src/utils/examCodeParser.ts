@@ -59,13 +59,13 @@ export function parseExamCodeString(input: string): ParsedExamCode | null {
   }
 
   // 3. Detect Series / Season / Month: M/J, O/N, F/M, May/June, Oct/Nov, Feb/March
-  if (/m[\/_]?j|may[\/_]?june|s/i.test(clean)) {
+  if (/(?:^|[\/_\s])(?:m[\/_]?j|may[\/_]?june|s\d{2}|summer)(?:[\/_\s\d]|$)/i.test(clean) || /\bm[\/_]j\b/i.test(clean) || clean.includes('/M/J') || clean.includes('/m/j')) {
     sessionName = 'May/June';
     seasonCode = 'M/J';
-  } else if (/o[\/_]?n|oct[\/_]?nov|w/i.test(clean)) {
+  } else if (/(?:^|[\/_\s])(?:o[\/_]?n|oct[\/_]?nov|w\d{2}|winter)(?:[\/_\s\d]|$)/i.test(clean) || /\bo[\/_]n\b/i.test(clean) || clean.includes('/O/N') || clean.includes('/o/n')) {
     sessionName = 'Oct/Nov';
     seasonCode = 'O/N';
-  } else if (/f[\/_]?m|feb[\/_]?march|m/i.test(clean)) {
+  } else if (/(?:^|[\/_\s])(?:f[\/_]?m|feb[\/_]?march|m\d{2}|spring)(?:[\/_\s\d]|$)/i.test(clean) || /\bf[\/_]m\b/i.test(clean) || clean.includes('/F/M') || clean.includes('/f/m')) {
     sessionName = 'Feb/March';
     seasonCode = 'F/M';
   } else if (/specimen|sp/i.test(clean)) {
@@ -73,15 +73,21 @@ export function parseExamCodeString(input: string): ParsedExamCode | null {
     seasonCode = 'SP';
   }
 
-  // 4. Detect Year: 2018 to 2026, or 2-digit years /18 to /26
+  // 4. Detect Year: Prioritize explicit 4-digit years or 2-digit years associated with the series/season
   const fullYearMatch = clean.match(/\b(20[1-2][0-9])\b/);
   if (fullYearMatch) {
     year = parseInt(fullYearMatch[1], 10);
   } else {
-    const shortYearMatch = clean.match(/(?:[\/_'\s])([1-2][0-9])\b/);
-    if (shortYearMatch) {
-      const yr = parseInt(shortYearMatch[1], 10);
-      if (yr >= 15 && yr <= 30) {
+    // 2-digit year right after series / season: e.g. M/J/23, O/N/22, F/M/24, s23, w22
+    const seasonYearMatch = clean.match(/(?:m[\/_]?j|o[\/_]?n|f[\/_]?m|may[\/_]?june|oct[\/_]?nov|feb[\/_]?march|[swm])[\/_]?([1-2][0-9])\b/i);
+    if (seasonYearMatch) {
+      const yr = parseInt(seasonYearMatch[1], 10);
+      year = 2000 + yr;
+    } else {
+      // 2-digit year at end of slash chain: e.g. /23 or /23 Q4(b)
+      const endSlashYearMatch = clean.match(/[\/_]([1-2][0-9])(?:\s+q|\s*$)/i);
+      if (endSlashYearMatch) {
+        const yr = parseInt(endSlashYearMatch[1], 10);
         year = 2000 + yr;
       }
     }

@@ -36,7 +36,8 @@ import {
   Smartphone,
   Info,
   ChevronDown,
-  Sparkles
+  Sparkles,
+  GraduationCap
 } from 'lucide-react';
 import {
   UserAccount,
@@ -78,6 +79,7 @@ import {
 } from '../services/paymentAutomation';
 import { runPastPaperQaAgent, validateKatexSyntax } from '../services/pastPaperQaAgent';
 import { SimplyLogo } from './SimplyLogo';
+import { TeacherAnalyticsDashboard } from './TeacherAnalyticsDashboard';
 
 interface AdminDashboardProps {
   currentUser: UserAccount;
@@ -251,7 +253,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   // CMS & Admin Sections State
-  const [adminActiveTab, setAdminActiveTab] = useState<'accounts' | 'cms' | 'payments' | 'qa'>('accounts');
+  const [adminActiveTab, setAdminActiveTab] = useState<'accounts' | 'cms' | 'payments' | 'qa' | 'classroom'>('accounts');
   const [cmsSection, setCmsSection] = useState<'flashcards' | 'pastpapers'>('flashcards');
 
   // Flashcards CMS form state
@@ -681,6 +683,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <span>BDC Bank Feed & InstaPay</span>
           <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-300 border border-emerald-500/30">
             {bankMetrics.unclaimed} Unclaimed
+          </span>
+        </button>
+
+        <button
+          onClick={() => setAdminActiveTab('classroom')}
+          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
+            adminActiveTab === 'classroom'
+              ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/30'
+              : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
+          }`}
+        >
+          <GraduationCap className="h-4 w-4" />
+          <span>Teacher Classroom</span>
+          <span className="rounded-full bg-violet-500/20 px-2 py-0.5 text-[10px] text-violet-300 border border-violet-500/30">
+            Cohorts & Heatmaps
           </span>
         </button>
 
@@ -2151,6 +2168,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
             )}
           </div>
+        </div>
+      )}
+
+      {/* Teacher Classroom & Diagnostic Analytics Portal */}
+      {adminActiveTab === 'classroom' && (
+        <div className="space-y-4 animate-fadeIn">
+          <TeacherAnalyticsDashboard
+            currentUser={currentUser}
+            subjects={IGCSE_SUBJECTS}
+          />
         </div>
       )}
 
