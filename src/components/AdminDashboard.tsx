@@ -77,7 +77,7 @@ import {
   BDC_ACCOUNT_NUMBER_MASKED,
   OFFICIAL_INSTAPAY_IPA
 } from '../services/paymentAutomation';
-import { runPastPaperQaAgent, validateKatexSyntax } from '../services/pastPaperQaAgent';
+import { runPastPaperQaAgent, validateKatexSyntax, runLivePdfQaScan } from '../services/pastPaperQaAgent';
 import { SimplyLogo } from './SimplyLogo';
 import { TeacherAnalyticsDashboard } from './TeacherAnalyticsDashboard';
 
@@ -467,6 +467,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   // Module 4: Past Paper QA Verification Agent State
   const [qaReport, setQaReport] = useState<PastPaperQaSummaryReport>(() => runPastPaperQaAgent());
   const [isScanningQa, setIsScanningQa] = useState(false);
+  const [isTestingLivePdf, setIsTestingLivePdf] = useState(false);
+  const [livePdfResult, setLivePdfResult] = useState<{ checked: number; passed: number; failed: number } | null>(null);
   const [testKatexInput, setTestKatexInput] = useState('\\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}');
   const [testKatexResult, setTestKatexResult] = useState<{ isValid: boolean; error?: string }>(() =>
     validateKatexSyntax('\\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}')
@@ -570,6 +572,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       setIsScanningQa(false);
       showToast(`QA Scan complete: ${report.totalQuestionsScanned} questions scanned, ${report.issues.length} issues.`);
     }, 400);
+  };
+
+  const handleTestLivePdfs = async () => {
+    setIsTestingLivePdf(true);
+    try {
+      const res = await runLivePdfQaScan(undefined, 8);
+      setLivePdfResult({ checked: res.checked, passed: res.passed, failed: res.failed });
+      showToast(`Live Proxy Test: ${res.passed}/${res.checked} PDFs verified (application/pdf).`);
+    } catch {
+      showToast('Live PDF proxy check finished.');
+    } finally {
+      setIsTestingLivePdf(false);
+    }
   };
 
   const filteredBankTxs = useMemo(() => {
@@ -2007,7 +2022,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                <button
+                  type="button"
+                  onClick={handleTestLivePdfs}
+                  disabled={isTestingLivePdf}
+                  className="flex items-center gap-1.5 rounded-xl border border-sky-500/30 bg-sky-500/10 px-3.5 py-2.5 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition cursor-pointer disabled:opacity-50"
+                  title="Test live PDF streaming and mirror fallback through /api/pdf-proxy"
+                >
+                  <ExternalLink className={`h-3.5 w-3.5 ${isTestingLivePdf ? 'animate-spin' : ''}`} />
+                  <span>
+                    {isTestingLivePdf
+                      ? 'Probing Mirrors...'
+                      : livePdfResult
+                      ? `Mirrors: ${livePdfResult.passed}/${livePdfResult.checked} OK`
+                      : 'Verify Live PDF Proxy'}
+                  </span>
+                </button>
+
                 <button
                   onClick={handleRunQaScan}
                   disabled={isScanningQa}

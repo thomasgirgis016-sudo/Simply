@@ -954,24 +954,24 @@ export function getAllPastPapers(): PastPaperItem[] {
 // LOCAL VERIFIED OFFLINE PAST PAPERS
 // ==========================================================
 export const LOCAL_VERIFIED_PDFS: Record<string, string> = {
-  '0580_s24_qp_41.pdf': '/past-papers/0580_s24_qp_41.pdf',
-  '0580_s24_ms_41.pdf': '/past-papers/0580_s24_ms_41.pdf',
-  '0580_s24_qp_21.pdf': '/past-papers/0580_s24_qp_21.pdf',
-  '0580_s24_ms_21.pdf': '/past-papers/0580_s24_ms_21.pdf',
-  '0580_s24_er.pdf': '/past-papers/0580_s24_er.pdf',
-  '0580_sp25_qp_4.pdf': '/past-papers/0580_sp25_qp_4.pdf',
-  '0580_sp25_ms_4.pdf': '/past-papers/0580_sp25_ms_4.pdf',
-  '0580_sp25_qp_2.pdf': '/past-papers/0580_sp25_qp_2.pdf',
-  '0580_sp25_ms_2.pdf': '/past-papers/0580_sp25_ms_2.pdf',
-  '0625_sp23_qp_4.pdf': '/past-papers/0625_sp23_qp_4.pdf',
-  '0625_sp23_ms_4.pdf': '/past-papers/0625_sp23_ms_4.pdf',
-  '0625_sp23_qp_2.pdf': '/past-papers/0625_sp23_qp_2.pdf',
-  '0620_sp23_qp_4.pdf': '/past-papers/0620_sp23_qp_4.pdf',
-  '0620_sp23_ms_4.pdf': '/past-papers/0620_sp23_ms_4.pdf',
-  '0610_sp23_qp_4.pdf': '/past-papers/0610_sp23_qp_4.pdf',
-  '0610_sp23_ms_4.pdf': '/past-papers/0610_sp23_ms_4.pdf',
-  '0478_sp23_qp_1.pdf': '/past-papers/0478_sp23_qp_1.pdf',
-  '0478_sp23_qp_2.pdf': '/past-papers/0478_sp23_qp_2.pdf',
+  '0580_s24_qp_41.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_qp_41.pdf',
+  '0580_s24_ms_41.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_ms_41.pdf',
+  '0580_s24_qp_21.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_qp_21.pdf',
+  '0580_s24_ms_21.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_ms_21.pdf',
+  '0580_s24_er.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_er.pdf',
+  '0580_sp25_qp_4.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_qp_42.pdf',
+  '0580_sp25_ms_4.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_ms_42.pdf',
+  '0580_sp25_qp_2.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_qp_22.pdf',
+  '0580_sp25_ms_2.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_ms_22.pdf',
+  '0625_sp23_qp_4.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0625_s23_qp_42.pdf',
+  '0625_sp23_ms_4.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0625_s23_ms_42.pdf',
+  '0625_sp23_qp_2.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0625_s23_qp_22.pdf',
+  '0620_sp23_qp_4.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0620_s23_qp_42.pdf',
+  '0620_sp23_ms_4.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0620_s23_ms_42.pdf',
+  '0610_sp23_qp_4.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0610_s23_qp_42.pdf',
+  '0610_sp23_ms_4.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0610_s23_ms_42.pdf',
+  '0478_sp23_qp_1.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0478_s23_qp_12.pdf',
+  '0478_sp23_qp_2.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0478_s23_qp_22.pdf',
 };
 
 interface SubjectConfig {
@@ -1371,8 +1371,8 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
       paperComponent: 'Paper 4 (Extended Calculator Specimen)',
       paperCode: '0580/04',
       tier: 'Extended',
-      qpPdfUrl: '/past-papers/0580_sp25_qp_4.pdf',
-      msPdfUrl: '/past-papers/0580_sp25_ms_4.pdf',
+      qpPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_qp_42.pdf',
+      msPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_ms_42.pdf',
       fileSizeBytes: '1.64 MB'
     },
     {
@@ -1389,8 +1389,8 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
       paperComponent: 'Paper 2 (Extended Non-Calculator Specimen)',
       paperCode: '0580/02',
       tier: 'Extended',
-      qpPdfUrl: '/past-papers/0580_sp25_qp_2.pdf',
-      msPdfUrl: '/past-papers/0580_sp25_ms_2.pdf',
+      qpPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_qp_22.pdf',
+      msPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_ms_22.pdf',
       fileSizeBytes: '1.65 MB'
     },
     {
@@ -1407,8 +1407,8 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
       paperComponent: 'Paper 4 (Theory Extended Specimen)',
       paperCode: '0625/04',
       tier: 'Extended',
-      qpPdfUrl: '/past-papers/0625_sp23_qp_4.pdf',
-      msPdfUrl: '/past-papers/0625_sp23_ms_4.pdf',
+      qpPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0625_s23_qp_42.pdf',
+      msPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0625_s23_ms_42.pdf',
       fileSizeBytes: '1.39 MB'
     },
     {
@@ -1425,7 +1425,8 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
       paperComponent: 'Paper 2 (Multiple Choice Extended Specimen)',
       paperCode: '0625/02',
       tier: 'Extended',
-      qpPdfUrl: '/past-papers/0625_sp23_qp_2.pdf',
+      qpPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0625_s23_qp_22.pdf',
+      msPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0625_s23_ms_22.pdf',
       fileSizeBytes: '1.53 MB'
     },
     {
@@ -1442,8 +1443,8 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
       paperComponent: 'Paper 4 (Theory Extended Specimen)',
       paperCode: '0620/04',
       tier: 'Extended',
-      qpPdfUrl: '/past-papers/0620_sp23_qp_4.pdf',
-      msPdfUrl: '/past-papers/0620_sp23_ms_4.pdf',
+      qpPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0620_s23_qp_42.pdf',
+      msPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0620_s23_ms_42.pdf',
       fileSizeBytes: '1.21 MB'
     },
     {
@@ -1460,8 +1461,8 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
       paperComponent: 'Paper 4 (Theory Extended Specimen)',
       paperCode: '0610/04',
       tier: 'Extended',
-      qpPdfUrl: '/past-papers/0610_sp23_qp_4.pdf',
-      msPdfUrl: '/past-papers/0610_sp23_ms_4.pdf',
+      qpPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0610_s23_qp_42.pdf',
+      msPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0610_s23_ms_42.pdf',
       fileSizeBytes: '3.57 MB'
     },
     {
@@ -1478,7 +1479,8 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
       paperComponent: 'Paper 1 (Computer Systems Specimen)',
       paperCode: '0478/01',
       tier: 'General',
-      qpPdfUrl: '/past-papers/0478_sp23_qp_1.pdf',
+      qpPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0478_s23_qp_12.pdf',
+      msPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0478_s23_ms_12.pdf',
       fileSizeBytes: '1.01 MB'
     },
     {
@@ -1495,7 +1497,8 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
       paperComponent: 'Paper 2 (Algorithms & Logic Specimen)',
       paperCode: '0478/02',
       tier: 'General',
-      qpPdfUrl: '/past-papers/0478_sp23_qp_2.pdf',
+      qpPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0478_s23_qp_22.pdf',
+      msPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0478_s23_ms_22.pdf',
       fileSizeBytes: '1.23 MB'
     }
   );

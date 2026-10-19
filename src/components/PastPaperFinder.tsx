@@ -73,8 +73,8 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
     type: 'qp' | 'ms' | 'er' | 'gt';
   } | null>(null);
 
-  // Viewer Engine in Modal: 'gdocs' (Universal Embed) vs 'direct'
-  const [viewerEngine, setViewerEngine] = useState<'gdocs' | 'direct'>('gdocs');
+  // Viewer Engine in Modal: 'proxy' (Verified Proxy Stream) vs 'gdocs' vs 'direct'
+  const [viewerEngine, setViewerEngine] = useState<'proxy' | 'gdocs' | 'direct'>('proxy');
   // Mirror toggle: primary CDN vs backup CDN
   const [useBackupMirror, setUseBackupMirror] = useState<boolean>(false);
 
@@ -2063,6 +2063,16 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                 <div className="hidden sm:flex items-center rounded-lg border border-slate-700 bg-slate-800 p-0.5 text-[11px]">
                   <button
                     type="button"
+                    onClick={() => setViewerEngine('proxy')}
+                    className={`rounded px-2 py-1 font-semibold transition cursor-pointer ${
+                      viewerEngine === 'proxy' ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-white'
+                    }`}
+                    title="Verified Serverless PDF Stream (Auto-Mirrored & Clean)"
+                  >
+                    Verified Stream
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => setViewerEngine('gdocs')}
                     className={`rounded px-2 py-1 font-semibold transition cursor-pointer ${
                       viewerEngine === 'gdocs' ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-white'
@@ -2079,7 +2089,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                     }`}
                     title="Direct PDF Embed"
                   >
-                    Direct Frame
+                    Direct
                   </button>
                 </div>
 
@@ -2146,11 +2156,13 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               </a>
             </div>
 
-            {/* Modal Body: PDF Iframe / Google Docs Viewer */}
+            {/* Modal Body: PDF Iframe / Google Docs Viewer / Proxy Stream */}
             <div className="relative flex-1 w-full bg-slate-950 overflow-hidden">
               <iframe
                 src={
-                  viewerEngine === 'gdocs' && !currentModalUrl.startsWith('/past-papers/')
+                  viewerEngine === 'proxy'
+                    ? `/api/pdf-proxy?url=${encodeURIComponent(currentModalUrl)}${previewModal.backupUrl ? `&fallback=${encodeURIComponent(previewModal.backupUrl)}` : ''}`
+                    : viewerEngine === 'gdocs'
                     ? `https://docs.google.com/viewer?url=${encodeURIComponent(currentModalUrl)}&embedded=true`
                     : currentModalUrl
                 }

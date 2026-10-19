@@ -163,13 +163,40 @@ export function runPastPaperQaAgent(
 
   // 2. Iterate through official PDFs
   for (const pdf of pdfs) {
+    // Validate Question Paper URL
     if (!pdf.qpPdfUrl || !pdf.qpPdfUrl.startsWith('http')) {
       issues.push({
         paperId: pdf.id,
         paperCode: pdf.paperCode,
-        questionNumber: 'Full Paper PDF',
+        questionNumber: 'Question Paper PDF',
         issueType: 'broken_link',
-        details: `Invalid or missing Question Paper PDF link: ${pdf.qpPdfUrl}`
+        details: pdf.qpPdfUrl?.startsWith('/')
+          ? `Local relative path detected (${pdf.qpPdfUrl}). Must use verified remote https:// URL.`
+          : `Invalid or missing Question Paper PDF link: ${pdf.qpPdfUrl}`
+      });
+    }
+
+    // Validate Mark Scheme URL if present
+    if (pdf.msPdfUrl && !pdf.msPdfUrl.startsWith('http')) {
+      issues.push({
+        paperId: pdf.id,
+        paperCode: pdf.paperCode,
+        questionNumber: 'Mark Scheme PDF',
+        issueType: 'broken_link',
+        details: pdf.msPdfUrl.startsWith('/')
+          ? `Local relative path detected in MS (${pdf.msPdfUrl}). Must use verified remote https:// URL.`
+          : `Invalid Mark Scheme PDF link: ${pdf.msPdfUrl}`
+      });
+    }
+
+    // Validate Examiner Report URL if present
+    if (pdf.examinerReportUrl && !pdf.examinerReportUrl.startsWith('http')) {
+      issues.push({
+        paperId: pdf.id,
+        paperCode: pdf.paperCode,
+        questionNumber: 'Examiner Report PDF',
+        issueType: 'broken_link',
+        details: `Invalid Examiner Report PDF link: ${pdf.examinerReportUrl}`
       });
     }
   }
@@ -192,3 +219,61 @@ export function runPastPaperQaAgent(
     healthScorePercent: Math.max(0, healthScore)
   };
 }
+
+/**
+ * Validates a live PDF link via the server-side /api/pdf-proxy endpoint.
+ * Returns whether the target or its mirrors resolved to a valid application/pdf.
+ */
+export async function verifyPdfLiveViaProxy(
+  url: string,
+  fallback?: string
+): Promise<{ ok: boolean; status: number; contentType?: string; error?: string }> {
+  try {
+    const params = new URLSearchParams({ url, checkOnly: 'true' });
+    if (fallback) params.set('fallback', fallback);
+    const res = await fetch(`/api/pdf-proxy?${params.toString()}`);
+    if (res.ok) {
+      const data = await res.json().catch(() => ({}));
+      return { ok: true, status: res.status, contentType: data.contentType || 'application/pdf' };
+    }
+    const errData = await res.json().catch(() => ({}));
+    return {
+      ok: false,
+      status: res.status,
+      error: errData.error || `Proxy responded with status ${res.status}`
+    };
+  } catch (err: any) {
+    return { ok: false, status: 0, error: err?.message || 'Network request failed' };
+  }
+}
+
+/**
+ * Scans a sample of official PDFs through the live proxy to verify content types.
+ */
+export async function runLivePdfQaScan(
+  pdfs: OfficialPaperPdf[] = OFFICIAL_PAST_PAPER_PDFS,
+  sampleLimit: number = 10
+): Promise<{ checked: number; passed: number; failed: number; failures: { id: string; url: string; error: string }[] }> {
+  const sample = pdfs.slice(0, sampleLimit);
+  let passed = 0;
+  let failed = 0;
+  const failures: { id: string; url: string; error: string }[] = [];
+
+  for (const pdf of sample) {
+    if (!pdf.qpPdfUrl) continue;
+    const res = await verifyPdfLiveViaProxy(pdf.qpPdfUrl, pdf.backupQpUrl);
+    if (res.ok) {
+      passed++;
+    } else {
+      failed++;
+      failures.push({
+        id: pdf.id,
+        url: pdf.qpPdfUrl,
+        error: res.error || 'Failed proxy validation'
+      });
+    }
+  }
+
+  return { checked: sample.length, passed, failed, failures };
+}
+

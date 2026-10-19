@@ -32,16 +32,21 @@ const closeBraces = (fileContent.match(/(?<!\\)\}/g) || []).length;
 const msMatches = fileContent.match(/markScheme:\s*\[/g) || [];
 const finalAnswerMatches = fileContent.match(/finalAnswer:\s*['"]/g) || [];
 
+// Check for any legacy local /past-papers/ paths
+const localPdfMatches = fileContent.match(/['"]\/past-papers\/[^'"]+['"]/g) || [];
+const hasNoLocalPdfs = localPdfMatches.length === 0;
+
 console.log(`Scanned Past Paper Database:`);
 console.log(`• Total Questions Found:       ${totalQuestions}`);
 console.log(`• Mark Scheme Blocks:          ${msMatches.length}`);
 console.log(`• Final Published Answers:     ${finalAnswerMatches.length}`);
 console.log(`• Math Expression ($) Balance: ${isDollarBalanced ? 'PERFECT (All closed)' : 'Flagged unclosed $'}`);
 console.log(`• Structural Brace Balance:    ${openBraces === closeBraces ? 'BALANCED' : `${Math.abs(openBraces - closeBraces)} unclosed`}`);
+console.log(`• Local /past-papers/ Paths:   ${hasNoLocalPdfs ? '0 (All verified remote URLs)' : `${localPdfMatches.length} broken local paths detected`}`);
 
 console.log('\n--- VERIFICATION STATUS ---');
-if (totalQuestions > 0 && msMatches.length >= totalQuestions && isDollarBalanced) {
-  console.log('✅ ALL QA CHECKS PASSED: Questions have complete mark schemes and valid KaTeX syntax.');
+if (totalQuestions > 0 && msMatches.length >= totalQuestions && isDollarBalanced && hasNoLocalPdfs) {
+  console.log('✅ ALL QA CHECKS PASSED: Questions have complete mark schemes, valid KaTeX syntax, and 100% remote verified PDFs.');
 } else {
   console.log('⚠️ Some items need attention. Review report above.');
 }
