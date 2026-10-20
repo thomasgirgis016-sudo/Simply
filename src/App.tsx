@@ -31,6 +31,10 @@ import { HomeView } from './components/HomeView';
 import { AdminDashboard } from './components/AdminDashboard';
 import { AccountGate } from './components/AccountGate';
 import { TeacherAnalyticsDashboard } from './components/TeacherAnalyticsDashboard';
+import { MockExamSimulator } from './components/MockExamSimulator';
+import { WorksheetBuilder } from './components/WorksheetBuilder';
+import { WeakSpotRadar } from './components/WeakSpotRadar';
+import { PredictedPaperView } from './components/PredictedPaperView';
 import { PaymentModal } from './components/PaymentModal';
 import { SettingsModal } from './components/SettingsModal';
 import { ProfileModal } from './components/ProfileModal';
@@ -495,6 +499,10 @@ export function App() {
     switch (tab) {
       case 'solver': return 'the AI Question Solver & Grading Engine';
       case 'finder': return 'the Past Papers & Mark Schemes Hub';
+      case 'mock': return 'the Timed Mock Exam Simulator & Grade Boundaries';
+      case 'worksheet': return 'the Worksheet & Test Builder';
+      case 'radar': return 'the Weak-Spot Radar & Grade 9 Diagnostic';
+      case 'predicted': return 'the 2025/2026 Predicted Papers Engine';
       case 'revision': return 'the Revision Notes & Examiner Summaries';
       case 'quiz': return 'Past Paper Mock Quizzes & Tests';
       case 'flashcards': return 'Flashcards & Spaced Repetition';
@@ -622,6 +630,40 @@ export function App() {
                 onOpenChatWithQuestion={handleOpenChatWithQuestion}
                 onOpenSolverWithQuestion={() => setActiveTab('solver')}
                 onOpenSplitViewer={() => setActiveTab('split')}
+              />
+            )}
+
+            {activeTab === 'mock' && (
+              <MockExamSimulator
+                subject={activeSubject}
+                profile={profile}
+                onOpenCalculator={() => setIsCalculatorOpen(true)}
+              />
+            )}
+
+            {activeTab === 'worksheet' && (
+              <WorksheetBuilder
+                subject={activeSubject}
+                profile={profile}
+              />
+            )}
+
+            {activeTab === 'radar' && (
+              <WeakSpotRadar
+                subject={activeSubject}
+                profile={profile}
+                onLaunchTopicPractice={(topic) => {
+                  setChatInitialQuestion(`Please test me with 3 high-yield Cambridge examination questions on: "${topic}" with full mark scheme steps.`);
+                  setActiveTab('chat');
+                }}
+              />
+            )}
+
+            {activeTab === 'predicted' && (
+              <PredictedPaperView
+                subject={activeSubject}
+                profile={profile}
+                onSitPredictedMock={() => setActiveTab('mock')}
               />
             )}
 

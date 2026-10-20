@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Sparkles,
   Camera,
@@ -27,14 +27,23 @@ import {
   ShieldCheck,
   Sun,
   Moon,
-  Users
+  Users,
+  Clock,
+  Printer,
+  Activity,
+  Flame
 } from 'lucide-react';
 import { UserProfile, Subject, UserAccount } from '../types';
 import { SimplyLogo } from './SimplyLogo';
+import { getDailyStreak, DailyStreakState } from '../services/dailyStreak';
 
 export type ActiveTab =
   | 'home'
   | 'finder'
+  | 'mock'
+  | 'worksheet'
+  | 'radar'
+  | 'predicted'
   | 'revision'
   | 'quiz'
   | 'solver'
@@ -86,6 +95,14 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenSecretAdmin,
 }) => {
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
+  const [streakState, setStreakState] = useState<DailyStreakState>(() => getDailyStreak());
+
+  useEffect(() => {
+    const handleStreak = () => setStreakState(getDailyStreak());
+    window.addEventListener('simply_streak_updated', handleStreak);
+    return () => window.removeEventListener('simply_streak_updated', handleStreak);
+  }, []);
+
   const tapTimesRef = React.useRef<number[]>([]);
   const longPressTimerRef = React.useRef<any>(null);
 
@@ -124,6 +141,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   const baseTabs = [
     { id: 'home', label: 'Home', icon: Home, color: 'text-indigo-400' },
     { id: 'finder', label: 'Past Papers', icon: Search, color: 'text-amber-400' },
+    { id: 'mock', label: 'Timed Mock Simulator', icon: Clock, color: 'text-amber-400' },
+    { id: 'worksheet', label: 'Worksheet Builder', icon: Printer, color: 'text-indigo-400' },
+    { id: 'radar', label: 'Grade 9 Radar', icon: Activity, color: 'text-emerald-400' },
+    { id: 'predicted', label: '2025 Predictions', icon: Sparkles, color: 'text-purple-400' },
     { id: 'revision', label: 'Revision Notes', icon: BookOpen, color: 'text-cyan-400' },
     { id: 'quiz', label: 'Past Paper Quizzes', icon: GraduationCap, color: 'text-emerald-400' },
     { id: 'solver', label: 'AI Solver & Grading', icon: Camera, color: 'text-pink-400' },
@@ -209,6 +230,15 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Right side actions: Desktop Auth & Settings */}
           <div className="hidden sm:flex items-center gap-2">
+            {/* Daily Streak Counter Pill */}
+            <div
+              className="flex items-center gap-1.5 rounded-xl border border-amber-500/40 bg-gradient-to-r from-amber-500/15 via-orange-500/15 to-amber-500/10 px-2.5 py-1.5 text-xs font-black text-amber-300 shadow-sm cursor-default"
+              title={`${streakState.currentStreak} Day Study Streak! Solved ${streakState.totalQuestionsSolved} questions total (${streakState.xpPoints} XP).`}
+            >
+              <Flame className="h-3.5 w-3.5 text-amber-400 fill-amber-400 animate-pulse" />
+              <span>{streakState.currentStreak}d Streak</span>
+            </div>
+
             {/* Pro Upgrade / Badge Action */}
             {onOpenPayment && (
               <button

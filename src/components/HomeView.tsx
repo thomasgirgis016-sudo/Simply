@@ -26,13 +26,19 @@ import {
   KeyRound,
   RotateCcw,
   Check,
-  AlertTriangle
+  AlertTriangle,
+  Printer,
+  Activity,
+  Flame,
+  Play
 } from 'lucide-react';
 import { Subject, UserProfile, BookmarkItem, UserAccount } from '../types';
 import { PAST_PAPERS_DATABASE } from '../data/pastPapersData';
 import { INITIAL_REVISION_NOTES, INITIAL_FORMULAS } from '../data/initialData';
 import { ActiveTab } from './Navbar';
 import { SimplyLogo } from './SimplyLogo';
+import { getDailyStreak, getDailyChallengeQuestion, completeDailyChallenge, DailyStreakState } from '../services/dailyStreak';
+import { MathRenderer } from './MathRenderer';
 
 interface HomeViewProps {
   subjects: Subject[];
@@ -64,6 +70,46 @@ export const HomeView: React.FC<HomeViewProps> = ({
       return [];
     }
   });
+
+  // Daily Cambridge Challenge & Study Streak State
+  const [streakState, setStreakState] = useState<DailyStreakState>(() => getDailyStreak());
+  const [dailyQuestion, setDailyQuestion] = useState(() => getDailyChallengeQuestion(activeSubject));
+  const [dailyAnswerInput, setDailyAnswerInput] = useState('');
+  const [dailyResult, setDailyResult] = useState<{ isCorrect: boolean; message: string } | null>(null);
+
+  React.useEffect(() => {
+    setDailyQuestion(getDailyChallengeQuestion(activeSubject));
+    setDailyAnswerInput('');
+    setDailyResult(null);
+  }, [activeSubject]);
+
+  const handleCheckDailyAnswer = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!dailyAnswerInput.trim()) return;
+    const cleanStudent = dailyAnswerInput.trim().toLowerCase();
+    const cleanFinal = dailyQuestion.finalAnswer.trim().toLowerCase();
+
+    const isCorrect = cleanFinal.includes(cleanStudent) || cleanStudent.includes(cleanFinal) || cleanStudent.split(' ')[0] === cleanFinal.split(' ')[0];
+
+    if (isCorrect) {
+      const res = completeDailyChallenge({
+        questionId: dailyQuestion.id,
+        paperCode: dailyQuestion.paperCode,
+        marksEarned: dailyQuestion.marks || 4,
+        subjectId: activeSubject.id
+      });
+      setStreakState(getDailyStreak());
+      setDailyResult({
+        isCorrect: true,
+        message: `Outstanding! Correct answer. You earned +${res.earnedXp} XP and extended your streak to 🔥 ${res.newStreak} days!`
+      });
+    } else {
+      setDailyResult({
+        isCorrect: false,
+        message: `Not quite. Mark scheme answer: "${dailyQuestion.finalAnswer}". Method tip: ${dailyQuestion.markScheme?.[0]?.requirement || 'Review working steps'}.`
+      });
+    }
+  };
 
 
   // Unique categories for filtering
@@ -415,6 +461,185 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </button>
         </div>
       ) : null}
+
+      {/* Daily Cambridge Challenge & Streak Hero Card */}
+      <section className="rounded-3xl border-2 border-amber-500/40 bg-gradient-to-br from-amber-950/30 via-slate-900 to-slate-950 p-6 sm:p-7 shadow-2xl relative overflow-hidden">
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+          <div className="space-y-3 flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/20 px-3 py-1 text-xs font-black text-amber-300 border border-amber-500/40">
+                <Flame className="h-4 w-4 text-amber-400 fill-amber-400 animate-pulse" />
+                <span>Daily Cambridge Challenge • {activeSubject.code}</span>
+              </span>
+
+              <span className="rounded-md bg-slate-950/80 px-2.5 py-0.5 text-xs font-mono font-bold text-amber-300 border border-slate-800">
+                🔥 {streakState.currentStreak} Day Streak ({streakState.xpPoints} XP)
+              </span>
+            </div>
+
+            <div>
+              <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                Question of the Day: {dailyQuestion.topic} ({dailyQuestion.paperCode} • {dailyQuestion.questionNumber})
+              </div>
+              <div className="text-sm sm:text-base text-slate-100 font-sans mt-1">
+                <MathRenderer content={dailyQuestion.questionPrompt} />
+              </div>
+            </div>
+
+            {/* Answer Input Field */}
+            <form onSubmit={handleCheckDailyAnswer} className="flex flex-col sm:flex-row gap-2 max-w-xl pt-1">
+              <input
+                type="text"
+                value={dailyAnswerInput}
+                onChange={(e) => setDailyAnswerInput(e.target.value)}
+                placeholder="Enter your final answer (e.g. 14.5 or x = 3)..."
+                className="flex-1 rounded-xl border border-slate-700 bg-slate-950 px-3.5 py-2.5 text-xs sm:text-sm font-mono text-white placeholder-slate-500 focus:border-amber-400 focus:outline-none"
+              />
+              <button
+                type="submit"
+                className="rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-2.5 text-xs font-black text-slate-950 shadow-md hover:brightness-110 transition cursor-pointer"
+              >
+                Check Answer
+              </button>
+            </form>
+
+            {dailyResult && (
+              <div className={`rounded-xl p-3 text-xs font-semibold border animate-fadeIn ${
+                dailyResult.isCorrect
+                  ? 'border-emerald-500/40 bg-emerald-950/40 text-emerald-200'
+                  : 'border-amber-500/40 bg-amber-950/40 text-amber-200'
+              }`}>
+                {dailyResult.message}
+              </div>
+            )}
+          </div>
+
+          <div className="rounded-2xl border border-slate-800 bg-slate-950/80 p-4 shrink-0 text-center space-y-1 min-w-[140px] hidden sm:block">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Solved</span>
+            <div className="text-2xl font-black font-mono text-white">{streakState.totalQuestionsSolved}</div>
+            <span className="text-[10px] text-amber-400 font-bold block">🔥 Keep Streak Alive!</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Advanced Exam Intelligence Modules Grid */}
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+              Advanced Exam Intelligence
+            </h2>
+            <p className="text-xs text-slate-400">
+              Exam simulators, automated test builders, and diagnostic syllabus masteries
+            </p>
+          </div>
+          <span className="hidden sm:inline-flex items-center gap-1 text-xs text-amber-400 font-semibold">
+            <Sparkles className="h-3.5 w-3.5" /> High-yield tools
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Module 1: Timed Mock Simulator */}
+          <div
+            onClick={() => onNavigateTab('mock')}
+            className="group relative flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-lg hover:border-amber-500/50 hover:bg-slate-900 transition cursor-pointer"
+          >
+            <div>
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/25 mb-4 group-hover:scale-105 transition">
+                <Clock className="h-5 w-5" />
+              </div>
+              <span className="rounded-md bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold text-amber-300 font-mono">
+                Official Exam Conditions
+              </span>
+              <h3 className="text-base font-bold text-white mt-2 group-hover:text-amber-300 transition">
+                Timed Mock Simulator
+              </h3>
+              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                Sit full-length timed Cambridge past papers with live countdowns, official instructions, and real Grade 9 boundary grading.
+              </p>
+            </div>
+            <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-amber-400 group-hover:translate-x-1 transition">
+              <span>Start Mock Exam</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </div>
+          </div>
+
+          {/* Module 2: Worksheet Builder */}
+          <div
+            onClick={() => onNavigateTab('worksheet')}
+            className="group relative flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-lg hover:border-indigo-500/50 hover:bg-slate-900 transition cursor-pointer"
+          >
+            <div>
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-500/15 text-indigo-400 border border-indigo-500/25 mb-4 group-hover:scale-105 transition">
+                <Printer className="h-5 w-5" />
+              </div>
+              <span className="rounded-md bg-indigo-500/15 px-2 py-0.5 text-[10px] font-bold text-indigo-300 font-mono">
+                Printable Homework Tests
+              </span>
+              <h3 className="text-base font-bold text-white mt-2 group-hover:text-indigo-300 transition">
+                Worksheet Builder
+              </h3>
+              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                Generate 1-click printable student test papers and teacher mark schemes for unit homework, revision packs, and quizzes.
+              </p>
+            </div>
+            <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-indigo-400 group-hover:translate-x-1 transition">
+              <span>Create Worksheet</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </div>
+          </div>
+
+          {/* Module 3: Weak-Spot Radar */}
+          <div
+            onClick={() => onNavigateTab('radar')}
+            className="group relative flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-lg hover:border-emerald-500/50 hover:bg-slate-900 transition cursor-pointer"
+          >
+            <div>
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/25 mb-4 group-hover:scale-105 transition">
+                <Activity className="h-5 w-5" />
+              </div>
+              <span className="rounded-md bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-300 font-mono">
+                Syllabus Diagnostic
+              </span>
+              <h3 className="text-base font-bold text-white mt-2 group-hover:text-emerald-300 transition">
+                Grade 9 Weak-Spot Radar
+              </h3>
+              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                Track topic masteries across every chapter and pinpoint the top 3 bottlenecks holding your grade back from an A*.
+              </p>
+            </div>
+            <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-emerald-400 group-hover:translate-x-1 transition">
+              <span>View Diagnostics</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </div>
+          </div>
+
+          {/* Module 4: 2025 Predicted Papers */}
+          <div
+            onClick={() => onNavigateTab('predicted')}
+            className="group relative flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-lg hover:border-purple-500/50 hover:bg-slate-900 transition cursor-pointer"
+          >
+            <div>
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-500/15 text-purple-400 border border-purple-500/25 mb-4 group-hover:scale-105 transition">
+                <Sparkles className="h-5 w-5" />
+              </div>
+              <span className="rounded-md bg-purple-500/15 px-2 py-0.5 text-[10px] font-bold text-purple-300 font-mono">
+                Cycle Intelligence
+              </span>
+              <h3 className="text-base font-bold text-white mt-2 group-hover:text-purple-300 transition">
+                2025 Predicted Papers
+              </h3>
+              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                Exam predictions based on Cambridge rotation cycles and historical question appearances for May/June and Oct/Nov.
+              </p>
+            </div>
+            <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-purple-400 group-hover:translate-x-1 transition">
+              <span>View Predictions</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* 2. Main 4 Core Action Pillars (Instant Access) */}
       <section className="space-y-4">
