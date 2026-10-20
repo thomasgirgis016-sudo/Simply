@@ -317,6 +317,7 @@ export interface PastPaperItem {
   examinerReportSnippet?: string;
   pdfUrl?: string;
   markSchemePdfUrl?: string;
+  isExactCodeMatch?: boolean;
 }
 
 export interface OfficialPaperPdf {

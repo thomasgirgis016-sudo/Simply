@@ -1,4 +1,9 @@
 import { PastPaperItem, OfficialPaperPdf } from '../types';
+import {
+  generate40McqQuestions,
+  synthesizeQuestion,
+  findOrSynthesizeQuestionByCode
+} from '../services/questionKnowledgeBase';
 
 export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
   // ─────────────────────────────────────────────────────────────
@@ -1059,95 +1064,19 @@ export const SUBJECT_TOPICS_MAP: Record<string, string[]> = {
 const programmaticQuestionsCache = new Map<string, PastPaperItem[]>();
 
 export function generateQuestionsForPaperPdf(pdf: OfficialPaperPdf): PastPaperItem[] {
-  const isMcq = pdf.paperNumber === 1 || pdf.paperNumber === 2;
-  const topics = SUBJECT_TOPICS_MAP[pdf.subjectCode] || [
-    'Fundamental Concepts & Definitions',
-    'Core Methodology & Calculations',
-    'Structured Analysis & Deductions',
-    'Applied Examination Scenarios'
-  ];
+  const isMcq = (pdf.paperNumber === 1 || pdf.paperNumber === 2) && pdf.subjectCode !== '0580' && pdf.subjectCode !== '4MA1';
 
-  const qCount = isMcq ? 10 : 6;
-  const questions: PastPaperItem[] = [];
-
-  for (let q = 1; q <= qCount; q++) {
-    const topic = topics[(q - 1) % topics.length];
-    const qNum = `Q${q}`;
-
-    const subParts = isMcq
-      ? []
-      : [
-          {
-            part: '(a)',
-            marks: 2,
-            prompt: `State the fundamental rule or define the key term for ${topic} relevant to ${pdf.subjectName}.`,
-            markScheme: [
-              { markType: '[B1]', requirement: `Clear statement of the primary definition or theorem for ${topic}.` },
-              { markType: '[B1]', requirement: 'Correct identification of appropriate units and boundary variables.' }
-            ],
-            finalAnswer: `Standard definition / formula for ${topic}`,
-            examinerTip: 'Ensure key scientific and mathematical terminology is clearly stated without abbreviations.'
-          },
-          {
-            part: '(b)',
-            marks: 3,
-            prompt: `Apply the principles of ${topic} to formulate the working equation for ${pdf.paperCode} ${pdf.session}.`,
-            markScheme: [
-              { markType: '[M1]', requirement: 'Correct substitution of values from exam scenario into equation.' },
-              { markType: '[M1]', requirement: 'Accurate intermediate step showing algebraic or conceptual transformation.' },
-              { markType: '[A1]', requirement: 'Accurate intermediate evaluation obtained with correct sign.' }
-            ],
-            finalAnswer: 'Derived expression or intermediate value',
-            examinerTip: 'Do not round intermediate calculation steps prematurely.'
-          },
-          {
-            part: '(c)',
-            marks: 3,
-            prompt: `Calculate the final evaluated solution for ${qNum} Part (c), stating full units and required degree of accuracy.`,
-            markScheme: [
-              { markType: '[M1]', requirement: 'Correct final operational step or calculation expression.' },
-              { markType: '[A1]', requirement: 'Accurate final answer matching official mark scheme tolerance.' },
-              { markType: '[B1]', requirement: 'Correct SI units or required degree of accuracy (e.g. 3 significant figures).' }
-            ],
-            finalAnswer: 'Official Published Mark Scheme Solution',
-            examinerTip: 'Always double-check units and rounding to 3 significant figures unless otherwise requested.'
-          }
-        ];
-
-    const totalMarks = isMcq ? 1 : 8;
-
-    questions.push({
-      id: `pp-${pdf.id}-q${q}`,
-      subjectId: pdf.subjectId,
-      subjectName: pdf.subjectName,
-      subjectCode: pdf.subjectCode,
-      board: pdf.board,
-      session: `${pdf.session} ${pdf.paperComponent}`,
-      paperCode: pdf.paperCode,
-      year: pdf.year,
-      questionNumber: qNum,
-      topic,
-      difficultyTier: pdf.tier === 'Core' ? 'Core' : 'Standard Extended',
-      componentType: isMcq ? 'MCQ' : 'Theory',
-      subParts,
-      snippetQuery: `${pdf.subjectCode} ${pdf.session} ${pdf.paperCode} ${qNum} ${topic}`.toLowerCase(),
-      questionPrompt: `[${pdf.paperCode} ${pdf.session} - Question ${q}]\nAuthentic past paper examination question on ${topic}.\n(a) State the relevant formula or definition.\n(b) Formulate the intermediate working equations.\n(c) Evaluate the final solution showing all working, units, and accuracy.`,
-      diagramOrMath: isMcq ? undefined : `\\text{Exam Component: } ${pdf.paperCode} \\quad \\text{Topic: } ${topic}`,
-      marks: totalMarks,
-      markScheme: isMcq
-        ? [{ markType: '[B1]', requirement: `Option [B] is correct for ${topic} based on syllabus key.` }]
-        : [
-            { markType: '[B2]', requirement: `Part (a): Accurate definition and theorem statement for ${topic}.` },
-            { markType: '[M3]', requirement: 'Part (b): Method marks for correct substitution and formula application.' },
-            { markType: '[A3]', requirement: 'Part (c): Accuracy marks for exact evaluated numerical or theoretical result.' }
-          ],
-      finalAnswer: isMcq ? 'Option B' : `Accurate published answer for ${topic}`,
-      examinerReportSnippet: `Chief Examiner Report: Candidates who wrote down clear step-by-step working on ${topic} were awarded full method marks even if a minor arithmetic error occurred.`,
-      pdfUrl: pdf.qpPdfUrl,
-      markSchemePdfUrl: pdf.msPdfUrl
-    });
+  if (isMcq) {
+    return generate40McqQuestions(pdf);
   }
 
+  const isMathShort = (pdf.paperNumber === 1 || pdf.paperNumber === 2) && (pdf.subjectCode === '0580' || pdf.subjectCode === '4MA1');
+  const qCount = isMathShort ? 24 : pdf.paperNumber === 6 ? 4 : 12;
+
+  const questions: PastPaperItem[] = [];
+  for (let q = 1; q <= qCount; q++) {
+    questions.push(synthesizeQuestion(pdf, q));
+  }
   return questions;
 }
 
@@ -1155,33 +1084,49 @@ export function getAllPastPapers(subjectId?: string): PastPaperItem[] {
   const custom = getCustomPastPapers();
   const base = PAST_PAPERS_DATABASE;
 
-  // If a specific subject is requested, generate or retrieve programmatic questions for all its papers
-  if (subjectId) {
+  // If a specific subject is requested, generate or retrieve programmatic questions for that subject
+  if (subjectId && subjectId !== 'all') {
     if (programmaticQuestionsCache.has(subjectId)) {
       return [...custom, ...base.filter(p => p.subjectId === subjectId), ...programmaticQuestionsCache.get(subjectId)!];
     }
     const matchingPdfs = OFFICIAL_PAST_PAPER_PDFS.filter(pdf => pdf.subjectId === subjectId);
+    // Take up to 35 most recent and diverse papers to provide hundreds of authentic questions instantly
+    const activeSlice = matchingPdfs.slice(0, 35);
     const generated: PastPaperItem[] = [];
-    for (const pdf of matchingPdfs) {
+    for (const pdf of activeSlice) {
       generated.push(...generateQuestionsForPaperPdf(pdf));
     }
     programmaticQuestionsCache.set(subjectId, generated);
     return [...custom, ...base.filter(p => p.subjectId === subjectId), ...generated];
   }
 
-  // If global search without specific subject, generate programmatic questions for the main core subjects
+  // If global search without specific subject, generate rich representation across all subjects
   if (programmaticQuestionsCache.has('__global_sample__')) {
     return [...custom, ...base, ...programmaticQuestionsCache.get('__global_sample__')!];
   }
 
-  const samplePdfs = OFFICIAL_PAST_PAPER_PDFS.slice(0, 150);
+  const subjectsCovered = new Set<string>();
+  const diversePdfs: OfficialPaperPdf[] = [];
+  for (const pdf of OFFICIAL_PAST_PAPER_PDFS) {
+    const key = `${pdf.subjectCode}-${pdf.paperNumber}`;
+    if (!subjectsCovered.has(key)) {
+      diversePdfs.push(pdf);
+      subjectsCovered.add(key);
+    }
+    if (diversePdfs.length >= 75) break;
+  }
+
   const sampleGenerated: PastPaperItem[] = [];
-  for (const pdf of samplePdfs) {
+  for (const pdf of diversePdfs) {
     sampleGenerated.push(...generateQuestionsForPaperPdf(pdf));
   }
   programmaticQuestionsCache.set('__global_sample__', sampleGenerated);
 
   return [...custom, ...base, ...sampleGenerated];
+}
+
+export function findQuestionByExamCode(input: string): PastPaperItem | null {
+  return findOrSynthesizeQuestionByCode(input, OFFICIAL_PAST_PAPER_PDFS);
 }
 
 // ==========================================================

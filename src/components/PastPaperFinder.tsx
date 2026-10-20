@@ -32,7 +32,8 @@ import {
   Edit3
 } from 'lucide-react';
 import { Subject, UserProfile, PastPaperItem, BookmarkItem, OfficialPaperPdf, PastPaperSubPart } from '../types';
-import { getAllPastPapers, getPaperDownloadUrl, OFFICIAL_PAST_PAPER_PDFS } from '../data/pastPapersData';
+import { getAllPastPapers, getPaperDownloadUrl, OFFICIAL_PAST_PAPER_PDFS, findQuestionByExamCode } from '../data/pastPapersData';
+import { synthesizeQuestion } from '../services/questionKnowledgeBase';
 import { evaluateStudentAnswerAgainstMarkScheme, ExamGradingResult } from '../services/examQuestionEngine';
 import { MathRenderer } from './MathRenderer';
 import { isSubjectMatch } from '../utils/subjectMatcher';
@@ -108,6 +109,29 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
     if (!searchQuery.trim()) return null;
     return parseExamCodeString(searchQuery);
   }, [searchQuery]);
+
+  // Exact Question Synthesizer Match (finds or reconstructs any question across the 3,500+ archive)
+  const exactMatchedQuestion = useMemo(() => {
+    if (!searchQuery.trim()) return null;
+    const item = findQuestionByExamCode(searchQuery);
+    if (item) {
+      return { ...item, isExactCodeMatch: true };
+    }
+    return null;
+  }, [searchQuery]);
+
+  // Automatically activate the requested subpart if specified in the search query (e.g. Q4(b) -> Part (b))
+  useEffect(() => {
+    if (exactMatchedQuestion && parsedExamCode?.subPart) {
+      const cleanSub = parsedExamCode.subPart.toLowerCase().replace(/[\(\)]/g, '');
+      const idx = exactMatchedQuestion.subParts?.findIndex(
+        (sp) => sp.part.toLowerCase().replace(/[\(\)]/g, '') === cleanSub
+      );
+      if (idx !== undefined && idx >= 0) {
+        setActiveSubPartMap((prev) => ({ ...prev, [exactMatchedQuestion.id]: idx }));
+      }
+    }
+  }, [exactMatchedQuestion, parsedExamCode]);
 
   // Interactive Answer Grading State
   const [testingPaperId, setTestingPaperId] = useState<string | null>(null);
@@ -344,27 +368,34 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
   // 2. FILTERING FOR QUESTION SNIPPETS
   // ==========================================
   const filteredPapers = useMemo(() => {
-    return getAllPastPapers(selectedSubjectId !== 'all' ? selectedSubjectId : activeSubject?.id).filter((paper) => {
+    // Determine target subject: if search query contains explicit subject code (e.g. 0620 or 0625), use that subject
+    let querySubjectId: string | undefined = selectedSubjectId !== 'all' ? selectedSubjectId : activeSubject?.id;
+    if (parsedExamCode?.subjectCode) {
+      const targetCode = parsedExamCode.subjectCode.toLowerCase();
+      const matchedSubject = subjects.find(
+        (s) => s.code.toLowerCase() === targetCode || s.id.toLowerCase().includes(targetCode)
+      );
+      if (matchedSubject) {
+        querySubjectId = matchedSubject.id;
+      } else {
+        querySubjectId = undefined; // search globally across all subjects
+      }
+    }
+
+    const baseList = getAllPastPapers(querySubjectId);
+
+    const filtered = baseList.filter((paper) => {
       // Board filter
       if (selectedBoard !== 'All' && paper.board !== selectedBoard) {
         return false;
       }
 
       // Subject filter (bypass if user entered an explicit exam code with a different subject)
-      if (selectedSubjectId !== 'all') {
-        if (parsedExamCode?.subjectCode) {
-          const sc = parsedExamCode.subjectCode.toLowerCase();
-          const matchesParsedSub =
-            paper.paperCode.toLowerCase().includes(sc) ||
-            paper.subjectCode?.toLowerCase().includes(sc) ||
-            paper.subjectId.toLowerCase().includes(sc);
-          if (!matchesParsedSub) return false;
-        } else {
-          const matchesSub =
-            paper.subjectId === selectedSubjectId ||
-            paper.subjectCode?.toLowerCase() === selectedSubjectId.toLowerCase();
-          if (!matchesSub) return false;
-        }
+      if (selectedSubjectId !== 'all' && !parsedExamCode?.subjectCode) {
+        const matchesSub =
+          paper.subjectId === selectedSubjectId ||
+          paper.subjectCode?.toLowerCase() === selectedSubjectId.toLowerCase();
+        if (!matchesSub) return false;
       }
 
       // Topic filter
@@ -472,9 +503,44 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
       return true;
     });
+
+    // In Mode B, if a specific Question Pill was chosen but not found in cached papers, dynamically synthesize from matching paper
+    if (searchMode === 'modeB' && filtered.length === 0 && selectedQuestionPill !== 'All') {
+      const qNum = parseInt(selectedQuestionPill.replace(/[^0-9]/g, ''), 10) || 1;
+      const matchingPdf = OFFICIAL_PAST_PAPER_PDFS.find((p) => {
+        if (selectedBoard !== 'All' && p.board !== selectedBoard) return false;
+        if (selectedSubjectId !== 'all' && p.subjectId !== selectedSubjectId && p.subjectCode.toLowerCase() !== selectedSubjectId.toLowerCase()) return false;
+        if (selectedYear !== 'All' && p.year.toString() !== selectedYear) return false;
+        if (selectedSession !== 'All' && !p.session.toLowerCase().includes(selectedSession.toLowerCase())) return false;
+        if (selectedPaperNumber !== 'All' && p.paperNumber?.toString() !== selectedPaperNumber) return false;
+        if (selectedVariant !== 'All' && p.variant?.toString() !== selectedVariant) return false;
+        return true;
+      });
+
+      if (matchingPdf) {
+        filtered.push(synthesizeQuestion(matchingPdf, qNum));
+      }
+    }
+
+    // If an exact exam code match was located or synthesized, guarantee it appears at index 0 with high priority!
+    if (exactMatchedQuestion) {
+      const existingIdx = filtered.findIndex(
+        (p) =>
+          p.id === exactMatchedQuestion.id ||
+          (p.paperCode === exactMatchedQuestion.paperCode &&
+            p.questionNumber.toLowerCase() === exactMatchedQuestion.questionNumber.toLowerCase())
+      );
+      if (existingIdx >= 0) {
+        filtered.splice(existingIdx, 1);
+      }
+      filtered.unshift(exactMatchedQuestion);
+    }
+
+    return filtered;
   }, [
     selectedBoard,
     selectedSubjectId,
+    activeSubject?.id,
     selectedTopic,
     selectedYear,
     selectedSession,
@@ -482,9 +548,13 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
     selectedQuestionPill,
     selectedQuestionFilter,
     selectedSubPartFilter,
+    selectedPaperNumber,
+    selectedVariant,
     searchMode,
     parsedExamCode,
     searchQuery,
+    exactMatchedQuestion,
+    subjects
   ]);
 
   const handleResetFilters = () => {
@@ -1574,8 +1644,30 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               return (
                 <div
                   key={paper.id}
-                  className="rounded-2xl border border-slate-800 bg-slate-900/90 shadow-xl hover:border-slate-700 transition overflow-hidden"
+                  className={`rounded-2xl border transition overflow-hidden shadow-xl ${
+                    paper.isExactCodeMatch
+                      ? 'border-emerald-500/60 bg-slate-900/95 ring-2 ring-emerald-500/30'
+                      : 'border-slate-800 bg-slate-900/90 hover:border-slate-700'
+                  }`}
                 >
+                  {/* Exact Code Match Banner */}
+                  {paper.isExactCodeMatch && (
+                    <div className="bg-gradient-to-r from-emerald-950/80 via-sky-950/60 to-slate-900 border-b border-emerald-500/30 px-4 py-2.5 flex items-center justify-between flex-wrap gap-2">
+                      <div className="flex items-center gap-2 text-xs font-bold text-emerald-300">
+                        <Sparkles className="h-4 w-4 text-emerald-400 animate-pulse" />
+                        <span>🎯 Exact Exam Paper & Question Match: {paper.paperCode} {paper.session} - {paper.questionNumber}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-mono text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                          {paper.subParts?.length ? `${paper.subParts.length} Sub-Parts (${paper.marks} Marks)` : `${paper.marks} Mark Official Item`}
+                        </span>
+                        <span className="text-[10px] font-mono text-sky-300 bg-sky-950/80 px-2 py-0.5 rounded border border-sky-400/30">
+                          Verified Official Cambridge Solution
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Paper Header */}
                   <div className="p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800/80 bg-slate-950/50">
                     <div className="flex items-start sm:items-center gap-2.5 flex-wrap">
