@@ -10,6 +10,7 @@ import {
   TrendingUp,
   Bookmark,
   CheckCircle,
+  CheckCircle2,
   ExternalLink,
   Layers,
   Zap,
@@ -36,7 +37,11 @@ import {
   ShieldAlert,
   Swords,
   TrendingDown,
-  Scan
+  Scan,
+  Info,
+  Target,
+  School,
+  UserCheck
 } from 'lucide-react';
 import { Subject, UserProfile, BookmarkItem, UserAccount } from '../types';
 import { PAST_PAPERS_DATABASE } from '../data/pastPapersData';
@@ -45,6 +50,7 @@ import { ActiveTab } from './Navbar';
 import { SimplyLogo } from './SimplyLogo';
 import { getDailyStreak, getDailyChallengeQuestion, completeDailyChallenge, DailyStreakState } from '../services/dailyStreak';
 import { MathRenderer } from './MathRenderer';
+import { AboutSimplyModal } from './AboutSimplyModal';
 
 interface HomeViewProps {
   subjects: Subject[];
@@ -57,6 +63,7 @@ interface HomeViewProps {
   onOpenParentReport?: () => void;
   onOpenStudyDuel?: () => void;
   onOpenHandwritingScanner?: () => void;
+  onOpenAbout?: () => void;
 }
 
 export const HomeView: React.FC<HomeViewProps> = ({
@@ -70,10 +77,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
   onOpenParentReport,
   onOpenStudyDuel,
   onOpenHandwritingScanner,
+  onOpenAbout,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [boardFilter, setBoardFilter] = useState<'All' | 'CIE' | 'Edexcel'>('All');
   const [categoryFilter, setCategoryFilter] = useState<string>('All');
+  const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
   const [bookmarks, setBookmarks] = useState<BookmarkItem[]>(() => {
     try {
       const saved = localStorage.getItem('simply_igcse_bookmarks');
@@ -530,6 +539,112 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Solved</span>
             <div className="text-2xl font-black font-mono text-white">{streakState.totalQuestionsSolved}</div>
             <span className="text-[10px] text-amber-400 font-bold block">🔥 Keep Streak Alive!</span>
+          </div>
+        </div>
+      </section>
+
+      {/* 0. Executive Platform Briefing: What Simply IGCSE is & What It Does */}
+      <section className="rounded-3xl border border-indigo-500/30 bg-gradient-to-br from-slate-900 via-indigo-950/20 to-slate-950 p-6 sm:p-7 shadow-2xl relative overflow-hidden">
+        {/* Glow accent */}
+        <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 space-y-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-2 flex-wrap mb-1.5">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-500/20 px-3 py-0.5 text-xs font-black text-indigo-300 border border-indigo-500/30">
+                  <Sparkles className="h-3.5 w-3.5 text-indigo-400" />
+                  <span>Platform Briefing</span>
+                </span>
+                <span className="rounded-md bg-amber-500/15 px-2.5 py-0.5 text-[11px] font-bold text-amber-300 border border-amber-500/30 font-mono">
+                  CAIE & Edexcel Academic OS
+                </span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                What is Simply IGCSE & What Does It Do?
+              </h2>
+            </div>
+
+            <button
+              onClick={() => setIsAboutModalOpen(true)}
+              className="self-start md:self-auto inline-flex items-center gap-1.5 rounded-xl border border-indigo-500/40 bg-indigo-600/20 hover:bg-indigo-600/30 px-3.5 py-2 text-xs font-bold text-indigo-200 transition cursor-pointer"
+            >
+              <Info className="h-4 w-4 text-indigo-400" />
+              <span>Read Full Executive Brief</span>
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+
+          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-sans max-w-4xl">
+            <strong className="text-white font-bold">Simply IGCSE</strong> is the all-in-one exam intelligence platform engineered to replace disorganized past paper drives, slow internet searches, and generic AI speculation with an authentic, mark-scheme-verified examination companion. Designed for Year 10 & 11 candidates, private tutors, and international schools aiming for <span className="text-amber-400 font-bold">Grade 9 / A*</span>.
+          </p>
+
+          {/* 4 Core Pillars Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
+            <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4 space-y-1.5">
+              <div className="flex items-center gap-2 text-amber-400 font-bold text-xs">
+                <FileText className="h-4 w-4 shrink-0" />
+                <span>3,500+ Official Papers</span>
+              </div>
+              <p className="text-[11px] text-slate-400 leading-relaxed">
+                Complete QP & authentic MS vault (2016–2025) across all series and variants with side-by-side split screen view.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4 space-y-1.5">
+              <div className="flex items-center gap-2 text-indigo-400 font-bold text-xs">
+                <Camera className="h-4 w-4 shrink-0" />
+                <span>AI Chief Examiner OCR</span>
+              </div>
+              <p className="text-[11px] text-slate-400 leading-relaxed">
+                Snap pen-and-paper working for instant line-by-line red-ink grading ([M1], [A1], [B1]) strictly against CAIE marking schemes.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4 space-y-1.5">
+              <div className="flex items-center gap-2 text-rose-400 font-bold text-xs">
+                <Flame className="h-4 w-4 shrink-0" />
+                <span>Examiner Pitfall Heatmaps</span>
+              </div>
+              <p className="text-[11px] text-slate-400 leading-relaxed">
+                Synthesis of official Cambridge Examiner Reports detailing exact reasons why candidates failed each question.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4 space-y-1.5">
+              <div className="flex items-center gap-2 text-teal-400 font-bold text-xs">
+                <FlaskConical className="h-4 w-4 shrink-0" />
+                <span>Science ATP Lab Master</span>
+              </div>
+              <p className="text-[11px] text-slate-400 leading-relaxed">
+                Interactive Paper 6 practicals, meniscus simulator, cation/anion chemical tests, and 6-mark experimental planning blueprints.
+              </p>
+            </div>
+          </div>
+
+          {/* Quick Metrics & Pillars Bar */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-800/80 text-xs text-slate-400">
+            <div className="flex flex-wrap items-center gap-4">
+              <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
+                <CheckCircle2 className="h-3.5 w-3.5" /> 100% Mark Scheme Fidelity
+              </span>
+              <span className="flex items-center gap-1.5 text-cyan-400 font-medium">
+                <CheckCircle2 className="h-3.5 w-3.5" /> Spaced Repetition (SM-2) Flashcards
+              </span>
+              <span className="flex items-center gap-1.5 text-amber-400 font-medium">
+                <CheckCircle2 className="h-3.5 w-3.5" /> 1-Click Printable Worksheets & Reports
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => onNavigateTab('finder')}
+                className="text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1 cursor-pointer"
+              >
+                <span>Launch Past Papers</span>
+                <ArrowRight className="h-3 w-3" />
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -1227,6 +1342,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
           })}
         </div>
       </section>
+
+      {/* Platform Briefing Modal */}
+      <AboutSimplyModal
+        isOpen={isAboutModalOpen}
+        onClose={() => setIsAboutModalOpen(false)}
+        onNavigateTab={onNavigateTab}
+      />
     </div>
   );
 };

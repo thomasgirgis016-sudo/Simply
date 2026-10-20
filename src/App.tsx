@@ -49,6 +49,7 @@ import { ProfileModal } from './components/ProfileModal';
 import { AuthModal } from './components/AuthModal';
 import { ScientificCalculator } from './components/ScientificCalculator';
 import { SecretAdminModal } from './components/SecretAdminModal';
+import { AboutSimplyModal } from './components/AboutSimplyModal';
 import { SimplyLogo } from './components/SimplyLogo';
 import { getActiveUser, setActiveUser, grantUserProSubscription, hasActiveSubscription, updateUserAccount, validateActiveSession, logoutUser } from './services/auth';
 import {
@@ -122,6 +123,7 @@ export function App() {
   const [isParentReportOpen, setIsParentReportOpen] = useState(false);
   const [isStudyDuelOpen, setIsStudyDuelOpen] = useState(false);
   const [isHandwritingScannerOpen, setIsHandwritingScannerOpen] = useState(false);
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
 
   // 4b. Executive vs Classic Design System & Theme
   const [designTheme, setDesignTheme] = useState<'executive' | 'classic'>(() => {
@@ -590,6 +592,7 @@ export function App() {
         onOpenParentReport={() => setIsParentReportOpen(true)}
         onOpenStudyDuel={() => setIsStudyDuelOpen(true)}
         onOpenHandwritingScanner={() => setIsHandwritingScannerOpen(true)}
+        onOpenAbout={() => setIsAboutOpen(true)}
         designTheme={designTheme}
         onToggleDesignTheme={handleToggleDesignTheme}
       />
@@ -663,6 +666,7 @@ export function App() {
                 onOpenParentReport={() => setIsParentReportOpen(true)}
                 onOpenStudyDuel={() => setIsStudyDuelOpen(true)}
                 onOpenHandwritingScanner={() => setIsHandwritingScannerOpen(true)}
+                onOpenAbout={() => setIsAboutOpen(true)}
               />
             )}
 
@@ -904,6 +908,13 @@ export function App() {
             )}
             <span>•</span>
             <button
+              onClick={() => setIsAboutOpen(true)}
+              className="text-indigo-400 hover:text-indigo-300 font-semibold transition cursor-pointer"
+            >
+              About Platform
+            </button>
+            <span>•</span>
+            <button
               onClick={() => setIsProfileOpen(true)}
               className="hover:text-white transition cursor-pointer"
             >
@@ -1014,6 +1025,13 @@ export function App() {
         onClose={() => setIsHandwritingScannerOpen(false)}
         subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
         profile={profile}
+      />
+
+      {/* Platform Briefing Modal */}
+      <AboutSimplyModal
+        isOpen={isAboutOpen}
+        onClose={() => setIsAboutOpen(false)}
+        onNavigateTab={setActiveTab}
       />
     </div>
   );

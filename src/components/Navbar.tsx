@@ -39,7 +39,8 @@ import {
   Award,
   Palette,
   TrendingDown,
-  Zap
+  Zap,
+  Info
 } from 'lucide-react';
 import { UserProfile, Subject, UserAccount } from '../types';
 import { SimplyLogo } from './SimplyLogo';
@@ -90,6 +91,7 @@ interface NavbarProps {
   onOpenParentReport?: () => void;
   onOpenStudyDuel?: () => void;
   onOpenHandwritingScanner?: () => void;
+  onOpenAbout?: () => void;
   designTheme?: 'executive' | 'classic';
   onToggleDesignTheme?: () => void;
 }
@@ -114,6 +116,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenParentReport,
   onOpenStudyDuel,
   onOpenHandwritingScanner,
+  onOpenAbout,
   designTheme = 'executive',
   onToggleDesignTheme,
 }) => {
@@ -610,6 +613,19 @@ export const Navbar: React.FC<NavbarProps> = ({
                   >
                     <Calculator className="h-4 w-4 text-amber-400" />
                     <span>Scientific Calculator</span>
+                  </button>
+                )}
+
+                {onOpenAbout && (
+                  <button
+                    onClick={() => {
+                      onOpenAbout();
+                      setIsMobileDrawerOpen(false);
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-indigo-300 hover:bg-slate-900 transition"
+                  >
+                    <Info className="h-4 w-4 text-indigo-400" />
+                    <span>About Simply IGCSE (Briefing)</span>
                   </button>
                 )}
               </div>
