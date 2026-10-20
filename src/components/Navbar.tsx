@@ -31,7 +31,13 @@ import {
   Clock,
   Printer,
   Activity,
-  Flame
+  Flame,
+  FlaskConical,
+  Calendar,
+  ShieldAlert,
+  Swords,
+  Award,
+  Palette
 } from 'lucide-react';
 import { UserProfile, Subject, UserAccount } from '../types';
 import { SimplyLogo } from './SimplyLogo';
@@ -40,6 +46,9 @@ import { getDailyStreak, DailyStreakState } from '../services/dailyStreak';
 export type ActiveTab =
   | 'home'
   | 'finder'
+  | 'atp'
+  | 'roadmap'
+  | 'traps'
   | 'mock'
   | 'worksheet'
   | 'radar'
@@ -74,6 +83,10 @@ interface NavbarProps {
   theme?: 'dark' | 'light';
   onToggleTheme?: () => void;
   onOpenSecretAdmin?: () => void;
+  onOpenParentReport?: () => void;
+  onOpenStudyDuel?: () => void;
+  designTheme?: 'executive' | 'classic';
+  onToggleDesignTheme?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -93,6 +106,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   theme = 'dark',
   onToggleTheme,
   onOpenSecretAdmin,
+  onOpenParentReport,
+  onOpenStudyDuel,
+  designTheme = 'executive',
+  onToggleDesignTheme,
 }) => {
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const [streakState, setStreakState] = useState<DailyStreakState>(() => getDailyStreak());
@@ -141,6 +158,9 @@ export const Navbar: React.FC<NavbarProps> = ({
   const baseTabs = [
     { id: 'home', label: 'Home', icon: Home, color: 'text-indigo-400' },
     { id: 'finder', label: 'Past Papers', icon: Search, color: 'text-amber-400' },
+    { id: 'atp', label: 'Paper 6 ATP', icon: FlaskConical, color: 'text-amber-400' },
+    { id: 'roadmap', label: 'Exam Roadmap', icon: Calendar, color: 'text-indigo-400' },
+    { id: 'traps', label: 'Command Words', icon: ShieldAlert, color: 'text-rose-400' },
     { id: 'mock', label: 'Timed Mock Simulator', icon: Clock, color: 'text-amber-400' },
     { id: 'worksheet', label: 'Worksheet Builder', icon: Printer, color: 'text-indigo-400' },
     { id: 'radar', label: 'Grade 9 Radar', icon: Activity, color: 'text-emerald-400' },
@@ -313,6 +333,50 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <span>Sign Up</span>
                 </button>
               </div>
+            )}
+
+            {/* Collaborative Study Duel */}
+            {onOpenStudyDuel && (
+              <button
+                onClick={onOpenStudyDuel}
+                className="flex items-center gap-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 px-2.5 py-1.5 text-xs font-semibold text-rose-300 hover:bg-rose-500/20 hover:border-rose-500/50 transition cursor-pointer"
+                title="Challenge a classmate to a synchronized Cambridge past paper duel"
+              >
+                <Swords className="h-3.5 w-3.5 text-rose-400" />
+                <span className="hidden xl:inline">Duel</span>
+              </button>
+            )}
+
+            {/* Parent Progress Report Card */}
+            {onOpenParentReport && (
+              <button
+                onClick={onOpenParentReport}
+                className="flex items-center gap-1.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-2.5 py-1.5 text-xs font-semibold text-indigo-300 hover:bg-indigo-500/20 hover:border-indigo-500/50 transition cursor-pointer"
+                title="Generate 1-Click Cambridge Parent Report Card (Printable / PDF)"
+              >
+                <Award className="h-3.5 w-3.5 text-indigo-400" />
+                <span className="hidden xl:inline">Report Card</span>
+              </button>
+            )}
+
+            {/* Executive vs Classic Design Switcher */}
+            {onToggleDesignTheme && (
+              <button
+                onClick={onToggleDesignTheme}
+                className={`flex items-center gap-1.5 rounded-xl border px-2.5 py-1.5 text-xs font-semibold transition cursor-pointer ${
+                  designTheme === 'executive'
+                    ? 'border-indigo-500/40 bg-indigo-500/15 text-indigo-200 hover:bg-indigo-500/25'
+                    : 'border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700'
+                }`}
+                title={
+                  designTheme === 'executive'
+                    ? 'Currently in Modern Executive Academic Layout. Click to revert to Classic Layout.'
+                    : 'Currently in Classic Layout. Click to switch to Modern Executive Academic Layout.'
+                }
+              >
+                <Palette className="h-3.5 w-3.5 text-indigo-400" />
+                <span className="hidden lg:inline">{designTheme === 'executive' ? 'Executive' : 'Classic'}</span>
+              </button>
             )}
 
             {/* Theme Toggle (Light / Dark) */}
@@ -589,6 +653,52 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <span>Sign Up</span>
                   </button>
                 </div>
+              )}
+
+              {/* Study Duel & Parent Report in Mobile Drawer */}
+              <div className="grid grid-cols-2 gap-2">
+                {onOpenStudyDuel && (
+                  <button
+                    onClick={() => {
+                      onOpenStudyDuel();
+                      setIsMobileDrawerOpen(false);
+                    }}
+                    className="flex items-center justify-center gap-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 py-2 text-xs font-semibold text-rose-300 hover:bg-rose-500/20 transition cursor-pointer"
+                  >
+                    <Swords className="h-3.5 w-3.5 text-rose-400" />
+                    <span>Study Duel</span>
+                  </button>
+                )}
+                {onOpenParentReport && (
+                  <button
+                    onClick={() => {
+                      onOpenParentReport();
+                      setIsMobileDrawerOpen(false);
+                    }}
+                    className="flex items-center justify-center gap-1.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 py-2 text-xs font-semibold text-indigo-300 hover:bg-indigo-500/20 transition cursor-pointer"
+                  >
+                    <Award className="h-3.5 w-3.5 text-indigo-400" />
+                    <span>Report Card</span>
+                  </button>
+                )}
+              </div>
+
+              {onToggleDesignTheme && (
+                <button
+                  onClick={() => {
+                    onToggleDesignTheme();
+                  }}
+                  className={`w-full flex items-center justify-center gap-2 rounded-xl border py-2 text-xs font-semibold transition cursor-pointer ${
+                    designTheme === 'executive'
+                      ? 'border-indigo-500/40 bg-indigo-500/15 text-indigo-200'
+                      : 'border-slate-800 bg-slate-900/60 text-slate-300'
+                  }`}
+                >
+                  <Palette className="h-3.5 w-3.5 text-indigo-400" />
+                  <span>
+                    Design: {designTheme === 'executive' ? 'Executive Academic (Active)' : 'Classic Layout (Active)'}
+                  </span>
+                </button>
               )}
 
               {onToggleTheme && (

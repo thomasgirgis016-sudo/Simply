@@ -321,3 +321,40 @@ html.light .text-amber-200 {
 html.light .katex {
   color: #0f172a !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   BRITISH ACADEMIC EXECUTIVE DESIGN THEME (PROFESSIONAL SUITE)
+   ═══════════════════════════════════════════════════════════════ */
+html.executive:not(.light) body {
+  background-color: #080c15 !important;
+  color: #e2e8f0 !important;
+}
+
+html.executive:not(.light) .bg-\[\#090d16\] {
+  background-color: #080c15 !important;
+}
+
+html.executive:not(.light) .bg-slate-950 {
+  background-color: #0b1120 !important;
+}
+
+html.executive:not(.light) .bg-slate-900 {
+  background-color: #10182b !important;
+}
+
+html.executive:not(.light) .border-slate-800 {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+html.executive:not(.light) .border-slate-700 {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+html.executive .shadow-lg {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3) !important;
+}
+
+html.executive .shadow-xl {
+  box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.5), 0 10px 15px -7px rgba(0, 0, 0, 0.4) !important;
+}
+

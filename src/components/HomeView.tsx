@@ -30,7 +30,11 @@ import {
   Printer,
   Activity,
   Flame,
-  Play
+  Play,
+  FlaskConical,
+  Calendar,
+  ShieldAlert,
+  Swords
 } from 'lucide-react';
 import { Subject, UserProfile, BookmarkItem, UserAccount } from '../types';
 import { PAST_PAPERS_DATABASE } from '../data/pastPapersData';
@@ -48,6 +52,8 @@ interface HomeViewProps {
   profile: UserProfile;
   currentUser?: UserAccount | null;
   onOpenAuth?: (mode?: 'signin' | 'signup') => void;
+  onOpenParentReport?: () => void;
+  onOpenStudyDuel?: () => void;
 }
 
 export const HomeView: React.FC<HomeViewProps> = ({
@@ -58,6 +64,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
   profile,
   currentUser,
   onOpenAuth,
+  onOpenParentReport,
+  onOpenStudyDuel,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [boardFilter, setBoardFilter] = useState<'All' | 'CIE' | 'Edexcel'>('All');
@@ -635,6 +643,151 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
             <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-purple-400 group-hover:translate-x-1 transition">
               <span>View Predictions</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 1.5 Cambridge Specialized Master Suites */}
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+              <Award className="h-6 w-6 text-indigo-400" />
+              Cambridge Master Suites & High-Yield Strategy
+            </h2>
+            <p className="text-xs text-slate-400">
+              Interactive practical drills, countdown roadmaps, examiner command traps, and collaborative duels
+            </p>
+          </div>
+          <span className="hidden sm:inline-flex items-center gap-1 text-xs text-indigo-400 font-semibold">
+            <Sparkles className="h-3.5 w-3.5" /> Cambridge Exclusive
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+          {/* Card 1: Science Paper 6 ATP Master */}
+          <div
+            onClick={() => onNavigateTab('atp')}
+            className="group relative flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-lg hover:border-amber-500/50 hover:bg-slate-900 transition cursor-pointer"
+          >
+            <div>
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/25 mb-4 group-hover:scale-105 transition">
+                <FlaskConical className="h-5 w-5" />
+              </div>
+              <span className="rounded-md bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold text-amber-300 font-mono">
+                Paper 6 Alternative to Practical
+              </span>
+              <h3 className="text-base font-bold text-white mt-2 group-hover:text-amber-300 transition">
+                Science ATP Master
+              </h3>
+              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                Chemical cation/anion tests, interactive burette meniscus simulator, and 6-mark plan blueprint.
+              </p>
+            </div>
+            <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-amber-400 group-hover:translate-x-1 transition">
+              <span>Open ATP Suite</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </div>
+          </div>
+
+          {/* Card 2: AI Exam Countdown & Daily Study Roadmap */}
+          <div
+            onClick={() => onNavigateTab('roadmap')}
+            className="group relative flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-lg hover:border-indigo-500/50 hover:bg-slate-900 transition cursor-pointer"
+          >
+            <div>
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-500/15 text-indigo-400 border border-indigo-500/25 mb-4 group-hover:scale-105 transition">
+                <Calendar className="h-5 w-5" />
+              </div>
+              <span className="rounded-md bg-indigo-500/15 px-2 py-0.5 text-[10px] font-bold text-indigo-300 font-mono">
+                Personalized Countdown
+              </span>
+              <h3 className="text-base font-bold text-white mt-2 group-hover:text-indigo-300 transition">
+                Daily Study Roadmap
+              </h3>
+              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                Live days remaining until official exam with adaptive day-by-day past paper task checklists.
+              </p>
+            </div>
+            <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-indigo-400 group-hover:translate-x-1 transition">
+              <span>View Roadmap</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </div>
+          </div>
+
+          {/* Card 3: Cambridge Command Words Trap Detector */}
+          <div
+            onClick={() => onNavigateTab('traps')}
+            className="group relative flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-lg hover:border-rose-500/50 hover:bg-slate-900 transition cursor-pointer"
+          >
+            <div>
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-rose-500/15 text-rose-400 border border-rose-500/25 mb-4 group-hover:scale-105 transition">
+                <ShieldAlert className="h-5 w-5" />
+              </div>
+              <span className="rounded-md bg-rose-500/15 px-2 py-0.5 text-[10px] font-bold text-rose-300 font-mono">
+                Examiner Secrets
+              </span>
+              <h3 className="text-base font-bold text-white mt-2 group-hover:text-rose-300 transition">
+                Command Words Traps
+              </h3>
+              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                Spot why students lose marks on Describe vs Explain and take the Cambridge mark scheme quiz.
+              </p>
+            </div>
+            <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-rose-400 group-hover:translate-x-1 transition">
+              <span>Check Traps</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </div>
+          </div>
+
+          {/* Card 4: 1-Click Parent Progress Report */}
+          <div
+            onClick={() => onOpenParentReport?.()}
+            className="group relative flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-lg hover:border-emerald-500/50 hover:bg-slate-900 transition cursor-pointer"
+          >
+            <div>
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/25 mb-4 group-hover:scale-105 transition">
+                <Award className="h-5 w-5" />
+              </div>
+              <span className="rounded-md bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-300 font-mono">
+                Print / Export PDF
+              </span>
+              <h3 className="text-base font-bold text-white mt-2 group-hover:text-emerald-300 transition">
+                Parent Report Card
+              </h3>
+              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                Generate an executive Cambridge performance letter with mock averages, streak, and WhatsApp share.
+              </p>
+            </div>
+            <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-emerald-400 group-hover:translate-x-1 transition">
+              <span>Generate Report</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </div>
+          </div>
+
+          {/* Card 5: Collaborative Study Duel */}
+          <div
+            onClick={() => onOpenStudyDuel?.()}
+            className="group relative flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-lg hover:border-purple-500/50 hover:bg-slate-900 transition cursor-pointer"
+          >
+            <div>
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-500/15 text-purple-400 border border-purple-500/25 mb-4 group-hover:scale-105 transition">
+                <Swords className="h-5 w-5" />
+              </div>
+              <span className="rounded-md bg-purple-500/15 px-2 py-0.5 text-[10px] font-bold text-purple-300 font-mono">
+                Multiplayer Challenge
+              </span>
+              <h3 className="text-base font-bold text-white mt-2 group-hover:text-purple-300 transition">
+                Past Paper Duels
+              </h3>
+              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                6-digit room code with synchronized timer and side-by-side Cambridge mark scheme comparison.
+              </p>
+            </div>
+            <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-purple-400 group-hover:translate-x-1 transition">
+              <span>Enter Arena</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </div>
           </div>

@@ -35,6 +35,11 @@ import { MockExamSimulator } from './components/MockExamSimulator';
 import { WorksheetBuilder } from './components/WorksheetBuilder';
 import { WeakSpotRadar } from './components/WeakSpotRadar';
 import { PredictedPaperView } from './components/PredictedPaperView';
+import { ScienceAtpMaster } from './components/ScienceAtpMaster';
+import { StudyRoadmap } from './components/StudyRoadmap';
+import { CommandWordsTrapDetector } from './components/CommandWordsTrapDetector';
+import { ParentReportModal } from './components/ParentReportModal';
+import { StudyDuelModal } from './components/StudyDuelModal';
 import { PaymentModal } from './components/PaymentModal';
 import { SettingsModal } from './components/SettingsModal';
 import { ProfileModal } from './components/ProfileModal';
@@ -111,8 +116,40 @@ export function App() {
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
   const [isSecretAdminOpen, setIsSecretAdminOpen] = useState(false);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
+  const [isParentReportOpen, setIsParentReportOpen] = useState(false);
+  const [isStudyDuelOpen, setIsStudyDuelOpen] = useState(false);
 
-  // 4b. Theme & Accessibility State
+  // 4b. Executive vs Classic Design System & Theme
+  const [designTheme, setDesignTheme] = useState<'executive' | 'classic'>(() => {
+    try {
+      const saved = localStorage.getItem('simply_design_theme');
+      if (saved === 'executive' || saved === 'classic') return saved;
+    } catch (e) {
+      console.warn(e);
+    }
+    return 'executive';
+  });
+
+  const handleToggleDesignTheme = () => {
+    setDesignTheme(prev => (prev === 'executive' ? 'classic' : 'executive'));
+  };
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('simply_design_theme', designTheme);
+      if (designTheme === 'executive') {
+        document.documentElement.classList.add('executive');
+        document.documentElement.classList.remove('classic');
+      } else {
+        document.documentElement.classList.add('classic');
+        document.documentElement.classList.remove('executive');
+      }
+    } catch (e) {
+      console.warn('Design theme sync error:', e);
+    }
+  }, [designTheme]);
+
+  // 4c. Theme & Accessibility State
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     try {
       const saved = localStorage.getItem('simply_igcse_theme');
@@ -497,6 +534,9 @@ export function App() {
 
   const getTabFeatureName = (tab: ActiveTab): string => {
     switch (tab) {
+      case 'atp': return 'the Science Paper 6 Alternative to Practical (ATP) Master';
+      case 'roadmap': return 'the AI Exam Countdown & Daily Study Roadmap';
+      case 'traps': return 'the Cambridge Command Words Trap Detector';
       case 'solver': return 'the AI Question Solver & Grading Engine';
       case 'finder': return 'the Past Papers & Mark Schemes Hub';
       case 'mock': return 'the Timed Mock Exam Simulator & Grade Boundaries';
@@ -541,6 +581,10 @@ export function App() {
         theme={theme}
         onToggleTheme={handleToggleTheme}
         onOpenSecretAdmin={() => setIsSecretAdminOpen(true)}
+        onOpenParentReport={() => setIsParentReportOpen(true)}
+        onOpenStudyDuel={() => setIsStudyDuelOpen(true)}
+        designTheme={designTheme}
+        onToggleDesignTheme={handleToggleDesignTheme}
       />
 
       {/* Main Container */}
@@ -609,7 +653,28 @@ export function App() {
                   setAuthMode(mode || 'signin');
                   setIsAuthOpen(true);
                 }}
+                onOpenParentReport={() => setIsParentReportOpen(true)}
+                onOpenStudyDuel={() => setIsStudyDuelOpen(true)}
               />
+            )}
+
+            {activeTab === 'atp' && (
+              <ScienceAtpMaster
+                subject={activeSubject}
+                profile={profile}
+              />
+            )}
+
+            {activeTab === 'roadmap' && (
+              <StudyRoadmap
+                subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
+                profile={profile}
+                onNavigateToTab={setActiveTab}
+              />
+            )}
+
+            {activeTab === 'traps' && (
+              <CommandWordsTrapDetector />
             )}
 
             {activeTab === 'solver' && (
@@ -906,6 +971,22 @@ export function App() {
           handleRefreshStatus();
           setIsPaymentOpen(false);
         }}
+      />
+
+      {/* 1-Click Cambridge Parent Progress Report Card Modal */}
+      <ParentReportModal
+        isOpen={isParentReportOpen}
+        onClose={() => setIsParentReportOpen(false)}
+        profile={profile}
+        subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
+      />
+
+      {/* Collaborative Study Duel (Past Paper Sprint) Modal */}
+      <StudyDuelModal
+        isOpen={isStudyDuelOpen}
+        onClose={() => setIsStudyDuelOpen(false)}
+        profile={profile}
+        subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
       />
     </div>
   );
