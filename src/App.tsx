@@ -38,6 +38,9 @@ import { PredictedPaperView } from './components/PredictedPaperView';
 import { ScienceAtpMaster } from './components/ScienceAtpMaster';
 import { StudyRoadmap } from './components/StudyRoadmap';
 import { CommandWordsTrapDetector } from './components/CommandWordsTrapDetector';
+import { ExaminerPitfallsHeatmap } from './components/ExaminerPitfallsHeatmap';
+import { UnitConversionBlitz } from './components/UnitConversionBlitz';
+import { HandwritingScannerModal } from './components/HandwritingScannerModal';
 import { ParentReportModal } from './components/ParentReportModal';
 import { StudyDuelModal } from './components/StudyDuelModal';
 import { PaymentModal } from './components/PaymentModal';
@@ -118,6 +121,7 @@ export function App() {
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [isParentReportOpen, setIsParentReportOpen] = useState(false);
   const [isStudyDuelOpen, setIsStudyDuelOpen] = useState(false);
+  const [isHandwritingScannerOpen, setIsHandwritingScannerOpen] = useState(false);
 
   // 4b. Executive vs Classic Design System & Theme
   const [designTheme, setDesignTheme] = useState<'executive' | 'classic'>(() => {
@@ -537,6 +541,8 @@ export function App() {
       case 'atp': return 'the Science Paper 6 Alternative to Practical (ATP) Master';
       case 'roadmap': return 'the AI Exam Countdown & Daily Study Roadmap';
       case 'traps': return 'the Cambridge Command Words Trap Detector';
+      case 'pitfalls': return 'the Examiner Pitfalls Heatmap';
+      case 'blitz': return 'the 60-Second Unit Conversion Blitz';
       case 'solver': return 'the AI Question Solver & Grading Engine';
       case 'finder': return 'the Past Papers & Mark Schemes Hub';
       case 'mock': return 'the Timed Mock Exam Simulator & Grade Boundaries';
@@ -583,6 +589,7 @@ export function App() {
         onOpenSecretAdmin={() => setIsSecretAdminOpen(true)}
         onOpenParentReport={() => setIsParentReportOpen(true)}
         onOpenStudyDuel={() => setIsStudyDuelOpen(true)}
+        onOpenHandwritingScanner={() => setIsHandwritingScannerOpen(true)}
         designTheme={designTheme}
         onToggleDesignTheme={handleToggleDesignTheme}
       />
@@ -655,6 +662,7 @@ export function App() {
                 }}
                 onOpenParentReport={() => setIsParentReportOpen(true)}
                 onOpenStudyDuel={() => setIsStudyDuelOpen(true)}
+                onOpenHandwritingScanner={() => setIsHandwritingScannerOpen(true)}
               />
             )}
 
@@ -675,6 +683,17 @@ export function App() {
 
             {activeTab === 'traps' && (
               <CommandWordsTrapDetector />
+            )}
+
+            {activeTab === 'pitfalls' && (
+              <ExaminerPitfallsHeatmap
+                subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
+                profile={profile}
+              />
+            )}
+
+            {activeTab === 'blitz' && (
+              <UnitConversionBlitz />
             )}
 
             {activeTab === 'solver' && (
@@ -987,6 +1006,14 @@ export function App() {
         onClose={() => setIsStudyDuelOpen(false)}
         profile={profile}
         subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
+      />
+
+      {/* Snap Handwritten Working Camera OCR Modal */}
+      <HandwritingScannerModal
+        isOpen={isHandwritingScannerOpen}
+        onClose={() => setIsHandwritingScannerOpen(false)}
+        subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
+        profile={profile}
       />
     </div>
   );

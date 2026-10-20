@@ -1134,15 +1134,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       )}
 
       {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 p-6 sm:p-8 shadow-2xl">
-        <div className="absolute -top-12 -right-12 h-44 w-44 rounded-full bg-[#FF5E62]/10 blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-indigo-950/40 to-slate-900 p-6 sm:p-8 shadow-2xl">
+        <div className="absolute -top-12 -right-12 h-44 w-44 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative">
           <div className="space-y-3">
             <div className="flex items-center gap-3">
               <SimplyLogo size="sm" />
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-[#FF5E62]/15 px-3 py-0.5 text-xs font-bold text-[#FFA63A] border border-[#FF5E62]/30">
-                <ShieldCheck className="h-3.5 w-3.5 text-[#FF5E62]" />
-                <span>Administrative Portal (Hidden)</span>
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-indigo-500/15 px-3 py-0.5 text-xs font-bold text-indigo-300 border border-indigo-500/30">
+                <ShieldCheck className="h-3.5 w-3.5 text-indigo-400" />
+                <span>Executive Governance & Administration</span>
               </div>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
@@ -1174,7 +1174,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
             <button
               onClick={() => setIsAddModalOpen(true)}
-              className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#FF5E62] to-[#FFA63A] px-4 py-2 text-xs font-extrabold text-slate-950 shadow-lg shadow-amber-500/20 hover:opacity-95 transition cursor-pointer"
+              className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-indigo-500/20 hover:from-indigo-400 hover:to-indigo-500 transition cursor-pointer"
             >
               <UserPlus className="h-4 w-4" />
               <span>Pre-Approve Account</span>
@@ -1183,11 +1183,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </div>
       </div>
 
-      {/* Admin Mode Tab Switcher */}
-      <div className="flex items-center gap-2 border-b border-slate-800 pb-3 flex-wrap">
+      {/* Admin Mode Tab Switcher (Mobile Swipeable) */}
+      <div className="flex items-center gap-2 border-b border-slate-800 pb-3 overflow-x-auto no-scrollbar scroll-smooth flex-nowrap">
         <button
           onClick={() => setAdminActiveTab('accounts')}
-          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
+          className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
             adminActiveTab === 'accounts'
               ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
               : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
@@ -1202,7 +1202,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         <button
           onClick={() => setAdminActiveTab('access-codes')}
-          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
+          className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
             adminActiveTab === 'access-codes'
               ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-lg shadow-amber-500/30 font-black'
               : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
@@ -1217,7 +1217,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         <button
           onClick={() => setAdminActiveTab('audit')}
-          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
+          className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
             adminActiveTab === 'audit'
               ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
               : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
@@ -1232,7 +1232,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         <button
           onClick={() => setAdminActiveTab('pricing')}
-          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
+          className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
             adminActiveTab === 'pricing'
               ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/30 font-black'
               : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
@@ -1247,7 +1247,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         <button
           onClick={() => setAdminActiveTab('enquiries')}
-          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
+          className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
             adminActiveTab === 'enquiries'
               ? 'bg-teal-600 text-white shadow-lg shadow-teal-600/30'
               : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
@@ -1262,7 +1262,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         <button
           onClick={() => setAdminActiveTab('cms')}
-          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
+          className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
             adminActiveTab === 'cms'
               ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
               : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
@@ -1277,7 +1277,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         <button
           onClick={() => setAdminActiveTab('payments')}
-          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
+          className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
             adminActiveTab === 'payments'
               ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30'
               : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
@@ -1292,7 +1292,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         <button
           onClick={() => setAdminActiveTab('classroom')}
-          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
+          className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
             adminActiveTab === 'classroom'
               ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/30'
               : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
@@ -1307,7 +1307,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         <button
           onClick={() => setAdminActiveTab('qa')}
-          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
+          className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
             adminActiveTab === 'qa'
               ? 'bg-sky-600 text-white shadow-lg shadow-sky-600/30'
               : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'

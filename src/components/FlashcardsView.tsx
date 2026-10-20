@@ -54,10 +54,21 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
 
   // Filter flashcards for this subject, topic, and tier
   const subjectCards = flashcards.filter(c => isSubjectMatch(c.subjectId, subject));
+
+  // SM-2 Spaced Repetition Due Card Logic
+  const isDueToday = (card: Flashcard) => {
+    if (!card.nextReviewDate) return true;
+    return new Date(card.nextReviewDate).getTime() <= Date.now();
+  };
+
+  const dueCardsCount = subjectCards.filter(isDueToday).length;
+  const [filterDueOnly, setFilterDueOnly] = useState<boolean>(false);
+
   const filteredCards = subjectCards.filter(c => {
     const matchesTopic = selectedTopic === 'All' || c.topic === selectedTopic;
     const matchesTier = selectedTier === 'All' || c.difficulty === selectedTier;
-    return matchesTopic && matchesTier;
+    const matchesDue = !filterDueOnly || isDueToday(c);
+    return matchesTopic && matchesTier && matchesDue;
   });
 
   const currentCard = filteredCards[currentIndex];
@@ -232,6 +243,24 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                 {masteredCount} / {subjectCards.length} ({masteryPercentage}%)
               </p>
             </div>
+
+            {/* SM-2 Due Today Quick Filter */}
+            <button
+              onClick={() => {
+                setFilterDueOnly(!filterDueOnly);
+                setCurrentIndex(0);
+                setIsFlipped(false);
+              }}
+              className={`flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-bold transition cursor-pointer ${
+                filterDueOnly
+                  ? 'bg-amber-500 border-amber-500 text-slate-950 font-black shadow-md'
+                  : 'bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20'
+              }`}
+              title="Filter to show only cards scheduled for SM-2 spaced repetition review today"
+            >
+              <Lightbulb className="h-3.5 w-3.5" />
+              <span>{dueCardsCount} Due Today</span>
+            </button>
 
             <button
               onClick={handleExportAnkiCsv}

@@ -37,7 +37,9 @@ import {
   ShieldAlert,
   Swords,
   Award,
-  Palette
+  Palette,
+  TrendingDown,
+  Zap
 } from 'lucide-react';
 import { UserProfile, Subject, UserAccount } from '../types';
 import { SimplyLogo } from './SimplyLogo';
@@ -49,6 +51,8 @@ export type ActiveTab =
   | 'atp'
   | 'roadmap'
   | 'traps'
+  | 'pitfalls'
+  | 'blitz'
   | 'mock'
   | 'worksheet'
   | 'radar'
@@ -85,6 +89,7 @@ interface NavbarProps {
   onOpenSecretAdmin?: () => void;
   onOpenParentReport?: () => void;
   onOpenStudyDuel?: () => void;
+  onOpenHandwritingScanner?: () => void;
   designTheme?: 'executive' | 'classic';
   onToggleDesignTheme?: () => void;
 }
@@ -108,6 +113,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenSecretAdmin,
   onOpenParentReport,
   onOpenStudyDuel,
+  onOpenHandwritingScanner,
   designTheme = 'executive',
   onToggleDesignTheme,
 }) => {
@@ -161,6 +167,8 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'atp', label: 'Paper 6 ATP', icon: FlaskConical, color: 'text-amber-400' },
     { id: 'roadmap', label: 'Exam Roadmap', icon: Calendar, color: 'text-indigo-400' },
     { id: 'traps', label: 'Command Words', icon: ShieldAlert, color: 'text-rose-400' },
+    { id: 'pitfalls', label: 'Examiner Pitfalls', icon: TrendingDown, color: 'text-rose-400' },
+    { id: 'blitz', label: '60s Unit Blitz', icon: Zap, color: 'text-amber-400' },
     { id: 'mock', label: 'Timed Mock Simulator', icon: Clock, color: 'text-amber-400' },
     { id: 'worksheet', label: 'Worksheet Builder', icon: Printer, color: 'text-indigo-400' },
     { id: 'radar', label: 'Grade 9 Radar', icon: Activity, color: 'text-emerald-400' },
@@ -333,6 +341,18 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <span>Sign Up</span>
                 </button>
               </div>
+            )}
+
+            {/* Handwriting Camera Scanner */}
+            {onOpenHandwritingScanner && (
+              <button
+                onClick={onOpenHandwritingScanner}
+                className="flex items-center gap-1.5 rounded-xl border border-sky-500/30 bg-sky-500/10 px-2.5 py-1.5 text-xs font-semibold text-sky-300 hover:bg-sky-500/20 hover:border-sky-500/50 transition cursor-pointer"
+                title="Snap a photo of your handwritten past paper solution for line-by-line AI grading"
+              >
+                <Camera className="h-3.5 w-3.5 text-sky-400" />
+                <span className="hidden xl:inline">Scan Paper</span>
+              </button>
             )}
 
             {/* Collaborative Study Duel */}
@@ -655,18 +675,30 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </div>
               )}
 
-              {/* Study Duel & Parent Report in Mobile Drawer */}
-              <div className="grid grid-cols-2 gap-2">
+              {/* Quick Actions in Mobile Drawer: Scan Paper, Study Duel & Parent Report */}
+              <div className="grid grid-cols-3 gap-1.5">
+                {onOpenHandwritingScanner && (
+                  <button
+                    onClick={() => {
+                      onOpenHandwritingScanner();
+                      setIsMobileDrawerOpen(false);
+                    }}
+                    className="flex flex-col items-center justify-center gap-1 rounded-xl border border-sky-500/30 bg-sky-500/10 py-2 px-1 text-[11px] font-semibold text-sky-300 hover:bg-sky-500/20 transition cursor-pointer text-center"
+                  >
+                    <Camera className="h-4 w-4 text-sky-400" />
+                    <span>Scan Paper</span>
+                  </button>
+                )}
                 {onOpenStudyDuel && (
                   <button
                     onClick={() => {
                       onOpenStudyDuel();
                       setIsMobileDrawerOpen(false);
                     }}
-                    className="flex items-center justify-center gap-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 py-2 text-xs font-semibold text-rose-300 hover:bg-rose-500/20 transition cursor-pointer"
+                    className="flex flex-col items-center justify-center gap-1 rounded-xl border border-rose-500/30 bg-rose-500/10 py-2 px-1 text-[11px] font-semibold text-rose-300 hover:bg-rose-500/20 transition cursor-pointer text-center"
                   >
-                    <Swords className="h-3.5 w-3.5 text-rose-400" />
-                    <span>Study Duel</span>
+                    <Swords className="h-4 w-4 text-rose-400" />
+                    <span>Duel</span>
                   </button>
                 )}
                 {onOpenParentReport && (
@@ -675,10 +707,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                       onOpenParentReport();
                       setIsMobileDrawerOpen(false);
                     }}
-                    className="flex items-center justify-center gap-1.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 py-2 text-xs font-semibold text-indigo-300 hover:bg-indigo-500/20 transition cursor-pointer"
+                    className="flex flex-col items-center justify-center gap-1 rounded-xl border border-indigo-500/30 bg-indigo-500/10 py-2 px-1 text-[11px] font-semibold text-indigo-300 hover:bg-indigo-500/20 transition cursor-pointer text-center"
                   >
-                    <Award className="h-3.5 w-3.5 text-indigo-400" />
-                    <span>Report Card</span>
+                    <Award className="h-4 w-4 text-indigo-400" />
+                    <span>Report</span>
                   </button>
                 )}
               </div>

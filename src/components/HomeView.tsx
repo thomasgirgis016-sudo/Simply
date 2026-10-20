@@ -34,7 +34,9 @@ import {
   FlaskConical,
   Calendar,
   ShieldAlert,
-  Swords
+  Swords,
+  TrendingDown,
+  Scan
 } from 'lucide-react';
 import { Subject, UserProfile, BookmarkItem, UserAccount } from '../types';
 import { PAST_PAPERS_DATABASE } from '../data/pastPapersData';
@@ -54,6 +56,7 @@ interface HomeViewProps {
   onOpenAuth?: (mode?: 'signin' | 'signup') => void;
   onOpenParentReport?: () => void;
   onOpenStudyDuel?: () => void;
+  onOpenHandwritingScanner?: () => void;
 }
 
 export const HomeView: React.FC<HomeViewProps> = ({
@@ -66,6 +69,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
   onOpenAuth,
   onOpenParentReport,
   onOpenStudyDuel,
+  onOpenHandwritingScanner,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [boardFilter, setBoardFilter] = useState<'All' | 'CIE' | 'Edexcel'>('All');
@@ -788,6 +792,81 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
             <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-purple-400 group-hover:translate-x-1 transition">
               <span>Enter Arena</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </div>
+          </div>
+
+          {/* Card 6: Examiner Pitfalls Heatmap */}
+          <div
+            onClick={() => onNavigateTab('pitfalls')}
+            className="group relative flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-lg hover:border-rose-500/50 hover:bg-slate-900 transition cursor-pointer"
+          >
+            <div>
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-rose-500/15 text-rose-400 border border-rose-500/25 mb-4 group-hover:scale-105 transition">
+                <TrendingDown className="h-5 w-5" />
+              </div>
+              <span className="rounded-md bg-rose-500/15 px-2 py-0.5 text-[10px] font-bold text-rose-300 font-mono">
+                Official ER Synthesis
+              </span>
+              <h3 className="text-base font-bold text-white mt-2 group-hover:text-rose-300 transition">
+                Examiner Pitfalls Heatmap
+              </h3>
+              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                "Why candidates lost marks" parsed from thousands of Cambridge Examiner Reports.
+              </p>
+            </div>
+            <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-rose-400 group-hover:translate-x-1 transition">
+              <span>Explore Pitfalls</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </div>
+          </div>
+
+          {/* Card 7: Snap Handwritten Working */}
+          <div
+            onClick={() => onOpenHandwritingScanner?.()}
+            className="group relative flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-lg hover:border-sky-500/50 hover:bg-slate-900 transition cursor-pointer"
+          >
+            <div>
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-sky-500/15 text-sky-400 border border-sky-500/25 mb-4 group-hover:scale-105 transition">
+                <Scan className="h-5 w-5" />
+              </div>
+              <span className="rounded-md bg-sky-500/15 px-2 py-0.5 text-[10px] font-bold text-sky-300 font-mono">
+                Camera OCR AI
+              </span>
+              <h3 className="text-base font-bold text-white mt-2 group-hover:text-sky-300 transition">
+                Snap Handwritten Paper
+              </h3>
+              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                Take a photo of your pen-and-paper working for instant line-by-line Cambridge marking.
+              </p>
+            </div>
+            <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-sky-400 group-hover:translate-x-1 transition">
+              <span>Scan Working</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </div>
+          </div>
+
+          {/* Card 8: 60s Unit Conversion Blitz */}
+          <div
+            onClick={() => onNavigateTab('blitz')}
+            className="group relative flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-lg hover:border-amber-500/50 hover:bg-slate-900 transition cursor-pointer"
+          >
+            <div>
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/25 mb-4 group-hover:scale-105 transition">
+                <Zap className="h-5 w-5" />
+              </div>
+              <span className="rounded-md bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold text-amber-300 font-mono">
+                Speed Drill
+              </span>
+              <h3 className="text-base font-bold text-white mt-2 group-hover:text-amber-300 transition">
+                Unit Conversion Blitz
+              </h3>
+              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                60-second rapid-fire metric conversions: cm³ to dm³, kJ to J, hours to seconds.
+              </p>
+            </div>
+            <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-amber-400 group-hover:translate-x-1 transition">
+              <span>Start Blitz</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </div>
           </div>
