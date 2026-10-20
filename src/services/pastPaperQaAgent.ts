@@ -1,5 +1,5 @@
 import { PastPaperItem, OfficialPaperPdf, PastPaperQaSummaryReport, PastPaperQaItemIssue } from '../types';
-import { PAST_PAPERS_DATABASE, OFFICIAL_PAST_PAPER_PDFS } from '../data/pastPapersData';
+import { PAST_PAPERS_DATABASE, OFFICIAL_PAST_PAPER_PDFS, getAllPastPapers } from '../data/pastPapersData';
 
 /**
  * Validates basic KaTeX / LaTeX math syntax:
@@ -36,19 +36,20 @@ export function validateKatexSyntax(mathText?: string): { isValid: boolean; erro
 
 /**
  * Runs the comprehensive Past Paper QA Verification Agent
- * Inspects every question and official PDF in the database.
+ * Inspects every question and official PDF in the catalog.
  */
 export function runPastPaperQaAgent(
-  papers: PastPaperItem[] = PAST_PAPERS_DATABASE,
+  papers?: PastPaperItem[],
   pdfs: OfficialPaperPdf[] = OFFICIAL_PAST_PAPER_PDFS
 ): PastPaperQaSummaryReport {
+  const activePapers = papers && papers.length > 0 ? papers : getAllPastPapers();
   const issues: PastPaperQaItemIssue[] = [];
   let katexSyntaxErrors = 0;
   let missingMarkSchemes = 0;
   let formatMismatches = 0;
 
   // 1. Iterate through every past paper question
-  for (const paper of papers) {
+  for (const paper of activePapers) {
     // Check KaTeX in prompt and math fields
     const promptCheck = validateKatexSyntax(paper.questionPrompt);
     if (!promptCheck.isValid) {
@@ -201,7 +202,7 @@ export function runPastPaperQaAgent(
     }
   }
 
-  const totalScanned = papers.length;
+  const totalScanned = activePapers.length;
   const failedCount = issues.length;
   const passedCount = Math.max(0, totalScanned - failedCount);
   const healthScore = totalScanned > 0 ? Math.round(((totalScanned - failedCount) / totalScanned) * 100) : 100;
@@ -328,8 +329,9 @@ export function setPdfUrlOverride(paperId: string, newUrl: string): void {
  */
 export async function runFullAutonomousQaSweep(
   samplePdfs: OfficialPaperPdf[] = OFFICIAL_PAST_PAPER_PDFS.slice(0, 8),
-  papers: PastPaperItem[] = PAST_PAPERS_DATABASE
+  papers?: PastPaperItem[]
 ): Promise<FullQaSweepReport> {
+  const activePapers = papers && papers.length > 0 ? papers : getAllPastPapers();
   const checks: AutonomousQaCheckResult[] = [];
 
   // ==========================================
@@ -478,7 +480,7 @@ export async function runFullAutonomousQaSweep(
   ];
 
   for (const subj of subjectCodes) {
-    const subjQuestions = papers.filter(p => p.subjectId === subj.id || p.paperCode?.includes(subj.code));
+    const subjQuestions = activePapers.filter(p => p.subjectId === subj.id || p.paperCode?.includes(subj.code));
     let hasContamination = false;
     let foreignCode = '';
 

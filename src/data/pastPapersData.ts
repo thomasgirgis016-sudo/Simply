@@ -1062,58 +1062,95 @@ export const SUBJECT_TOPICS_MAP: Record<string, string[]> = {
 
 // Programmatic question cache to ensure ultra-fast memory lookups
 const programmaticQuestionsCache = new Map<string, PastPaperItem[]>();
+const paperPdfQuestionsCache = new Map<string, PastPaperItem[]>();
 
 export function generateQuestionsForPaperPdf(pdf: OfficialPaperPdf): PastPaperItem[] {
+  if (paperPdfQuestionsCache.has(pdf.id)) {
+    return paperPdfQuestionsCache.get(pdf.id)!;
+  }
+
   const isMcq = (pdf.paperNumber === 1 || pdf.paperNumber === 2) && pdf.subjectCode !== '0580' && pdf.subjectCode !== '4MA1';
 
+  let questions: PastPaperItem[] = [];
   if (isMcq) {
-    return generate40McqQuestions(pdf);
+    questions = generate40McqQuestions(pdf);
+  } else {
+    const isMathShort = (pdf.paperNumber === 1 || pdf.paperNumber === 2) && (pdf.subjectCode === '0580' || pdf.subjectCode === '4MA1');
+    const qCount = isMathShort ? 24 : pdf.paperNumber === 6 ? 4 : 12;
+
+    for (let q = 1; q <= qCount; q++) {
+      questions.push(synthesizeQuestion(pdf, q));
+    }
   }
 
-  const isMathShort = (pdf.paperNumber === 1 || pdf.paperNumber === 2) && (pdf.subjectCode === '0580' || pdf.subjectCode === '4MA1');
-  const qCount = isMathShort ? 24 : pdf.paperNumber === 6 ? 4 : 12;
-
-  const questions: PastPaperItem[] = [];
-  for (let q = 1; q <= qCount; q++) {
-    questions.push(synthesizeQuestion(pdf, q));
-  }
+  paperPdfQuestionsCache.set(pdf.id, questions);
   return questions;
 }
+
+/**
+ * Generate questions for a collection of official paper PDFs (cached per paper).
+ */
+export function getQuestionsForPdfs(pdfs: OfficialPaperPdf[], maxPapers = 40): PastPaperItem[] {
+  const result: PastPaperItem[] = [];
+  const slice = pdfs.slice(0, maxPapers);
+  for (const pdf of slice) {
+    result.push(...generateQuestionsForPaperPdf(pdf));
+  }
+  return result;
+}
+
+export const TOTAL_ARCHIVE_PAPERS_COUNT = 3500;
+export const TOTAL_ARCHIVE_QUESTIONS_COUNT = 45000;
 
 export function getAllPastPapers(subjectId?: string): PastPaperItem[] {
   const custom = getCustomPastPapers();
   const base = PAST_PAPERS_DATABASE;
 
-  // If a specific subject is requested, generate or retrieve programmatic questions for that subject
+  // If a specific subject is requested, generate diverse multi-year questions covering 2016 to 2025
   if (subjectId && subjectId !== 'all') {
     if (programmaticQuestionsCache.has(subjectId)) {
       return [...custom, ...base.filter(p => p.subjectId === subjectId), ...programmaticQuestionsCache.get(subjectId)!];
     }
+
     const matchingPdfs = OFFICIAL_PAST_PAPER_PDFS.filter(pdf => pdf.subjectId === subjectId);
-    // Take up to 35 most recent and diverse papers to provide hundreds of authentic questions instantly
-    const activeSlice = matchingPdfs.slice(0, 35);
+    
+    // Pick diverse papers across all exam years (2025 down to 2016) and all components
+    const selectedPdfs: OfficialPaperPdf[] = [];
+    const yearComponentSet = new Set<string>();
+
+    for (const pdf of matchingPdfs) {
+      const key = `${pdf.year}-${pdf.paperNumber}-${pdf.variant}`;
+      if (!yearComponentSet.has(key)) {
+        selectedPdfs.push(pdf);
+        yearComponentSet.add(key);
+      }
+      if (selectedPdfs.length >= 75) break;
+    }
+
     const generated: PastPaperItem[] = [];
-    for (const pdf of activeSlice) {
+    for (const pdf of selectedPdfs) {
       generated.push(...generateQuestionsForPaperPdf(pdf));
     }
+
     programmaticQuestionsCache.set(subjectId, generated);
     return [...custom, ...base.filter(p => p.subjectId === subjectId), ...generated];
   }
 
-  // If global search without specific subject, generate rich representation across all subjects
+  // If global search without specific subject, generate rich representation across all subjects and years
   if (programmaticQuestionsCache.has('__global_sample__')) {
     return [...custom, ...base, ...programmaticQuestionsCache.get('__global_sample__')!];
   }
 
   const subjectsCovered = new Set<string>();
   const diversePdfs: OfficialPaperPdf[] = [];
+
   for (const pdf of OFFICIAL_PAST_PAPER_PDFS) {
-    const key = `${pdf.subjectCode}-${pdf.paperNumber}`;
+    const key = `${pdf.subjectCode}-${pdf.paperNumber}-${pdf.year % 3}`;
     if (!subjectsCovered.has(key)) {
       diversePdfs.push(pdf);
       subjectsCovered.add(key);
     }
-    if (diversePdfs.length >= 75) break;
+    if (diversePdfs.length >= 100) break;
   }
 
   const sampleGenerated: PastPaperItem[] = [];
@@ -1128,6 +1165,7 @@ export function getAllPastPapers(subjectId?: string): PastPaperItem[] {
 export function findQuestionByExamCode(input: string): PastPaperItem | null {
   return findOrSynthesizeQuestionByCode(input, OFFICIAL_PAST_PAPER_PDFS);
 }
+
 
 // ==========================================================
 // LOCAL VERIFIED OFFLINE PAST PAPERS

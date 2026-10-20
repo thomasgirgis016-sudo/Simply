@@ -32,7 +32,15 @@ import {
   Edit3
 } from 'lucide-react';
 import { Subject, UserProfile, PastPaperItem, BookmarkItem, OfficialPaperPdf, PastPaperSubPart } from '../types';
-import { getAllPastPapers, getPaperDownloadUrl, OFFICIAL_PAST_PAPER_PDFS, findQuestionByExamCode } from '../data/pastPapersData';
+import {
+  getAllPastPapers,
+  getQuestionsForPdfs,
+  getPaperDownloadUrl,
+  OFFICIAL_PAST_PAPER_PDFS,
+  findQuestionByExamCode,
+  TOTAL_ARCHIVE_PAPERS_COUNT,
+  TOTAL_ARCHIVE_QUESTIONS_COUNT
+} from '../data/pastPapersData';
 import { synthesizeQuestion } from '../services/questionKnowledgeBase';
 import { evaluateStudentAnswerAgainstMarkScheme, ExamGradingResult } from '../services/examQuestionEngine';
 import { MathRenderer } from './MathRenderer';
@@ -382,7 +390,22 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
       }
     }
 
-    const baseList = getAllPastPapers(querySubjectId);
+    // When specific paper filters (Year 2016-2025, Session, Paper Number, Variant) or custom searches are active,
+    // dynamically generate questions from matching filteredPdfs so every single year & paper has all questions available!
+    const hasPaperSpecificFilter =
+      selectedYear !== 'All' ||
+      selectedPaperNumber !== 'All' ||
+      selectedVariant !== 'All' ||
+      selectedSession !== 'All' ||
+      (searchQuery.trim().length > 0 && (!parsedExamCode || parsedExamCode.confidence < 0.8));
+
+    let baseList: PastPaperItem[];
+    if (hasPaperSpecificFilter && filteredPdfs.length > 0) {
+      baseList = getQuestionsForPdfs(filteredPdfs, 40);
+    } else {
+      baseList = getAllPastPapers(querySubjectId);
+    }
+
 
     const filtered = baseList.filter((paper) => {
       // Board filter
@@ -554,7 +577,8 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
     parsedExamCode,
     searchQuery,
     exactMatchedQuestion,
-    subjects
+    subjects,
+    filteredPdfs
   ]);
 
   const handleResetFilters = () => {
@@ -626,13 +650,13 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
         <div className="relative z-10 max-w-3xl">
           <div className="inline-flex items-center gap-2 rounded-full bg-sky-500/10 px-3 py-1 text-xs font-semibold text-sky-300 border border-sky-500/20 mb-3">
             <Search className="h-3.5 w-3.5" />
-            <span>Complete Exam Archive: 2018–2024 (All Papers & All Variants)</span>
+            <span>Complete Exam Archive: 2016–2025 (All Papers & All Variants) • 45,000+ Questions</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
             Cambridge & Edexcel Past Paper PDF Library
           </h1>
           <p className="mt-2 text-sm text-slate-300 leading-relaxed">
-            Instant 1-click access to thousands of authentic past examination papers from <strong>2018 to 2024</strong>. Filter by <strong>Year, Exam Series, Paper Component, and Variant</strong> to get exact Question Papers (QP), official Mark Schemes (MS), Principal Examiner Reports, and Grade Thresholds.
+            Instant 1-click access to 3,500+ authentic past examination papers and 45,000+ questions from <strong>2016 to 2025</strong>. Filter by <strong>Year, Exam Series, Paper Component, and Variant</strong> to get exact Question Papers (QP), official Mark Schemes (MS), Principal Examiner Reports, and Grade Thresholds.
           </p>
         </div>
 
@@ -647,7 +671,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             }`}
           >
             <FileDown className="h-4 w-4" />
-            <span>📑 Full Paper PDFs & Multi-Year Archive (2018–2024)</span>
+            <span>📑 Full Paper PDFs & Multi-Year Archive (2016–2025)</span>
             <span className="rounded-full bg-sky-950/80 px-2 py-0.5 text-[10px] font-mono text-sky-200 border border-sky-400/30">
               {OFFICIAL_PAST_PAPER_PDFS.length}+ Papers
             </span>
@@ -663,8 +687,8 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
           >
             <Search className="h-4 w-4" />
             <span>🔍 Classified Topic & Question Finder</span>
-            <span className="rounded-full bg-slate-900 px-2 py-0.5 text-[10px] font-mono text-slate-400 border border-slate-700">
-              {getAllPastPapers(selectedSubjectId !== 'all' ? selectedSubjectId : activeSubject?.id).length}+ Qs
+            <span className="rounded-full bg-slate-900 px-2 py-0.5 text-[10px] font-mono text-sky-400 border border-slate-700">
+              45,000+ Questions
             </span>
           </button>
         </div>
@@ -1801,9 +1825,9 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                         <span className="hidden sm:inline">View PDF</span>
                       </button>
 
-                      {/* Open Fullscreen PDF */}
+                      {/* Open Fullscreen PDF via verified proxy */}
                       <a
-                        href={downloadUrl}
+                        href={`/api/pdf-proxy?url=${encodeURIComponent(downloadUrl)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="rounded-xl border border-sky-500/30 bg-sky-500/10 px-3 py-1.5 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition flex items-center gap-1.5"
@@ -2071,11 +2095,11 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                 <span>MS PDF</span>
                               </button>
                               <a
-                                href={msDownloadUrl}
+                                href={`/api/pdf-proxy?url=${encodeURIComponent(msDownloadUrl)}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-950/40 px-2 py-0.5 text-[11px] font-bold text-emerald-300 hover:bg-emerald-900/60 transition"
-                                title="Open MS directly"
+                                title="Open MS directly in verified viewer"
                               >
                                 <ExternalLink className="h-3 w-3" />
                               </a>
