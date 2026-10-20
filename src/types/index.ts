@@ -242,6 +242,12 @@ export interface SolverResult {
     breakdownPointOfFailure?: string;
     correctStepByStep: string[];
   };
+  examinerVerification?: {
+    isVerified: boolean;
+    accuracyScorePercent: number;
+    examinerSeal?: string;
+    details?: string;
+  };
 }
 
 export interface FlaggedQuestionIssue {

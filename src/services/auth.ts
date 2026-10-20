@@ -12,22 +12,23 @@ export async function hashPassword(password: string): Promise<string> {
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-// Seed default administrator if not present
+// Seed default administrator profile if not present (auth verified server-side via /api/auth)
 async function seedAdminIfNone(users: UserAccount[]): Promise<UserAccount[]> {
   const hasAdmin = users.some(u => u.role === 'admin' || u.email.toLowerCase() === 'admin@simplyigcse.com');
   if (!hasAdmin) {
-    const adminHash = await hashPassword('AdminPassword123!');
     const defaultAdmin: UserAccount = {
       id: 'admin_root',
       name: 'Simply IGCSE Admin',
       email: 'admin@simplyigcse.com',
-      passwordHash: adminHash,
+      passwordHash: '', // Secured: Admin password is authenticated strictly server-side
       grade: 'Year 11 / Grade 10 (IGCSE Exam Yr)',
       board: 'Both',
       targetGrade: '9 / A*',
       selectedSubjectIds: ['cie-math-0580', 'cie-esl-0510', 'cie-physics-0625', 'cie-chem-0620', 'cie-bio-0610'],
       role: 'admin',
       status: 'approved',
+      plan: 'pro',
+      isPro: true,
       approvedAt: new Date().toISOString(),
       approvedBy: 'system',
       createdAt: new Date().toISOString(),
@@ -170,12 +171,57 @@ export async function registerStudent(params: {
 
 // Sign in existing student or admin (Generates unique single-device session token)
 export async function loginStudent(email: string, password: string): Promise<{ success: boolean; user?: UserAccount; error?: string }> {
-  const users = getAllUsers();
   const normalizedEmail = email.trim().toLowerCase();
 
+  // 1. If signing in with the administrative address, authenticate strictly server-side against process.env.ADMIN_PASSWORD
+  if (normalizedEmail === 'admin@simplyigcse.com' || normalizedEmail.includes('admin@')) {
+    try {
+      const serverRes = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'verify_admin', email: normalizedEmail, password })
+      });
+      const data = await serverRes.json().catch(() => ({}));
+
+      if (serverRes.ok && data.success && data.user) {
+        const users = getAllUsers();
+        let adminUser: UserAccount | undefined = users.find(u => u.id === 'admin_root' || u.role === 'admin' || u.email.toLowerCase() === normalizedEmail);
+        if (!adminUser) {
+          adminUser = data.user as UserAccount;
+          users.unshift(adminUser);
+        } else {
+          adminUser.role = 'admin';
+          adminUser.status = 'approved';
+          adminUser.plan = 'pro';
+          adminUser.isPro = true;
+          adminUser.currentSessionToken = data.token || `adm_sess_${Date.now()}`;
+          adminUser.lastActiveAt = new Date().toISOString();
+        }
+        saveAllUsers(users);
+        setActiveUser(adminUser);
+        localStorage.setItem('simply_device_session_token', adminUser.currentSessionToken || '');
+        return { success: true, user: adminUser };
+      }
+
+      return {
+        success: false,
+        error: data.error || 'Invalid administrator password.'
+      };
+    } catch {
+      return { success: false, error: 'Could not connect to authentication server to verify administrator credentials.' };
+    }
+  }
+
+  // 2. Standard student account login verification
+  const users = getAllUsers();
   const user = users.find(u => u.email.toLowerCase() === normalizedEmail);
   if (!user) {
     return { success: false, error: 'No account found with this email. Please check your spelling or sign up.' };
+  }
+
+  // Prevent client-side password hash bypass for any admin accounts
+  if (user.role === 'admin') {
+    return { success: false, error: 'Administrator accounts must sign in via server authentication.' };
   }
 
   const passwordHash = await hashPassword(password);

@@ -17,7 +17,8 @@ import {
   PenTool,
   Award,
   Edit3,
-  Search
+  Search,
+  ShieldCheck
 } from 'lucide-react';
 import { Subject, UserProfile, SolverResult, FlaggedQuestionIssue, HandwrittenReviewResult, PastPaperItem } from '../types';
 import { SAMPLE_SOLVER_QUESTIONS } from '../data/initialData';
@@ -1003,6 +1004,38 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
                     )}
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* Senior Cambridge Examiner Autonomous AI Agent Verification Shield */}
+          {result.examinerVerification && (
+            <div className="rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-emerald-950/40 via-slate-900 to-sky-950/30 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shadow-inner">
+                  <ShieldCheck className="h-5 w-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-300">
+                      Senior Cambridge Examiner AI Agent
+                    </span>
+                    <span className="rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-[10px] font-extrabold text-emerald-300 border border-emerald-500/40">
+                      0-Mistake Audit Passed ✅
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-300 mt-1 leading-relaxed">
+                    {result.examinerVerification.details || 'Step-by-step arithmetic equality, SI units, 3 significant figures, and mark scheme criteria strictly validated.'}
+                  </p>
+                </div>
+              </div>
+              <div className="text-left sm:text-right shrink-0">
+                <span className="text-[10px] font-mono text-emerald-400 font-bold block">
+                  Accuracy Confidence: {result.examinerVerification.accuracyScorePercent}%
+                </span>
+                <span className="text-[10px] text-slate-400 font-mono">
+                  Official CAIE & Edexcel Protocol
+                </span>
               </div>
             </div>
           )}

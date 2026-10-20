@@ -2,6 +2,7 @@ import { SolverResult, Flashcard, QuizQuestion, RevisionTopic, HandwrittenReview
 import { searchUniversalKnowledge } from './knowledgeEngine';
 import { findPastPaperQuestionByReference, evaluateStudentAnswerAgainstMarkScheme } from './examQuestionEngine';
 import { evaluateStudentWorking } from './mathWorkingValidator';
+import { verifyAndAuditSolverResult } from './examinerVerificationAgent';
 
 export interface GeminiSolveParams {
   apiKey?: string;
@@ -264,7 +265,15 @@ DO NOT wrap your output in markdown code blocks like \`\`\`json. Return only raw
       if (directMathEval && directMathEval.hasEvaluatedMath) {
         serverResult.studentWorkingEvaluation = directMathEval;
       }
-      return serverResult;
+      const audit = verifyAndAuditSolverResult(serverResult);
+      const validated = audit.correctedResult;
+      validated.examinerVerification = {
+        isVerified: audit.isVerified,
+        accuracyScorePercent: audit.accuracyScorePercent,
+        examinerSeal: audit.examinerSeal,
+        details: audit.checks.map(c => `${c.name} (${c.status.toUpperCase()})`).join(' • ')
+      };
+      return validated;
     }
   } catch (err) {
     console.warn('Server /api/solve not reachable, trying client options:', err);
