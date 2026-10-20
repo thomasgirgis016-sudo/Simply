@@ -5,7 +5,16 @@ export type GradeLevel = 'Year 9 / Grade 8' | 'Year 10 / Grade 9 (IGCSE Yr 1)' |
 export type TargetGrade = '9 / A*' | '8 / A*' | '7 / A' | '6 / B' | '5 / C';
 
 export type AccountStatus = 'pending' | 'approved' | 'rejected' | 'suspended';
-export type UserRole = 'student' | 'admin';
+export type UserRole = 'student' | 'admin' | 'founder' | 'teacher';
+
+export interface StaffAccessCode {
+  code: string;
+  name: string;
+  role: 'founder' | 'admin' | 'teacher';
+  email: string;
+  title: string;
+  createdAt: string;
+}
 
 export type SubjectLevel = 'O Level / IGCSE' | 'AS Level' | 'A Level';
 export type SubscriptionPlan = 'free' | 'plus' | 'pro' | 'class' | 'school';
@@ -23,6 +32,7 @@ export interface UserAccount {
   targetGrade: TargetGrade;
   selectedSubjectIds: string[]; // max 5 subjects
   role?: UserRole;
+  title?: string;
   status?: AccountStatus;
   plan?: SubscriptionPlan;
   billingCycle?: BillingCycle;

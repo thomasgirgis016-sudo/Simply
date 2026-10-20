@@ -10,10 +10,11 @@ import {
   AlertCircle,
   ArrowRight,
   Sparkles,
-  ShieldCheck
+  ShieldCheck,
+  Crown
 } from 'lucide-react';
 import { UserAccount, GradeLevel, ExamBoard, TargetGrade, MAX_STUDENT_SUBJECTS } from '../types';
-import { registerStudent, loginStudent, requestPasswordReset, completePasswordReset } from '../services/auth';
+import { registerStudent, loginStudent, loginWithAccessCode, requestPasswordReset, completePasswordReset } from '../services/auth';
 import { IGCSE_SUBJECTS } from '../data/subjects';
 
 interface AuthModalProps {
@@ -29,11 +30,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onAuthSuccess,
   initialMode = 'signin'
 }) => {
-  const [mode, setMode] = useState<'signin' | 'signup' | 'forgot_request' | 'forgot_confirm' | 'reset_success'>(initialMode);
+  const [mode, setMode] = useState<'signin' | 'signup' | 'access_code' | 'forgot_request' | 'forgot_confirm' | 'reset_success'>(initialMode);
 
   // Form fields
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [accessCode, setAccessCode] = useState('');
   const [name, setName] = useState('');
   const [grade, setGrade] = useState<GradeLevel>('Year 11 / Grade 10 (IGCSE Exam Yr)');
   const [board, setBoard] = useState<ExamBoard>('Both');
@@ -49,7 +51,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   // Forgot password flow state
   const [resetCode, setResetCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
-  const [simulatedCode, setSimulatedCode] = useState<string | null>(null);
 
   // Status
   const [loading, setLoading] = useState(false);
@@ -75,6 +76,24 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         onClose();
       } else {
         setErrorMsg(res.error || 'Failed to sign in.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAccessCodeLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    resetMessages();
+    setLoading(true);
+
+    try {
+      const res = await loginWithAccessCode(accessCode);
+      if (res.success && res.user) {
+        onAuthSuccess(res.user);
+        onClose();
+      } else {
+        setErrorMsg(res.error || 'Invalid staff / founder access code.');
       }
     } finally {
       setLoading(false);
@@ -108,8 +127,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
   };
 
-  const handleRequestReset = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleRequestReset = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     resetMessages();
 
     if (!email || !email.includes('@')) {
@@ -117,13 +136,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       return;
     }
 
-    const res = requestPasswordReset(email);
-    if (res.success && res.code) {
-      setSimulatedCode(res.code);
-      setInfoMsg(`Security verification code generated for ${email}`);
-      setMode('forgot_confirm');
-    } else {
-      setErrorMsg(res.error || 'Unable to find an account with this email.');
+    setLoading(true);
+    try {
+      const res = await requestPasswordReset(email);
+      if (res.success) {
+        setInfoMsg(`A 6-digit verification code has been dispatched to ${email}. Check your inbox!`);
+        setMode('forgot_confirm');
+      } else {
+        setErrorMsg(res.error || 'Unable to find an account with this email.');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -178,6 +201,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <p className="text-xs text-slate-400">
               {mode === 'signin' && 'Sign in to access your subjects, progress & flashcards'}
               {mode === 'signup' && 'Create your student account to start studying'}
+              {mode === 'access_code' && 'Enter your unique Staff or Founder Access Code'}
               {mode.startsWith('forgot') && 'Reset your student account password'}
               {mode === 'reset_success' && 'Password successfully updated'}
             </p>
@@ -199,13 +223,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </div>
         )}
 
-        {/* Tab switchers if on signin or signup */}
-        {(mode === 'signin' || mode === 'signup') && (
+        {/* Tab switchers if on signin, signup or access_code */}
+        {(mode === 'signin' || mode === 'signup' || mode === 'access_code') && (
           <div className="mb-6 flex rounded-xl bg-slate-950 p-1 border border-slate-800">
             <button
               type="button"
               onClick={() => { setMode('signin'); resetMessages(); }}
-              className={`flex-1 rounded-lg py-2 text-xs font-bold transition ${
+              className={`flex-1 rounded-lg py-2 text-xs font-bold transition cursor-pointer ${
                 mode === 'signin'
                   ? 'bg-indigo-600 text-white shadow-sm'
                   : 'text-slate-400 hover:text-white'
@@ -216,13 +240,25 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <button
               type="button"
               onClick={() => { setMode('signup'); resetMessages(); }}
-              className={`flex-1 rounded-lg py-2 text-xs font-bold transition ${
+              className={`flex-1 rounded-lg py-2 text-xs font-bold transition cursor-pointer ${
                 mode === 'signup'
                   ? 'bg-indigo-600 text-white shadow-sm'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
               Create Account
+            </button>
+            <button
+              type="button"
+              onClick={() => { setMode('access_code'); resetMessages(); }}
+              className={`flex-1 rounded-lg py-2 text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1 ${
+                mode === 'access_code'
+                  ? 'bg-amber-500 text-slate-950 font-extrabold shadow-sm'
+                  : 'text-slate-400 hover:text-amber-300'
+              }`}
+            >
+              <Crown className="h-3.5 w-3.5" />
+              <span>Access Code</span>
             </button>
           </div>
         )}
@@ -255,7 +291,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <button
                   type="button"
                   onClick={() => { setMode('forgot_request'); resetMessages(); }}
-                  className="text-xs text-indigo-400 hover:text-indigo-300 font-medium"
+                  className="text-xs text-indigo-400 hover:text-indigo-300 font-medium cursor-pointer"
                 >
                   Forgot Password?
                 </button>
@@ -280,6 +316,79 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             >
               {loading ? 'Signing in...' : 'Sign In to Dashboard'}
             </button>
+
+            <div className="pt-3 text-center border-t border-slate-800">
+              <button
+                type="button"
+                onClick={() => { setMode('access_code'); resetMessages(); }}
+                className="inline-flex items-center gap-1.5 text-xs text-amber-400 hover:text-amber-300 font-semibold cursor-pointer transition"
+              >
+                <Crown className="h-3.5 w-3.5" />
+                <span>Staff or Founder? Log in with Access Code</span>
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* 1b. ACCESS CODE FORM (Thomas Founder & Staff) */}
+        {mode === 'access_code' && (
+          <form onSubmit={handleAccessCodeLogin} className="space-y-4 animate-fadeIn">
+            <div className="rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-950/30 via-slate-900 to-slate-950 p-4 text-xs text-amber-200">
+              <div className="flex items-center gap-2 font-bold text-amber-300 mb-1">
+                <Crown className="h-4 w-4 text-amber-400" />
+                Staff & Founder Portal
+              </div>
+              <p className="text-[11px] text-slate-300 leading-relaxed">
+                Platform founders and staff authenticate using an individual Security Access Code. Passwords are never written down or exposed.
+              </p>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+                  Security Access Code
+                </label>
+                <span className="text-[10px] text-amber-400/80 font-medium">Single-Device Auth</span>
+              </div>
+              <div className="relative">
+                <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-amber-400" />
+                <input
+                  type="password"
+                  required
+                  autoFocus
+                  value={accessCode}
+                  onChange={(e) => setAccessCode(e.target.value)}
+                  placeholder="Enter access code (e.g. 2011)"
+                  className="w-full rounded-xl border border-slate-700 bg-slate-950/80 py-2.5 pl-10 pr-3 text-base sm:text-sm text-white font-mono tracking-wider placeholder-slate-500 focus:border-amber-400 focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="mt-6 w-full rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 py-3 text-sm font-extrabold text-slate-950 shadow-lg shadow-amber-500/20 hover:from-amber-400 hover:to-orange-500 transition active:scale-95 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <span>Verifying Access Code...</span>
+              ) : (
+                <>
+                  <ShieldCheck className="h-4 w-4" />
+                  <span>Unlock Founder / Staff Console</span>
+                  <ArrowRight className="h-4 w-4" />
+                </>
+              )}
+            </button>
+
+            <div className="pt-3 text-center border-t border-slate-800">
+              <button
+                type="button"
+                onClick={() => { setMode('signin'); resetMessages(); }}
+                className="text-xs text-slate-400 hover:text-white cursor-pointer"
+              >
+                ← Back to Student Sign In
+              </button>
+            </div>
           </form>
         )}
 
@@ -490,29 +599,25 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         {/* 4. FORGOT PASSWORD - STEP 2 (CONFIRM CODE & SET NEW PASSWORD) */}
         {mode === 'forgot_confirm' && (
           <form onSubmit={handleConfirmReset} className="space-y-4">
-            {simulatedCode && (
-              <div className="rounded-2xl border border-amber-500/40 bg-amber-950/30 p-4 text-amber-200">
-                <div className="flex items-center gap-2 font-bold text-xs text-amber-300 mb-1">
-                  <ShieldCheck className="h-4 w-4 text-amber-400" />
-                  Your 6-Digit Password Reset Code:
-                </div>
-                <div className="flex items-center justify-between mt-2">
-                  <span className="font-mono text-2xl font-black tracking-widest text-white bg-slate-950 px-3 py-1 rounded-xl border border-amber-500/40">
-                    {simulatedCode}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setResetCode(simulatedCode)}
-                    className="text-xs underline text-amber-400 hover:text-amber-300 font-semibold"
-                  >
-                    Auto-Fill Code
-                  </button>
-                </div>
-                <p className="text-[11px] text-amber-300/80 mt-2">
-                  This code expires in 15 minutes. Enter it below along with your new password.
-                </p>
+            <div className="rounded-2xl border border-sky-500/30 bg-sky-950/40 p-4 text-sky-200">
+              <div className="flex items-center gap-2 font-bold text-xs text-sky-300 mb-1">
+                <Mail className="h-4 w-4 text-sky-400" />
+                Security Verification Code Dispatched to Your Email
               </div>
-            )}
+              <p className="text-xs text-slate-300 leading-relaxed">
+                We have sent a 6-digit verification code to <strong className="text-white font-mono">{email}</strong>. Please check your inbox and enter the code below.
+              </p>
+              <div className="mt-2.5 pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+                <span>Didn't receive it?</span>
+                <button
+                  type="button"
+                  onClick={() => handleRequestReset()}
+                  className="text-sky-400 hover:text-sky-300 font-semibold underline cursor-pointer"
+                >
+                  Resend Code
+                </button>
+              </div>
+            </div>
 
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">

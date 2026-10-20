@@ -488,7 +488,7 @@ export function App() {
   };
 
   const canAccessTools = Boolean(
-    currentUser && (currentUser.role === 'admin' || (currentUser.status === 'approved' && hasActiveSubscription(currentUser)))
+    currentUser && (currentUser.role === 'admin' || currentUser.role === 'founder' || (currentUser.status === 'approved' && hasActiveSubscription(currentUser)))
   );
 
   const getTabFeatureName = (tab: ActiveTab): string => {
@@ -505,7 +505,7 @@ export function App() {
       case 'boundaries': return 'the Grade Boundaries Calculator';
       case 'split': return 'the Split-Screen Exam Viewer';
       case 'analytics': return 'the School & Teacher Analytics Diagnostics';
-      case 'admin': return 'the Administrative Control Console';
+      case 'admin': return 'the Administrative & Founder Console';
       default: return 'this study resource';
     }
   };
@@ -536,7 +536,7 @@ export function App() {
       />
 
       {/* Main Container */}
-      <main className={`flex-1 px-3 py-3 sm:px-6 sm:py-8 max-w-7xl mx-auto w-full ${activeTab === 'chat' ? 'pb-20 md:pb-8' : 'pb-24 md:pb-8'}`}>
+      <main className={`flex-1 px-3 py-4 sm:px-6 sm:py-8 max-w-7xl mx-auto w-full ${activeTab === 'chat' ? 'pb-24 md:pb-8' : 'pb-28 md:pb-12'}`}>
         {/* Single Device Session Conflict Banner */}
         {deviceConflictAlert && (
           <div className="mb-6 rounded-2xl border border-rose-500/50 bg-rose-950/80 p-4 text-xs font-semibold text-rose-200 shadow-2xl flex items-center justify-between gap-3 animate-fadeIn">
@@ -553,9 +553,9 @@ export function App() {
           </div>
         )}
 
-        {/* Admin Dashboard (Only when activeTab is admin and current user has admin role) */}
+        {/* Admin Dashboard (Only when activeTab is admin and current user has admin or founder role) */}
         {activeTab === 'admin' ? (
-          currentUser?.role === 'admin' ? (
+          (currentUser?.role === 'admin' || currentUser?.role === 'founder') ? (
             <AdminDashboard
               currentUser={currentUser}
               onRefreshUser={handleRefreshStatus}

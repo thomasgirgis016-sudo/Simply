@@ -97,7 +97,7 @@ export const TeacherAnalyticsDashboard: React.FC<TeacherAnalyticsDashboardProps>
     <div className="space-y-8 animate-fadeIn text-left">
       {/* Toast */}
       {drillSuccessToast && (
-        <div className="fixed top-20 right-4 z-50 rounded-2xl border border-emerald-500/40 bg-emerald-950/95 px-4 py-3 text-xs font-bold text-emerald-200 shadow-2xl backdrop-blur-md flex items-center gap-2">
+        <div className="fixed top-32 sm:top-28 right-4 z-50 rounded-2xl border border-emerald-500/40 bg-emerald-950/95 px-4 py-3 text-xs font-bold text-emerald-200 shadow-2xl backdrop-blur-md flex items-center gap-2">
           <CheckCircle className="h-4 w-4 text-emerald-400" />
           <span>{drillSuccessToast}</span>
         </div>

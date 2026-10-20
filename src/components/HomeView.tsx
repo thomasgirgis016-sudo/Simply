@@ -375,6 +375,27 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
           </div>
         </div>
+      ) : currentUser.role === 'founder' ? (
+        <div className="rounded-2xl border border-amber-500/40 bg-gradient-to-r from-amber-950/40 via-slate-900 to-orange-950/30 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xl">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30">
+              <Crown className="h-5 w-5 text-amber-400 fill-amber-400" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-black text-white">Founder Console</h3>
+                <span className="rounded-md bg-amber-500/20 px-2 py-0.5 text-[10px] font-black text-amber-300 border border-amber-500/30">Thomas</span>
+              </div>
+              <p className="text-xs text-amber-200/80">Full administrative, syllabus control, and platform authority unlocked.</p>
+            </div>
+          </div>
+          <button
+            onClick={() => onNavigateTab('admin')}
+            className="rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-2 text-xs font-bold text-slate-950 shadow-md hover:from-amber-400 hover:to-orange-400 transition cursor-pointer shrink-0"
+          >
+            Open Founder Console
+          </button>
+        </div>
       ) : currentUser.role === 'admin' ? (
         <div className="rounded-2xl border border-purple-500/40 bg-gradient-to-r from-purple-950/30 via-slate-900 to-indigo-950/25 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xl">
           <div className="flex items-center gap-3">

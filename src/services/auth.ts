@@ -1,8 +1,21 @@
-import { UserAccount, GradeLevel, ExamBoard, TargetGrade, UserRole, AccountStatus, SubscriptionPlan, BillingCycle, MAX_STUDENT_SUBJECTS } from '../types';
+import { UserAccount, GradeLevel, ExamBoard, TargetGrade, UserRole, AccountStatus, SubscriptionPlan, BillingCycle, MAX_STUDENT_SUBJECTS, StaffAccessCode } from '../types';
 
 const STORAGE_USERS_KEY = 'simply_igcse_users';
 const STORAGE_ACTIVE_USER_ID = 'simply_igcse_active_user_id';
 const STORAGE_RESET_CODES = 'simply_igcse_reset_codes';
+const STORAGE_STAFF_ACCESS_CODES = 'simply_staff_access_codes';
+
+// Hardened Initial Staff Access Codes (Thomas - Founder)
+export const INITIAL_STAFF_ACCESS_CODES: StaffAccessCode[] = [
+  {
+    code: '2011',
+    name: 'Thomas',
+    role: 'founder',
+    email: 'thomas@simplyigcse.com',
+    title: 'Founder & Head of Platform',
+    createdAt: '2026-01-01T00:00:00.000Z'
+  }
+];
 
 // Helper to hash password with browser Web Crypto API SHA-256
 export async function hashPassword(password: string): Promise<string> {
@@ -240,8 +253,136 @@ export async function loginStudent(email: string, password: string): Promise<{ s
   return { success: true, user };
 }
 
-// Request password reset code
-export function requestPasswordReset(email: string): { success: boolean; code?: string; error?: string } {
+// Get all authorized staff access codes
+export function getStaffAccessCodes(): StaffAccessCode[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_STAFF_ACCESS_CODES);
+    const custom: StaffAccessCode[] = raw ? JSON.parse(raw) : [];
+    const merged = [...INITIAL_STAFF_ACCESS_CODES];
+    for (const c of custom) {
+      if (!merged.some(m => m.code === c.code)) {
+        merged.push(c);
+      }
+    }
+    return merged;
+  } catch {
+    return INITIAL_STAFF_ACCESS_CODES;
+  }
+}
+
+// Save staff access codes to local storage
+export function saveStaffAccessCodes(codes: StaffAccessCode[]): void {
+  try {
+    localStorage.setItem(STORAGE_STAFF_ACCESS_CODES, JSON.stringify(codes));
+  } catch (err) {
+    console.error('Failed to save staff access codes:', err);
+  }
+}
+
+// Add or update an authorized staff access code
+export function addStaffAccessCode(newCode: StaffAccessCode): void {
+  const current = getStaffAccessCodes();
+  const exists = current.findIndex(c => c.code === newCode.code);
+  if (exists >= 0) {
+    current[exists] = newCode;
+  } else {
+    current.push(newCode);
+  }
+  saveStaffAccessCodes(current);
+}
+
+// Sign in staff or founder using their unique Access Code (e.g. Thomas, Founder: 2011)
+export async function loginWithAccessCode(code: string): Promise<{ success: boolean; user?: UserAccount; error?: string }> {
+  const cleanCode = code.trim();
+  if (!cleanCode) {
+    return { success: false, error: 'Please enter your access code.' };
+  }
+
+  // 1. Try server verification first
+  try {
+    const res = await fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'verify_access_code', code: cleanCode })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data.success && data.user) {
+      const users = getAllUsers();
+      let matched = users.find(u => u.email.toLowerCase() === data.user.email.toLowerCase() || u.id === data.user.id);
+      if (!matched) {
+        matched = data.user as UserAccount;
+        users.unshift(matched);
+      } else {
+        matched.role = data.user.role;
+        matched.title = data.user.title;
+        matched.name = data.user.name;
+        matched.status = 'approved';
+        matched.plan = 'pro';
+        matched.isPro = true;
+        matched.currentSessionToken = data.token || `sess_${Date.now()}`;
+        matched.lastActiveAt = new Date().toISOString();
+      }
+      saveAllUsers(users);
+      setActiveUser(matched);
+      localStorage.setItem('simply_device_session_token', matched.currentSessionToken || '');
+      return { success: true, user: matched };
+    } else if (res.status === 401) {
+      return { success: false, error: data.error || 'Invalid access code.' };
+    }
+  } catch {
+    // Fall back to client-side access codes table (e.g. offline or dev)
+  }
+
+  // 2. Client-side access code validation fallback
+  const staffCodes = getStaffAccessCodes();
+  const staff = staffCodes.find(c => c.code.trim() === cleanCode);
+  if (!staff) {
+    return { success: false, error: 'Invalid access code. Please check your credentials.' };
+  }
+
+  const users = getAllUsers();
+  let existingUser = users.find(u => u.email.toLowerCase() === staff.email.toLowerCase());
+  const sessionToken = `sess_${staff.role}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+
+  if (!existingUser) {
+    existingUser = {
+      id: staff.role === 'founder' ? 'founder_thomas' : `staff_${staff.code}`,
+      name: staff.name,
+      email: staff.email,
+      passwordHash: '',
+      grade: 'Year 11 / Grade 10 (IGCSE Exam Yr)',
+      board: 'Both',
+      targetGrade: '9 / A*',
+      selectedSubjectIds: ['cie-math-0580', 'cie-esl-0510', 'cie-physics-0625', 'cie-chem-0620', 'cie-bio-0610'],
+      role: staff.role,
+      title: staff.title,
+      status: 'approved',
+      plan: 'pro',
+      isPro: true,
+      currentSessionToken: sessionToken,
+      lastActiveAt: new Date().toISOString(),
+      createdAt: staff.createdAt || new Date().toISOString(),
+    };
+    users.unshift(existingUser);
+  } else {
+    existingUser.role = staff.role;
+    existingUser.title = staff.title;
+    existingUser.name = staff.name;
+    existingUser.status = 'approved';
+    existingUser.plan = 'pro';
+    existingUser.isPro = true;
+    existingUser.currentSessionToken = sessionToken;
+    existingUser.lastActiveAt = new Date().toISOString();
+  }
+
+  saveAllUsers(users);
+  setActiveUser(existingUser);
+  localStorage.setItem('simply_device_session_token', sessionToken);
+  return { success: true, user: existingUser };
+}
+
+// Request password reset code (Dispatches 6-digit verification code to student's email)
+export async function requestPasswordReset(email: string): Promise<{ success: boolean; error?: string }> {
   const users = getAllUsers();
   const normalizedEmail = email.trim().toLowerCase();
 
@@ -258,7 +399,18 @@ export function requestPasswordReset(email: string): { success: boolean; code?: 
   resetCodes[normalizedEmail] = { code, expiresAt };
   localStorage.setItem(STORAGE_RESET_CODES, JSON.stringify(resetCodes));
 
-  return { success: true, code };
+  // Dispatch email notification via server /api/auth
+  try {
+    await fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'send_reset_code', email: normalizedEmail, code })
+    });
+  } catch (err) {
+    console.warn('Email dispatch completed with local fallback:', err);
+  }
+
+  return { success: true };
 }
 
 // Verify reset code and update password
@@ -481,26 +633,34 @@ export const MASTER_ADMIN_PASSCODE = 'simply-admin-2026';
 
 export async function verifyAdminPasscode(passcode: string): Promise<boolean> {
   const trimmed = passcode.trim();
-  if (
-    trimmed === MASTER_ADMIN_PASSCODE ||
-    trimmed === 'AdminPassword123!' ||
-    trimmed === 'simply2026' ||
-    trimmed === 'simplyadmin'
-  ) {
-    return true;
-  }
+  if (trimmed === '2011') return true;
+
+  const staffCodes = getStaffAccessCodes();
+  if (staffCodes.some(c => c.code.trim() === trimmed)) return true;
+
+  if (trimmed === MASTER_ADMIN_PASSCODE) return true;
+
   const users = getAllUsers();
-  const admin = users.find(u => u.role === 'admin' || u.email.toLowerCase() === 'admin@simplyigcse.com');
-  if (admin) {
+  const admin = users.find(u => u.role === 'admin' || u.role === 'founder' || u.email.toLowerCase() === 'admin@simplyigcse.com');
+  if (admin && admin.passwordHash) {
     const hash = await hashPassword(trimmed);
     if (admin.passwordHash === hash) return true;
   }
   return false;
 }
 
-export async function loginAsMasterAdmin(): Promise<UserAccount> {
+export async function loginAsMasterAdmin(passcode?: string): Promise<UserAccount> {
+  const trimmed = passcode?.trim();
+  if (trimmed === '2011' || !trimmed) {
+    const res = await loginWithAccessCode('2011');
+    if (res.success && res.user) return res.user;
+  } else {
+    const res = await loginWithAccessCode(trimmed);
+    if (res.success && res.user) return res.user;
+  }
+
   const users = getAllUsers();
-  let admin = users.find(u => u.role === 'admin');
+  let admin = users.find(u => u.role === 'founder' || u.role === 'admin');
   if (!admin) {
     await seedAdminIfNone(users);
     admin = getAllUsers().find(u => u.role === 'admin')!;
@@ -614,7 +774,7 @@ export function updateUserAccount(
 
 export function hasActiveSubscription(user: UserAccount | null): boolean {
   if (!user) return false;
-  if (user.role === 'admin') return true;
+  if (user.role === 'admin' || user.role === 'founder') return true;
   if (user.isEnrolledViaSchool) return true;
   if (user.isPro) {
     if (!user.proExpiresAt) return true;
@@ -625,6 +785,15 @@ export function hasActiveSubscription(user: UserAccount | null): boolean {
     return new Date(user.proExpiresAt).getTime() > Date.now();
   }
   return false;
+}
+
+export function isStaffOrAdmin(user: UserAccount | null | undefined): boolean {
+  if (!user) return false;
+  return user.role === 'admin' || user.role === 'founder';
+}
+
+export function isFounder(user: UserAccount | null | undefined): boolean {
+  return user?.role === 'founder';
 }
 
 export const DEVICE_SESSION_STORAGE_KEY = 'simply_device_session_token';

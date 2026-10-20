@@ -129,7 +129,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newName, setNewName] = useState('');
   const [newEmail, setNewEmail] = useState('');
-  const [newPassword, setNewPassword] = useState('Password123!');
+  const [newPassword, setNewPassword] = useState('');
   const [newRole, setNewRole] = useState<UserRole>('student');
   const [newGrade, setNewGrade] = useState<GradeLevel>('Year 11 / Grade 10 (IGCSE Exam Yr)');
   const [newBoard, setNewBoard] = useState<ExamBoard>('Both');
@@ -734,7 +734,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     <div className="mx-auto max-w-6xl space-y-6 animate-fadeIn pb-12">
       {/* Toast Alert */}
       {actionSuccessMsg && (
-        <div className="fixed top-20 right-4 z-50 rounded-2xl border border-emerald-500/40 bg-emerald-950/90 px-4 py-3 text-xs font-bold text-emerald-200 shadow-2xl backdrop-blur-md flex items-center gap-2 animate-fadeIn">
+        <div className="fixed top-32 sm:top-28 right-4 z-50 rounded-2xl border border-emerald-500/40 bg-emerald-950/95 px-4 py-3 text-xs font-bold text-emerald-200 shadow-2xl backdrop-blur-md flex items-center gap-2 animate-fadeIn">
           <CheckCircle className="h-4 w-4 text-emerald-400" />
           <span>{actionSuccessMsg}</span>
         </div>
@@ -3111,11 +3111,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <div>
                 <label className="text-[11px] font-bold text-slate-300 block mb-1">Temporary Password</label>
                 <input
-                  type="text"
+                  type="password"
                   required
+                  minLength={6}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white font-mono focus:border-indigo-500 focus:outline-none"
+                  placeholder="Enter initial password (min 6 chars)..."
+                  className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white focus:border-indigo-500 focus:outline-none"
                 />
               </div>
 
@@ -3129,6 +3131,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   >
                     <option value="student">Student</option>
                     <option value="admin">Administrator</option>
+                    <option value="founder">Platform Founder</option>
+                    <option value="teacher">Teacher</option>
                   </select>
                 </div>
 

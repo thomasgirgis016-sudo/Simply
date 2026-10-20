@@ -33,12 +33,12 @@ export const SecretAdminModal: React.FC<SecretAdminModalProps> = ({
     try {
       const isValid = await verifyAdminPasscode(passcode.trim());
       if (isValid) {
-        const admin = await loginAsMasterAdmin();
+        const admin = await loginAsMasterAdmin(passcode.trim());
         onSuccess(admin);
         onClose();
         setPasscode('');
       } else {
-        setError('Invalid master passcode. Access restricted to authorized administrators.');
+        setError('Invalid access code. Access restricted to authorized personnel.');
       }
     } catch {
       setError('Verification failed. Please retry.');
@@ -70,7 +70,7 @@ export const SecretAdminModal: React.FC<SecretAdminModalProps> = ({
 
           <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 px-3 py-1 text-xs font-bold text-amber-300 border border-amber-500/30">
             <ShieldCheck className="h-3.5 w-3.5" />
-            <span>Restricted Access Portal</span>
+            <span>Staff & Founder Portal</span>
           </div>
 
           <h3 className="text-xl font-black text-white tracking-tight">
@@ -78,7 +78,7 @@ export const SecretAdminModal: React.FC<SecretAdminModalProps> = ({
           </h3>
 
           <p className="text-xs text-slate-400 leading-relaxed max-w-xs mx-auto">
-            Review user waitlist requests, grant student approvals, and manage examination assets.
+            Authorized staff and founder access portal. Enter your security access code below.
           </p>
         </div>
 
@@ -95,22 +95,19 @@ export const SecretAdminModal: React.FC<SecretAdminModalProps> = ({
           <div>
             <label className="text-[11px] font-bold uppercase tracking-wider text-slate-300 block mb-1.5 flex items-center gap-1.5">
               <KeyRound className="h-3.5 w-3.5 text-amber-400" />
-              <span>Master Passcode or Password:</span>
+              <span>Staff / Founder Access Code:</span>
             </label>
             <div className="relative">
               <input
                 type="password"
                 value={passcode}
                 onChange={(e) => setPasscode(e.target.value)}
-                placeholder="Enter master admin passcode..."
+                placeholder="Enter access code (e.g. 2011)..."
                 autoFocus
                 className="w-full rounded-xl border border-slate-700 bg-slate-950/90 px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:border-amber-400 focus:outline-none font-mono"
               />
               <Lock className="absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
             </div>
-            <p className="text-[10px] text-slate-500 mt-1 italic">
-              Default passcode: <code className="text-slate-400">simply-admin-2026</code>
-            </p>
           </div>
 
           <button

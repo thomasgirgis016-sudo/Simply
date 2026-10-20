@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Sparkles,
   Camera,
@@ -137,7 +137,18 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'split', label: 'Split-Screen Papers', icon: Columns, color: 'text-sky-400' },
   ];
 
-  const navTabs = baseTabs;
+  const navTabs = useMemo(() => {
+    const tabs = [...baseTabs];
+    if (currentUser?.role === 'admin' || currentUser?.role === 'founder') {
+      tabs.push({
+        id: 'admin',
+        label: currentUser.role === 'founder' ? 'Founder Console' : 'Admin Console',
+        icon: Crown,
+        color: 'text-amber-400'
+      });
+    }
+    return tabs;
+  }, [currentUser]);
 
   const handleMobileTabClick = (tabId: ActiveTab) => {
     onSelectTab(tabId);
@@ -216,6 +227,13 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             {currentUser ? (
               <div className="flex items-center gap-2">
+                {currentUser.role === 'founder' && (
+                  <div className="flex items-center gap-1.5 rounded-xl border border-amber-500/50 bg-gradient-to-r from-amber-500/20 via-orange-500/15 to-amber-500/20 px-2.5 py-1 text-xs font-black text-amber-300 shadow-sm shadow-amber-500/10">
+                    <Crown className="h-3.5 w-3.5 text-amber-400 fill-amber-400" />
+                    <span>FOUNDER</span>
+                  </div>
+                )}
+
                 {currentUser.status === 'pending' && (
                   <span className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-[10px] font-bold text-amber-300 animate-pulse">
                     Pending Approval
@@ -224,10 +242,16 @@ export const Navbar: React.FC<NavbarProps> = ({
 
                 <button
                   onClick={onOpenProfile}
-                  className="flex items-center gap-2 rounded-xl border border-indigo-500/30 bg-indigo-950/40 px-3 py-1.5 text-xs font-semibold text-indigo-200 hover:bg-indigo-900/50 transition cursor-pointer"
+                  className={`flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs font-semibold transition cursor-pointer ${
+                    currentUser.role === 'founder'
+                      ? 'border-amber-500/40 bg-amber-950/40 text-amber-200 hover:bg-amber-900/50'
+                      : 'border-indigo-500/30 bg-indigo-950/40 text-indigo-200 hover:bg-indigo-900/50'
+                  }`}
                   title="Account Settings"
                 >
-                  <div className="h-5 w-5 rounded-full bg-indigo-600 flex items-center justify-center text-[10px] font-bold text-white uppercase">
+                  <div className={`h-5 w-5 rounded-full flex items-center justify-center text-[10px] font-bold uppercase ${
+                    currentUser.role === 'founder' ? 'bg-amber-500 text-slate-950 font-black' : 'bg-indigo-600 text-white'
+                  }`}>
                     {currentUser.name.charAt(0)}
                   </div>
                   <span>{currentUser.name}</span>
@@ -284,11 +308,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* Mobile Right: Quick Action & Hamburger Menu */}
-          <div className="flex sm:hidden items-center gap-1.5">
+          <div className="flex sm:hidden items-center gap-1.5 shrink-0">
             {onOpenPayment && (
               <button
                 onClick={onOpenPayment}
-                className={`flex items-center gap-1 rounded-xl px-2 py-1 text-[11px] font-extrabold transition cursor-pointer ${
+                className={`flex items-center gap-1 rounded-xl px-2 py-1 text-[11px] font-extrabold transition cursor-pointer shrink-0 ${
                   currentUser?.isPro
                     ? 'border border-amber-500/40 bg-amber-500/10 text-amber-300'
                     : 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-sm'
@@ -303,7 +327,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {onToggleTheme && (
               <button
                 onClick={onToggleTheme}
-                className="rounded-xl border border-slate-800 bg-slate-900/90 p-2 text-slate-400 hover:text-amber-400 transition"
+                className="rounded-xl border border-slate-800 bg-slate-900/90 p-2 text-slate-400 hover:text-amber-400 transition shrink-0"
                 aria-label="Toggle Theme"
               >
                 {theme === 'dark' ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-indigo-400" />}
@@ -313,17 +337,24 @@ export const Navbar: React.FC<NavbarProps> = ({
             {currentUser ? (
               <button
                 onClick={onOpenProfile}
-                className="flex items-center gap-1.5 rounded-xl border border-slate-800 bg-slate-900/90 px-2 py-1.5 text-xs text-white"
+                className="flex items-center gap-1.5 rounded-xl border border-slate-800 bg-slate-900/90 px-2 py-1.5 text-xs text-white shrink-0"
                 title="Profile"
               >
-                <div className="h-5 w-5 rounded-full bg-gradient-to-tr from-[#FF5E62] to-[#FFA63A] flex items-center justify-center text-[10px] font-black text-slate-950 uppercase">
+                <div className={`h-5 w-5 rounded-full flex items-center justify-center text-[10px] font-black uppercase ${
+                  currentUser.role === 'founder'
+                    ? 'bg-amber-400 text-slate-950'
+                    : 'bg-gradient-to-tr from-[#FF5E62] to-[#FFA63A] text-slate-950'
+                }`}>
                   {currentUser.name.charAt(0)}
                 </div>
+                {currentUser.role === 'founder' && (
+                  <Crown className="h-3 w-3 text-amber-400 fill-amber-400" />
+                )}
               </button>
             ) : (
               <button
                 onClick={() => onOpenAuth('signin')}
-                className="rounded-xl bg-gradient-to-r from-[#FF5E62] to-[#FFA63A] px-2.5 py-1 text-[11px] font-extrabold text-slate-950 shadow-sm"
+                className="rounded-xl bg-gradient-to-r from-[#FF5E62] to-[#FFA63A] px-2.5 py-1 text-[11px] font-extrabold text-slate-950 shadow-sm shrink-0"
               >
                 Sign In
               </button>
@@ -331,7 +362,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             <button
               onClick={() => setIsMobileDrawerOpen(true)}
-              className="rounded-xl border border-slate-800 bg-slate-900/90 p-2 text-slate-300 hover:text-white transition cursor-pointer"
+              className="rounded-xl border border-slate-800 bg-slate-900/90 p-2 text-slate-300 hover:text-white transition cursor-pointer shrink-0"
               aria-label="Open Mobile Menu"
             >
               <Menu className="h-5 w-5 text-amber-400" />
@@ -369,14 +400,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
         </div>
 
-        {/* Navigation tabs bar (Desktop, Tablet & Mobile Horizontal Scroll with Gradient Fade Mask) */}
-        <div
-          className="flex mx-auto max-w-7xl items-center gap-1 overflow-x-auto px-3.5 pb-2 pt-1 sm:px-6 no-scrollbar scroll-smooth"
-          style={{
-            maskImage: 'linear-gradient(to right, black 85%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(to right, black 85%, transparent 100%)',
-          }}
-        >
+        {/* Navigation tabs bar (Desktop, Tablet & Mobile Horizontal Scroll) */}
+        <div className="flex mx-auto max-w-7xl items-center gap-1 overflow-x-auto px-3.5 pb-2 pt-1 sm:px-6 no-scrollbar scroll-smooth">
           {navTabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
