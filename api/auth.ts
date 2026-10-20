@@ -1,6 +1,12 @@
-// Server-side Authentication & Administrator Verification Endpoint: /api/auth
-// Validates admin credentials strictly against server environment variables
-// (ADMIN_EMAIL, ADMIN_PASSWORD) so secrets are never bundled into client JavaScript.
+// Global in-memory dynamic staff codes table
+const DYNAMIC_STAFF_CODES: Record<string, any> = {
+  '2011': {
+    name: 'Thomas',
+    email: 'thomas@simplyigcse.com',
+    role: 'founder',
+    title: 'Founder & Head of Platform'
+  }
+};
 
 export default async function handler(req: any, res?: any) {
   // CORS Headers
@@ -45,8 +51,50 @@ export default async function handler(req: any, res?: any) {
       return new Response(JSON.stringify(payload), { status: 200, headers });
     }
 
+    // 1b. Update or change an access code (e.g. Thomas changing his access code)
+    if (action === 'update_access_code') {
+      const { oldCode, newCode, name, role = 'founder', title } = body;
+      const cleanNewCode = String(newCode || '').trim();
+      const cleanOldCode = String(oldCode || '').trim();
+
+      if (!cleanNewCode) {
+        const payload = { success: false, error: 'New access code cannot be empty.' };
+        if (res?.status) return res.status(400).json(payload);
+        return new Response(JSON.stringify(payload), { status: 400, headers });
+      }
+
+      DYNAMIC_STAFF_CODES[cleanNewCode] = {
+        name: name || 'Thomas',
+        email: role === 'founder' ? 'thomas@simplyigcse.com' : `${cleanNewCode}@staff.simplyigcse.com`,
+        role: role || 'founder',
+        title: title || (role === 'founder' ? 'Founder & Head of Platform' : 'Staff Administrator')
+      };
+
+      if (cleanOldCode && cleanOldCode !== cleanNewCode) {
+        delete DYNAMIC_STAFF_CODES[cleanOldCode];
+      }
+
+      console.log(`[ACCESS CODE UPDATED] ${name || 'Staff'} updated access code to: [PROTECTED]`);
+
+      const payload = { success: true, message: `Access code successfully updated to ${cleanNewCode}` };
+      if (res?.status) return res.status(200).json(payload);
+      return new Response(JSON.stringify(payload), { status: 200, headers });
+    }
+
+    // 1c. Delete an access code
+    if (action === 'delete_access_code') {
+      const { code: targetCode } = body;
+      const cleanTarget = String(targetCode || '').trim();
+      if (cleanTarget) {
+        delete DYNAMIC_STAFF_CODES[cleanTarget];
+      }
+      const payload = { success: true, message: 'Access code revoked' };
+      if (res?.status) return res.status(200).json(payload);
+      return new Response(JSON.stringify(payload), { status: 200, headers });
+    }
+
     // 2. Staff & Founder Access Code Authentication
-    // Validates individual access codes (e.g. Thomas, Founder: 2011)
+    // Validates individual access codes (e.g. Thomas, Founder: 2011 or any updated code)
     if (action === 'verify_access_code') {
       if (!cleanCode) {
         const payload = { success: false, error: 'Access code is required.' };
@@ -54,14 +102,22 @@ export default async function handler(req: any, res?: any) {
         return new Response(JSON.stringify(payload), { status: 400, headers });
       }
 
-      // Hardened Access Code Table
-      if (cleanCode === '2011') {
-        const founderUser = {
-          id: 'founder_thomas',
+      // Check dynamic table or default
+      if (cleanCode === '2011' || DYNAMIC_STAFF_CODES[cleanCode]) {
+        const staffMeta = DYNAMIC_STAFF_CODES[cleanCode] || {
           name: 'Thomas',
           email: 'thomas@simplyigcse.com',
           role: 'founder',
-          title: 'Founder & Head of Platform',
+          title: 'Founder & Head of Platform'
+        };
+
+        const isFounderUser = staffMeta.role === 'founder';
+        const staffUser = {
+          id: isFounderUser ? 'founder_thomas' : `staff_${cleanCode}`,
+          name: staffMeta.name,
+          email: staffMeta.email,
+          role: staffMeta.role,
+          title: staffMeta.title,
           status: 'approved',
           plan: 'pro',
           isPro: true,
@@ -70,18 +126,18 @@ export default async function handler(req: any, res?: any) {
           board: 'Both',
           targetGrade: '9 / A*',
           selectedSubjectIds: ['cie-math-0580', 'cie-esl-0510', 'cie-physics-0625', 'cie-chem-0620', 'cie-bio-0610'],
-          currentSessionToken: `founder_sess_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+          currentSessionToken: `${staffMeta.role}_sess_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
           lastActiveAt: new Date().toISOString(),
           createdAt: '2026-01-01T00:00:00.000Z'
         };
 
         const payload = {
           success: true,
-          isFounder: true,
+          isFounder: isFounderUser,
           isAdmin: true,
-          user: founderUser,
-          token: founderUser.currentSessionToken,
-          message: 'Welcome back, Founder Thomas!'
+          user: staffUser,
+          token: staffUser.currentSessionToken,
+          message: isFounderUser ? `Welcome back, Founder ${staffUser.name}!` : `Welcome back, ${staffUser.name}!`
         };
 
         if (res?.status) return res.status(200).json(payload);

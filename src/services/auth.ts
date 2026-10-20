@@ -282,13 +282,89 @@ export function saveStaffAccessCodes(codes: StaffAccessCode[]): void {
 // Add or update an authorized staff access code
 export function addStaffAccessCode(newCode: StaffAccessCode): void {
   const current = getStaffAccessCodes();
-  const exists = current.findIndex(c => c.code === newCode.code);
+  const exists = current.findIndex(c => c.code.trim() === newCode.code.trim());
   if (exists >= 0) {
     current[exists] = newCode;
   } else {
     current.push(newCode);
   }
   saveStaffAccessCodes(current);
+
+  // Sync to server
+  try {
+    fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'update_access_code', newCode: newCode.code, name: newCode.name, role: newCode.role, title: newCode.title })
+    }).catch(() => {});
+  } catch {}
+}
+
+// Update an existing access code (e.g. changing Thomas's code from 2011 to a new code)
+export function updateStaffAccessCode(oldCode: string, updated: StaffAccessCode): { success: boolean; error?: string } {
+  const current = getStaffAccessCodes();
+  const cleanOld = oldCode.trim();
+  const cleanNew = updated.code.trim();
+
+  if (!cleanNew) {
+    return { success: false, error: 'New access code cannot be empty.' };
+  }
+
+  // Check if new code conflicts with another existing code
+  const conflict = current.find(c => c.code.trim() === cleanNew && c.code.trim() !== cleanOld);
+  if (conflict) {
+    return { success: false, error: `Access code "${cleanNew}" is already in use by ${conflict.name}.` };
+  }
+
+  const idx = current.findIndex(c => c.code.trim() === cleanOld);
+  if (idx !== -1) {
+    current[idx] = updated;
+  } else {
+    current.push(updated);
+  }
+  saveStaffAccessCodes(current);
+
+  // Sync to server
+  try {
+    fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'update_access_code',
+        oldCode: cleanOld,
+        newCode: cleanNew,
+        name: updated.name,
+        role: updated.role,
+        title: updated.title
+      })
+    }).catch(() => {});
+  } catch {}
+
+  return { success: true };
+}
+
+// Delete an authorized access code
+export function deleteStaffAccessCode(code: string): { success: boolean; error?: string } {
+  const current = getStaffAccessCodes();
+  const clean = code.trim();
+  const target = current.find(c => c.code.trim() === clean);
+
+  if (target && target.role === 'founder' && current.filter(c => c.role === 'founder').length <= 1) {
+    return { success: false, error: 'Cannot delete the only Founder access code. Please update it instead.' };
+  }
+
+  const filtered = current.filter(c => c.code.trim() !== clean);
+  saveStaffAccessCodes(filtered);
+
+  try {
+    fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'delete_access_code', code: clean })
+    }).catch(() => {});
+  } catch {}
+
+  return { success: true };
 }
 
 // Sign in staff or founder using their unique Access Code (e.g. Thomas, Founder: 2011)
@@ -298,7 +374,56 @@ export async function loginWithAccessCode(code: string): Promise<{ success: bool
     return { success: false, error: 'Please enter your access code.' };
   }
 
-  // 1. Try server verification first
+  // 1. Direct validation against current staff access codes table (always honors user-customized codes!)
+  const staffCodes = getStaffAccessCodes();
+  const localMatch = staffCodes.find(c => c.code.trim() === cleanCode);
+
+  if (localMatch) {
+    const users = getAllUsers();
+    const userEmail = (localMatch.email || `${localMatch.role}_${localMatch.code}@simplyigcse.com`).toLowerCase();
+    const existingUser = users.find(u => (u.email && u.email.toLowerCase() === userEmail) || (localMatch.role === 'founder' && u.role === 'founder'));
+    const sessionToken = `sess_${localMatch.role}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+
+    let userToSet: UserAccount;
+    if (!existingUser) {
+      userToSet = {
+        id: localMatch.role === 'founder' ? 'founder_thomas' : `staff_${localMatch.code}`,
+        name: localMatch.name,
+        email: userEmail,
+        passwordHash: '',
+        grade: 'Year 11 / Grade 10 (IGCSE Exam Yr)',
+        board: 'Both',
+        targetGrade: '9 / A*',
+        selectedSubjectIds: ['cie-math-0580', 'cie-esl-0510', 'cie-physics-0625', 'cie-chem-0620', 'cie-bio-0610'],
+        role: localMatch.role,
+        title: localMatch.title,
+        status: 'approved',
+        plan: 'pro',
+        isPro: true,
+        currentSessionToken: sessionToken,
+        lastActiveAt: new Date().toISOString(),
+        createdAt: localMatch.createdAt || new Date().toISOString(),
+      };
+      users.unshift(userToSet);
+    } else {
+      existingUser.role = localMatch.role;
+      existingUser.title = localMatch.title;
+      existingUser.name = localMatch.name;
+      existingUser.status = 'approved';
+      existingUser.plan = 'pro';
+      existingUser.isPro = true;
+      existingUser.currentSessionToken = sessionToken;
+      existingUser.lastActiveAt = new Date().toISOString();
+      userToSet = existingUser;
+    }
+
+    saveAllUsers(users);
+    setActiveUser(userToSet);
+    localStorage.setItem('simply_device_session_token', sessionToken);
+    return { success: true, user: userToSet };
+  }
+
+  // 2. Fall back to server verification
   try {
     const res = await fetch('/api/auth', {
       method: 'POST',
@@ -326,59 +451,12 @@ export async function loginWithAccessCode(code: string): Promise<{ success: bool
       setActiveUser(matched);
       localStorage.setItem('simply_device_session_token', matched.currentSessionToken || '');
       return { success: true, user: matched };
-    } else if (res.status === 401) {
-      return { success: false, error: data.error || 'Invalid access code.' };
     }
   } catch {
-    // Fall back to client-side access codes table (e.g. offline or dev)
+    // Offline or server unreachable
   }
 
-  // 2. Client-side access code validation fallback
-  const staffCodes = getStaffAccessCodes();
-  const staff = staffCodes.find(c => c.code.trim() === cleanCode);
-  if (!staff) {
-    return { success: false, error: 'Invalid access code. Please check your credentials.' };
-  }
-
-  const users = getAllUsers();
-  let existingUser = users.find(u => u.email.toLowerCase() === staff.email.toLowerCase());
-  const sessionToken = `sess_${staff.role}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-
-  if (!existingUser) {
-    existingUser = {
-      id: staff.role === 'founder' ? 'founder_thomas' : `staff_${staff.code}`,
-      name: staff.name,
-      email: staff.email,
-      passwordHash: '',
-      grade: 'Year 11 / Grade 10 (IGCSE Exam Yr)',
-      board: 'Both',
-      targetGrade: '9 / A*',
-      selectedSubjectIds: ['cie-math-0580', 'cie-esl-0510', 'cie-physics-0625', 'cie-chem-0620', 'cie-bio-0610'],
-      role: staff.role,
-      title: staff.title,
-      status: 'approved',
-      plan: 'pro',
-      isPro: true,
-      currentSessionToken: sessionToken,
-      lastActiveAt: new Date().toISOString(),
-      createdAt: staff.createdAt || new Date().toISOString(),
-    };
-    users.unshift(existingUser);
-  } else {
-    existingUser.role = staff.role;
-    existingUser.title = staff.title;
-    existingUser.name = staff.name;
-    existingUser.status = 'approved';
-    existingUser.plan = 'pro';
-    existingUser.isPro = true;
-    existingUser.currentSessionToken = sessionToken;
-    existingUser.lastActiveAt = new Date().toISOString();
-  }
-
-  saveAllUsers(users);
-  setActiveUser(existingUser);
-  localStorage.setItem('simply_device_session_token', sessionToken);
-  return { success: true, user: existingUser };
+  return { success: false, error: 'Invalid access code. Please check your credentials.' };
 }
 
 // Request password reset code (Dispatches 6-digit verification code to student's email)

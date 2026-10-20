@@ -42,7 +42,13 @@ import {
   DollarSign,
   Building,
   Check,
-  Tag
+  Tag,
+  History,
+  Eye,
+  EyeOff,
+  Edit3,
+  KeyRound,
+  Download
 } from 'lucide-react';
 import {
   UserAccount,
@@ -57,7 +63,8 @@ import {
   PastPaperQaSummaryReport,
   PastPaperQaItemIssue,
   SubscriptionPlan,
-  BillingCycle
+  BillingCycle,
+  StaffAccessCode
 } from '../types';
 import {
   getAllUsers,
@@ -69,8 +76,18 @@ import {
   rejectAllPendingUsers,
   createPreApprovedUser,
   grantUserProSubscription,
-  updateUserSubscriptionPlan
+  updateUserSubscriptionPlan,
+  getStaffAccessCodes,
+  updateStaffAccessCode,
+  addStaffAccessCode,
+  deleteStaffAccessCode
 } from '../services/auth';
+import {
+  getAuditLogs,
+  logAuditEvent,
+  clearAuditLogs,
+  AuditLogEntry
+} from '../services/auditTrail';
 import { IGCSE_SUBJECTS } from '../data/subjects';
 import { getCustomPastPapers, saveCustomPastPapers } from '../data/pastPapersData';
 import { SimplyLogo } from './SimplyLogo';
@@ -152,8 +169,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   const handleSetUserPlan = (userId: string, plan: SubscriptionPlan, cycle: BillingCycle = 'monthly') => {
+    const target = users.find(u => u.id === userId);
     const res = updateUserSubscriptionPlan(userId, plan, cycle);
     if (res.success) {
+      logAuditEvent({
+        actorName: currentUser.name || (currentUser.role === 'founder' ? 'Thomas (Founder)' : 'Administrator'),
+        actorRole: (currentUser.role as any) || 'admin',
+        actorEmail: currentUser.email,
+        action: 'PLAN_CHANGED',
+        actionLabel: 'Changed Subscription Plan',
+        targetType: 'user',
+        targetId: userId,
+        targetLabel: target ? `${target.name} (${target.email})` : userId,
+        details: `Updated subscription plan for ${target ? target.name : userId} to ${plan.toUpperCase()} (${cycle}).`,
+        previousValue: `Plan: ${target?.plan || 'free'}`,
+        newValue: `Plan: ${plan} (${cycle})`
+      });
+      reloadAuditLogs();
       reloadUsers();
       showToast(`Updated student subscription to ${plan.toUpperCase()} (${cycle})!`);
     } else {
@@ -223,6 +255,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const handleApprove = (u: UserAccount) => {
     const ok = approveUser(u.id, currentUser.email);
     if (ok) {
+      logAuditEvent({
+        actorName: currentUser.name || (currentUser.role === 'founder' ? 'Thomas (Founder)' : 'Administrator'),
+        actorRole: (currentUser.role as any) || 'admin',
+        actorEmail: currentUser.email,
+        action: 'USER_APPROVED',
+        actionLabel: 'Approved User Account',
+        targetType: 'user',
+        targetId: u.id,
+        targetLabel: `${u.name} (${u.email})`,
+        details: `Approved student admissions waitlist access for ${u.name} (${u.email}).`,
+        previousValue: 'Status: Pending',
+        newValue: 'Status: Approved'
+      });
+      reloadAuditLogs();
       reloadUsers();
       showToast(`Account for ${u.name} (${u.email}) approved successfully!`);
     }
@@ -235,6 +281,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }
     const ok = rejectUser(u.id);
     if (ok) {
+      logAuditEvent({
+        actorName: currentUser.name || (currentUser.role === 'founder' ? 'Thomas (Founder)' : 'Administrator'),
+        actorRole: (currentUser.role as any) || 'admin',
+        actorEmail: currentUser.email,
+        action: 'USER_SUSPENDED',
+        actionLabel: 'Suspended User Account',
+        targetType: 'user',
+        targetId: u.id,
+        targetLabel: `${u.name} (${u.email})`,
+        details: `Suspended account access for ${u.name} (${u.email}).`,
+        previousValue: 'Status: Approved',
+        newValue: 'Status: Suspended'
+      });
+      reloadAuditLogs();
       reloadUsers();
       showToast(`Account for ${u.name} suspended.`);
     }
@@ -245,8 +305,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       alert("You cannot remove your own admin role.");
       return;
     }
+    const newRole = u.role === 'admin' ? 'student' : 'admin';
     const ok = toggleUserRole(u.id);
     if (ok) {
+      logAuditEvent({
+        actorName: currentUser.name || (currentUser.role === 'founder' ? 'Thomas (Founder)' : 'Administrator'),
+        actorRole: (currentUser.role as any) || 'admin',
+        actorEmail: currentUser.email,
+        action: 'ROLE_MODIFIED',
+        actionLabel: 'Modified User Role',
+        targetType: 'user',
+        targetId: u.id,
+        targetLabel: `${u.name} (${u.email})`,
+        details: `Changed role of ${u.name} (${u.email}) from ${u.role || 'student'} to ${newRole}.`,
+        previousValue: `Role: ${u.role || 'student'}`,
+        newValue: `Role: ${newRole}`
+      });
+      reloadAuditLogs();
       reloadUsers();
       showToast(`Role updated for ${u.name}.`);
     }
@@ -260,6 +335,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     if (confirm(`Are you sure you want to permanently delete account: ${u.email}?`)) {
       const ok = deleteUser(u.id);
       if (ok) {
+        logAuditEvent({
+          actorName: currentUser.name || (currentUser.role === 'founder' ? 'Thomas (Founder)' : 'Administrator'),
+          actorRole: (currentUser.role as any) || 'admin',
+          actorEmail: currentUser.email,
+          action: 'USER_DELETED',
+          actionLabel: 'Permanently Deleted User',
+          targetType: 'user',
+          targetId: u.id,
+          targetLabel: `${u.name} (${u.email})`,
+          details: `Permanently removed account ${u.email} from the platform.`
+        });
+        reloadAuditLogs();
         reloadUsers();
         showToast(`Account ${u.email} permanently removed.`);
       }
@@ -281,8 +368,264 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   // CMS & Admin Sections State
-  const [adminActiveTab, setAdminActiveTab] = useState<'accounts' | 'cms' | 'payments' | 'pricing' | 'enquiries' | 'qa' | 'classroom'>('accounts');
+  const [adminActiveTab, setAdminActiveTab] = useState<'accounts' | 'cms' | 'payments' | 'pricing' | 'enquiries' | 'qa' | 'classroom' | 'access-codes' | 'audit'>('accounts');
   const [cmsSection, setCmsSection] = useState<'flashcards' | 'pastpapers'>('flashcards');
+
+  // Staff & Founder Access Codes State
+  const [staffCodes, setStaffCodes] = useState<StaffAccessCode[]>(() => getStaffAccessCodes());
+  const [codeVisibility, setCodeVisibility] = useState<Record<string, boolean>>({});
+  const [isEditCodeModalOpen, setIsEditCodeModalOpen] = useState(false);
+  const [editingCode, setEditingCode] = useState<StaffAccessCode | null>(null);
+  const [editNewCodeVal, setEditNewCodeVal] = useState('');
+  const [editName, setEditName] = useState('');
+  const [editRole, setEditRole] = useState<'founder' | 'admin' | 'teacher'>('founder');
+  const [editTitle, setEditTitle] = useState('');
+  const [isAddCodeModalOpen, setIsAddCodeModalOpen] = useState(false);
+  const [addCodeVal, setAddCodeVal] = useState('');
+  const [addName, setAddName] = useState('');
+  const [addRole, setAddRole] = useState<'founder' | 'admin' | 'teacher'>('teacher');
+  const [addTitle, setAddTitle] = useState('');
+  const [testCodeInput, setTestCodeInput] = useState('');
+  const [testCodeResult, setTestCodeResult] = useState<{ success: boolean; message: string; code?: StaffAccessCode } | null>(null);
+
+  // Platform Audit Trail State
+  const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>(() => getAuditLogs());
+  const [auditSearch, setAuditSearch] = useState('');
+  const [auditActorFilter, setAuditActorFilter] = useState<'all' | 'founder' | 'admin' | 'system'>('all');
+  const [auditTargetFilter, setAuditTargetFilter] = useState<'all' | 'access_code' | 'user' | 'pricing' | 'payment' | 'system'>('all');
+
+  const reloadStaffCodes = () => {
+    setStaffCodes(getStaffAccessCodes());
+  };
+
+  const reloadAuditLogs = () => {
+    setAuditLogs(getAuditLogs());
+  };
+
+  const toggleCodeVisibility = (code: string) => {
+    setCodeVisibility(prev => ({ ...prev, [code]: !prev[code] }));
+  };
+
+  const handleOpenEditCode = (codeItem: StaffAccessCode) => {
+    setEditingCode(codeItem);
+    setEditNewCodeVal(codeItem.code);
+    setEditName(codeItem.name);
+    setEditRole(codeItem.role);
+    setEditTitle(codeItem.title || '');
+    setIsEditCodeModalOpen(true);
+  };
+
+  const handleSaveEditedCode = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingCode) return;
+    const cleanNewCode = editNewCodeVal.trim();
+    if (!cleanNewCode) {
+      alert('Access code cannot be empty.');
+      return;
+    }
+
+    const updated: StaffAccessCode = {
+      ...editingCode,
+      code: cleanNewCode,
+      name: editName.trim() || editingCode.name,
+      role: editRole,
+      title: editTitle.trim() || editingCode.title,
+    };
+
+    const res = updateStaffAccessCode(editingCode.code, updated);
+    if (!res.success) {
+      alert(res.error || 'Failed to update access code.');
+      return;
+    }
+
+    reloadStaffCodes();
+    setIsEditCodeModalOpen(false);
+
+    // Record audit event
+    const actorRole = (currentUser.role as any) || 'founder';
+    const actorName = currentUser.name || (currentUser.role === 'founder' ? 'Thomas (Founder)' : 'Administrator');
+    logAuditEvent({
+      actorName,
+      actorRole,
+      actorEmail: currentUser.email,
+      action: 'ACCESS_CODE_UPDATED',
+      actionLabel: 'Updated Access Code',
+      targetType: 'access_code',
+      targetLabel: `${updated.name} (${updated.role.toUpperCase()})`,
+      details: `${actorName} updated access code for ${updated.name} from "${editingCode.code}" to "${cleanNewCode}".`,
+      previousValue: `Code: ${editingCode.code} (${editingCode.role})`,
+      newValue: `Code: ${cleanNewCode} (${updated.role})`
+    });
+    reloadAuditLogs();
+
+    showToast(`Access code for ${updated.name} successfully updated to "${cleanNewCode}"!`);
+  };
+
+  const handleCreateNewCode = (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanCode = addCodeVal.trim();
+    if (!cleanCode) {
+      alert('Access code cannot be empty.');
+      return;
+    }
+
+    const newStaffCode: StaffAccessCode = {
+      code: cleanCode,
+      name: addName.trim() || 'Staff Member',
+      role: addRole,
+      title: addTitle.trim() || `${addRole === 'founder' ? 'Founder' : addRole === 'admin' ? 'Administrator' : 'Educator'}`
+    };
+
+    addStaffAccessCode(newStaffCode);
+    reloadStaffCodes();
+    setIsAddCodeModalOpen(false);
+    setAddCodeVal('');
+    setAddName('');
+    setAddTitle('');
+
+    const actorRole = (currentUser.role as any) || 'founder';
+    const actorName = currentUser.name || (currentUser.role === 'founder' ? 'Thomas (Founder)' : 'Administrator');
+    logAuditEvent({
+      actorName,
+      actorRole,
+      actorEmail: currentUser.email,
+      action: 'ACCESS_CODE_CREATED',
+      actionLabel: 'Created Staff Access Code',
+      targetType: 'access_code',
+      targetLabel: `${newStaffCode.name} (${newStaffCode.role.toUpperCase()})`,
+      details: `${actorName} provisioned a new access code for ${newStaffCode.name} (${newStaffCode.title}).`,
+      newValue: `Code: ${cleanCode} | Role: ${newStaffCode.role}`
+    });
+    reloadAuditLogs();
+
+    showToast(`Created new access code "${cleanCode}" for ${newStaffCode.name}!`);
+  };
+
+  const handleDeleteStaffCode = (codeItem: StaffAccessCode) => {
+    if (codeItem.role === 'founder' && staffCodes.filter(c => c.role === 'founder').length <= 1) {
+      alert('Cannot delete the primary Founder access code. You can update or change the code instead.');
+      return;
+    }
+
+    if (!confirm(`Are you sure you want to revoke access code for ${codeItem.name} (${codeItem.code})?`)) {
+      return;
+    }
+
+    const res = deleteStaffAccessCode(codeItem.code);
+    if (!res.success) {
+      alert(res.error || 'Failed to revoke access code.');
+      return;
+    }
+
+    reloadStaffCodes();
+
+    const actorRole = (currentUser.role as any) || 'founder';
+    const actorName = currentUser.name || (currentUser.role === 'founder' ? 'Thomas (Founder)' : 'Administrator');
+    logAuditEvent({
+      actorName,
+      actorRole,
+      actorEmail: currentUser.email,
+      action: 'ACCESS_CODE_REVOKED',
+      actionLabel: 'Revoked Staff Access Code',
+      targetType: 'access_code',
+      targetLabel: `${codeItem.name} (${codeItem.role.toUpperCase()})`,
+      details: `${actorName} revoked access code "${codeItem.code}" previously held by ${codeItem.name}.`,
+      previousValue: `Code: ${codeItem.code}`
+    });
+    reloadAuditLogs();
+
+    showToast(`Access code for ${codeItem.name} has been revoked.`);
+  };
+
+  const handleTestAccessCode = (e: React.FormEvent) => {
+    e.preventDefault();
+    const clean = testCodeInput.trim();
+    if (!clean) return;
+
+    const matched = staffCodes.find(c => c.code.trim().toLowerCase() === clean.toLowerCase());
+    if (matched) {
+      setTestCodeResult({
+        success: true,
+        message: `VALID ACCESS CODE: Authenticates as ${matched.name} (${matched.title || matched.role.toUpperCase()}) with role: [${matched.role}].`,
+        code: matched
+      });
+    } else {
+      setTestCodeResult({
+        success: false,
+        message: `INVALID: Code "${clean}" does not match any registered Founder, Admin, or Teacher access codes.`
+      });
+    }
+  };
+
+  const handleExportAuditJson = () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(auditLogs, null, 2));
+    const dlAnchorElem = document.createElement('a');
+    dlAnchorElem.setAttribute("href", dataStr);
+    dlAnchorElem.setAttribute("download", `simply-igcse-audit-trail-${new Date().toISOString().slice(0, 10)}.json`);
+    dlAnchorElem.click();
+    showToast('Exported audit logs to JSON file.');
+  };
+
+  const handleExportAuditCsv = () => {
+    const headers = ['ID', 'Timestamp', 'Actor Name', 'Actor Role', 'Actor Email', 'Action', 'Target Type', 'Target Label', 'Details', 'Previous Value', 'New Value'];
+    const rows = auditLogs.map(l => [
+      l.id,
+      l.timestamp,
+      `"${l.actorName.replace(/"/g, '""')}"`,
+      l.actorRole,
+      l.actorEmail || '',
+      l.action,
+      l.targetType,
+      `"${l.targetLabel.replace(/"/g, '""')}"`,
+      `"${l.details.replace(/"/g, '""')}"`,
+      `"${(l.previousValue || '').replace(/"/g, '""')}"`,
+      `"${(l.newValue || '').replace(/"/g, '""')}"`
+    ]);
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `simply-igcse-audit-trail-${new Date().toISOString().slice(0, 10)}.csv`);
+    link.click();
+    showToast('Exported audit logs to CSV file.');
+  };
+
+  const handleClearAuditLogs = () => {
+    if (confirm('Are you sure you want to archive and reset the audit log history? A fresh archive record will be created.')) {
+      clearAuditLogs(currentUser.name || 'Thomas', (currentUser.role as any) || 'founder');
+      reloadAuditLogs();
+      showToast('Audit trail history archived.');
+    }
+  };
+
+  const filteredAuditLogs = useMemo(() => {
+    return auditLogs.filter(log => {
+      const q = auditSearch.toLowerCase().trim();
+      const matchesSearch = !q ||
+        log.actorName.toLowerCase().includes(q) ||
+        log.actionLabel.toLowerCase().includes(q) ||
+        log.details.toLowerCase().includes(q) ||
+        log.targetLabel.toLowerCase().includes(q);
+
+      const matchesActor =
+        auditActorFilter === 'all' ||
+        log.actorRole === auditActorFilter;
+
+      const matchesTarget =
+        auditTargetFilter === 'all' ||
+        log.targetType === auditTargetFilter;
+
+      return matchesSearch && matchesActor && matchesTarget;
+    });
+  }, [auditLogs, auditSearch, auditActorFilter, auditTargetFilter]);
+
+  const auditMetrics = useMemo(() => {
+    const total = auditLogs.length;
+    const founderActions = auditLogs.filter(l => l.actorRole === 'founder' || l.actorName.includes('Thomas')).length;
+    const securityActions = auditLogs.filter(l => l.targetType === 'access_code' || l.action.includes('SECURITY') || l.action.includes('AUTH')).length;
+    const accountActions = auditLogs.filter(l => l.targetType === 'user').length;
+    return { total, founderActions, securityActions, accountActions };
+  }, [auditLogs]);
 
   // Pricing & Promotions State
   const [pricingSettings, setPricingSettings] = useState<PricingSettings>(getPricingSettings);
@@ -354,6 +697,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   const handleSavePricing = () => {
     savePricingSettings(pricingSettings);
+    logAuditEvent({
+      actorName: currentUser.name || (currentUser.role === 'founder' ? 'Thomas (Founder)' : 'Administrator'),
+      actorRole: (currentUser.role as any) || 'admin',
+      actorEmail: currentUser.email,
+      action: 'PRICING_UPDATED',
+      actionLabel: 'Updated Course Pricing & Discounts',
+      targetType: 'pricing',
+      targetLabel: 'Platform Pricing Settings',
+      details: `Updated subscription pricing and discount rules. Plus: EGP ${pricingSettings.plans?.plus?.discountPrice ?? 199}/mo, Pro: EGP ${pricingSettings.plans?.pro?.discountPrice ?? 299}/mo. Discount Active: ${pricingSettings.discountActive}.`,
+      newValue: `Plus: ${pricingSettings.plans?.plus?.discountPrice ?? 199} EGP | Pro: ${pricingSettings.plans?.pro?.discountPrice ?? 299} EGP`
+    });
+    reloadAuditLogs();
     showToast('Pricing & promotional discount settings saved and broadcasted platform-wide!');
   };
 
@@ -380,6 +735,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     resetSchoolSubmissions();
     setBankTxs([]);
     setSchoolSubmissions([]);
+    logAuditEvent({
+      actorName: currentUser.name || (currentUser.role === 'founder' ? 'Thomas (Founder)' : 'Administrator'),
+      actorRole: (currentUser.role as any) || 'admin',
+      actorEmail: currentUser.email,
+      action: 'DEMO_DATA_RESET',
+      actionLabel: 'Reset Demo Data to Zero-State',
+      targetType: 'system',
+      targetLabel: 'Platform Test Database',
+      details: `Cleared all mock transactions, cohorts, and school questionnaire entries. Clean 0-state ready for live users.`,
+    });
+    reloadAuditLogs();
     showToast("All demo/test data successfully reset to clean production state (0 records)!");
   };
 
@@ -568,6 +934,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       });
 
       if (res.success) {
+        logAuditEvent({
+          actorName: currentUser.name || (currentUser.role === 'founder' ? 'Thomas (Founder)' : 'Administrator'),
+          actorRole: (currentUser.role as any) || 'admin',
+          actorEmail: currentUser.email,
+          action: 'USER_PREAPPROVED',
+          actionLabel: 'Enrolled & Pre-Approved Student',
+          targetType: 'user',
+          targetId: res.user?.id,
+          targetLabel: `${res.user?.name} (${res.user?.email})`,
+          details: `Directly created and pre-approved account for ${res.user?.name} with ${newRole} permissions.`,
+          newValue: `Role: ${newRole} | Board: ${newBoard}`
+        });
+        reloadAuditLogs();
         reloadUsers();
         setIsAddModalOpen(false);
         setNewName('');
@@ -674,6 +1053,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     reloadUsers();
     setManualMatchTx(null);
     setManualMatchEmail('');
+
+    logAuditEvent({
+      actorName: currentUser.name || (currentUser.role === 'founder' ? 'Thomas (Founder)' : 'Administrator'),
+      actorRole: (currentUser.role as any) || 'admin',
+      actorEmail: currentUser.email,
+      action: 'PAYMENT_MATCHED_PRO_GRANTED',
+      actionLabel: 'Matched InstaPay & Granted Pro',
+      targetType: 'payment',
+      targetId: tx.txNumber,
+      targetLabel: `Tx #${tx.txNumber} (EGP ${tx.amount.toFixed(2)})`,
+      details: `Matched BDC transfer #${tx.txNumber} (EGP ${tx.amount.toFixed(2)}) with student ${targetEmail} and granted 30-day Pro plan.`,
+      newValue: `Status: Claimed | Pro Active (30 Days)`
+    });
+    reloadAuditLogs();
 
     if (grantRes.success) {
       showToast(`Matched Tx #${tx.txNumber} with ${targetEmail}! 30-day Pro granted.`);
@@ -804,6 +1197,36 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <span>Student Accounts & Access</span>
           <span className="rounded-full bg-slate-950/60 px-2 py-0.5 text-[10px] text-slate-300">
             {metrics.total}
+          </span>
+        </button>
+
+        <button
+          onClick={() => setAdminActiveTab('access-codes')}
+          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
+            adminActiveTab === 'access-codes'
+              ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-lg shadow-amber-500/30 font-black'
+              : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
+          }`}
+        >
+          <KeyRound className="h-4 w-4" />
+          <span>Staff & Founder Access Codes</span>
+          <span className="rounded-full bg-slate-950/60 px-2 py-0.5 text-[10px] text-amber-300 border border-amber-500/30">
+            {staffCodes.length} Codes
+          </span>
+        </button>
+
+        <button
+          onClick={() => setAdminActiveTab('audit')}
+          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
+            adminActiveTab === 'audit'
+              ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+              : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
+          }`}
+        >
+          <History className="h-4 w-4" />
+          <span>Platform Activity & Change Trail</span>
+          <span className="rounded-full bg-slate-950/60 px-2 py-0.5 text-[10px] text-slate-300">
+            {auditLogs.length}
           </span>
         </button>
 
@@ -2969,6 +3392,689 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             currentUser={currentUser}
             subjects={IGCSE_SUBJECTS}
           />
+        </div>
+      )}
+
+      {/* Staff & Founder Access Codes Portal */}
+      {adminActiveTab === 'access-codes' && (
+        <div className="space-y-6 animate-fadeIn">
+          {/* Header Card */}
+          <div className="rounded-3xl border border-amber-500/30 bg-gradient-to-br from-amber-950/30 via-slate-900 to-slate-950 p-6 sm:p-8 shadow-xl relative overflow-hidden">
+            <div className="absolute -top-12 -right-12 h-44 w-44 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative">
+              <div className="space-y-2">
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/20 px-3 py-1 text-xs font-black text-amber-300 border border-amber-500/30">
+                  <KeyRound className="h-3.5 w-3.5" />
+                  <span>Access Control & Security Provisioning</span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black text-white">Staff & Founder Access Codes</h2>
+                <p className="text-xs sm:text-sm text-slate-300 max-w-2xl">
+                  Authorized staff and Founder passcodes allow instant, single-step login without email passwords. Changes here take effect immediately across all active login gates.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setIsAddCodeModalOpen(true)}
+                  className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-2.5 text-xs font-black text-slate-950 shadow-lg shadow-amber-500/25 hover:brightness-110 transition cursor-pointer"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span>Provision New Staff Code</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Founder Highlight Spotlight (Thomas) */}
+          {staffCodes.filter(c => c.role === 'founder').map(founderCode => (
+            <div
+              key={founderCode.code}
+              className="rounded-3xl border-2 border-amber-500/50 bg-gradient-to-r from-amber-950/40 via-slate-900 to-amber-950/20 p-6 sm:p-7 shadow-2xl relative overflow-hidden"
+            >
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="flex items-start sm:items-center gap-4">
+                  <div className="relative">
+                    <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 p-0.5 shadow-xl shadow-amber-500/20 flex items-center justify-center">
+                      <div className="h-full w-full rounded-2xl bg-slate-950 flex items-center justify-center">
+                        <Crown className="h-8 w-8 text-amber-400" />
+                      </div>
+                    </div>
+                    <span className="absolute -bottom-1 -right-1 flex h-4 w-4">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-4 w-4 bg-amber-500 border-2 border-slate-950"></span>
+                    </span>
+                  </div>
+
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="text-xl font-black text-white flex items-center gap-1.5">
+                        {founderCode.name}
+                        <CheckCircle2 className="h-4 w-4 text-amber-400 fill-amber-400/20" />
+                      </h3>
+                      <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-500/20 to-yellow-500/20 px-2.5 py-0.5 text-[10px] font-black text-amber-300 border border-amber-500/40 uppercase tracking-wider">
+                        <Crown className="h-3 w-3 text-amber-400" />
+                        Founder • Root Authority
+                      </span>
+                    </div>
+                    <p className="text-xs text-amber-200/90 font-medium">
+                      {founderCode.title || 'Founder & Head of Platform'} • {founderCode.email || 'thomas@simplyigcse.com'}
+                    </p>
+                    <p className="text-[11px] text-slate-400">
+                      Primary platform creator and administrative authority with root access privileges.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 bg-slate-950/80 rounded-2xl border border-amber-500/30 p-3 sm:p-4 self-stretch md:self-auto justify-between sm:justify-end">
+                  <div className="space-y-0.5 text-right sm:text-left">
+                    <div className="text-[10px] font-bold text-amber-400/80 uppercase tracking-wider">
+                      Current Access Code
+                    </div>
+                    <div className="text-xl sm:text-2xl font-black font-mono text-white tracking-widest">
+                      {codeVisibility[founderCode.code] ? founderCode.code : '••••'}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => toggleCodeVisibility(founderCode.code)}
+                      className="rounded-xl border border-slate-700 bg-slate-800 p-2 text-slate-300 hover:text-white hover:border-slate-600 transition cursor-pointer"
+                      title={codeVisibility[founderCode.code] ? "Hide Code" : "Show Code"}
+                    >
+                      {codeVisibility[founderCode.code] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEditCode(founderCode)}
+                      className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-3.5 py-2 text-xs font-black text-slate-950 hover:brightness-110 shadow-md shadow-amber-500/20 transition cursor-pointer"
+                    >
+                      <Edit3 className="h-3.5 w-3.5" />
+                      <span>Change Code</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {/* Other Staff & Teacher Access Codes Grid */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                <Users className="h-4 w-4 text-indigo-400" />
+                <span>All Authorized Staff & Teacher Access Codes ({staffCodes.length})</span>
+              </h3>
+              <span className="text-xs text-slate-400">Instant login without password</span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+              {staffCodes.map((codeItem) => {
+                const isFounder = codeItem.role === 'founder';
+                const isTeacher = codeItem.role === 'teacher';
+                const isAdmin = codeItem.role === 'admin';
+
+                return (
+                  <div
+                    key={codeItem.code}
+                    className={`rounded-2xl border p-4 sm:p-5 transition shadow-lg ${
+                      isFounder
+                        ? 'border-amber-500/40 bg-slate-900/90'
+                        : isAdmin
+                        ? 'border-indigo-500/30 bg-slate-900/70'
+                        : 'border-slate-800 bg-slate-900/50'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-3">
+                        <div className={`rounded-xl p-2.5 ${
+                          isFounder
+                            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                            : isAdmin
+                            ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30'
+                            : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                        }`}>
+                          {isFounder ? <Crown className="h-5 w-5" /> : isTeacher ? <GraduationCap className="h-5 w-5" /> : <ShieldCheck className="h-5 w-5" />}
+                        </div>
+
+                        <div className="space-y-0.5">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-bold text-white">{codeItem.name}</span>
+                            <span className={`rounded-full px-2 py-0.5 text-[9px] font-black uppercase ${
+                              isFounder
+                                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                : isAdmin
+                                ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
+                                : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                            }`}>
+                              {codeItem.role}
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-400 font-medium">{codeItem.title || 'Staff Member'}</p>
+                          {codeItem.email && <p className="text-[11px] text-slate-500">{codeItem.email}</p>}
+                        </div>
+                      </div>
+
+                      <div className="text-right">
+                        <div className="text-[10px] text-slate-500 uppercase tracking-wider">Access Code</div>
+                        <div className="text-base font-black font-mono text-white tracking-wider">
+                          {codeVisibility[codeItem.code] ? codeItem.code : '••••'}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-2 pt-3 mt-3 border-t border-slate-800/80">
+                      <button
+                        type="button"
+                        onClick={() => toggleCodeVisibility(codeItem.code)}
+                        className="flex items-center gap-1 text-[11px] font-semibold text-slate-400 hover:text-white transition cursor-pointer"
+                      >
+                        {codeVisibility[codeItem.code] ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                        <span>{codeVisibility[codeItem.code] ? 'Hide' : 'Reveal'}</span>
+                      </button>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEditCode(codeItem)}
+                          className="flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-800/80 px-2.5 py-1 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition cursor-pointer"
+                        >
+                          <Edit3 className="h-3 w-3" />
+                          <span>Change</span>
+                        </button>
+
+                        {!isFounder && (
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteStaffCode(codeItem)}
+                            className="flex items-center gap-1 rounded-lg border border-rose-500/30 bg-rose-500/10 px-2.5 py-1 text-xs font-semibold text-rose-300 hover:bg-rose-500/20 transition cursor-pointer"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                            <span>Revoke</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Live Access Code Validator */}
+          <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 space-y-3">
+            <div className="flex items-center gap-2">
+              <Zap className="h-4 w-4 text-amber-400" />
+              <h3 className="text-xs font-bold uppercase tracking-wider text-white">Live Access Code Tester & Simulator</h3>
+            </div>
+            <p className="text-xs text-slate-400">
+              Test any access code here to verify that changes have propagated and see which identity and permissions it authenticates as.
+            </p>
+
+            <form onSubmit={handleTestAccessCode} className="flex flex-col sm:flex-row gap-2">
+              <input
+                type="text"
+                value={testCodeInput}
+                onChange={(e) => setTestCodeInput(e.target.value)}
+                placeholder="Enter access code to test (e.g. 2011)..."
+                className="flex-1 rounded-xl border border-slate-700 bg-slate-950 px-3.5 py-2 text-xs font-mono text-white placeholder-slate-500 focus:border-amber-500 focus:outline-none"
+              />
+              <button
+                type="submit"
+                className="rounded-xl bg-slate-800 border border-slate-700 px-4 py-2 text-xs font-bold text-white hover:bg-slate-700 transition cursor-pointer"
+              >
+                Verify Code
+              </button>
+            </form>
+
+            {testCodeResult && (
+              <div className={`rounded-xl p-3 text-xs font-medium border animate-fadeIn ${
+                testCodeResult.success
+                  ? 'border-emerald-500/40 bg-emerald-950/40 text-emerald-300'
+                  : 'border-rose-500/40 bg-rose-950/40 text-rose-300'
+              }`}>
+                <div className="flex items-center gap-2">
+                  {testCodeResult.success ? <CheckCircle className="h-4 w-4 text-emerald-400 shrink-0" /> : <AlertTriangle className="h-4 w-4 text-rose-400 shrink-0" />}
+                  <span>{testCodeResult.message}</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Platform Activity & Change Audit Trail Portal */}
+      {adminActiveTab === 'audit' && (
+        <div className="space-y-6 animate-fadeIn">
+          {/* Header Card */}
+          <div className="rounded-3xl border border-blue-500/30 bg-gradient-to-br from-blue-950/30 via-slate-900 to-slate-950 p-6 sm:p-8 shadow-xl relative overflow-hidden">
+            <div className="absolute -top-12 -right-12 h-44 w-44 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative">
+              <div className="space-y-2">
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-500/20 px-3 py-1 text-xs font-black text-blue-300 border border-blue-500/30">
+                  <History className="h-3.5 w-3.5" />
+                  <span>Platform Change Audit Trail</span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black text-white">Platform Activity & Change History</h2>
+                <p className="text-xs sm:text-sm text-slate-300 max-w-2xl">
+                  Inspect who made changes to any account, access code, subscription plan, pricing rule, or system configuration across Simply IGCSE.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                <button
+                  type="button"
+                  onClick={handleExportAuditCsv}
+                  className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition cursor-pointer"
+                  title="Download CSV export"
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  <span>Export CSV</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleExportAuditJson}
+                  className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition cursor-pointer"
+                  title="Download JSON export"
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  <span>Export JSON</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleClearAuditLogs}
+                  className="flex items-center gap-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs font-semibold text-rose-300 hover:bg-rose-500/20 transition cursor-pointer"
+                  title="Reset and archive audit history"
+                >
+                  <RotateCcw className="h-3.5 w-3.5" />
+                  <span>Archive</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Overview Metrics Bar */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-md">
+              <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+                <span>Total Actions Tracked</span>
+                <History className="h-4 w-4 text-blue-400" />
+              </div>
+              <div className="text-2xl font-black text-white mt-1 font-mono">{auditMetrics.total}</div>
+              <span className="text-[10px] text-slate-500">Persistent log entries</span>
+            </div>
+
+            <div className="rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-950/20 to-slate-900 p-4 shadow-md">
+              <div className="flex items-center justify-between text-amber-300 text-xs font-medium">
+                <span>Founder (Thomas) Actions</span>
+                <Crown className="h-4 w-4 text-amber-400" />
+              </div>
+              <div className="text-2xl font-black text-amber-300 mt-1 font-mono">{auditMetrics.founderActions}</div>
+              <span className="text-[10px] text-amber-400/70">Root authority actions</span>
+            </div>
+
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-md">
+              <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+                <span>Security & Codes</span>
+                <KeyRound className="h-4 w-4 text-emerald-400" />
+              </div>
+              <div className="text-2xl font-black text-white mt-1 font-mono">{auditMetrics.securityActions}</div>
+              <span className="text-[10px] text-slate-500">Access credential changes</span>
+            </div>
+
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-md">
+              <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+                <span>Account Operations</span>
+                <Users className="h-4 w-4 text-indigo-400" />
+              </div>
+              <div className="text-2xl font-black text-white mt-1 font-mono">{auditMetrics.accountActions}</div>
+              <span className="text-[10px] text-slate-500">Approvals, plans & roles</span>
+            </div>
+          </div>
+
+          {/* Search & Filter Toolbar */}
+          <div className="flex flex-col sm:flex-row gap-3 rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <input
+                type="text"
+                value={auditSearch}
+                onChange={(e) => setAuditSearch(e.target.value)}
+                placeholder="Search audit trail by actor name, action, target, or details..."
+                className="w-full rounded-xl border border-slate-700 bg-slate-950 pl-10 pr-4 py-2 text-xs text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <select
+                value={auditActorFilter}
+                onChange={(e) => setAuditActorFilter(e.target.value as any)}
+                className="rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-slate-300 focus:border-blue-500 focus:outline-none"
+              >
+                <option value="all">All Actors</option>
+                <option value="founder">Thomas (Founder)</option>
+                <option value="admin">Administrators</option>
+                <option value="system">System Automation</option>
+              </select>
+
+              <select
+                value={auditTargetFilter}
+                onChange={(e) => setAuditTargetFilter(e.target.value as any)}
+                className="rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-slate-300 focus:border-blue-500 focus:outline-none"
+              >
+                <option value="all">All Categories</option>
+                <option value="access_code">Access Codes</option>
+                <option value="user">User Accounts</option>
+                <option value="pricing">Pricing & Discounts</option>
+                <option value="payment">Bank Payments</option>
+                <option value="system">System</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Audit Event Timeline */}
+          <div className="space-y-3">
+            {filteredAuditLogs.length === 0 ? (
+              <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-12 text-center text-slate-400">
+                <History className="h-8 w-8 mx-auto mb-2 text-slate-600" />
+                <p className="text-sm font-semibold">No audit log entries matched your filter criteria.</p>
+                <p className="text-xs text-slate-500 mt-1">Actions performed across the dashboard will appear here in real-time.</p>
+              </div>
+            ) : (
+              filteredAuditLogs.map((log) => {
+                const isFounder = log.actorRole === 'founder' || log.actorName.includes('Thomas');
+                const isAccessCode = log.targetType === 'access_code';
+                const isUser = log.targetType === 'user';
+                const isPricing = log.targetType === 'pricing';
+                const isPayment = log.targetType === 'payment';
+
+                return (
+                  <div
+                    key={log.id}
+                    className={`rounded-2xl border p-4 sm:p-5 transition shadow-sm ${
+                      isFounder
+                        ? 'border-amber-500/30 bg-slate-900/80 hover:border-amber-500/50'
+                        : 'border-slate-800 bg-slate-900/50 hover:border-slate-700'
+                    }`}
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                      <div className="flex items-start gap-3">
+                        <div className={`rounded-xl p-2.5 shrink-0 ${
+                          isFounder
+                            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                            : isAccessCode
+                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                            : isUser
+                            ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30'
+                            : isPricing
+                            ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                            : isPayment
+                            ? 'bg-teal-500/20 text-teal-400 border border-teal-500/30'
+                            : 'bg-slate-800 text-slate-300 border border-slate-700'
+                        }`}>
+                          {isFounder ? <Crown className="h-4 w-4" /> : isAccessCode ? <KeyRound className="h-4 w-4" /> : isUser ? <UserCheck className="h-4 w-4" /> : isPricing ? <Tag className="h-4 w-4" /> : isPayment ? <Receipt className="h-4 w-4" /> : <Activity className="h-4 w-4" />}
+                        </div>
+
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                              {log.actorName}
+                            </span>
+                            <span className={`rounded-full px-2 py-0.5 text-[9px] font-black uppercase ${
+                              isFounder
+                                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                : log.actorRole === 'admin'
+                                ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
+                                : 'bg-slate-800 text-slate-300 border border-slate-700'
+                            }`}>
+                              {log.actorRole}
+                            </span>
+
+                            <span className="text-slate-500">•</span>
+
+                            <span className="rounded-md bg-slate-800/80 px-2 py-0.5 text-[10px] font-bold text-slate-300">
+                              {log.actionLabel}
+                            </span>
+
+                            <span className="text-slate-500">•</span>
+
+                            <span className="text-xs font-semibold text-slate-300">
+                              Target: <span className="text-white font-mono">{log.targetLabel}</span>
+                            </span>
+                          </div>
+
+                          <p className="text-xs text-slate-300 leading-relaxed">
+                            {log.details}
+                          </p>
+
+                          {(log.previousValue || log.newValue) && (
+                            <div className="flex items-center gap-2 pt-1 flex-wrap text-[11px] font-mono">
+                              {log.previousValue && (
+                                <span className="rounded bg-rose-950/40 border border-rose-500/30 px-2 py-0.5 text-rose-300">
+                                  Before: {log.previousValue}
+                                </span>
+                              )}
+                              {log.previousValue && log.newValue && (
+                                <ArrowRight className="h-3 w-3 text-slate-500" />
+                              )}
+                              {log.newValue && (
+                                <span className="rounded bg-emerald-950/40 border border-emerald-500/30 px-2 py-0.5 text-emerald-300">
+                                  After: {log.newValue}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="text-left sm:text-right shrink-0">
+                        <div className="text-[11px] font-medium text-slate-400">
+                          {new Date(log.timestamp).toLocaleString()}
+                        </div>
+                        <div className="text-[10px] text-slate-500 font-mono">
+                          ID: {log.id}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Edit Staff / Founder Access Code Modal */}
+      {isEditCodeModalOpen && editingCode && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-fadeIn">
+          <div className="relative w-full max-w-md rounded-2xl border border-amber-500/40 bg-slate-900 p-6 shadow-2xl space-y-4">
+            <button
+              onClick={() => setIsEditCodeModalOpen(false)}
+              className="absolute right-4 top-4 rounded-lg p-1 text-slate-400 hover:bg-slate-800 hover:text-white"
+            >
+              ✕
+            </button>
+
+            <div className="flex items-center gap-2">
+              <div className="rounded-xl bg-amber-500/20 p-2 text-amber-400 border border-amber-500/30">
+                <KeyRound className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-white">Change Access Code</h3>
+                <p className="text-xs text-slate-400">Update passcode for {editingCode.name}</p>
+              </div>
+            </div>
+
+            <form onSubmit={handleSaveEditedCode} className="space-y-3 text-xs">
+              <div>
+                <label className="text-[11px] font-bold text-slate-300 block mb-1">
+                  New Access Code
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editNewCodeVal}
+                  onChange={(e) => setEditNewCodeVal(e.target.value)}
+                  placeholder="e.g. 2011, 2026, VIP8888..."
+                  className="w-full rounded-xl border border-amber-500/40 bg-slate-950 p-2.5 font-mono text-base font-bold text-amber-300 tracking-wider focus:border-amber-400 focus:outline-none"
+                />
+                <p className="text-[10px] text-slate-400 mt-1">
+                  Students and unauthorized users cannot see this code. Authenticates immediately on submission.
+                </p>
+              </div>
+
+              <div>
+                <label className="text-[11px] font-bold text-slate-300 block mb-1">Display Name</label>
+                <input
+                  type="text"
+                  required
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white focus:border-amber-500 focus:outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-[11px] font-bold text-slate-300 block mb-1">Role</label>
+                  <select
+                    value={editRole}
+                    onChange={(e) => setEditRole(e.target.value as any)}
+                    className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white focus:border-amber-500 focus:outline-none"
+                  >
+                    <option value="founder">Founder</option>
+                    <option value="admin">Administrator</option>
+                    <option value="teacher">Teacher</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-slate-300 block mb-1">Title / Designation</label>
+                  <input
+                    type="text"
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    placeholder="e.g. Head of Platform"
+                    className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white focus:border-amber-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setIsEditCodeModalOpen(false)}
+                  className="rounded-xl border border-slate-800 px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-2 text-xs font-bold text-slate-950 hover:brightness-110 shadow-md shadow-amber-500/20"
+                >
+                  Save & Activate Code
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Provision New Staff Access Code Modal */}
+      {isAddCodeModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-fadeIn">
+          <div className="relative w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-2xl space-y-4">
+            <button
+              onClick={() => setIsAddCodeModalOpen(false)}
+              className="absolute right-4 top-4 rounded-lg p-1 text-slate-400 hover:bg-slate-800 hover:text-white"
+            >
+              ✕
+            </button>
+
+            <div className="flex items-center gap-2">
+              <div className="rounded-xl bg-amber-500/20 p-2 text-amber-400 border border-amber-500/30">
+                <Plus className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-white">Provision New Staff Access Code</h3>
+                <p className="text-xs text-slate-400">Create a privileged code for a teacher or administrator</p>
+              </div>
+            </div>
+
+            <form onSubmit={handleCreateNewCode} className="space-y-3 text-xs">
+              <div>
+                <label className="text-[11px] font-bold text-slate-300 block mb-1">
+                  Access Code (Secret)
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={addCodeVal}
+                  onChange={(e) => setAddCodeVal(e.target.value)}
+                  placeholder="e.g. TEACHER2026, ADMIN77..."
+                  className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 font-mono text-base font-bold text-white tracking-wider focus:border-amber-500 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="text-[11px] font-bold text-slate-300 block mb-1">Staff Full Name</label>
+                <input
+                  type="text"
+                  required
+                  value={addName}
+                  onChange={(e) => setAddName(e.target.value)}
+                  placeholder="e.g. Dr. Sarah Jenkins"
+                  className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white focus:border-amber-500 focus:outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-[11px] font-bold text-slate-300 block mb-1">Role Permissions</label>
+                  <select
+                    value={addRole}
+                    onChange={(e) => setAddRole(e.target.value as any)}
+                    className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white focus:border-amber-500 focus:outline-none"
+                  >
+                    <option value="teacher">Teacher</option>
+                    <option value="admin">Administrator</option>
+                    <option value="founder">Founder</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-slate-300 block mb-1">Title / Designation</label>
+                  <input
+                    type="text"
+                    value={addTitle}
+                    onChange={(e) => setAddTitle(e.target.value)}
+                    placeholder="e.g. Head of Sciences"
+                    className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-white focus:border-amber-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setIsAddCodeModalOpen(false)}
+                  className="rounded-xl border border-slate-800 px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-2 text-xs font-bold text-slate-950 hover:brightness-110 shadow-md shadow-amber-500/20"
+                >
+                  Provision Access Code
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 

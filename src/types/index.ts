@@ -11,9 +11,9 @@ export interface StaffAccessCode {
   code: string;
   name: string;
   role: 'founder' | 'admin' | 'teacher';
-  email: string;
-  title: string;
-  createdAt: string;
+  email?: string;
+  title?: string;
+  createdAt?: string;
 }
 
 export type SubjectLevel = 'O Level / IGCSE' | 'AS Level' | 'A Level';
