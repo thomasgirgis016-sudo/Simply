@@ -4,50 +4,7 @@ import { PAST_PAPERS_DATABASE } from '../data/pastPapersData';
 const STORAGE_KEY_COHORTS = 'simply_igcse_cohorts';
 const STORAGE_KEY_ASSIGNMENTS = 'simply_igcse_class_assignments';
 
-export const INITIAL_COHORTS: ClassroomCohort[] = [
-  {
-    id: 'cohort-bio-1',
-    name: 'Year 11 Biology Set 1 (Extended)',
-    subjectId: 'cie-bio-0610',
-    subjectCode: '0610',
-    subjectName: 'Biology',
-    teacherId: 'teacher-101',
-    teacherName: 'Dr. Sarah Mansour',
-    teacherEmail: 's.mansour@cairoschool.edu.eg',
-    inviteCode: 'BIO-Y11-S1',
-    schoolDomain: 'cairoschool.edu.eg',
-    studentIds: ['std-1', 'std-2', 'std-3', 'std-4', 'std-5'],
-    createdAt: new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString(),
-  },
-  {
-    id: 'cohort-math-1',
-    name: '0580 Mathematics Extended A* Cohort',
-    subjectId: 'cie-math-0580',
-    subjectCode: '0580',
-    subjectName: 'Mathematics',
-    teacherId: 'teacher-102',
-    teacherName: 'Mr. Mark Williams',
-    teacherEmail: 'm.williams@cairoschool.edu.eg',
-    inviteCode: 'MTH-0580-X',
-    schoolDomain: 'cairoschool.edu.eg',
-    studentIds: ['std-1', 'std-3', 'std-6', 'std-7'],
-    createdAt: new Date(Date.now() - 45 * 24 * 3600 * 1000).toISOString(),
-  },
-  {
-    id: 'cohort-chem-1',
-    name: 'Year 10 Chemistry Core & Extended',
-    subjectId: 'cie-chem-0620',
-    subjectCode: '0620',
-    subjectName: 'Chemistry',
-    teacherId: 'teacher-103',
-    teacherName: 'Eng. Ahmed Tarek',
-    teacherEmail: 'a.tarek@cairoschool.edu.eg',
-    inviteCode: 'CHM-0620-Y10',
-    schoolDomain: 'cairoschool.edu.eg',
-    studentIds: ['std-2', 'std-4', 'std-8'],
-    createdAt: new Date(Date.now() - 15 * 24 * 3600 * 1000).toISOString(),
-  }
-];
+export const INITIAL_COHORTS: ClassroomCohort[] = [];
 
 export const DIAGNOSTIC_ERROR_DATABASE: Record<string, DiagnosticErrorItem[]> = {
   'cohort-bio-1': [
@@ -187,14 +144,12 @@ export function getCohorts(): ClassroomCohort[] {
     const raw = localStorage.getItem(STORAGE_KEY_COHORTS);
     if (raw) {
       const parsed: ClassroomCohort[] = JSON.parse(raw);
-      const existingIds = new Set(parsed.map(c => c.id));
-      const missing = INITIAL_COHORTS.filter(c => !existingIds.has(c.id));
-      return [...parsed, ...missing];
+      return Array.isArray(parsed) ? parsed : [];
     }
   } catch (e) {
     console.error('Error loading cohorts:', e);
   }
-  return INITIAL_COHORTS;
+  return [];
 }
 
 export function saveCohorts(cohorts: ClassroomCohort[]): void {
@@ -202,6 +157,15 @@ export function saveCohorts(cohorts: ClassroomCohort[]): void {
     localStorage.setItem(STORAGE_KEY_COHORTS, JSON.stringify(cohorts));
   } catch (e) {
     console.error('Error saving cohorts:', e);
+  }
+}
+
+export function resetAllCohortsAndAssignments(): void {
+  try {
+    localStorage.removeItem(STORAGE_KEY_COHORTS);
+    localStorage.removeItem(STORAGE_KEY_ASSIGNMENTS);
+  } catch (e) {
+    console.error('Error resetting cohorts and assignments:', e);
   }
 }
 

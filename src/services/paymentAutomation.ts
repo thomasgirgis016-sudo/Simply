@@ -2,11 +2,14 @@ import { BankTransaction, InstaPayReceiptExtraction, PaymentVerificationResult, 
 import { enrollUserInSchoolOrClass } from './auth';
 import { getCohorts, saveCohorts, createCohort } from './teacherAnalytics';
 
-export const SUBSCRIPTION_PRICE_EGP = 250; // Standard 30-day IGCSE Pro subscription
+import { getPricingSettings } from './pricingConfig';
+
+export const SUBSCRIPTION_PRICE_EGP = 299; // Standard 30-day IGCSE Pro subscription (discounted price)
 export const PLAN_PRICING = {
   plus: {
-    monthly: 150,
-    annual: 1200,
+    monthly: 199,
+    baseMonthly: 350,
+    annual: 1599,
     features: [
       'Access to 5 selected IGCSE / AS / A-Level subjects',
       'Classified past paper questions with official mark schemes',
@@ -16,8 +19,9 @@ export const PLAN_PRICING = {
     ]
   },
   pro: {
-    monthly: 250,
-    annual: 2000,
+    monthly: 299,
+    baseMonthly: 500,
+    annual: 2399,
     features: [
       'Everything in Plus Tier included',
       'AI Multimodal Handwritten Step-by-Step Question Solver',
@@ -29,8 +33,9 @@ export const PLAN_PRICING = {
     ]
   },
   class: {
-    monthly: 599,
-    annual: 1499,
+    monthly: 699,
+    baseMonthly: 1200,
+    annual: 5599,
     features: [
       'Full Teacher Analytics & Diagnostic Error Heatmap',
       'Generates unique Class Invite Code for up to 35 students',
@@ -40,8 +45,9 @@ export const PLAN_PRICING = {
     ]
   },
   school: {
-    monthly: 1999,
-    annual: 4999,
+    monthly: 2499,
+    baseMonthly: 4500,
+    annual: 19999,
     features: [
       'Multi-teacher & multi-cohort department access',
       'Unlimited student enrollments across all year groups (Y9–Y13)',
@@ -57,39 +63,9 @@ export const OFFICIAL_INSTAPAY_IPA = 'simply.igcse@instapay';
 export const OFFICIAL_RECEIVER_PHONE = '01023456789';
 
 // ─────────────────────────────────────────────────────────────
-// Initial Seed Bank Transactions (Banque Du Caire - BDC)
+// Initial Seed Bank Transactions (Clean production state: 0 mock transactions)
 // ─────────────────────────────────────────────────────────────
-const INITIAL_BDC_TRANSACTIONS: BankTransaction[] = [
-  {
-    id: 'bdc-tx-1001',
-    txNumber: '2026101900481234',
-    amount: 250,
-    source: 'BDC',
-    status: 'unclaimed',
-    receivedAt: new Date(Date.now() - 25 * 60 * 1000).toISOString(),
-    rawSmsText: 'تم تحويل مبلغ 250.00 جم إلى حسابك رقم **4812 طرف بنك القاهرة. الرقم المرجعي للعملية: 2026101900481234. بنك القاهرة',
-  },
-  {
-    id: 'bdc-tx-1002',
-    txNumber: '489201938472',
-    amount: 300,
-    source: 'BDC',
-    status: 'unclaimed',
-    receivedAt: new Date(Date.now() - 95 * 60 * 1000).toISOString(),
-    rawSmsText: 'Credit Alert: EGP 300.00 received in your BDC account **4812 via InstaPay. Transaction Ref: 489201938472. Banque Du Caire',
-  },
-  {
-    id: 'bdc-tx-1003',
-    txNumber: 'IP26101899120',
-    amount: 250,
-    source: 'BDC',
-    status: 'claimed',
-    receivedAt: new Date(Date.now() - 26 * 3600 * 1000).toISOString(),
-    rawSmsText: 'حسابك طرف بنك القاهرة قيد له مبلغ 250.00 EGP عبر InstaPay. رقم العملية: IP26101899120',
-    claimedBy: 'student@example.com',
-    claimedAt: new Date(Date.now() - 25 * 3600 * 1000).toISOString(),
-  }
-];
+const INITIAL_BDC_TRANSACTIONS: BankTransaction[] = [];
 
 const STORAGE_KEY_BANK_TXS = 'simply_igcse_bank_txs';
 
@@ -98,15 +74,20 @@ export function getBankTransactions(): BankTransaction[] {
     const raw = localStorage.getItem(STORAGE_KEY_BANK_TXS);
     if (raw) {
       const parsed: BankTransaction[] = JSON.parse(raw);
-      // Merge with initial if missing
-      const existingIds = new Set(parsed.map(t => t.txNumber));
-      const missing = INITIAL_BDC_TRANSACTIONS.filter(t => !existingIds.has(t.txNumber));
-      return [...parsed, ...missing];
+      return parsed;
     }
   } catch (e) {
     console.error('Error reading bank transactions:', e);
   }
-  return INITIAL_BDC_TRANSACTIONS;
+  return [];
+}
+
+export function resetAllBankTransactions(): void {
+  try {
+    localStorage.removeItem(STORAGE_KEY_BANK_TXS);
+  } catch (e) {
+    console.error('Failed to reset bank transactions:', e);
+  }
 }
 
 export function saveBankTransactions(transactions: BankTransaction[]): void {

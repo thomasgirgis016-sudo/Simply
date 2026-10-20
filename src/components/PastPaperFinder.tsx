@@ -321,7 +321,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
   // Available topics for active subject & board filters
   const availableTopics = useMemo(() => {
-    const allPapers = getAllPastPapers();
+    const allPapers = getAllPastPapers(selectedSubjectId !== 'all' ? selectedSubjectId : activeSubject?.id);
     const filtered = allPapers.filter((paper) => {
       if (selectedBoard !== 'All' && paper.board !== selectedBoard) return false;
       if (selectedSubjectId !== 'all') {
@@ -338,13 +338,13 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
       if (p.topic) topicSet.add(p.topic);
     });
     return Array.from(topicSet).sort();
-  }, [selectedBoard, selectedSubjectId]);
+  }, [selectedBoard, selectedSubjectId, activeSubject?.id]);
 
   // ==========================================
   // 2. FILTERING FOR QUESTION SNIPPETS
   // ==========================================
   const filteredPapers = useMemo(() => {
-    return getAllPastPapers().filter((paper) => {
+    return getAllPastPapers(selectedSubjectId !== 'all' ? selectedSubjectId : activeSubject?.id).filter((paper) => {
       // Board filter
       if (selectedBoard !== 'All' && paper.board !== selectedBoard) {
         return false;
@@ -594,7 +594,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             <Search className="h-4 w-4" />
             <span>🔍 Classified Topic & Question Finder</span>
             <span className="rounded-full bg-slate-900 px-2 py-0.5 text-[10px] font-mono text-slate-400 border border-slate-700">
-              {getAllPastPapers().length} Qs
+              {getAllPastPapers(selectedSubjectId !== 'all' ? selectedSubjectId : activeSubject?.id).length}+ Qs
             </span>
           </button>
         </div>
@@ -1393,20 +1393,18 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                               <span className="hidden sm:inline">View</span>
                             </button>
                             <a
-                              href={pdf.qpPdfUrl}
+                              href={`/api/pdf-proxy?url=${encodeURIComponent(pdf.qpPdfUrl)}${pdf.backupQpUrl ? `&fallback=${encodeURIComponent(pdf.backupQpUrl)}` : ''}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-1 rounded-lg border border-sky-500/40 bg-sky-500/10 px-2 py-1 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition"
-                              title="Open PDF in new tab"
+                              title="Open PDF directly in verified viewer"
                             >
                               <ExternalLink className="h-3.5 w-3.5" />
                               <span className="hidden sm:inline">Open</span>
                             </a>
                             <a
-                              href={pdf.qpPdfUrl}
+                              href={`/api/pdf-proxy?url=${encodeURIComponent(pdf.qpPdfUrl)}${pdf.backupQpUrl ? `&fallback=${encodeURIComponent(pdf.backupQpUrl)}` : ''}&download=true`}
                               download
-                              target="_blank"
-                              rel="noopener noreferrer"
                               className="inline-flex items-center gap-1 rounded-lg bg-sky-600 px-2.5 py-1 text-xs font-bold text-white hover:bg-sky-500 transition shadow-sm"
                               title="Download official Question Paper PDF"
                             >
@@ -1442,20 +1440,18 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                 <span className="hidden sm:inline">View</span>
                               </button>
                               <a
-                                href={pdf.msPdfUrl}
+                                href={`/api/pdf-proxy?url=${encodeURIComponent(pdf.msPdfUrl)}${pdf.backupMsUrl ? `&fallback=${encodeURIComponent(pdf.backupMsUrl)}` : ''}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20 transition"
-                                title="Open Mark Scheme in new tab"
+                                title="Open Mark Scheme in verified viewer"
                               >
                                 <ExternalLink className="h-3.5 w-3.5" />
                                 <span className="hidden sm:inline">Open</span>
                               </a>
                               <a
-                                href={pdf.msPdfUrl}
+                                href={`/api/pdf-proxy?url=${encodeURIComponent(pdf.msPdfUrl)}${pdf.backupMsUrl ? `&fallback=${encodeURIComponent(pdf.backupMsUrl)}` : ''}&download=true`}
                                 download
-                                target="_blank"
-                                rel="noopener noreferrer"
                                 className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-2.5 py-1 text-xs font-bold text-white hover:bg-emerald-500 transition shadow-sm"
                                 title="Download official Mark Scheme PDF"
                               >
@@ -1741,11 +1737,28 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                             {paper.componentType || (paper.paperCode.includes('/1') || paper.paperCode.includes('/2') ? 'MCQ (40 Discrete Items)' : 'Theory & Extended (Sub-Part Structured)')}
                           </span>
                         </div>
-                        <span className="text-xs font-bold text-amber-400">
-                          {typeof activeSubPartMap[paper.id] === 'number' && paper.subParts?.[activeSubPartMap[paper.id] as number]
-                            ? `[${paper.subParts[activeSubPartMap[paper.id] as number].marks} Marks in Part ${paper.subParts[activeSubPartMap[paper.id] as number].part}]`
-                            : `[${paper.marks} Marks Available]`}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (onOpenSolverWithQuestion) {
+                                onOpenSolverWithQuestion(`[${paper.paperCode} ${paper.session} - ${paper.questionNumber}] Topic: ${paper.topic}\n${paper.questionPrompt || ''}`);
+                              } else {
+                                navigator.clipboard.writeText(`[${paper.paperCode} ${paper.session} - ${paper.questionNumber}] ${paper.questionPrompt || ''}`);
+                              }
+                            }}
+                            className="inline-flex items-center gap-1 rounded-lg border border-purple-500/40 bg-purple-500/10 px-2.5 py-1 text-[11px] font-bold text-purple-300 hover:bg-purple-500/20 transition cursor-pointer"
+                            title="Open AI Multimodal Solver to breakdown steps and official criteria"
+                          >
+                            <Sparkles className="h-3 w-3 text-purple-400" />
+                            <span>AI Solver Breakdown</span>
+                          </button>
+                          <span className="text-xs font-bold text-amber-400">
+                            {typeof activeSubPartMap[paper.id] === 'number' && paper.subParts?.[activeSubPartMap[paper.id] as number]
+                              ? `[${paper.subParts[activeSubPartMap[paper.id] as number].marks} Marks in Part ${paper.subParts[activeSubPartMap[paper.id] as number].part}]`
+                              : `[${paper.marks} Marks Available]`}
+                          </span>
+                        </div>
                       </div>
 
                       {/* Sub-Part Hierarchy Tabs */}
@@ -2108,7 +2121,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
                 {/* Open in Fullscreen / New Tab (Guaranteed to work 100% on phones and desktops) */}
                 <a
-                  href={currentModalUrl}
+                  href={`/api/pdf-proxy?url=${encodeURIComponent(currentModalUrl)}${previewModal?.backupUrl ? `&fallback=${encodeURIComponent(previewModal.backupUrl)}` : ''}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 rounded-xl border border-sky-500/40 bg-sky-500/10 px-3 py-1.5 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition"
@@ -2120,7 +2133,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
                 {/* Direct Download */}
                 <a
-                  href={currentModalUrl}
+                  href={`/api/pdf-proxy?url=${encodeURIComponent(currentModalUrl)}${previewModal?.backupUrl ? `&fallback=${encodeURIComponent(previewModal.backupUrl)}` : ''}&download=true`}
                   download
                   className="inline-flex items-center gap-1.5 rounded-xl bg-sky-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-sky-500 transition shadow-sm"
                   title="Download PDF to computer"

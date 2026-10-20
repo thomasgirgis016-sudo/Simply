@@ -29,6 +29,8 @@ import {
   OFFICIAL_RECEIVER_PHONE,
   PLAN_PRICING
 } from '../services/paymentAutomation';
+import { getPricingSettings, PricingSettings, getTimeRemaining } from '../services/pricingConfig';
+import { SchoolQuestionnaireModal } from './SchoolQuestionnaireModal';
 import confetti from 'canvas-confetti';
 
 interface PaymentModalProps {
@@ -57,6 +59,25 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
   const [currentStepText, setCurrentStepText] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [showSchoolQuestionnaire, setShowSchoolQuestionnaire] = useState(false);
+  const [pricingSettings, setPricingSettings] = useState<PricingSettings>(getPricingSettings);
+  const [timeLeft, setTimeLeft] = useState(() => getTimeRemaining(pricingSettings.discountEndsAt));
+
+  React.useEffect(() => {
+    const handleUpdate = () => {
+      const s = getPricingSettings();
+      setPricingSettings(s);
+      setTimeLeft(getTimeRemaining(s.discountEndsAt));
+    };
+    window.addEventListener('simply_pricing_updated', handleUpdate);
+    const interval = setInterval(() => {
+      setTimeLeft(getTimeRemaining(pricingSettings.discountEndsAt));
+    }, 1000);
+    return () => {
+      window.removeEventListener('simply_pricing_updated', handleUpdate);
+      clearInterval(interval);
+    };
+  }, [pricingSettings.discountEndsAt]);
   const [successResult, setSuccessResult] = useState<{
     txNumber: string;
     amount: number;
@@ -68,8 +89,33 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
 
   if (!isOpen) return null;
 
-  // Active pricing based on plan & cycle
-  const currentPrice = PLAN_PRICING[selectedPlan as keyof typeof PLAN_PRICING]?.[billingCycle] || 250;
+  const isDiscountActive = pricingSettings.discountActive && !timeLeft.isExpired;
+
+  const getPlanDisplayPricing = (planKey: SubscriptionPlan) => {
+    const normalized = planKey === 'free' ? 'pro' : planKey;
+    const configKey = normalized === 'class' ? 'teacher' : normalized;
+    const planConfig = pricingSettings.plans[configKey as 'plus' | 'pro' | 'teacher' | 'school'];
+    const baseMonthly = planConfig.basePrice;
+    const discountMonthly = planConfig.discountPrice;
+
+    if (billingCycle === 'annual') {
+      const baseAnnual = Math.round(baseMonthly * 10);
+      const discountAnnual = Math.round(discountMonthly * 8);
+      return {
+        base: baseAnnual,
+        current: isDiscountActive ? discountAnnual : baseAnnual,
+        isDiscounted: isDiscountActive
+      };
+    }
+
+    return {
+      base: baseMonthly,
+      current: isDiscountActive ? discountMonthly : baseMonthly,
+      isDiscounted: isDiscountActive
+    };
+  };
+
+  const currentPrice = getPlanDisplayPricing(selectedPlan).current;
 
   const handleCopy = (text: string, fieldName: string) => {
     navigator.clipboard.writeText(text);
@@ -299,6 +345,27 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
           </div>
         ) : (
           <div className="space-y-5">
+            {/* Promotional Countdown Banner */}
+            {isDiscountActive && (
+              <div className="rounded-2xl border border-amber-500/40 bg-gradient-to-r from-amber-500/15 via-orange-500/15 to-amber-500/15 p-3.5 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 shadow-inner animate-fadeIn">
+                <div className="flex items-center gap-2.5">
+                  <span className="flex h-2.5 w-2.5 rounded-full bg-amber-400 animate-ping" />
+                  <div>
+                    <span className="font-black text-amber-300 uppercase tracking-wider text-[11px] mr-2">
+                      ⚡ {pricingSettings.promoTitle}
+                    </span>
+                    <span className="text-[11px] text-slate-300">Limited launch offer — save up to 45% platform-wide!</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 font-mono font-black text-amber-300 bg-slate-950/90 px-3 py-1 rounded-xl border border-amber-500/40 text-[11px] shrink-0 self-end sm:self-auto">
+                  <Clock className="h-3.5 w-3.5 text-amber-400" />
+                  <span>
+                    {String(timeLeft.days).padStart(2, '0')}d : {String(timeLeft.hours).padStart(2, '0')}h : {String(timeLeft.minutes).padStart(2, '0')}m : {String(timeLeft.seconds).padStart(2, '0')}s
+                  </span>
+                </div>
+              </div>
+            )}
+
             {/* Top Navigation Tabs: Individual, School, Redeem */}
             <div className="grid grid-cols-3 gap-2 bg-slate-900/80 p-1.5 rounded-2xl border border-slate-800 text-xs">
               <button
@@ -398,9 +465,16 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                     <div>
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold uppercase tracking-wider text-indigo-300">Plus Tier</span>
-                        <span className="text-xs font-mono font-bold text-white">
-                          {PLAN_PRICING.plus[billingCycle]} EGP {billingCycle === 'annual' ? '/yr' : '/mo'}
-                        </span>
+                        <div className="flex items-baseline gap-1.5">
+                          {isDiscountActive && (
+                            <span className="text-[11px] line-through text-slate-500 font-mono">
+                              {getPlanDisplayPricing('plus').base} EGP
+                            </span>
+                          )}
+                          <span className="text-xs font-mono font-bold text-white">
+                            {getPlanDisplayPricing('plus').current} EGP {billingCycle === 'annual' ? '/yr' : '/mo'}
+                          </span>
+                        </div>
                       </div>
                       <p className="text-[11px] text-slate-400 mt-1">Core study suite for the 5 official subjects</p>
 
@@ -453,9 +527,16 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                           <Sparkles className="h-3.5 w-3.5 text-amber-400" />
                           Pro Tier (All Features)
                         </span>
-                        <span className="text-xs font-mono font-black text-amber-300">
-                          {PLAN_PRICING.pro[billingCycle]} EGP {billingCycle === 'annual' ? '/yr' : '/mo'}
-                        </span>
+                        <div className="flex items-baseline gap-1.5">
+                          {isDiscountActive && (
+                            <span className="text-[11px] line-through text-slate-500 font-mono">
+                              {getPlanDisplayPricing('pro').base} EGP
+                            </span>
+                          )}
+                          <span className="text-xs font-mono font-black text-amber-300">
+                            {getPlanDisplayPricing('pro').current} EGP {billingCycle === 'annual' ? '/yr' : '/mo'}
+                          </span>
+                        </div>
                       </div>
                       <p className="text-[11px] text-slate-400 mt-1">Full AI power, line-by-line mark grading & speaking</p>
 
@@ -547,9 +628,16 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                           <Users className="h-3.5 w-3.5 text-indigo-400" />
                           Class / Teacher
                         </span>
-                        <span className="text-xs font-mono font-bold text-white">
-                          {PLAN_PRICING.class[billingCycle]} EGP {billingCycle === 'annual' ? '/yr' : '/mo'}
-                        </span>
+                        <div className="flex items-baseline gap-1.5">
+                          {isDiscountActive && (
+                            <span className="text-[11px] line-through text-slate-500 font-mono">
+                              {getPlanDisplayPricing('class').base} EGP
+                            </span>
+                          )}
+                          <span className="text-xs font-mono font-bold text-white">
+                            {getPlanDisplayPricing('class').current} EGP {billingCycle === 'annual' ? '/yr' : '/mo'}
+                          </span>
+                        </div>
                       </div>
                       <p className="text-[11px] text-slate-400 mt-1">Up to 35 students per classroom cohort</p>
 
@@ -606,9 +694,16 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                           <Building2 className="h-3.5 w-3.5 text-amber-400" />
                           Full School License
                         </span>
-                        <span className="text-xs font-mono font-black text-amber-300">
-                          {PLAN_PRICING.school[billingCycle]} EGP {billingCycle === 'annual' ? '/yr' : '/mo'}
-                        </span>
+                        <div className="flex items-baseline gap-1.5">
+                          {isDiscountActive && (
+                            <span className="text-[11px] line-through text-slate-500 font-mono">
+                              {getPlanDisplayPricing('school').base} EGP
+                            </span>
+                          )}
+                          <span className="text-xs font-mono font-black text-amber-300">
+                            {getPlanDisplayPricing('school').current} EGP {billingCycle === 'annual' ? '/yr' : '/mo'}
+                          </span>
+                        </div>
                       </div>
                       <p className="text-[11px] text-slate-400 mt-1">Multi-class management for entire school departments</p>
 
@@ -645,6 +740,27 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                       </div>
                     </div>
                   </div>
+                </div>
+
+                {/* School Questionnaire Callout */}
+                <div className="rounded-2xl border border-dashed border-amber-500/40 bg-amber-500/5 p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+                  <div>
+                    <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                      <Building2 className="h-4 w-4 text-amber-400" />
+                      <span>Enrolling an Entire School, Department or Multi-Teacher Cohort?</span>
+                    </div>
+                    <p className="text-[11px] text-slate-400 mt-1">
+                      Complete our 2-minute school onboarding questionnaire for custom invoices, bank transfers & bulk class seats.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowSchoolQuestionnaire(true)}
+                    className="shrink-0 px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black text-xs hover:opacity-95 transition cursor-pointer flex items-center gap-1.5 shadow-md"
+                  >
+                    <span>School Questionnaire</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </button>
                 </div>
               </div>
             )}
@@ -714,10 +830,10 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                     <div className="rounded-xl border border-slate-800 bg-slate-950/80 p-2.5 flex items-center justify-between">
                       <div>
                         <div className="text-[10px] text-slate-500 font-semibold">InstaPay Address (IPA):</div>
-                        <div className="font-mono font-bold text-white">{OFFICIAL_INSTAPAY_IPA}</div>
+                        <div className="font-mono font-bold text-white">{pricingSettings.paymentDetails.instapayIpa || OFFICIAL_INSTAPAY_IPA}</div>
                       </div>
                       <button
-                        onClick={() => handleCopy(OFFICIAL_INSTAPAY_IPA, 'ipa')}
+                        onClick={() => handleCopy(pricingSettings.paymentDetails.instapayIpa || OFFICIAL_INSTAPAY_IPA, 'ipa')}
                         className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
                         title="Copy IPA"
                       >
@@ -725,16 +841,16 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                       </button>
                     </div>
 
-                    {/* Mobile Phone */}
+                    {/* Mobile Phone / BDC Account */}
                     <div className="rounded-xl border border-slate-800 bg-slate-950/80 p-2.5 flex items-center justify-between">
                       <div>
-                        <div className="text-[10px] text-slate-500 font-semibold">Mobile / BDC Account:</div>
-                        <div className="font-mono font-bold text-white">{OFFICIAL_RECEIVER_PHONE} (BDC)</div>
+                        <div className="text-[10px] text-slate-500 font-semibold">BDC Account / Telda:</div>
+                        <div className="font-mono font-bold text-white">{pricingSettings.paymentDetails.bdcAccountNumber || OFFICIAL_RECEIVER_PHONE} ({pricingSettings.paymentDetails.teldaTag || 'Telda'})</div>
                       </div>
                       <button
-                        onClick={() => handleCopy(OFFICIAL_RECEIVER_PHONE, 'phone')}
+                        onClick={() => handleCopy(pricingSettings.paymentDetails.bdcAccountNumber || OFFICIAL_RECEIVER_PHONE, 'phone')}
                         className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
-                        title="Copy Phone"
+                        title="Copy Account"
                       >
                         {copiedField === 'phone' ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
                       </button>
@@ -870,6 +986,11 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
           </div>
         )}
       </div>
+
+      <SchoolQuestionnaireModal
+        isOpen={showSchoolQuestionnaire}
+        onClose={() => setShowSchoolQuestionnaire(false)}
+      />
     </div>
   );
 };

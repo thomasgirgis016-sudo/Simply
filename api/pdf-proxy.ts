@@ -5,34 +5,62 @@ import { URL } from 'url';
 // Cambridge Subject slugs for BestExamHelp
 const SUBJECT_SLUG_MAP: Record<string, string> = {
   '0580': 'mathematics-0580',
+  '0606': 'additional-mathematics-0606',
   '0625': 'physics-0625',
   '0620': 'chemistry-0620',
   '0610': 'biology-0610',
   '0510': 'english-second-language-0510',
   '0478': 'computer-science-0478',
+  '0455': 'economics-0455',
+  '0452': 'accounting-0452',
+  '0470': 'history-0470',
+  '0450': 'business-studies-0450'
 };
 
 // Cambridge Subject folders for GCE Guide
 const GCE_FOLDER_MAP: Record<string, string> = {
   '0580': 'Mathematics (0580)',
+  '0606': 'Additional Mathematics (0606)',
   '0625': 'Physics (0625)',
   '0620': 'Chemistry (0620)',
   '0610': 'Biology (0610)',
   '0510': 'English - Second Language (oral endorsement) (0510)',
   '0478': 'Computer Science (0478)',
+  '0455': 'Economics (0455)',
+  '0452': 'Accounting (0452)',
+  '0470': 'History (0470)',
+  '0450': 'Business Studies (0450)'
 };
 
 /**
  * Generate candidate mirror URLs for a given PDF filename or target URL.
  */
-function buildCandidateUrls(targetUrl: string, fallbackUrl?: string): string[] {
+function buildCandidateUrls(targetUrl: string, fallbackUrl?: string, examCode?: string): string[] {
   const candidates: string[] = [];
-  if (targetUrl) candidates.push(targetUrl);
-  if (fallbackUrl) candidates.push(fallbackUrl);
 
-  try {
-    const parsed = new URL(targetUrl);
-    const filename = parsed.pathname.split('/').pop()?.split('?')[0] || '';
+  let filename = '';
+  if (examCode) {
+    const clean = examCode.trim().replace(/\.pdf$/i, '');
+    filename = `${clean}.pdf`;
+    candidates.push(`https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${filename}`);
+  }
+
+  if (targetUrl) {
+    if (!candidates.includes(targetUrl)) candidates.push(targetUrl);
+    try {
+      const parsed = new URL(targetUrl);
+      const name = parsed.pathname.split('/').pop()?.split('?')[0] || '';
+      if (name && !filename) filename = name;
+    } catch {
+      // url parse error
+    }
+  }
+
+  if (fallbackUrl && !candidates.includes(fallbackUrl)) {
+    candidates.push(fallbackUrl);
+  }
+
+  if (filename) {
     const match = filename.match(/^([0-9]{4})_([smw])([0-9]{2})_([a-z]{2})(?:_([0-9]{1,2}))?\.pdf$/i);
 
     if (match) {
@@ -41,24 +69,26 @@ function buildCandidateUrls(targetUrl: string, fallbackUrl?: string): string[] {
       const slug = SUBJECT_SLUG_MAP[syllabus];
       const gceFolder = GCE_FOLDER_MAP[syllabus];
 
-      // Mirror 1: BestExamHelp
-      if (slug) {
-        const behUrl = `https://bestexamhelp.com/exam/cambridge-igcse/${slug}/${fullYear}/${filename}`;
-        if (!candidates.includes(behUrl)) candidates.push(behUrl);
-      }
-
-      // Mirror 2: PapaCambridge upload direct
+      // Mirror 1: PapaCambridge direct
       const pcUrl = `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${filename}`;
       if (!candidates.includes(pcUrl)) candidates.push(pcUrl);
 
-      // Mirror 3: GCE Guide mirror
+      // Mirror 2: GCE Guide mirror
       if (gceFolder) {
         const gceUrl = `https://papers.gceguide.cc/Cambridge%20IGCSE/${encodeURIComponent(gceFolder)}/${fullYear}/${filename}`;
         if (!candidates.includes(gceUrl)) candidates.push(gceUrl);
       }
+
+      // Mirror 3: Dynamic Papers
+      const dpUrl = `https://dynamicpapers.com/wp-content/uploads/papers/${syllabus}/${filename}`;
+      if (!candidates.includes(dpUrl)) candidates.push(dpUrl);
+
+      // Mirror 4: BestExamHelp
+      if (slug) {
+        const behUrl = `https://bestexamhelp.com/exam/cambridge-igcse/${slug}/${fullYear}/${filename}`;
+        if (!candidates.includes(behUrl)) candidates.push(behUrl);
+      }
     }
-  } catch {
-    // If URL parsing fails, stick with initial target and fallback
   }
 
   return candidates;
@@ -122,7 +152,7 @@ function probePdfUrl(urlStr: string): Promise<{ ok: boolean; status: number; con
 /**
  * Stream PDF binary directly from the verified source URL to response.
  */
-function pipePdfStream(urlStr: string, res: any, filename: string): Promise<boolean> {
+function pipePdfStream(urlStr: string, res: any, filename: string, asAttachment: boolean = false): Promise<boolean> {
   return new Promise((resolve) => {
     try {
       const parsed = new URL(urlStr);
@@ -141,9 +171,10 @@ function pipePdfStream(urlStr: string, res: any, filename: string): Promise<bool
           const contentType = remoteRes.headers['content-type'] || '';
 
           if (status === 200 && contentType.toLowerCase().includes('application/pdf')) {
+            const disposition = asAttachment ? 'attachment' : 'inline';
             res.writeHead(200, {
               'Content-Type': 'application/pdf',
-              'Content-Disposition': `inline; filename="${filename}"`,
+              'Content-Disposition': `${disposition}; filename="${filename}"`,
               'Cache-Control': 'public, max-age=86400, s-maxage=604800',
               'Access-Control-Allow-Origin': '*',
               'X-Proxied-By': 'Simply-IGCSE-PDF-Proxy',
@@ -182,15 +213,17 @@ export default async function handler(req: any, res: any) {
 
   const rawUrl = (req.query?.url as string) || '';
   const rawFallback = (req.query?.fallback as string) || '';
+  const examCode = (req.query?.code as string) || '';
   const checkOnly = req.query?.checkOnly === 'true' || req.method === 'HEAD';
+  const asAttachment = req.query?.download === 'true';
 
-  if (!rawUrl || rawUrl.trim() === '') {
+  if (!rawUrl && !examCode) {
     return res.status(400).json({
-      error: 'Missing required "url" parameter. Example: /api/pdf-proxy?url=https://example.com/paper.pdf'
+      error: 'Missing required "url" or "code" parameter. Example: /api/pdf-proxy?code=0580_s24_qp_42 or ?url=https://...'
     });
   }
 
-  const candidates = buildCandidateUrls(rawUrl.trim(), rawFallback.trim());
+  const candidates = buildCandidateUrls(rawUrl.trim(), rawFallback.trim(), examCode.trim());
   let resolvedUrl: string | null = null;
   let resolvedContentType: string | null = null;
 
@@ -205,9 +238,9 @@ export default async function handler(req: any, res: any) {
 
   if (!resolvedUrl) {
     return res.status(404).json({
-      error: 'PDF not found on primary or secondary mirror archives',
+      error: 'PDF not found on official mirror archives (blocked HTML redirects / 404s)',
       attemptedUrls: candidates,
-      requestedUrl: rawUrl
+      requestedUrl: rawUrl || examCode
     });
   }
 
@@ -218,13 +251,13 @@ export default async function handler(req: any, res: any) {
       status: 200,
       contentType: resolvedContentType,
       resolvedUrl,
-      originalUrl: rawUrl
+      originalUrl: rawUrl || examCode
     });
   }
 
-  // Stream binary PDF
-  const filename = resolvedUrl.split('/').pop()?.split('?')[0] || 'document.pdf';
-  const streamed = await pipePdfStream(resolvedUrl, res, filename);
+  // Stream binary PDF directly
+  const filename = resolvedUrl.split('/').pop()?.split('?')[0] || `${examCode || 'document'}.pdf`;
+  const streamed = await pipePdfStream(resolvedUrl, res, filename, asAttachment);
 
   if (!streamed && !res.headersSent) {
     return res.status(502).json({
