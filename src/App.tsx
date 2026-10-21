@@ -15,7 +15,7 @@ import {
   INITIAL_REVISION_NOTES,
   INITIAL_FORMULAS
 } from './data/initialData';
-import { Navbar, ActiveTab } from './components/Navbar';
+import { type ActiveTab } from './components/Navbar';
 import { QuestionSolver } from './components/QuestionSolver';
 import { FlashcardsView } from './components/FlashcardsView';
 import { QuizView } from './components/QuizView';
@@ -132,35 +132,18 @@ export function App() {
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
-  // 4b. Executive vs Classic Design System & Theme
-  const [designTheme, setDesignTheme] = useState<'executive' | 'classic'>(() => {
-    try {
-      const saved = localStorage.getItem('simply_design_theme');
-      if (saved === 'executive' || saved === 'classic') return saved;
-    } catch (e) {
-      console.warn(e);
-    }
-    return 'executive';
-  });
-
-  const handleToggleDesignTheme = () => {
-    setDesignTheme(prev => (prev === 'executive' ? 'classic' : 'executive'));
-  };
+  // 4b. Executive Design System & Theme
+  const [designTheme, setDesignTheme] = useState<'executive'>('executive');
 
   useEffect(() => {
     try {
-      localStorage.setItem('simply_design_theme', designTheme);
-      if (designTheme === 'executive') {
-        document.documentElement.classList.add('executive');
-        document.documentElement.classList.remove('classic');
-      } else {
-        document.documentElement.classList.add('classic');
-        document.documentElement.classList.remove('executive');
-      }
+      localStorage.setItem('simply_design_theme', 'executive');
+      document.documentElement.classList.add('executive');
+      document.documentElement.classList.remove('classic');
     } catch (e) {
       console.warn('Design theme sync error:', e);
     }
-  }, [designTheme]);
+  }, []);
 
   // 4c. Theme & Accessibility State
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
@@ -574,81 +557,50 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#080c15] text-slate-100 flex font-sans selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen bg-[#0a0e1a] text-slate-100 flex font-sans selection:bg-indigo-500 selection:text-white">
       {/* Modern Collapsible Sidebar (Desktop & Mobile Drawer) */}
-      {designTheme === 'executive' && (
-        <AppSidebar
+      <AppSidebar
+        activeTab={activeTab}
+        onSelectTab={setActiveTab}
+        subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
+        activeSubject={activeSubject}
+        onSelectSubject={setActiveSubject}
+        profile={profile}
+        currentUser={currentUser}
+        onOpenProfile={() => setIsProfileOpen(true)}
+        onOpenAuth={(mode) => {
+          setAuthMode(mode || 'signin');
+          setIsAuthOpen(true);
+        }}
+        onLogout={handleLogout}
+        onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenCalculator={() => setIsCalculatorOpen(true)}
+        onOpenPayment={() => setIsPaymentOpen(true)}
+        onOpenHandwritingScanner={() => setIsHandwritingScannerOpen(true)}
+        onOpenAbout={() => setIsAboutOpen(true)}
+        isMobileOpen={isMobileSidebarOpen}
+        onCloseMobile={() => setIsMobileSidebarOpen(false)}
+      />
+
+      {/* Main App Canvas */}
+      <div className="flex-1 flex flex-col min-w-0 min-h-screen">
+        <AppHeader
           activeTab={activeTab}
-          onSelectTab={setActiveTab}
           subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
           activeSubject={activeSubject}
           onSelectSubject={setActiveSubject}
           profile={profile}
           currentUser={currentUser}
+          onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)}
           onOpenProfile={() => setIsProfileOpen(true)}
+          onOpenPayment={() => setIsPaymentOpen(true)}
+          onOpenHandwritingScanner={() => setIsHandwritingScannerOpen(true)}
+          onOpenCalculator={() => setIsCalculatorOpen(true)}
           onOpenAuth={(mode) => {
             setAuthMode(mode || 'signin');
             setIsAuthOpen(true);
           }}
-          onLogout={handleLogout}
-          onOpenSettings={() => setIsSettingsOpen(true)}
-          onOpenCalculator={() => setIsCalculatorOpen(true)}
-          onOpenPayment={() => setIsPaymentOpen(true)}
-          onOpenHandwritingScanner={() => setIsHandwritingScannerOpen(true)}
-          onOpenAbout={() => setIsAboutOpen(true)}
-          isMobileOpen={isMobileSidebarOpen}
-          onCloseMobile={() => setIsMobileSidebarOpen(false)}
         />
-      )}
-
-      {/* Main App Canvas */}
-      <div className="flex-1 flex flex-col min-w-0 min-h-screen">
-        {designTheme === 'classic' ? (
-          <Navbar
-            profile={profile}
-            currentUser={currentUser}
-            subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
-            activeSubject={activeSubject}
-            onSelectSubject={setActiveSubject}
-            activeTab={activeTab}
-            onSelectTab={setActiveTab}
-            onOpenProfile={() => setIsProfileOpen(true)}
-            onOpenAuth={(mode) => {
-              setAuthMode(mode || 'signin');
-              setIsAuthOpen(true);
-            }}
-            onLogout={handleLogout}
-            onOpenSettings={() => setIsSettingsOpen(true)}
-            onOpenCalculator={() => setIsCalculatorOpen(true)}
-            onOpenPayment={() => setIsPaymentOpen(true)}
-            theme={theme}
-            onToggleTheme={handleToggleTheme}
-            onOpenSecretAdmin={() => setIsSecretAdminOpen(true)}
-            onOpenParentReport={() => setIsParentReportOpen(true)}
-            onOpenStudyDuel={() => setIsStudyDuelOpen(true)}
-            onOpenHandwritingScanner={() => setIsHandwritingScannerOpen(true)}
-            onOpenAbout={() => setIsAboutOpen(true)}
-            designTheme={designTheme}
-            onToggleDesignTheme={handleToggleDesignTheme}
-          />
-        ) : (
-          <AppHeader
-            activeTab={activeTab}
-            subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
-            activeSubject={activeSubject}
-            onSelectSubject={setActiveSubject}
-            profile={profile}
-            currentUser={currentUser}
-            onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)}
-            onOpenProfile={() => setIsProfileOpen(true)}
-            onOpenPayment={() => setIsPaymentOpen(true)}
-            onOpenHandwritingScanner={() => setIsHandwritingScannerOpen(true)}
-            onOpenAuth={(mode) => {
-              setAuthMode(mode || 'signin');
-              setIsAuthOpen(true);
-            }}
-          />
-        )}
 
         {/* Main Container */}
         <main className={`flex-1 px-3 py-4 sm:px-6 sm:py-8 max-w-7xl mx-auto w-full ${activeTab === 'chat' ? 'pb-28 md:pb-10' : 'pb-36 sm:pb-16'}`}>
@@ -1048,14 +1000,14 @@ export function App() {
         onUpdateProfile={handleUpdateProfile}
       />
 
-      {/* Floating Scientific Calculator Toggle (Permitted in Exam Papers 4 & 2) */}
+      {/* Floating Scientific Calculator Toggle (Desktop only to prevent mobile overlap; mobile uses header calculator button) */}
       <button
         onClick={() => setIsCalculatorOpen(!isCalculatorOpen)}
-        className="fixed bottom-20 right-3.5 md:bottom-6 md:right-6 z-30 flex items-center gap-1.5 sm:gap-2 rounded-2xl border border-amber-500/40 bg-gradient-to-r from-amber-500 to-amber-600 px-3 sm:px-4 py-2 sm:py-2.5 text-xs font-extrabold text-slate-950 shadow-xl shadow-amber-500/25 hover:from-amber-400 hover:to-amber-500 transition active:scale-95 cursor-pointer"
+        className="hidden md:flex fixed bottom-6 right-6 z-30 items-center gap-2 rounded-2xl border border-amber-500/40 bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-2.5 text-xs font-extrabold text-slate-950 shadow-xl shadow-amber-500/25 hover:from-amber-400 hover:to-amber-500 transition active:scale-95 cursor-pointer"
         title="Open IGCSE Scientific Calculator (DEG/RAD)"
       >
         <Calculator className="h-4 w-4" />
-        <span className="hidden sm:inline">Scientific Calc</span>
+        <span>Scientific Calc</span>
       </button>
 
       {/* Embedded Scientific Calculator */}
