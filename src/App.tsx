@@ -52,6 +52,8 @@ import { AuthModal } from './components/AuthModal';
 import { ScientificCalculator } from './components/ScientificCalculator';
 import { SecretAdminModal } from './components/SecretAdminModal';
 import { AboutSimplyModal } from './components/AboutSimplyModal';
+import { AppSidebar } from './components/AppSidebar';
+import { AppHeader } from './components/AppHeader';
 import { SimplyLogo } from './components/SimplyLogo';
 import { getActiveUser, setActiveUser, grantUserProSubscription, hasActiveSubscription, updateUserAccount, validateActiveSession, logoutUser } from './services/auth';
 import {
@@ -63,7 +65,9 @@ import {
   MessageSquare,
   Calculator,
   Home,
-  FileText
+  FileText,
+  Menu,
+  BookMarked
 } from 'lucide-react';
 
 const DEFAULT_PROFILE: UserProfile = {
@@ -126,6 +130,7 @@ export function App() {
   const [isStudyDuelOpen, setIsStudyDuelOpen] = useState(false);
   const [isHandwritingScannerOpen, setIsHandwritingScannerOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   // 4b. Executive vs Classic Design System & Theme
   const [designTheme, setDesignTheme] = useState<'executive' | 'classic'>(() => {
@@ -569,38 +574,84 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
-      {/* Top Navbar */}
-      <Navbar
-        profile={profile}
-        currentUser={currentUser}
-        subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
-        activeSubject={activeSubject}
-        onSelectSubject={setActiveSubject}
-        activeTab={activeTab}
-        onSelectTab={setActiveTab}
-        onOpenProfile={() => setIsProfileOpen(true)}
-        onOpenAuth={(mode) => {
-          setAuthMode(mode || 'signin');
-          setIsAuthOpen(true);
-        }}
-        onLogout={handleLogout}
-        onOpenSettings={() => setIsSettingsOpen(true)}
-        onOpenCalculator={() => setIsCalculatorOpen(true)}
-        onOpenPayment={() => setIsPaymentOpen(true)}
-        theme={theme}
-        onToggleTheme={handleToggleTheme}
-        onOpenSecretAdmin={() => setIsSecretAdminOpen(true)}
-        onOpenParentReport={() => setIsParentReportOpen(true)}
-        onOpenStudyDuel={() => setIsStudyDuelOpen(true)}
-        onOpenHandwritingScanner={() => setIsHandwritingScannerOpen(true)}
-        onOpenAbout={() => setIsAboutOpen(true)}
-        designTheme={designTheme}
-        onToggleDesignTheme={handleToggleDesignTheme}
-      />
+    <div className="min-h-screen bg-[#080c15] text-slate-100 flex font-sans selection:bg-indigo-500 selection:text-white">
+      {/* Modern Collapsible Sidebar (Desktop & Mobile Drawer) */}
+      {designTheme === 'executive' && (
+        <AppSidebar
+          activeTab={activeTab}
+          onSelectTab={setActiveTab}
+          subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
+          activeSubject={activeSubject}
+          onSelectSubject={setActiveSubject}
+          profile={profile}
+          currentUser={currentUser}
+          onOpenProfile={() => setIsProfileOpen(true)}
+          onOpenAuth={(mode) => {
+            setAuthMode(mode || 'signin');
+            setIsAuthOpen(true);
+          }}
+          onLogout={handleLogout}
+          onOpenSettings={() => setIsSettingsOpen(true)}
+          onOpenCalculator={() => setIsCalculatorOpen(true)}
+          onOpenPayment={() => setIsPaymentOpen(true)}
+          onOpenHandwritingScanner={() => setIsHandwritingScannerOpen(true)}
+          onOpenAbout={() => setIsAboutOpen(true)}
+          isMobileOpen={isMobileSidebarOpen}
+          onCloseMobile={() => setIsMobileSidebarOpen(false)}
+        />
+      )}
 
-      {/* Main Container */}
-      <main className={`flex-1 px-3 py-4 sm:px-6 sm:py-8 max-w-7xl mx-auto w-full ${activeTab === 'chat' ? 'pb-28 md:pb-10' : 'pb-36 sm:pb-16'}`}>
+      {/* Main App Canvas */}
+      <div className="flex-1 flex flex-col min-w-0 min-h-screen">
+        {designTheme === 'classic' ? (
+          <Navbar
+            profile={profile}
+            currentUser={currentUser}
+            subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
+            activeSubject={activeSubject}
+            onSelectSubject={setActiveSubject}
+            activeTab={activeTab}
+            onSelectTab={setActiveTab}
+            onOpenProfile={() => setIsProfileOpen(true)}
+            onOpenAuth={(mode) => {
+              setAuthMode(mode || 'signin');
+              setIsAuthOpen(true);
+            }}
+            onLogout={handleLogout}
+            onOpenSettings={() => setIsSettingsOpen(true)}
+            onOpenCalculator={() => setIsCalculatorOpen(true)}
+            onOpenPayment={() => setIsPaymentOpen(true)}
+            theme={theme}
+            onToggleTheme={handleToggleTheme}
+            onOpenSecretAdmin={() => setIsSecretAdminOpen(true)}
+            onOpenParentReport={() => setIsParentReportOpen(true)}
+            onOpenStudyDuel={() => setIsStudyDuelOpen(true)}
+            onOpenHandwritingScanner={() => setIsHandwritingScannerOpen(true)}
+            onOpenAbout={() => setIsAboutOpen(true)}
+            designTheme={designTheme}
+            onToggleDesignTheme={handleToggleDesignTheme}
+          />
+        ) : (
+          <AppHeader
+            activeTab={activeTab}
+            subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
+            activeSubject={activeSubject}
+            onSelectSubject={setActiveSubject}
+            profile={profile}
+            currentUser={currentUser}
+            onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)}
+            onOpenProfile={() => setIsProfileOpen(true)}
+            onOpenPayment={() => setIsPaymentOpen(true)}
+            onOpenHandwritingScanner={() => setIsHandwritingScannerOpen(true)}
+            onOpenAuth={(mode) => {
+              setAuthMode(mode || 'signin');
+              setIsAuthOpen(true);
+            }}
+          />
+        )}
+
+        {/* Main Container */}
+        <main className={`flex-1 px-3 py-4 sm:px-6 sm:py-8 max-w-7xl mx-auto w-full ${activeTab === 'chat' ? 'pb-28 md:pb-10' : 'pb-36 sm:pb-16'}`}>
         {/* Single Device Session Conflict Banner */}
         {deviceConflictAlert && (
           <div className="mb-6 rounded-2xl border border-rose-500/50 bg-rose-950/80 p-4 text-xs font-semibold text-rose-200 shadow-2xl flex items-center justify-between gap-3 animate-fadeIn">
@@ -875,16 +926,22 @@ export function App() {
         {[
           { id: 'home', label: 'Home', icon: Home, color: 'text-indigo-400' },
           { id: 'finder', label: 'Papers', icon: FileText, color: 'text-amber-400' },
-          { id: 'revision', label: 'Notes', icon: BookOpen, color: 'text-cyan-400' },
-          { id: 'quiz', label: 'Quizzes', icon: GraduationCap, color: 'text-emerald-400' },
           { id: 'solver', label: 'AI Solver', icon: Camera, color: 'text-pink-400' },
+          { id: 'mistakes', label: 'Black Book', icon: BookMarked, color: 'text-rose-400' },
+          { id: 'menu', label: 'All Tools', icon: Menu, color: 'text-indigo-400' },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as ActiveTab)}
+              onClick={() => {
+                if (tab.id === 'menu') {
+                  setIsMobileSidebarOpen(true);
+                } else {
+                  setActiveTab(tab.id as ActiveTab);
+                }
+              }}
               className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl transition-all active:scale-90 cursor-pointer min-w-[48px] min-h-[48px] ${
                 isActive ? 'bg-indigo-500/15 text-white' : 'text-slate-400 hover:text-slate-200'
               }`}
@@ -954,6 +1011,7 @@ export function App() {
           </div>
         </div>
       </footer>
+      </div>
 
       {/* Secret Admin Passcode Modal (Hidden Portal) */}
       <SecretAdminModal
