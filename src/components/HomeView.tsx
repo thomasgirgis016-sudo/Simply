@@ -985,6 +985,56 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <ArrowRight className="h-3.5 w-3.5" />
             </div>
           </div>
+
+          {/* Card 9: The Mistake Black Book */}
+          <div
+            onClick={() => onNavigateTab('mistakes')}
+            className="group relative flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-lg hover:border-rose-500/50 hover:bg-slate-900 transition cursor-pointer"
+          >
+            <div>
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-rose-500/15 text-rose-400 border border-rose-500/25 mb-4 group-hover:scale-105 transition">
+                <BookMarked className="h-5 w-5" />
+              </div>
+              <span className="rounded-md bg-rose-500/15 px-2 py-0.5 text-[10px] font-bold text-rose-300 font-mono">
+                Error Rematch Engine
+              </span>
+              <h3 className="text-base font-bold text-white mt-2 group-hover:text-rose-300 transition">
+                The Mistake Black Book
+              </h3>
+              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                Log failed questions, diagnose why marks were lost, and drill rematch quizzes until 100% mastered.
+              </p>
+            </div>
+            <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-rose-400 group-hover:translate-x-1 transition">
+              <span>Open Black Book</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </div>
+          </div>
+
+          {/* Card 10: Night Before Cheat Sheets */}
+          <div
+            onClick={() => onNavigateTab('cheatsheets')}
+            className="group relative flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-lg hover:border-amber-500/50 hover:bg-slate-900 transition cursor-pointer"
+          >
+            <div>
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/25 mb-4 group-hover:scale-105 transition">
+                <FileText className="h-5 w-5" />
+              </div>
+              <span className="rounded-md bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold text-amber-300 font-mono">
+                1-Page Emergency PDF
+              </span>
+              <h3 className="text-base font-bold text-white mt-2 group-hover:text-amber-300 transition">
+                Night Before Cheat Sheets
+              </h3>
+              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                Ultra-dense formulas, chemical tests, and examiner trap summaries formatted for 1-click A4 print.
+              </p>
+            </div>
+            <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-amber-400 group-hover:translate-x-1 transition">
+              <span>View Cheat Sheets</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </div>
+          </div>
         </div>
       </section>
 

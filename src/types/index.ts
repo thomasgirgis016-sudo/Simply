@@ -557,3 +557,60 @@ export interface PastPaperQaSummaryReport {
   healthScorePercent: number;
 }
 
+// ─────────────────────────────────────────────────────────────
+// Module 5: Mistake Black Book & Night-Before Cheat Sheets Types
+// ─────────────────────────────────────────────────────────────
+
+export type MistakeReason = 
+  | 'careless_math'       // Careless arithmetic or algebra slip
+  | 'misread_command'     // Misread question command (e.g. Describe vs Explain)
+  | 'formula_forgotten'   // Forgot formula or theorem
+  | 'unit_confusion'      // Unit conversion or missing units (e.g. cm3 vs dm3)
+  | 'concept_gap'         // Concept gap / didn't know topic
+  | 'time_pressure';      // Ran out of time / rushed
+
+export interface MistakeItem {
+  id: string;
+  subjectId: string;
+  subjectCode: string;
+  topic: string;
+  paperCode?: string;       // e.g. "0580/42/M/J/23"
+  questionNumber?: string;  // e.g. "Q4(b)"
+  questionPrompt: string;
+  myMistakeAnswer: string;
+  markSchemeAnswer: string;
+  examinerTip?: string;
+  reason: MistakeReason;
+  marksLost: number;
+  totalMarks: number;
+  addedAt: string;
+  isMastered: boolean;
+  masteredAt?: string;
+  rematchAttempts: number;
+}
+
+export interface CheatSheetItem {
+  label: string;
+  formula?: string; // LaTeX KaTeX expression
+  notes: string;
+  warning?: string; // High-yield examiner trap
+}
+
+export interface CheatSheetSection {
+  title: string;
+  color?: 'amber' | 'indigo' | 'cyan' | 'rose' | 'emerald' | 'purple' | 'teal';
+  items: CheatSheetItem[];
+}
+
+export interface SubjectCheatSheet {
+  subjectId: string;
+  subjectCode: string;
+  subjectName: string;
+  board: 'CIE' | 'Edexcel' | 'Both';
+  badge: string;
+  lastUpdated: string;
+  estimatedReadTime: string;
+  criticalRules: string[];
+  sections: CheatSheetSection[];
+}
+

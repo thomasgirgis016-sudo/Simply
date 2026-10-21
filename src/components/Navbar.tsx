@@ -40,7 +40,9 @@ import {
   Palette,
   TrendingDown,
   Zap,
-  Info
+  Info,
+  BookMarked,
+  FileText
 } from 'lucide-react';
 import { UserProfile, Subject, UserAccount } from '../types';
 import { SimplyLogo } from './SimplyLogo';
@@ -54,6 +56,8 @@ export type ActiveTab =
   | 'traps'
   | 'pitfalls'
   | 'blitz'
+  | 'mistakes'
+  | 'cheatsheets'
   | 'mock'
   | 'worksheet'
   | 'radar'
@@ -172,6 +176,8 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'traps', label: 'Command Words', icon: ShieldAlert, color: 'text-rose-400' },
     { id: 'pitfalls', label: 'Examiner Pitfalls', icon: TrendingDown, color: 'text-rose-400' },
     { id: 'blitz', label: '60s Unit Blitz', icon: Zap, color: 'text-amber-400' },
+    { id: 'mistakes', label: 'Mistake Black Book', icon: BookMarked, color: 'text-rose-400' },
+    { id: 'cheatsheets', label: 'Night Before Sheets', icon: FileText, color: 'text-amber-400' },
     { id: 'mock', label: 'Timed Mock Simulator', icon: Clock, color: 'text-amber-400' },
     { id: 'worksheet', label: 'Worksheet Builder', icon: Printer, color: 'text-indigo-400' },
     { id: 'radar', label: 'Grade 9 Radar', icon: Activity, color: 'text-emerald-400' },

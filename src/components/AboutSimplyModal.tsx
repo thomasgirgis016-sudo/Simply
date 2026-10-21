@@ -156,9 +156,37 @@ export const AboutSimplyModal: React.FC<AboutSimplyModalProps> = ({
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 mb-3">
                   <School className="h-4.5 w-4.5" />
                 </div>
-                <h4 className="text-sm font-bold text-white mb-1.5">Printable Tests & Parent Report Cards</h4>
+                <h4 className="text-sm font-bold text-white mb-1.5">Printable Tests & Parent Reports</h4>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Tutors can generate 1-click printable PDF homework tests with teacher mark schemes. Parents receive executive progress letters detailing mock exam trajectories and syllabus readiness.
+                  Tutors can generate 1-click printable PDF homework tests with teacher mark schemes. Parents receive executive progress letters detailing mock trajectories.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-1">
+            {/* Capability 7 */}
+            <div className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4.5 flex flex-col justify-between">
+              <div>
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-500/15 text-rose-400 border border-rose-500/20 mb-3">
+                  <Flame className="h-4.5 w-4.5" />
+                </div>
+                <h4 className="text-sm font-bold text-white mb-1.5">The Mistake Black Book & Rematch Engine</h4>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Personal error log where candidates save every question they lost marks on, diagnose the root cause (arithmetic slip, misread command, formula trap), and run active recall Rematch Quizzes until 100% mastered.
+                </p>
+              </div>
+            </div>
+
+            {/* Capability 8 */}
+            <div className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4.5 flex flex-col justify-between">
+              <div>
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/20 mb-3">
+                  <FileText className="h-4.5 w-4.5" />
+                </div>
+                <h4 className="text-sm font-bold text-white mb-1.5">"Night Before the Exam" 1-Page Cheat Sheets</h4>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Ultra-dense single-page emergency summaries for Maths 0580, Chemistry 0620, Physics 0625, Biology 0610, and ESL 0510. Formatted with non-negotiable Cambridge instructions for 1-click clean A4 PDF printing.
                 </p>
               </div>
             </div>

@@ -40,6 +40,8 @@ import { StudyRoadmap } from './components/StudyRoadmap';
 import { CommandWordsTrapDetector } from './components/CommandWordsTrapDetector';
 import { ExaminerPitfallsHeatmap } from './components/ExaminerPitfallsHeatmap';
 import { UnitConversionBlitz } from './components/UnitConversionBlitz';
+import { MistakeNotebookView } from './components/MistakeNotebookView';
+import { NightBeforeCheatSheets } from './components/NightBeforeCheatSheets';
 import { HandwritingScannerModal } from './components/HandwritingScannerModal';
 import { ParentReportModal } from './components/ParentReportModal';
 import { StudyDuelModal } from './components/StudyDuelModal';
@@ -698,6 +700,22 @@ export function App() {
 
             {activeTab === 'blitz' && (
               <UnitConversionBlitz />
+            )}
+
+            {activeTab === 'mistakes' && (
+              <MistakeNotebookView
+                subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
+                profile={profile}
+              />
+            )}
+
+            {activeTab === 'cheatsheets' && (
+              <NightBeforeCheatSheets
+                subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
+                profile={profile}
+                activeSubject={activeSubject}
+                onSelectSubject={setActiveSubject}
+              />
             )}
 
             {activeTab === 'solver' && (
