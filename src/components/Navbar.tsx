@@ -477,7 +477,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             ) : (
               <button
                 onClick={() => onOpenAuth('signin')}
-                className="rounded-xl bg-gradient-to-r from-[#FF5E62] to-[#FFA63A] px-2.5 py-1 text-[11px] font-extrabold text-slate-950 shadow-sm shrink-0"
+                className="rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-3 py-1.5 text-[11px] font-black text-slate-950 shadow-md hover:brightness-110 transition shrink-0"
               >
                 Sign In
               </button>

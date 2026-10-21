@@ -600,7 +600,7 @@ export function App() {
       />
 
       {/* Main Container */}
-      <main className={`flex-1 px-3 py-4 sm:px-6 sm:py-8 max-w-7xl mx-auto w-full ${activeTab === 'chat' ? 'pb-24 md:pb-8' : 'pb-28 md:pb-12'}`}>
+      <main className={`flex-1 px-3 py-4 sm:px-6 sm:py-8 max-w-7xl mx-auto w-full ${activeTab === 'chat' ? 'pb-28 md:pb-10' : 'pb-36 sm:pb-16'}`}>
         {/* Single Device Session Conflict Banner */}
         {deviceConflictAlert && (
           <div className="mb-6 rounded-2xl border border-rose-500/50 bg-rose-950/80 p-4 text-xs font-semibold text-rose-200 shadow-2xl flex items-center justify-between gap-3 animate-fadeIn">
