@@ -42,7 +42,10 @@ import {
   ListChecks,
   MessageSquare,
   Users,
-  X
+  X,
+  Atom,
+  Download,
+  Smartphone
 } from 'lucide-react';
 import { Subject, UserProfile, UserAccount } from '../types';
 import { ActiveTab } from './Navbar';
@@ -64,6 +67,9 @@ interface AppSidebarProps {
   onOpenPayment?: () => void;
   onOpenHandwritingScanner?: () => void;
   onOpenAbout?: () => void;
+  onOpenExamHud?: () => void;
+  onOpenRevisionKit?: () => void;
+  onOpenPwaModal?: () => void;
   isMobileOpen: boolean;
   onCloseMobile: () => void;
 }
@@ -84,6 +90,9 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   onOpenPayment,
   onOpenHandwritingScanner,
   onOpenAbout,
+  onOpenExamHud,
+  onOpenRevisionKit,
+  onOpenPwaModal,
   isMobileOpen,
   onCloseMobile,
 }) => {
@@ -272,20 +281,65 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
       </div>
 
       {/* 3. Bottom Profile & System Footer */}
-      <div className="space-y-3 p-3 border-t border-slate-800/80 bg-slate-950/90">
-        {/* Scientific Calculator Quick Action */}
-        {onOpenCalculator && (
-          <button
-            onClick={() => {
-              onOpenCalculator();
-              onCloseMobile();
-            }}
-            className="w-full flex items-center gap-2.5 rounded-xl border border-slate-800 bg-slate-900/70 hover:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-amber-300 transition cursor-pointer"
-          >
-            <Calculator className="h-4 w-4 text-amber-400 shrink-0" />
-            {!isCollapsed && <span>Scientific Calculator</span>}
-          </button>
-        )}
+      <div className="space-y-2 p-3 border-t border-slate-800/80 bg-slate-950/90">
+        {/* Quick Exam Utilities */}
+        <div className="space-y-1">
+          {onOpenExamHud && (
+            <button
+              onClick={() => {
+                onOpenExamHud();
+                onCloseMobile();
+              }}
+              className="w-full flex items-center gap-2.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 px-2.5 py-1.5 text-xs font-semibold text-indigo-300 transition cursor-pointer"
+              title="Open Periodic Table & Formula Reference HUD"
+            >
+              <Atom className="h-4 w-4 text-indigo-400 shrink-0" />
+              {!isCollapsed && <span>Reference HUD (Formulas)</span>}
+            </button>
+          )}
+
+          {onOpenRevisionKit && (
+            <button
+              onClick={() => {
+                onOpenRevisionKit();
+                onCloseMobile();
+              }}
+              className="w-full flex items-center gap-2.5 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 px-2.5 py-1.5 text-xs font-semibold text-rose-300 transition cursor-pointer"
+              title="1-Click Complete Revision Kit PDF Booklet"
+            >
+              <Download className="h-4 w-4 text-rose-400 shrink-0" />
+              {!isCollapsed && <span>1-Click Revision Kit (PDF)</span>}
+            </button>
+          )}
+
+          {onOpenPwaModal && (
+            <button
+              onClick={() => {
+                onOpenPwaModal();
+                onCloseMobile();
+              }}
+              className="w-full flex items-center gap-2.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 px-2.5 py-1.5 text-xs font-semibold text-emerald-300 transition cursor-pointer"
+              title="Install Simply IGCSE App"
+            >
+              <Smartphone className="h-4 w-4 text-emerald-400 shrink-0" />
+              {!isCollapsed && <span>Install Mobile App</span>}
+            </button>
+          )}
+
+          {/* Scientific Calculator Quick Action */}
+          {onOpenCalculator && (
+            <button
+              onClick={() => {
+                onOpenCalculator();
+                onCloseMobile();
+              }}
+              className="w-full flex items-center gap-2.5 rounded-xl border border-slate-800 bg-slate-900/70 hover:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-amber-300 transition cursor-pointer"
+            >
+              <Calculator className="h-4 w-4 text-amber-400 shrink-0" />
+              {!isCollapsed && <span>Scientific Calculator</span>}
+            </button>
+          )}
+        </div>
 
         {/* User Card */}
         {currentUser ? (

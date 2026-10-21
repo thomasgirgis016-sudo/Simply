@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { Subject, UserProfile } from '../types';
 
-interface ExaminerPitfall {
+export interface ExaminerPitfall {
   id: string;
   subjectCode: string; // e.g. "0580", "0625", "0620", "0610", "0510"
   subjectName: string;
@@ -31,7 +31,7 @@ interface ExaminerPitfall {
   marksLostAverage: string;
 }
 
-const EXAMINER_PITFALLS_DATABASE: ExaminerPitfall[] = [
+export const EXAMINER_PITFALLS_DATABASE: ExaminerPitfall[] = [
   // 0580 Mathematics
   {
     id: 'math-1',

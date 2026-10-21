@@ -52,6 +52,10 @@ import { AuthModal } from './components/AuthModal';
 import { ScientificCalculator } from './components/ScientificCalculator';
 import { SecretAdminModal } from './components/SecretAdminModal';
 import { AboutSimplyModal } from './components/AboutSimplyModal';
+import { ExamReferenceHudModal } from './components/ExamReferenceHudModal';
+import { PwaInstallModal } from './components/PwaInstallModal';
+import { CompleteRevisionKitModal } from './components/CompleteRevisionKitModal';
+import { initPwaListener } from './services/pwaService';
 import { AppSidebar } from './components/AppSidebar';
 import { AppHeader } from './components/AppHeader';
 import { SimplyLogo } from './components/SimplyLogo';
@@ -131,6 +135,14 @@ export function App() {
   const [isHandwritingScannerOpen, setIsHandwritingScannerOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isExamHudOpen, setIsExamHudOpen] = useState(false);
+  const [isPwaModalOpen, setIsPwaModalOpen] = useState(false);
+  const [isRevisionKitOpen, setIsRevisionKitOpen] = useState(false);
+
+  // Initialize PWA beforeinstallprompt listener
+  useEffect(() => {
+    initPwaListener();
+  }, []);
 
   // 4b. Executive Design System & Theme
   const [designTheme, setDesignTheme] = useState<'executive'>('executive');
@@ -206,6 +218,9 @@ export function App() {
         setIsProfileOpen(false);
         setIsAuthOpen(false);
         setIsSecretAdminOpen(false);
+        setIsExamHudOpen(false);
+        setIsPwaModalOpen(false);
+        setIsRevisionKitOpen(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -578,6 +593,9 @@ export function App() {
         onOpenPayment={() => setIsPaymentOpen(true)}
         onOpenHandwritingScanner={() => setIsHandwritingScannerOpen(true)}
         onOpenAbout={() => setIsAboutOpen(true)}
+        onOpenExamHud={() => setIsExamHudOpen(true)}
+        onOpenRevisionKit={() => setIsRevisionKitOpen(true)}
+        onOpenPwaModal={() => setIsPwaModalOpen(true)}
         isMobileOpen={isMobileSidebarOpen}
         onCloseMobile={() => setIsMobileSidebarOpen(false)}
       />
@@ -596,6 +614,9 @@ export function App() {
           onOpenPayment={() => setIsPaymentOpen(true)}
           onOpenHandwritingScanner={() => setIsHandwritingScannerOpen(true)}
           onOpenCalculator={() => setIsCalculatorOpen(true)}
+          onOpenExamHud={() => setIsExamHudOpen(true)}
+          onOpenRevisionKit={() => setIsRevisionKitOpen(true)}
+          onOpenPwaModal={() => setIsPwaModalOpen(true)}
           onOpenAuth={(mode) => {
             setAuthMode(mode || 'signin');
             setIsAuthOpen(true);
@@ -672,6 +693,9 @@ export function App() {
                 onOpenStudyDuel={() => setIsStudyDuelOpen(true)}
                 onOpenHandwritingScanner={() => setIsHandwritingScannerOpen(true)}
                 onOpenAbout={() => setIsAboutOpen(true)}
+                onOpenExamHud={() => setIsExamHudOpen(true)}
+                onOpenRevisionKit={() => setIsRevisionKitOpen(true)}
+                onOpenPwaModal={() => setIsPwaModalOpen(true)}
               />
             )}
 
@@ -1060,6 +1084,28 @@ export function App() {
         isOpen={isAboutOpen}
         onClose={() => setIsAboutOpen(false)}
         onNavigateTab={setActiveTab}
+      />
+
+      {/* Cambridge Interactive Periodic Table & Exam Formula Reference HUD */}
+      <ExamReferenceHudModal
+        isOpen={isExamHudOpen}
+        onClose={() => setIsExamHudOpen(false)}
+        activeSubject={activeSubject}
+      />
+
+      {/* PWA Mobile App Install Modal */}
+      <PwaInstallModal
+        isOpen={isPwaModalOpen}
+        onClose={() => setIsPwaModalOpen(false)}
+      />
+
+      {/* 1-Click Cambridge Complete Revision Kit PDF Exporter */}
+      <CompleteRevisionKitModal
+        isOpen={isRevisionKitOpen}
+        onClose={() => setIsRevisionKitOpen(false)}
+        activeSubject={activeSubject}
+        subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
+        profile={profile}
       />
     </div>
   );

@@ -33,7 +33,10 @@ import {
   Target,
   Columns,
   ListChecks,
-  MessageSquare
+  MessageSquare,
+  Atom,
+  Download,
+  Smartphone
 } from 'lucide-react';
 import { Subject, UserProfile, BookmarkItem, UserAccount } from '../types';
 import { PAST_PAPERS_DATABASE } from '../data/pastPapersData';
@@ -43,6 +46,7 @@ import { getDailyStreak, getDailyChallengeQuestion, completeDailyChallenge, Dail
 import { getMistakeNotebook } from '../services/mistakeNotebook';
 import { MathRenderer } from './MathRenderer';
 import { AboutSimplyModal } from './AboutSimplyModal';
+import { ExamCountdownWidget } from './ExamCountdownWidget';
 
 interface HomeViewProps {
   subjects: Subject[];
@@ -56,6 +60,9 @@ interface HomeViewProps {
   onOpenStudyDuel?: () => void;
   onOpenHandwritingScanner?: () => void;
   onOpenAbout?: () => void;
+  onOpenExamHud?: () => void;
+  onOpenRevisionKit?: () => void;
+  onOpenPwaModal?: () => void;
 }
 
 type CategoryHub = 'featured' | 'papers' | 'ai' | 'mastery' | 'drills' | 'all';
@@ -72,6 +79,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
   onOpenStudyDuel,
   onOpenHandwritingScanner,
   onOpenAbout,
+  onOpenExamHud,
+  onOpenRevisionKit,
+  onOpenPwaModal,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [boardFilter, setBoardFilter] = useState<'All' | 'CIE' | 'Edexcel'>('All');
@@ -333,7 +343,49 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
           )}
         </div>
+
+        {/* Quick Launch Action Pills */}
+        <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-slate-800/60">
+          {onOpenExamHud && (
+            <button
+              onClick={onOpenExamHud}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-indigo-500/40 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 text-xs font-bold transition active:scale-95 cursor-pointer shadow-sm"
+              title="Open Periodic Table & Cambridge Formula Reference HUD"
+            >
+              <Atom className="h-3.5 w-3.5 text-indigo-400" />
+              <span>Reference HUD & Periodic Table</span>
+            </button>
+          )}
+
+          {onOpenRevisionKit && (
+            <button
+              onClick={onOpenRevisionKit}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs font-bold transition active:scale-95 cursor-pointer shadow-sm"
+              title="Generate 1-Click Cambridge Revision Survival Kit PDF"
+            >
+              <Download className="h-3.5 w-3.5 text-rose-400" />
+              <span>1-Click Survival Kit (PDF)</span>
+            </button>
+          )}
+
+          {onOpenPwaModal && (
+            <button
+              onClick={onOpenPwaModal}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 text-xs font-bold transition active:scale-95 cursor-pointer shadow-sm"
+              title="Install Simply IGCSE to your home screen"
+            >
+              <Smartphone className="h-3.5 w-3.5 text-emerald-400" />
+              <span>Install App</span>
+            </button>
+          )}
+        </div>
       </section>
+
+      {/* Official Exam Countdown & Daily Revision Quota */}
+      <ExamCountdownWidget
+        activeSubject={activeSubject}
+        onNavigateTab={onNavigateTab}
+      />
 
       {/* 2. Four Core Workspaces (The Big Pillars) */}
       <section className="space-y-3">

@@ -9,7 +9,9 @@ import {
   UserCheck,
   Calculator,
   ShieldCheck,
-  Sparkles
+  Sparkles,
+  Atom,
+  Download
 } from 'lucide-react';
 import { Subject, UserProfile, UserAccount } from '../types';
 import { ActiveTab } from './Navbar';
@@ -28,6 +30,9 @@ interface AppHeaderProps {
   onOpenPayment?: () => void;
   onOpenHandwritingScanner?: () => void;
   onOpenCalculator?: () => void;
+  onOpenExamHud?: () => void;
+  onOpenRevisionKit?: () => void;
+  onOpenPwaModal?: () => void;
   onOpenAuth: (mode?: 'signin' | 'signup') => void;
 }
 
@@ -43,6 +48,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   onOpenPayment,
   onOpenHandwritingScanner,
   onOpenCalculator,
+  onOpenExamHud,
+  onOpenRevisionKit,
+  onOpenPwaModal,
   onOpenAuth,
 }) => {
   const streak = getDailyStreak();
@@ -122,6 +130,30 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
 
       {/* 3. Right Controls: Streak, Tools, Profile */}
       <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+        {/* Exam Reference HUD Button (Periodic Table & Formulas) */}
+        {onOpenExamHud && (
+          <button
+            onClick={onOpenExamHud}
+            className="hidden sm:flex h-9 items-center justify-center gap-1.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 px-2.5 text-xs font-semibold text-indigo-300 transition cursor-pointer"
+            title="Open Interactive Periodic Table & Cambridge Formulas Reference HUD"
+          >
+            <Atom className="h-4 w-4 text-indigo-400" />
+            <span className="hidden xl:inline text-[11px]">Reference HUD</span>
+          </button>
+        )}
+
+        {/* 1-Click Revision Kit Button */}
+        {onOpenRevisionKit && (
+          <button
+            onClick={onOpenRevisionKit}
+            className="hidden md:flex h-9 items-center justify-center gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 px-2.5 text-xs font-semibold text-amber-300 transition cursor-pointer"
+            title="Export 1-Click Complete Revision Kit (PDF)"
+          >
+            <Download className="h-4 w-4 text-amber-400" />
+            <span className="hidden xl:inline text-[11px]">Survival Kit</span>
+          </button>
+        )}
+
         {/* Calculator Button (Desktop / Tablet) */}
         {onOpenCalculator && (
           <button
