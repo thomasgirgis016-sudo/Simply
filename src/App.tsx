@@ -603,7 +603,7 @@ export function App() {
         />
 
         {/* Main Container */}
-        <main className={`flex-1 px-3 py-4 sm:px-6 sm:py-8 max-w-7xl mx-auto w-full ${activeTab === 'chat' ? 'pb-28 md:pb-10' : 'pb-36 sm:pb-16'}`}>
+        <main className={`flex-1 px-3 py-4 sm:px-6 sm:py-8 max-w-7xl mx-auto w-full overflow-x-hidden ${activeTab === 'chat' ? 'pb-24 md:pb-10' : 'pb-24 sm:pb-16'}`}>
         {/* Single Device Session Conflict Banner */}
         {deviceConflictAlert && (
           <div className="mb-6 rounded-2xl border border-rose-500/50 bg-rose-950/80 p-4 text-xs font-semibold text-rose-200 shadow-2xl flex items-center justify-between gap-3 animate-fadeIn">
@@ -874,12 +874,12 @@ export function App() {
       </main>
 
       {/* Mobile Phone Bottom Navigation Bar */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-slate-800/90 bg-slate-950/95 backdrop-blur-xl px-1.5 pt-1.5 pb-[max(0.6rem,env(safe-area-inset-bottom))] shadow-2xl flex items-center justify-around">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-slate-800/90 bg-slate-950/95 backdrop-blur-2xl px-1 pt-1 pb-[max(0.6rem,env(safe-area-inset-bottom))] shadow-2xl flex items-center justify-around h-16">
         {[
           { id: 'home', label: 'Home', icon: Home, color: 'text-indigo-400' },
           { id: 'finder', label: 'Papers', icon: FileText, color: 'text-amber-400' },
           { id: 'solver', label: 'AI Solver', icon: Camera, color: 'text-pink-400' },
-          { id: 'mistakes', label: 'Black Book', icon: BookMarked, color: 'text-rose-400' },
+          { id: 'mistakes', label: 'Mistakes', icon: BookMarked, color: 'text-rose-400' },
           { id: 'menu', label: 'All Tools', icon: Menu, color: 'text-indigo-400' },
         ].map((tab) => {
           const Icon = tab.icon;
@@ -894,17 +894,17 @@ export function App() {
                   setActiveTab(tab.id as ActiveTab);
                 }
               }}
-              className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl transition-all active:scale-90 cursor-pointer min-w-[48px] min-h-[48px] ${
-                isActive ? 'bg-indigo-500/15 text-white' : 'text-slate-400 hover:text-slate-200'
+              className={`flex-1 h-full flex flex-col items-center justify-center py-1 transition-all active:scale-90 cursor-pointer ${
+                isActive ? 'text-white' : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               <div className="relative">
                 <Icon className={`h-5 w-5 ${isActive ? tab.color : 'text-slate-400'}`} />
                 {isActive && (
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-1 w-3.5 rounded-full bg-indigo-500 shadow-sm shadow-indigo-500" />
+                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-1 w-3 rounded-full bg-indigo-500 shadow-sm shadow-indigo-500" />
                 )}
               </div>
-              <span className={`text-[10px] mt-1 font-semibold tracking-tight ${isActive ? 'text-white font-bold' : 'text-slate-400'}`}>
+              <span className={`text-[10px] mt-1 tracking-tight font-sans ${isActive ? 'text-white font-bold' : 'text-slate-400 font-medium'}`}>
                 {tab.label}
               </span>
             </button>
@@ -912,8 +912,8 @@ export function App() {
         })}
       </nav>
 
-      {/* Footer */}
-      <footer className="mt-auto border-t border-slate-800/80 bg-slate-950/90 py-8 px-4 text-xs text-slate-400">
+      {/* Footer (with bottom padding so it never hides behind mobile nav) */}
+      <footer className="mt-auto border-t border-slate-800/80 bg-slate-950/90 py-8 px-4 text-xs text-slate-400 mb-16 md:mb-0">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
             <SimplyLogo size="sm" showText={false} />

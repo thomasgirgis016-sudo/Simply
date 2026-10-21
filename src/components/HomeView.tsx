@@ -215,9 +215,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </div>
 
           {/* Quick Enrolled Subject Selector Pills */}
-          <div className="flex flex-wrap items-center gap-1.5 self-start md:self-center">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1">
-              Active:
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 max-w-full self-start md:self-center">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-0.5">
+              Syllabus:
             </span>
             {subjects.map((sub) => {
               const isActive = sub.id === activeSubject.id;
@@ -225,7 +225,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 <button
                   key={sub.id}
                   onClick={() => onSelectSubject(sub)}
-                  className={`rounded-xl px-2.5 py-1 text-xs font-mono font-bold transition cursor-pointer ${
+                  className={`rounded-xl px-2.5 py-1 text-xs font-mono font-bold transition shrink-0 cursor-pointer ${
                     isActive
                       ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/25 ring-1 ring-indigo-400'
                       : 'border border-slate-800 bg-slate-900/80 text-slate-400 hover:text-slate-200 hover:border-slate-700'
@@ -247,8 +247,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={`Search ${activeSubject.code} past papers, topics, formulas, or marking schemes...`}
-              className="w-full rounded-xl sm:rounded-2xl border border-slate-700/80 bg-slate-950/90 py-2.5 sm:py-3 pl-10 sm:pl-11 pr-14 text-xs sm:text-sm text-white placeholder-slate-400 shadow-inner focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition"
+              placeholder={`Search ${activeSubject.code} past papers, topics, formulas...`}
+              className="w-full rounded-xl sm:rounded-2xl border border-slate-700/80 bg-slate-950/90 py-2.5 sm:py-3 pl-10 sm:pl-11 pr-14 text-base sm:text-sm text-white placeholder-slate-400 shadow-inner focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition"
             />
             {searchQuery && (
               <button
@@ -347,112 +347,112 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
           {/* 1. Past Paper Vault */}
           <div
             onClick={() => onNavigateTab('finder')}
-            className="group flex flex-col justify-between rounded-2xl border border-slate-800/90 bg-slate-900/60 p-4 sm:p-5 shadow-lg hover:border-amber-500/50 hover:bg-slate-900/90 transition cursor-pointer"
+            className="group flex flex-col justify-between rounded-xl sm:rounded-2xl border border-slate-800/90 bg-slate-900/60 p-3 sm:p-5 shadow-lg hover:border-amber-500/50 hover:bg-slate-900/90 transition active:scale-95 cursor-pointer"
           >
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/25 group-hover:scale-105 transition">
-                  <FileText className="h-5 w-5" />
+              <div className="flex items-center justify-between mb-2 sm:mb-3">
+                <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/25 group-hover:scale-105 transition">
+                  <FileText className="h-4 w-4 sm:h-5 sm:w-5" />
                 </div>
-                <span className="rounded-md bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold text-amber-300 font-mono">
-                  3,500+ Papers
+                <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-[9px] sm:text-[10px] font-bold text-amber-300 font-mono">
+                  3,500+
                 </span>
               </div>
-              <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-amber-300 transition">
-                Past Paper Vault
+              <h3 className="text-xs sm:text-base font-bold text-white group-hover:text-amber-300 transition line-clamp-1">
+                Past Papers
               </h3>
-              <p className="text-xs text-slate-400 mt-1 leading-relaxed line-clamp-2">
+              <p className="hidden sm:block text-xs text-slate-400 mt-1 leading-relaxed line-clamp-2">
                 Official CAIE & Edexcel papers, QP & MS synchronized with topic filters.
               </p>
             </div>
-            <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-amber-400 group-hover:translate-x-1 transition">
-              <span>Open Past Papers</span>
-              <ArrowRight className="h-3.5 w-3.5" />
+            <div className="mt-2.5 sm:mt-4 flex items-center gap-1 text-[11px] sm:text-xs font-bold text-amber-400 group-hover:translate-x-1 transition">
+              <span>Open</span>
+              <ArrowRight className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
             </div>
           </div>
 
           {/* 2. AI Solver & Vision OCR */}
           <div
             onClick={() => onNavigateTab('solver')}
-            className="group flex flex-col justify-between rounded-2xl border border-slate-800/90 bg-slate-900/60 p-4 sm:p-5 shadow-lg hover:border-pink-500/50 hover:bg-slate-900/90 transition cursor-pointer"
+            className="group flex flex-col justify-between rounded-xl sm:rounded-2xl border border-slate-800/90 bg-slate-900/60 p-3 sm:p-5 shadow-lg hover:border-pink-500/50 hover:bg-slate-900/90 transition active:scale-95 cursor-pointer"
           >
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-pink-500/15 text-pink-400 border border-pink-500/25 group-hover:scale-105 transition">
-                  <Camera className="h-5 w-5" />
+              <div className="flex items-center justify-between mb-2 sm:mb-3">
+                <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl bg-pink-500/15 text-pink-400 border border-pink-500/25 group-hover:scale-105 transition">
+                  <Camera className="h-4 w-4 sm:h-5 sm:w-5" />
                 </div>
-                <span className="rounded-md bg-pink-500/15 px-2 py-0.5 text-[10px] font-bold text-pink-300 font-mono">
+                <span className="rounded bg-pink-500/15 px-1.5 py-0.5 text-[9px] sm:text-[10px] font-bold text-pink-300 font-mono">
                   Vision OCR
                 </span>
               </div>
-              <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-pink-300 transition">
-                AI Solver & Grader
+              <h3 className="text-xs sm:text-base font-bold text-white group-hover:text-pink-300 transition line-clamp-1">
+                AI Solver
               </h3>
-              <p className="text-xs text-slate-400 mt-1 leading-relaxed line-clamp-2">
+              <p className="hidden sm:block text-xs text-slate-400 mt-1 leading-relaxed line-clamp-2">
                 Snap handwriting for line-by-line mark scheme checks ([M1], [A1], [B1]).
               </p>
             </div>
-            <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-pink-400 group-hover:translate-x-1 transition">
-              <span>Grade My Working</span>
-              <ArrowRight className="h-3.5 w-3.5" />
+            <div className="mt-2.5 sm:mt-4 flex items-center gap-1 text-[11px] sm:text-xs font-bold text-pink-400 group-hover:translate-x-1 transition">
+              <span>Grade</span>
+              <ArrowRight className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
             </div>
           </div>
 
           {/* 3. The Mistake Black Book */}
           <div
             onClick={() => onNavigateTab('mistakes')}
-            className="group flex flex-col justify-between rounded-2xl border border-slate-800/90 bg-slate-900/60 p-4 sm:p-5 shadow-lg hover:border-rose-500/50 hover:bg-slate-900/90 transition cursor-pointer"
+            className="group flex flex-col justify-between rounded-xl sm:rounded-2xl border border-slate-800/90 bg-slate-900/60 p-3 sm:p-5 shadow-lg hover:border-rose-500/50 hover:bg-slate-900/90 transition active:scale-95 cursor-pointer"
           >
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-500/15 text-rose-400 border border-rose-500/25 group-hover:scale-105 transition">
-                  <BookMarked className="h-5 w-5" />
+              <div className="flex items-center justify-between mb-2 sm:mb-3">
+                <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl bg-rose-500/15 text-rose-400 border border-rose-500/25 group-hover:scale-105 transition">
+                  <BookMarked className="h-4 w-4 sm:h-5 sm:w-5" />
                 </div>
-                <span className="rounded-md bg-rose-500/15 px-2 py-0.5 text-[10px] font-bold text-rose-300 font-mono">
+                <span className="rounded bg-rose-500/15 px-1.5 py-0.5 text-[9px] sm:text-[10px] font-bold text-rose-300 font-mono">
                   {mistakesCount} Unmastered
                 </span>
               </div>
-              <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-rose-300 transition">
-                The Mistake Black Book
+              <h3 className="text-xs sm:text-base font-bold text-white group-hover:text-rose-300 transition line-clamp-1">
+                Black Book
               </h3>
-              <p className="text-xs text-slate-400 mt-1 leading-relaxed line-clamp-2">
+              <p className="hidden sm:block text-xs text-slate-400 mt-1 leading-relaxed line-clamp-2">
                 Personal error notebook with reason tags & active Rematch Quiz Engine.
               </p>
             </div>
-            <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-rose-400 group-hover:translate-x-1 transition">
-              <span>Launch Rematch</span>
-              <ArrowRight className="h-3.5 w-3.5" />
+            <div className="mt-2.5 sm:mt-4 flex items-center gap-1 text-[11px] sm:text-xs font-bold text-rose-400 group-hover:translate-x-1 transition">
+              <span>Rematch</span>
+              <ArrowRight className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
             </div>
           </div>
 
           {/* 4. Night Before Cheat Sheets */}
           <div
             onClick={() => onNavigateTab('cheatsheets')}
-            className="group flex flex-col justify-between rounded-2xl border border-slate-800/90 bg-slate-900/60 p-4 sm:p-5 shadow-lg hover:border-indigo-500/50 hover:bg-slate-900/90 transition cursor-pointer"
+            className="group flex flex-col justify-between rounded-xl sm:rounded-2xl border border-slate-800/90 bg-slate-900/60 p-3 sm:p-5 shadow-lg hover:border-indigo-500/50 hover:bg-slate-900/90 transition active:scale-95 cursor-pointer"
           >
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/15 text-indigo-400 border border-indigo-500/25 group-hover:scale-105 transition">
-                  <FileText className="h-5 w-5" />
+              <div className="flex items-center justify-between mb-2 sm:mb-3">
+                <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl bg-indigo-500/15 text-indigo-400 border border-indigo-500/25 group-hover:scale-105 transition">
+                  <FileText className="h-4 w-4 sm:h-5 sm:w-5" />
                 </div>
-                <span className="rounded-md bg-indigo-500/15 px-2 py-0.5 text-[10px] font-bold text-indigo-300 font-mono">
-                  1-Page A4 PDF
+                <span className="rounded bg-indigo-500/15 px-1.5 py-0.5 text-[9px] sm:text-[10px] font-bold text-indigo-300 font-mono">
+                  1-Page PDF
                 </span>
               </div>
-              <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-indigo-300 transition">
-                Night Before Sheets
+              <h3 className="text-xs sm:text-base font-bold text-white group-hover:text-indigo-300 transition line-clamp-1">
+                Cheat Sheets
               </h3>
-              <p className="text-xs text-slate-400 mt-1 leading-relaxed line-clamp-2">
+              <p className="hidden sm:block text-xs text-slate-400 mt-1 leading-relaxed line-clamp-2">
                 Emergency 1-page high-yield formula & trap summaries with 1-click A4 PDF export.
               </p>
             </div>
-            <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-indigo-400 group-hover:translate-x-1 transition">
-              <span>View Cheat Sheet</span>
-              <ArrowRight className="h-3.5 w-3.5" />
+            <div className="mt-2.5 sm:mt-4 flex items-center gap-1 text-[11px] sm:text-xs font-bold text-indigo-400 group-hover:translate-x-1 transition">
+              <span>Sheets</span>
+              <ArrowRight className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
             </div>
           </div>
         </div>
@@ -487,19 +487,19 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <MathRenderer content={dailyQuestion.questionPrompt} />
           </div>
 
-          <form onSubmit={handleCheckDailyAnswer} className="flex flex-col sm:flex-row gap-2 pt-1">
+          <form onSubmit={handleCheckDailyAnswer} className="flex items-center gap-2 pt-1">
             <input
               type="text"
               value={dailyAnswerInput}
               onChange={(e) => setDailyAnswerInput(e.target.value)}
-              placeholder="Enter final answer (e.g. 14.5 or x = 3)..."
-              className="flex-1 rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-xs sm:text-sm font-mono text-white placeholder-slate-500 focus:border-amber-400 focus:outline-none"
+              placeholder="Final answer (e.g. 14.5 or x = 3)..."
+              className="flex-1 min-w-0 rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-base sm:text-sm font-mono text-white placeholder-slate-500 focus:border-amber-400 focus:outline-none"
             />
             <button
               type="submit"
-              className="rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-2 text-xs font-black text-slate-950 shadow-md hover:brightness-110 transition cursor-pointer"
+              className="rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-3.5 sm:px-4 py-2 text-xs font-black text-slate-950 shadow-md hover:brightness-110 shrink-0 transition cursor-pointer"
             >
-              Check Answer
+              Check
             </button>
           </form>
 
