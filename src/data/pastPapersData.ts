@@ -1750,8 +1750,9 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
             paperCode,
             tier: p.tier,
             qpPdfUrl: qpUrl,
-            backupQpUrl: edx.specUrl,
+            backupQpUrl: `https://pastpapers.papacambridge.com/?s=${encodeURIComponent(`${edx.code} ${yr} ${sess.label} ${p.suffix}`)}`,
             msPdfUrl: msUrl,
+            backupMsUrl: `https://pastpapers.papacambridge.com/?s=${encodeURIComponent(`${edx.code} ${yr} ${sess.label} ${p.suffix} Mark Scheme`)}`,
             fileSizeBytes: 'Official Exam Pack'
           });
         }
@@ -1773,6 +1774,15 @@ export function getPaperDownloadUrl(paper: PastPaperItem, type: 'qp' | 'ms'): st
   const syllabusMatch = paper.paperCode.match(/(\d{4}|\w{4})/);
   const syllabus = syllabusMatch ? syllabusMatch[1] : '0580';
   const year = paper.year || 2023;
+
+  // Pearson Edexcel handling: route to official Pearson examination portal
+  const isEdexcel = paper.board === 'Edexcel' || /^[4][A-Z0-9]{3}/i.test(syllabus);
+  if (isEdexcel) {
+    const qSuffix = paper.paperCode.split('/')[1] || '1';
+    const query = `${syllabus} ${year} ${paper.session} ${qSuffix} ${type === 'ms' ? 'Mark Scheme' : ''}`.trim();
+    return `https://qualifications.pearson.com/en/support/support-topics/exams/past-papers.html?q=${encodeURIComponent(query)}`;
+  }
+
   const isMayJune = paper.session.toLowerCase().includes('may') || paper.session.toLowerCase().includes('june');
   const isOctNov = paper.session.toLowerCase().includes('oct') || paper.session.toLowerCase().includes('nov');
   const seasonCode = isMayJune ? 's' : isOctNov ? 'w' : 'm';

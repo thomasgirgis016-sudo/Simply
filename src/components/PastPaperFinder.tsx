@@ -79,6 +79,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
     title: string;
     subtitle?: string;
     paperCode?: string;
+    board?: string;
     type: 'qp' | 'ms' | 'er' | 'gt';
   } | null>(null);
 
@@ -616,14 +617,24 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
   };
 
   // Helper to open PDF in a new window or trigger viewer
-  const handleOpenPdf = (url: string, title: string, subtitle?: string, backupUrl?: string, type: 'qp' | 'ms' | 'er' | 'gt' = 'qp') => {
+  const handleOpenPdf = (
+    url: string,
+    title: string,
+    subtitle?: string,
+    backupUrl?: string,
+    type: 'qp' | 'ms' | 'er' | 'gt' = 'qp',
+    board?: string,
+    paperCode?: string
+  ) => {
     setUseBackupMirror(false);
     setPreviewModal({
       url,
       backupUrl,
       title,
       subtitle,
-      type
+      type,
+      board,
+      paperCode
     });
   };
 
@@ -1477,7 +1488,9 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                   `${pdf.paperCode} Question Paper`,
                                   `${pdf.subjectName} • ${pdf.session}`,
                                   pdf.backupQpUrl,
-                                  'qp'
+                                  'qp',
+                                  pdf.board,
+                                  pdf.paperCode
                                 )
                               }
                               className="inline-flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-800 px-2 py-1 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition cursor-pointer"
@@ -1487,23 +1500,23 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                               <span className="hidden sm:inline">View</span>
                             </button>
                             <a
-                              href={`/api/pdf-proxy?url=${encodeURIComponent(pdf.qpPdfUrl)}${pdf.backupQpUrl ? `&fallback=${encodeURIComponent(pdf.backupQpUrl)}` : ''}`}
+                              href={pdf.board === 'Edexcel' || pdf.qpPdfUrl.includes('pearson.com') ? pdf.qpPdfUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.qpPdfUrl)}${pdf.backupQpUrl ? `&fallback=${encodeURIComponent(pdf.backupQpUrl)}` : ''}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-1 rounded-lg border border-sky-500/40 bg-sky-500/10 px-2 py-1 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition"
                               title="Open PDF directly in verified viewer"
                             >
                               <ExternalLink className="h-3.5 w-3.5" />
-                              <span className="hidden sm:inline">Open</span>
+                              <span className="hidden sm:inline">{pdf.board === 'Edexcel' ? 'Portal' : 'Open'}</span>
                             </a>
                             <a
-                              href={`/api/pdf-proxy?url=${encodeURIComponent(pdf.qpPdfUrl)}${pdf.backupQpUrl ? `&fallback=${encodeURIComponent(pdf.backupQpUrl)}` : ''}&download=true`}
-                              download
+                              href={pdf.board === 'Edexcel' || pdf.qpPdfUrl.includes('pearson.com') ? pdf.qpPdfUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.qpPdfUrl)}${pdf.backupQpUrl ? `&fallback=${encodeURIComponent(pdf.backupQpUrl)}` : ''}&download=true`}
+                              {...(pdf.board === 'Edexcel' || pdf.qpPdfUrl.includes('pearson.com') ? { target: '_blank', rel: 'noopener noreferrer' } : { download: true })}
                               className="inline-flex items-center gap-1 rounded-lg bg-sky-600 px-2.5 py-1 text-xs font-bold text-white hover:bg-sky-500 transition shadow-sm"
                               title="Download official Question Paper PDF"
                             >
                               <Download className="h-3.5 w-3.5" />
-                              <span>Download</span>
+                              <span>{pdf.board === 'Edexcel' ? 'Portal' : 'Download'}</span>
                             </a>
                           </div>
                         </div>
@@ -1524,7 +1537,9 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                     `${pdf.paperCode} Mark Scheme`,
                                     `${pdf.subjectName} • ${pdf.session}`,
                                     pdf.backupMsUrl,
-                                    'ms'
+                                    'ms',
+                                    pdf.board,
+                                    pdf.paperCode
                                   )
                                 }
                                 className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-950/40 px-2 py-1 text-xs font-semibold text-emerald-300 hover:bg-emerald-900/60 transition cursor-pointer"
@@ -1534,23 +1549,23 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                 <span className="hidden sm:inline">View</span>
                               </button>
                               <a
-                                href={`/api/pdf-proxy?url=${encodeURIComponent(pdf.msPdfUrl)}${pdf.backupMsUrl ? `&fallback=${encodeURIComponent(pdf.backupMsUrl)}` : ''}`}
+                                href={pdf.board === 'Edexcel' || pdf.msPdfUrl.includes('pearson.com') ? pdf.msPdfUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.msPdfUrl)}${pdf.backupMsUrl ? `&fallback=${encodeURIComponent(pdf.backupMsUrl)}` : ''}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20 transition"
                                 title="Open Mark Scheme in verified viewer"
                               >
                                 <ExternalLink className="h-3.5 w-3.5" />
-                                <span className="hidden sm:inline">Open</span>
+                                <span className="hidden sm:inline">{pdf.board === 'Edexcel' ? 'Portal' : 'Open'}</span>
                               </a>
                               <a
-                                href={`/api/pdf-proxy?url=${encodeURIComponent(pdf.msPdfUrl)}${pdf.backupMsUrl ? `&fallback=${encodeURIComponent(pdf.backupMsUrl)}` : ''}&download=true`}
-                                download
+                                href={pdf.board === 'Edexcel' || pdf.msPdfUrl.includes('pearson.com') ? pdf.msPdfUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.msPdfUrl)}${pdf.backupMsUrl ? `&fallback=${encodeURIComponent(pdf.backupMsUrl)}` : ''}&download=true`}
+                                {...(pdf.board === 'Edexcel' || pdf.msPdfUrl.includes('pearson.com') ? { target: '_blank', rel: 'noopener noreferrer' } : { download: true })}
                                 className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-2.5 py-1 text-xs font-bold text-white hover:bg-emerald-500 transition shadow-sm"
                                 title="Download official Mark Scheme PDF"
                               >
                                 <Download className="h-3.5 w-3.5" />
-                                <span>Download</span>
+                                <span>{pdf.board === 'Edexcel' ? 'Portal' : 'Download'}</span>
                               </a>
                             </div>
                           </div>
@@ -1815,7 +1830,9 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                             `${paper.paperCode} Question Paper`,
                             `${paper.subjectName} • ${paper.session}`,
                             undefined,
-                            'qp'
+                            'qp',
+                            paper.board,
+                            paper.paperCode
                           )
                         }
                         className="rounded-xl border border-slate-700 bg-slate-800/90 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition flex items-center gap-1.5 cursor-pointer"
@@ -1825,16 +1842,16 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                         <span className="hidden sm:inline">View PDF</span>
                       </button>
 
-                      {/* Open Fullscreen PDF via verified proxy */}
+                      {/* Open Fullscreen PDF via verified proxy or direct portal */}
                       <a
-                        href={`/api/pdf-proxy?url=${encodeURIComponent(downloadUrl)}`}
+                        href={paper.board === 'Edexcel' || downloadUrl.includes('pearson.com') ? downloadUrl : `/api/pdf-proxy?url=${encodeURIComponent(downloadUrl)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="rounded-xl border border-sky-500/30 bg-sky-500/10 px-3 py-1.5 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition flex items-center gap-1.5"
                         title="Open PDF directly in new window"
                       >
                         <ExternalLink className="h-3.5 w-3.5" />
-                        <span className="hidden sm:inline">Open</span>
+                        <span className="hidden sm:inline">{paper.board === 'Edexcel' || downloadUrl.includes('pearson.com') ? 'Portal' : 'Open'}</span>
                       </a>
                     </div>
                   </div>
@@ -2085,7 +2102,9 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                     `${paper.paperCode} Mark Scheme`,
                                     `${paper.subjectName} • ${paper.session}`,
                                     undefined,
-                                    'ms'
+                                    'ms',
+                                    paper.board,
+                                    paper.paperCode
                                   )
                                 }
                                 className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-bold text-emerald-300 hover:bg-emerald-500/20 transition cursor-pointer"
@@ -2095,7 +2114,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                 <span>MS PDF</span>
                               </button>
                               <a
-                                href={`/api/pdf-proxy?url=${encodeURIComponent(msDownloadUrl)}`}
+                                href={paper.board === 'Edexcel' || msDownloadUrl.includes('pearson.com') ? msDownloadUrl : `/api/pdf-proxy?url=${encodeURIComponent(msDownloadUrl)}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-950/40 px-2 py-0.5 text-[11px] font-bold text-emerald-300 hover:bg-emerald-900/60 transition"
@@ -2159,164 +2178,261 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Top Bar */}
-            <div className="flex items-center justify-between gap-3 p-3 sm:p-4 bg-slate-950 border-b border-slate-800 flex-wrap">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div
-                  className={`p-2 rounded-xl shrink-0 ${
-                    previewModal.type === 'ms'
-                      ? 'bg-emerald-500/20 text-emerald-400'
-                      : previewModal.type === 'er'
-                      ? 'bg-indigo-500/20 text-indigo-400'
-                      : previewModal.type === 'gt'
-                      ? 'bg-purple-500/20 text-purple-400'
-                      : 'bg-sky-500/20 text-sky-400'
-                  }`}
-                >
-                  <FileText className="h-5 w-5" />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="text-sm font-bold text-white truncate">
-                    {previewModal.title}
-                  </h3>
-                  {previewModal.subtitle && (
-                    <p className="text-[11px] text-slate-400 truncate">
-                      {previewModal.subtitle}
-                    </p>
+            {(() => {
+              const isPearsonPortal =
+                currentModalUrl.includes('qualifications.pearson.com') ||
+                previewModal.board === 'Edexcel' ||
+                Boolean(previewModal.paperCode && previewModal.paperCode.startsWith('4'));
+
+              return (
+                <>
+                  <div className="flex items-center justify-between gap-3 p-3 sm:p-4 bg-slate-950 border-b border-slate-800 flex-wrap">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div
+                        className={`p-2 rounded-xl shrink-0 ${
+                          previewModal.type === 'ms'
+                            ? 'bg-emerald-500/20 text-emerald-400'
+                            : previewModal.type === 'er'
+                            ? 'bg-indigo-500/20 text-indigo-400'
+                            : previewModal.type === 'gt'
+                            ? 'bg-purple-500/20 text-purple-400'
+                            : 'bg-sky-500/20 text-sky-400'
+                        }`}
+                      >
+                        <FileText className="h-5 w-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-sm font-bold text-white truncate">
+                            {previewModal.title}
+                          </h3>
+                          {isPearsonPortal && (
+                            <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 border border-amber-500/30 text-amber-300">
+                              Pearson Edexcel
+                            </span>
+                          )}
+                        </div>
+                        {previewModal.subtitle && (
+                          <p className="text-[11px] text-slate-400 truncate">
+                            {previewModal.subtitle}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Controls: Engine Switcher, Open Fullscreen, Download, Close */}
+                    <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                      {/* Engine Switcher (Only for direct PDF documents) */}
+                      {!isPearsonPortal && (
+                        <div className="hidden sm:flex items-center rounded-lg border border-slate-700 bg-slate-800 p-0.5 text-[11px]">
+                          <button
+                            type="button"
+                            onClick={() => setViewerEngine('proxy')}
+                            className={`rounded px-2 py-1 font-semibold transition cursor-pointer ${
+                              viewerEngine === 'proxy' ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-white'
+                            }`}
+                            title="Verified Serverless PDF Stream (Auto-Mirrored & Clean)"
+                          >
+                            Verified Stream
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setViewerEngine('gdocs')}
+                            className={`rounded px-2 py-1 font-semibold transition cursor-pointer ${
+                              viewerEngine === 'gdocs' ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-white'
+                            }`}
+                            title="Universal Google Docs Embed Viewer (Recommended on mobile/tablets)"
+                          >
+                            Google Viewer
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setViewerEngine('direct')}
+                            className={`rounded px-2 py-1 font-semibold transition cursor-pointer ${
+                              viewerEngine === 'direct' ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-white'
+                            }`}
+                            title="Direct PDF Embed"
+                          >
+                            Direct
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Mirror Switcher if backup exists */}
+                      {previewModal.backupUrl && !isPearsonPortal && (
+                        <button
+                          type="button"
+                          onClick={() => setUseBackupMirror(!useBackupMirror)}
+                          className="inline-flex items-center gap-1 rounded-xl border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer"
+                          title="Switch between Primary CDN and Backup CDN"
+                        >
+                          <RefreshCw className="h-3 w-3" />
+                          <span className="hidden md:inline">{useBackupMirror ? 'Mirror 2 (Active)' : 'Switch Mirror'}</span>
+                        </button>
+                      )}
+
+                      {/* Open in Fullscreen / New Tab (Guaranteed to work 100% on phones and desktops) */}
+                      <a
+                        href={isPearsonPortal ? currentModalUrl : `/api/pdf-proxy?url=${encodeURIComponent(currentModalUrl)}${previewModal?.backupUrl ? `&fallback=${encodeURIComponent(previewModal.backupUrl)}` : ''}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-xl border border-sky-500/40 bg-sky-500/10 px-3 py-1.5 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition"
+                        title={isPearsonPortal ? 'Launch Pearson Official Portal' : 'Open PDF directly in full browser window'}
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                        <span>{isPearsonPortal ? 'Launch Portal' : 'Open Fullscreen'}</span>
+                      </a>
+
+                      {/* Direct Download (For direct PDFs) */}
+                      {!isPearsonPortal && (
+                        <a
+                          href={`/api/pdf-proxy?url=${encodeURIComponent(currentModalUrl)}${previewModal?.backupUrl ? `&fallback=${encodeURIComponent(previewModal.backupUrl)}` : ''}&download=true`}
+                          download
+                          className="inline-flex items-center gap-1.5 rounded-xl bg-sky-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-sky-500 transition shadow-sm"
+                          title="Download PDF to computer"
+                        >
+                          <Download className="h-3.5 w-3.5" />
+                          <span className="hidden sm:inline">Download</span>
+                        </a>
+                      )}
+
+                      {/* Close Button */}
+                      <button
+                        type="button"
+                        onClick={() => setPreviewModal(null)}
+                        className="p-1.5 rounded-xl border border-slate-700 bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition cursor-pointer"
+                        title="Close preview (Esc)"
+                      >
+                        <X className="h-5 w-5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Helper notice */}
+                  <div className="bg-sky-950/40 border-b border-sky-500/20 px-4 py-2 text-[11px] text-sky-200 flex items-center justify-between gap-2 flex-wrap">
+                    {isPearsonPortal ? (
+                      <span>
+                        🔒 <strong>Pearson Edexcel Materials Hub:</strong> Official Pearson past papers & mark schemes are hosted on Pearson's authenticated portal.
+                      </span>
+                    ) : (
+                      <span>
+                        💡 <strong>Mobile / Tablet tip:</strong> If the PDF appears small or doesn't display inline, tap <strong>Open Fullscreen</strong> above or toggle <strong>Google Viewer</strong>.
+                      </span>
+                    )}
+                    <a
+                      href={currentModalUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline font-bold text-sky-300 hover:text-white ml-auto"
+                    >
+                      {isPearsonPortal ? 'Launch Pearson Portal ↗' : 'Launch Direct PDF ↗'}
+                    </a>
+                  </div>
+
+                  {/* Modal Body: Pearson Hub Card vs PDF Viewer */}
+                  {isPearsonPortal ? (
+                    <div className="relative flex-1 w-full bg-slate-950 overflow-y-auto flex items-center justify-center p-4 sm:p-8">
+                      <div className="max-w-xl w-full bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl text-center space-y-6 animate-fadeIn">
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/30 text-sky-400 text-xs font-bold uppercase tracking-wider">
+                          <Sparkles className="h-4 w-4" />
+                          Official Pearson Edexcel Archive
+                        </div>
+
+                        <div>
+                          <h2 className="text-xl sm:text-2xl font-black text-white">
+                            {previewModal.title}
+                          </h2>
+                          {previewModal.subtitle && (
+                            <p className="text-xs sm:text-sm text-slate-400 mt-1 font-medium">
+                              {previewModal.subtitle}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 text-left space-y-2">
+                          <p className="font-bold text-slate-200 flex items-center gap-2">
+                            <span>✅</span> Verified Exam Board Portal Search
+                          </p>
+                          <p className="text-slate-400 leading-relaxed">
+                            Pearson Edexcel requires students and schools to access exam papers directly via their authenticated qualification portal. We have prepared the exact pre-filtered portal search and direct backup mirrors for this paper below:
+                          </p>
+                        </div>
+
+                        <div className="flex flex-col gap-3">
+                          <a
+                            href={currentModalUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-sky-600 hover:bg-sky-500 px-5 py-3 text-sm font-bold text-white transition shadow-lg shadow-sky-600/25 cursor-pointer"
+                          >
+                            <span>Launch Official Pearson Portal</span>
+                            <ExternalLink className="h-4 w-4" />
+                          </a>
+
+                          {previewModal.backupUrl && (
+                            <a
+                              href={previewModal.backupUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 hover:text-white px-4 py-2.5 text-xs font-semibold text-slate-300 transition"
+                            >
+                              <span>Search on PapaCambridge Archive</span>
+                              <ExternalLink className="h-3.5 w-3.5" />
+                            </a>
+                          )}
+
+                          <a
+                            href={`https://www.google.com/search?q=${encodeURIComponent(`${previewModal.paperCode || previewModal.title} past paper edexcel pdf`)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 hover:text-white px-4 py-2.5 text-xs font-semibold text-slate-300 transition"
+                          >
+                            <span>Search Google for Direct PDF Mirror</span>
+                            <ExternalLink className="h-3.5 w-3.5" />
+                          </a>
+                        </div>
+
+                        <p className="text-[11px] text-slate-500 pt-2 border-t border-slate-800/80">
+                          Simply IGCSE Platform • Fast, Verified Exam Preparation
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="relative flex-1 w-full bg-slate-950 overflow-hidden">
+                      <iframe
+                        src={
+                          viewerEngine === 'proxy'
+                            ? `/api/pdf-proxy?url=${encodeURIComponent(currentModalUrl)}${previewModal.backupUrl ? `&fallback=${encodeURIComponent(previewModal.backupUrl)}` : ''}`
+                            : viewerEngine === 'gdocs'
+                            ? `https://docs.google.com/viewer?url=${encodeURIComponent(currentModalUrl)}&embedded=true`
+                            : currentModalUrl
+                        }
+                        className="w-full h-full border-0 bg-white"
+                        title={previewModal.title}
+                      />
+                    </div>
                   )}
-                </div>
-              </div>
 
-              {/* Controls: Engine Switcher, Open Fullscreen, Download, Close */}
-              <div className="flex items-center gap-2 shrink-0 flex-wrap">
-                {/* Engine Switcher */}
-                <div className="hidden sm:flex items-center rounded-lg border border-slate-700 bg-slate-800 p-0.5 text-[11px]">
-                  <button
-                    type="button"
-                    onClick={() => setViewerEngine('proxy')}
-                    className={`rounded px-2 py-1 font-semibold transition cursor-pointer ${
-                      viewerEngine === 'proxy' ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-white'
-                    }`}
-                    title="Verified Serverless PDF Stream (Auto-Mirrored & Clean)"
-                  >
-                    Verified Stream
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setViewerEngine('gdocs')}
-                    className={`rounded px-2 py-1 font-semibold transition cursor-pointer ${
-                      viewerEngine === 'gdocs' ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-white'
-                    }`}
-                    title="Universal Google Docs Embed Viewer (Recommended on mobile/tablets)"
-                  >
-                    Google Viewer
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setViewerEngine('direct')}
-                    className={`rounded px-2 py-1 font-semibold transition cursor-pointer ${
-                      viewerEngine === 'direct' ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-white'
-                    }`}
-                    title="Direct PDF Embed"
-                  >
-                    Direct
-                  </button>
-                </div>
-
-                {/* Mirror Switcher if backup exists */}
-                {previewModal.backupUrl && (
-                  <button
-                    type="button"
-                    onClick={() => setUseBackupMirror(!useBackupMirror)}
-                    className="inline-flex items-center gap-1 rounded-xl border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer"
-                    title="Switch between Primary CDN and Backup CDN"
-                  >
-                    <RefreshCw className="h-3 w-3" />
-                    <span className="hidden md:inline">{useBackupMirror ? 'Mirror 2 (Active)' : 'Switch Mirror'}</span>
-                  </button>
-                )}
-
-                {/* Open in Fullscreen / New Tab (Guaranteed to work 100% on phones and desktops) */}
-                <a
-                  href={`/api/pdf-proxy?url=${encodeURIComponent(currentModalUrl)}${previewModal?.backupUrl ? `&fallback=${encodeURIComponent(previewModal.backupUrl)}` : ''}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-sky-500/40 bg-sky-500/10 px-3 py-1.5 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition"
-                  title="Open PDF directly in full browser window"
-                >
-                  <ExternalLink className="h-3.5 w-3.5" />
-                  <span>Open Fullscreen</span>
-                </a>
-
-                {/* Direct Download */}
-                <a
-                  href={`/api/pdf-proxy?url=${encodeURIComponent(currentModalUrl)}${previewModal?.backupUrl ? `&fallback=${encodeURIComponent(previewModal.backupUrl)}` : ''}&download=true`}
-                  download
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-sky-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-sky-500 transition shadow-sm"
-                  title="Download PDF to computer"
-                >
-                  <Download className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">Download</span>
-                </a>
-
-                {/* Close Button */}
-                <button
-                  type="button"
-                  onClick={() => setPreviewModal(null)}
-                  className="p-1.5 rounded-xl border border-slate-700 bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition cursor-pointer"
-                  title="Close preview (Esc)"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Helper notice for phone users */}
-            <div className="bg-sky-950/40 border-b border-sky-500/20 px-4 py-2 text-[11px] text-sky-200 flex items-center justify-between gap-2 flex-wrap">
-              <span>
-                💡 <strong>Mobile / Tablet tip:</strong> If the PDF appears small or doesn't display inline, tap <strong>Open Fullscreen</strong> above for your browser's native PDF reader with pinch-to-zoom.
-              </span>
-              <a
-                href={currentModalUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline font-bold text-sky-300 hover:text-white ml-auto"
-              >
-                Launch Direct PDF ↗
-              </a>
-            </div>
-
-            {/* Modal Body: PDF Iframe / Google Docs Viewer / Proxy Stream */}
-            <div className="relative flex-1 w-full bg-slate-950 overflow-hidden">
-              <iframe
-                src={
-                  viewerEngine === 'proxy'
-                    ? `/api/pdf-proxy?url=${encodeURIComponent(currentModalUrl)}${previewModal.backupUrl ? `&fallback=${encodeURIComponent(previewModal.backupUrl)}` : ''}`
-                    : viewerEngine === 'gdocs'
-                    ? `https://docs.google.com/viewer?url=${encodeURIComponent(currentModalUrl)}&embedded=true`
-                    : currentModalUrl
-                }
-                className="w-full h-full border-0 bg-white"
-                title={previewModal.title}
-              />
-            </div>
-
-            {/* Modal Footer */}
-            <div className="p-2 sm:p-2.5 bg-slate-950 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 px-4 flex-wrap gap-2">
-              <div className="flex items-center gap-2">
-                <span>Press <kbd className="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-300 font-mono">Esc</kbd> to close</span>
-                <span className="text-slate-600">•</span>
-                <span className="text-[10px] text-slate-500 font-mono truncate max-w-xs">{currentModalUrl}</span>
-              </div>
-              <a
-                href={currentModalUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sky-400 hover:underline flex items-center gap-1 font-semibold"
-              >
-                <span>Trouble viewing inline? Open original document</span>
-                <ExternalLink className="h-3 w-3" />
-              </a>
-            </div>
+                  {/* Modal Footer */}
+                  <div className="p-2 sm:p-2.5 bg-slate-950 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 px-4 flex-wrap gap-2">
+                    <div className="flex items-center gap-2">
+                      <span>Press <kbd className="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-300 font-mono">Esc</kbd> to close</span>
+                      <span className="text-slate-600">•</span>
+                      <span className="text-[10px] text-slate-500 font-mono truncate max-w-xs">{currentModalUrl}</span>
+                    </div>
+                    <a
+                      href={currentModalUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sky-400 hover:underline flex items-center gap-1 font-semibold"
+                    >
+                      <span>Trouble viewing inline? Open original document</span>
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </div>
+                </>
+              );
+            })()}
           </div>
         </div>
       )}

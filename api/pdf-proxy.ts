@@ -201,6 +201,161 @@ function pipePdfStream(urlStr: string, res: any, filename: string, asAttachment:
   });
 }
 
+function generateRescueHtml(title: string, safeQuery: string, originalUrl: string, _attemptedUrls?: string[]): string {
+  const pcamSearch = `https://pastpapers.papacambridge.com/?s=${encodeURIComponent(safeQuery)}`;
+  const pmtSearch = `https://www.google.com/search?q=${encodeURIComponent('physics and maths tutor ' + safeQuery)}`;
+  const behSearch = `https://bestexamhelp.com/`;
+  const googleSearch = `https://www.google.com/search?q=${encodeURIComponent(safeQuery + ' past paper pdf')}`;
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Past Paper Mirror • ${title}</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #090d16;
+      color: #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .card {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 1rem;
+      max-width: 640px;
+      width: 100%;
+      padding: 2rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      background: rgba(14, 165, 233, 0.15);
+      color: #38bdf8;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+    h1 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 0.5rem;
+      word-break: break-word;
+    }
+    p {
+      color: #94a3b8;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+    }
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-radius: 0.75rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: #0284c7;
+      color: #ffffff;
+      border: 1px solid #0369a1;
+    }
+    .btn-primary:hover {
+      background: #0369a1;
+    }
+    .btn-secondary {
+      background: #1e293b;
+      color: #f1f5f9;
+      border: 1px solid #334155;
+    }
+    .btn-secondary:hover {
+      background: #334155;
+      color: #ffffff;
+    }
+    .footer {
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid #1e293b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      color: #64748b;
+    }
+    .btn-subtle {
+      color: #38bdf8;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .btn-subtle:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="badge">Simply Mirror Rescue</div>
+    <h1>${title}</h1>
+    <p>The primary PDF stream archive is momentarily experiencing rate-limiting or origin protections. You can access this paper instantly across verified mirror repositories below:</p>
+
+    <div class="btn-group">
+      ${originalUrl ? `<a href="${originalUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+        <span>🔗 Open Direct Archive Source</span>
+        <span>↗</span>
+      </a>` : ''}
+      <a href="${pcamSearch}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+        <span>📑 Search on PapaCambridge Archive</span>
+        <span>↗</span>
+      </a>
+      <a href="${pmtSearch}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+        <span>📚 Search on Physics & Maths Tutor</span>
+        <span>↗</span>
+      </a>
+      <a href="${behSearch}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+        <span>🎯 Search on BestExamHelp</span>
+        <span>↗</span>
+      </a>
+      <a href="${googleSearch}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+        <span>🔍 Search Google for "${safeQuery}" PDF</span>
+        <span>↗</span>
+      </a>
+    </div>
+
+    <div class="footer">
+      <span>Simply IGCSE Platform</span>
+      <a href="javascript:window.history.back()" class="btn-subtle">← Go Back</a>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
 export default async function handler(req: any, res: any) {
   // CORS Headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -223,6 +378,16 @@ export default async function handler(req: any, res: any) {
     });
   }
 
+  // 1. Direct Pearson Edexcel Portal Redirect:
+  // If the URL is an official Pearson exam materials portal search, immediately 302 redirect.
+  if (rawUrl && rawUrl.includes('qualifications.pearson.com')) {
+    res.writeHead(302, {
+      Location: rawUrl,
+      'Access-Control-Allow-Origin': '*'
+    });
+    return res.end();
+  }
+
   const candidates = buildCandidateUrls(rawUrl.trim(), rawFallback.trim(), examCode.trim());
   let resolvedUrl: string | null = null;
   let resolvedContentType: string | null = null;
@@ -237,6 +402,19 @@ export default async function handler(req: any, res: any) {
   }
 
   if (!resolvedUrl) {
+    const acceptsHtml = (req.headers['accept'] || '').includes('text/html');
+    if (acceptsHtml && !checkOnly) {
+      const title = examCode || (rawUrl.split('/').pop()?.split('?')[0]) || 'Examination Document';
+      const safeQuery = title.replace(/[\._\-]/g, ' ');
+      const html = generateRescueHtml(title, safeQuery, rawUrl, candidates);
+      res.writeHead(200, {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'no-cache',
+        'Access-Control-Allow-Origin': '*'
+      });
+      return res.end(html);
+    }
+
     return res.status(404).json({
       error: 'PDF not found on official mirror archives (blocked HTML redirects / 404s)',
       attemptedUrls: candidates,
@@ -260,6 +438,19 @@ export default async function handler(req: any, res: any) {
   const streamed = await pipePdfStream(resolvedUrl, res, filename, asAttachment);
 
   if (!streamed && !res.headersSent) {
+    const acceptsHtml = (req.headers['accept'] || '').includes('text/html');
+    if (acceptsHtml) {
+      const title = examCode || (rawUrl.split('/').pop()?.split('?')[0]) || 'Examination Document';
+      const safeQuery = title.replace(/[\._\-]/g, ' ');
+      const html = generateRescueHtml(title, safeQuery, rawUrl, [resolvedUrl]);
+      res.writeHead(200, {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'no-cache',
+        'Access-Control-Allow-Origin': '*'
+      });
+      return res.end(html);
+    }
+
     return res.status(502).json({
       error: 'Failed to stream PDF stream from resolved mirror',
       resolvedUrl
