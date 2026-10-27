@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "test:papers": "node scripts/test-past-papers.mjs",
+    "test:qa": "npx tsx scripts/test-full-website-qa.ts",
     "preview": "vite preview"
   },
   "dependencies": {

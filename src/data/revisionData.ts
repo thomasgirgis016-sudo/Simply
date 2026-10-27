@@ -1,6 +1,8 @@
 import { RevisionTopic } from '../types';
+import { EXPANDED_REVISION_NOTES } from './expandedRevisionNotes';
 
 export const COMPREHENSIVE_REVISION_NOTES: RevisionTopic[] = [
+  ...EXPANDED_REVISION_NOTES,
   // ==========================================================
   // CHEMISTRY (CIE 0620 & EDEXCEL 4CH1)
   // ==========================================================
