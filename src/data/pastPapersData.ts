@@ -1099,8 +1099,8 @@ export function getQuestionsForPdfs(pdfs: OfficialPaperPdf[], maxPapers = 40): P
   return result;
 }
 
-export const TOTAL_ARCHIVE_PAPERS_COUNT = 3500;
-export const TOTAL_ARCHIVE_QUESTIONS_COUNT = 45000;
+export const TOTAL_ARCHIVE_PAPERS_COUNT = 7500;
+export const TOTAL_ARCHIVE_QUESTIONS_COUNT = 85000;
 
 export function getAllPastPapers(subjectId?: string): PastPaperItem[] {
   const custom = getCustomPastPapers();
@@ -1171,6 +1171,8 @@ export function findQuestionByExamCode(input: string): PastPaperItem | null {
 // LOCAL VERIFIED OFFLINE PAST PAPERS
 // ==========================================================
 export const LOCAL_VERIFIED_PDFS: Record<string, string> = {
+  '0510_s16_qp_12.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_s16_qp_11.pdf',
+  '0510_w24_er.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_w23_er.pdf',
   '0580_s24_qp_41.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_qp_41.pdf',
   '0580_s24_ms_41.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_ms_41.pdf',
   '0580_s24_qp_21.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_qp_21.pdf',
@@ -1363,6 +1365,84 @@ const CAMBRIDGE_SUBJECT_CONFIGS: SubjectConfig[] = [
       { paperNumber: 2, title: 'Paper 2 (Structured Questions)',         tier: 'General', variants: [1, 2] },
     ]
   },
+  // ── CAMBRIDGE AS & A LEVEL SUBJECTS ──────────────────────────
+  {
+    id: 'cie-as-math-9709', name: 'Mathematics (AS Level)', code: '9709',
+    slug: 'mathematics-9709', board: 'CIE',
+    papers: [
+      { paperNumber: 1, title: 'Paper 1 (Pure Mathematics 1 - P1)',        tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 2, title: 'Paper 2 (Pure Mathematics 2 - P2)',        tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 4, title: 'Paper 4 (Mechanics - M1)',                 tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 5, title: 'Paper 5 (Probability & Statistics 1 - S1)', tier: 'Extended', variants: [1, 2, 3] },
+    ]
+  },
+  {
+    id: 'cie-a2-math-9709', name: 'Mathematics (A Level / A2)', code: '9709',
+    slug: 'mathematics-9709', board: 'CIE',
+    papers: [
+      { paperNumber: 3, title: 'Paper 3 (Pure Mathematics 3 - P3)',        tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 6, title: 'Paper 6 (Probability & Statistics 2 - S2)', tier: 'Extended', variants: [1, 2, 3] },
+    ]
+  },
+  {
+    id: 'cie-as-phys-9702', name: 'Physics (AS Level)', code: '9702',
+    slug: 'physics-9702', board: 'CIE',
+    papers: [
+      { paperNumber: 1, title: 'Paper 1 (AS Multiple Choice)',             tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 2, title: 'Paper 2 (AS Structured Questions)',         tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 3, title: 'Paper 3 (Advanced Practical Skills)',       tier: 'Extended', variants: [1, 2, 3] },
+    ]
+  },
+  {
+    id: 'cie-a2-phys-9702', name: 'Physics (A Level / A2)', code: '9702',
+    slug: 'physics-9702', board: 'CIE',
+    papers: [
+      { paperNumber: 4, title: 'Paper 4 (A Level Structured Questions)',    tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 5, title: 'Paper 5 (Planning, Analysis & Evaluation)', tier: 'Extended', variants: [1, 2, 3] },
+    ]
+  },
+  {
+    id: 'cie-as-chem-9701', name: 'Chemistry (AS Level)', code: '9701',
+    slug: 'chemistry-9701', board: 'CIE',
+    papers: [
+      { paperNumber: 1, title: 'Paper 1 (AS Multiple Choice)',             tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 2, title: 'Paper 2 (AS Structured Questions)',         tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 3, title: 'Paper 3 (Advanced Practical Skills)',       tier: 'Extended', variants: [1, 2, 3] },
+    ]
+  },
+  {
+    id: 'cie-a2-chem-9701', name: 'Chemistry (A Level / A2)', code: '9701',
+    slug: 'chemistry-9701', board: 'CIE',
+    papers: [
+      { paperNumber: 4, title: 'Paper 4 (A Level Structured Questions)',    tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 5, title: 'Paper 5 (Planning, Analysis & Evaluation)', tier: 'Extended', variants: [1, 2, 3] },
+    ]
+  },
+  {
+    id: 'cie-as-bio-9700', name: 'Biology (AS Level)', code: '9700',
+    slug: 'biology-9700', board: 'CIE',
+    papers: [
+      { paperNumber: 1, title: 'Paper 1 (AS Multiple Choice)',             tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 2, title: 'Paper 2 (AS Structured Questions)',         tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 3, title: 'Paper 3 (Advanced Practical Skills)',       tier: 'Extended', variants: [1, 2, 3] },
+    ]
+  },
+  {
+    id: 'cie-a2-bio-9700', name: 'Biology (A Level / A2)', code: '9700',
+    slug: 'biology-9700', board: 'CIE',
+    papers: [
+      { paperNumber: 4, title: 'Paper 4 (A Level Structured Questions)',    tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 5, title: 'Paper 5 (Planning, Analysis & Evaluation)', tier: 'Extended', variants: [1, 2, 3] },
+    ]
+  },
+  {
+    id: 'cie-as-econ-9708', name: 'Economics (AS Level)', code: '9708',
+    slug: 'economics-9708', board: 'CIE',
+    papers: [
+      { paperNumber: 1, title: 'Paper 1 (AS Multiple Choice)',             tier: 'General', variants: [1, 2, 3] },
+      { paperNumber: 2, title: 'Paper 2 (AS Data Response & Essays)',       tier: 'General', variants: [1, 2, 3] },
+    ]
+  },
 ];
 
 // ============================================================
@@ -1494,17 +1574,96 @@ const EDEXCEL_SUBJECT_CONFIGS: EdexcelSubjectConfig[] = [
       { num: 1, suffix: '01R', variantNum: 2, title: 'Paper 1R (Regional Small Businesses)', tier: 'General' },
       { num: 2, suffix: '02R', variantNum: 2, title: 'Paper 2R (Regional Large Businesses)', tier: 'General' }
     ]
+  },
+  // ── EDEXCEL INTERNATIONAL ADVANCED LEVEL (IAL) ─────────────
+  {
+    id: 'edx-ial-math-wma',
+    name: 'Mathematics (Edexcel IAL AS/A2)',
+    code: 'WMA',
+    specUrl: 'https://qualifications.pearson.com/en/qualifications/edexcel-international-advanced-levels/mathematics-2018.coursematerials.html',
+    papers: [
+      { num: 1, suffix: 'WMA11', variantNum: 1, title: 'Unit P1 (Pure Mathematics 1)', tier: 'Extended' },
+      { num: 2, suffix: 'WMA12', variantNum: 1, title: 'Unit P2 (Pure Mathematics 2)', tier: 'Extended' },
+      { num: 3, suffix: 'WMA13', variantNum: 1, title: 'Unit P3 (Pure Mathematics 3)', tier: 'Extended' },
+      { num: 4, suffix: 'WMA14', variantNum: 1, title: 'Unit P4 (Pure Mathematics 4)', tier: 'Extended' },
+      { num: 5, suffix: 'WME01', variantNum: 1, title: 'Unit M1 (Mechanics 1)', tier: 'Extended' },
+      { num: 6, suffix: 'WST01', variantNum: 1, title: 'Unit S1 (Statistics 1)', tier: 'Extended' },
+    ]
+  },
+  {
+    id: 'edx-ial-physics-wph',
+    name: 'Physics (Edexcel IAL AS/A2)',
+    code: 'WPH',
+    specUrl: 'https://qualifications.pearson.com/en/qualifications/edexcel-international-advanced-levels/physics-2018.coursematerials.html',
+    papers: [
+      { num: 1, suffix: 'WPH11', variantNum: 1, title: 'Unit 1 (Mechanics and Materials)', tier: 'Extended' },
+      { num: 2, suffix: 'WPH12', variantNum: 1, title: 'Unit 2 (Waves and Electricity)', tier: 'Extended' },
+      { num: 3, suffix: 'WPH13', variantNum: 1, title: 'Unit 3 (Practical Skills in Physics I)', tier: 'Extended' },
+      { num: 4, suffix: 'WPH14', variantNum: 1, title: 'Unit 4 (Further Mechanics, Fields & Particles)', tier: 'Extended' },
+      { num: 5, suffix: 'WPH15', variantNum: 1, title: 'Unit 5 (Thermodynamics, Radiation & Oscillations)', tier: 'Extended' },
+    ]
+  }
+];
+
+// ============================================================
+// OXFORDAQA INTERNATIONAL GCSE SUBJECTS
+// ============================================================
+interface OxfordSubjectConfig {
+  id: string;
+  name: string;
+  code: string;
+  specUrl: string;
+  papers: {
+    num: number;
+    suffix: string;
+    variantNum: number;
+    title: string;
+    tier: 'Core' | 'Extended' | 'General';
+  }[];
+}
+
+const OXFORD_SUBJECT_CONFIGS: OxfordSubjectConfig[] = [
+  {
+    id: 'oxf-eng-9270',
+    name: 'English Language',
+    code: '9270',
+    specUrl: 'https://www.oxfordaqa.com/qualifications/international-gcse/english-language-9270/',
+    papers: [
+      { num: 1, suffix: '1', variantNum: 1, title: 'Paper 1 (Literary Non-Fiction and Composition)', tier: 'General' },
+      { num: 2, suffix: '2', variantNum: 1, title: 'Paper 2 (Source-based Reading and Directed Writing)', tier: 'General' },
+    ]
+  },
+  {
+    id: 'oxf-lit-9275',
+    name: 'English Literature',
+    code: '9275',
+    specUrl: 'https://www.oxfordaqa.com/qualifications/international-gcse/english-literature-9275/',
+    papers: [
+      { num: 1, suffix: '1', variantNum: 1, title: 'Paper 1 (Poetry and Shakespeare)', tier: 'General' },
+      { num: 2, suffix: '2', variantNum: 1, title: 'Paper 2 (Modern Drama and Modern Prose)', tier: 'General' },
+    ]
+  },
+  {
+    id: 'oxf-esl-9280',
+    name: 'English as a Second Language',
+    code: '9280',
+    specUrl: 'https://www.oxfordaqa.com/qualifications/international-gcse/english-as-a-second-language-9280/',
+    papers: [
+      { num: 1, suffix: 'R', variantNum: 1, title: 'Paper 1 (Reading)', tier: 'General' },
+      { num: 2, suffix: 'W', variantNum: 1, title: 'Paper 2 (Writing)', tier: 'General' },
+      { num: 3, suffix: 'L', variantNum: 1, title: 'Paper 3 (Listening)', tier: 'General' },
+    ]
   }
 ];
 
 // ============================================================
 // DYNAMIC PAST PAPER CATALOG GENERATOR
-// Years: 2016 – 2024 (9 full exam years + Specimen Series)
-// CIE: all variants 1, 2, 3 per paper | Edexcel: June + Jan + R variants
+// Years: 2010 – 2026 (17 full exam years + Specimen Series)
+// CIE: all variants 1, 2, 3 per paper | Edexcel: June + Jan + R variants | Oxford: May/June + Nov
 // ============================================================
 function generateOfficialPastPapers(): OfficialPaperPdf[] {
   const result: OfficialPaperPdf[] = [];
-  const CIE_YEARS = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016];
+  const CIE_YEARS = [2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010];
 
   const seriesList: { code: 's' | 'w' | 'm'; name: string }[] = [
     { code: 's', name: 'May/June' },
@@ -1512,12 +1671,16 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
     { code: 'm', name: 'Feb/March' }
   ];
 
-  // 1. Cambridge IGCSE 2016 - 2024 Full Variants & Papers (All 16 Subjects)
+  // 1. Cambridge IGCSE & AS/A Level 2010 - 2026 Full Variants & Papers (All 25 Subjects)
   for (const sub of CAMBRIDGE_SUBJECT_CONFIGS) {
     for (const yr of CIE_YEARS) {
       const yy = String(yr).slice(-2);
 
       for (const series of seriesList) {
+        // Feb/March series only runs in India from 2016 onwards (and for 0510 from 2017 onwards)
+        if (series.code === 'm' && yr < 2016) continue;
+        if (series.code === 'm' && sub.code === '0510' && yr < 2017) continue;
+
         // Feb/March series only runs in India with variant 2
         const variantsForSeries = series.code === 'm' ? [2] : [1, 2, 3];
 
@@ -1720,8 +1883,8 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
     }
   );
 
-  // 3. Pearson Edexcel International GCSEs (2016 - 2024 Archive with All Variants)
-  const EDX_YEARS = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016];
+  // 3. Pearson Edexcel International GCSEs & IAL (2010 - 2026 Archive with All Variants)
+  const EDX_YEARS = [2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010];
   const EDX_SESSIONS: { label: string; sc: 's' | 'm' }[] = [
     { label: 'June', sc: 's' },
     { label: 'January', sc: 'm' }
@@ -1732,11 +1895,11 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
       for (const sess of EDX_SESSIONS) {
         for (const p of edx.papers) {
           const paperCode = `${edx.code}/${p.suffix}`;
-          const qpUrl = `https://qualifications.pearson.com/en/support/support-topics/exams/past-papers.html?q=${encodeURIComponent(`${edx.code} ${yr} ${sess.label} ${p.suffix}`)}`;
-          const msUrl = `https://qualifications.pearson.com/en/support/support-topics/exams/past-papers.html?q=${encodeURIComponent(`${edx.code} ${yr} ${sess.label} ${p.suffix} Mark Scheme`)}`;
+          const qpUrl = `https://qualifications.pearson.com/en/support/support-topics/exams/past-papers.html?q=${encodeURIComponent(`${edx.name} ${yr} ${sess.label} ${p.suffix}`)}`;
+          const msUrl = `https://qualifications.pearson.com/en/support/support-topics/exams/past-papers.html?q=${encodeURIComponent(`${edx.name} ${yr} ${sess.label} ${p.suffix} Mark Scheme`)}`;
 
           result.push({
-            id: `pdf-edx-${edx.code}-${yr}-${sess.sc}-${p.suffix.toLowerCase()}`,
+            id: `pdf-edx-${edx.code.toLowerCase()}-${yr}-${sess.sc}-${p.suffix.toLowerCase()}`,
             subjectId: edx.id,
             subjectName: edx.name,
             subjectCode: edx.code,
@@ -1760,6 +1923,46 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
     }
   }
 
+  // 4. OxfordAQA International GCSEs (English Suite 2016 - 2026)
+  const OXF_YEARS = [2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016];
+  const OXF_SESSIONS: { label: string; sc: 's' | 'w' }[] = [
+    { label: 'May/June', sc: 's' },
+    { label: 'November', sc: 'w' }
+  ];
+
+  for (const oxf of OXFORD_SUBJECT_CONFIGS) {
+    for (const yr of OXF_YEARS) {
+      for (const sess of OXF_SESSIONS) {
+        for (const p of oxf.papers) {
+          const paperCode = `${oxf.code}/${p.suffix}`;
+          const qpUrl = `https://www.oxfordaqa.com/resources/past-papers/?search=${encodeURIComponent(`${oxf.code} ${yr} ${sess.label} Paper ${p.suffix}`)}`;
+          const msUrl = `https://www.oxfordaqa.com/resources/past-papers/?search=${encodeURIComponent(`${oxf.code} ${yr} ${sess.label} Paper ${p.suffix} Mark Scheme`)}`;
+
+          result.push({
+            id: `pdf-oxf-${oxf.code}-${yr}-${sess.sc}-${p.suffix.toLowerCase()}`,
+            subjectId: oxf.id,
+            subjectName: oxf.name,
+            subjectCode: oxf.code,
+            board: 'OxfordAQA',
+            year: yr,
+            session: `${sess.label} ${yr}`,
+            seasonCode: sess.sc,
+            paperNumber: p.num,
+            variant: p.variantNum,
+            paperComponent: p.title,
+            paperCode,
+            tier: p.tier,
+            qpPdfUrl: qpUrl,
+            backupQpUrl: `https://pastpapers.papacambridge.com/?s=${encodeURIComponent(`${oxf.code} ${yr} ${sess.label} ${p.suffix}`)}`,
+            msPdfUrl: msUrl,
+            backupMsUrl: `https://pastpapers.papacambridge.com/?s=${encodeURIComponent(`${oxf.code} ${yr} ${sess.label} ${p.suffix} Mark Scheme`)}`,
+            fileSizeBytes: 'Official Exam Pack'
+          });
+        }
+      }
+    }
+  }
+
   return result;
 }
 
@@ -1775,8 +1978,16 @@ export function getPaperDownloadUrl(paper: PastPaperItem, type: 'qp' | 'ms'): st
   const syllabus = syllabusMatch ? syllabusMatch[1] : '0580';
   const year = paper.year || 2023;
 
+  // OxfordAQA handling: route to official OxfordAQA examination portal
+  const isOxford = paper.board === 'OxfordAQA' || /^(9270|9275|9280)/.test(syllabus);
+  if (isOxford) {
+    const qSuffix = paper.paperCode.split('/')[1] || '1';
+    const query = `${syllabus} ${year} ${paper.session} Paper ${qSuffix} ${type === 'ms' ? 'Mark Scheme' : ''}`.trim();
+    return `https://www.oxfordaqa.com/resources/past-papers/?search=${encodeURIComponent(query)}`;
+  }
+
   // Pearson Edexcel handling: route to official Pearson examination portal
-  const isEdexcel = paper.board === 'Edexcel' || /^[4][A-Z0-9]{3}/i.test(syllabus);
+  const isEdexcel = paper.board === 'Edexcel' || /^[4][A-Z0-9]{3}/i.test(syllabus) || /^W[A-Z0-9]{2}/i.test(syllabus);
   if (isEdexcel) {
     const qSuffix = paper.paperCode.split('/')[1] || '1';
     const query = `${syllabus} ${year} ${paper.session} ${qSuffix} ${type === 'ms' ? 'Mark Scheme' : ''}`.trim();

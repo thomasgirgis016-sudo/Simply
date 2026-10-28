@@ -56,6 +56,53 @@ const BASE_SUBJECTS: Subject[] = [
       'Paper 2 Composition: Narrative Writing & Structure'
     ]
   },
+  {
+    id: 'oxf-eng-9270',
+    name: 'English Language',
+    code: 'OxfordAQA 9270',
+    board: 'OxfordAQA',
+    category: 'Languages',
+    icon: 'BookOpen',
+    color: '#8b5cf6', // purple
+    topics: [
+      'Paper 1 Section A: Literary Non-Fiction Reading Comprehension',
+      'Paper 1 Section B: Composition & Creative Descriptive/Narrative Writing',
+      'Paper 2 Section A: Source-based Reading Analysis & Comparative Synthesis',
+      'Paper 2 Section B: Directed Writing (Articles, Speeches, Letters & Opinions)',
+      'Spoken Language Endorsement: Speaking & Listening Presentation Skills'
+    ]
+  },
+  {
+    id: 'oxf-lit-9275',
+    name: 'English Literature',
+    code: 'OxfordAQA 9275',
+    board: 'OxfordAQA',
+    category: 'Languages',
+    icon: 'Bookmark',
+    color: '#7c3aed', // deep purple
+    topics: [
+      'Paper 1 Section A: Shakespeare Play Literary & Thematic Analysis',
+      'Paper 1 Section B: 19th-Century Novel & Characterisation',
+      'Paper 2 Section A: Modern Drama (Social Context, Themes & Dramatic Craft)',
+      'Paper 2 Section B: Poetry Anthology (Thematic Comparison & Form)',
+      'Paper 2 Section C: Unseen Poetry Critical Interpretation & Technique'
+    ]
+  },
+  {
+    id: 'oxf-esl-9280',
+    name: 'English as a Second Language',
+    code: 'OxfordAQA 9280',
+    board: 'OxfordAQA',
+    category: 'Languages',
+    icon: 'Languages',
+    color: '#a855f7', // violet
+    topics: [
+      'Paper 1: Reading for Factual Detail, Gist & Inference across Varied Texts',
+      'Paper 2: Writing (Informative Reports, Formal Reviews & Persuasive Essays)',
+      'Paper 3: Listening Comprehension (Dialogues, Monologues & News Broadcasts)',
+      'Paper 4: Spoken Interaction (Structured Discussion, Pronunciation & Fluency)'
+    ]
+  },
 
   // Mathematics
   {

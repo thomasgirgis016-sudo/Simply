@@ -378,9 +378,9 @@ export default async function handler(req: any, res: any) {
     });
   }
 
-  // 1. Direct Pearson Edexcel Portal Redirect:
-  // If the URL is an official Pearson exam materials portal search, immediately 302 redirect.
-  if (rawUrl && rawUrl.includes('qualifications.pearson.com')) {
+  // 1. Direct Pearson Edexcel & OxfordAQA Portal Redirect:
+  // If the URL is an official Pearson or OxfordAQA exam materials portal search, immediately 302 redirect.
+  if (rawUrl && (rawUrl.includes('qualifications.pearson.com') || rawUrl.includes('oxfordaqa.com'))) {
     res.writeHead(302, {
       Location: rawUrl,
       'Access-Control-Allow-Origin': '*'

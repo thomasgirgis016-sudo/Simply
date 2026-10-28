@@ -1,4 +1,4 @@
-export type ExamBoard = 'CIE' | 'Edexcel' | 'Both';
+export type ExamBoard = 'CIE' | 'Edexcel' | 'OxfordAQA' | 'Both';
 
 export type GradeLevel = 'Year 9 / Grade 8' | 'Year 10 / Grade 9 (IGCSE Yr 1)' | 'Year 11 / Grade 10 (IGCSE Exam Yr)' | 'Year 12 / Grade 11 (AS Level)' | 'Year 13 / Grade 12 (A Level)';
 
@@ -61,7 +61,7 @@ export interface Subject {
   id: string;
   name: string;
   code: string; // e.g. "0580", "9709", "4ES1"
-  board: 'CIE' | 'Edexcel' | 'Both';
+  board: ExamBoard;
   level?: SubjectLevel; // 'O Level / IGCSE' | 'AS Level' | 'A Level'
   category: 'Sciences' | 'Mathematics' | 'Humanities' | 'Languages' | 'Tech' | 'Commercial';
   icon: string;
@@ -606,7 +606,7 @@ export interface SubjectCheatSheet {
   subjectId: string;
   subjectCode: string;
   subjectName: string;
-  board: 'CIE' | 'Edexcel' | 'Both';
+  board: ExamBoard;
   badge: string;
   lastUpdated: string;
   estimatedReadTime: string;

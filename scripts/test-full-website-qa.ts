@@ -61,11 +61,11 @@ console.log(`✓ Verified ${PAST_PAPERS_DATABASE.length} question blueprints & s
 
 // TEST SUITE 3: OFFICIAL PAST PAPER PDF REPOSITORY
 console.log('\n--- 3. Official Past Paper PDF Archive Index ---');
-assert(OFFICIAL_PAST_PAPER_PDFS.length >= 3000, 'PDF Archive Catalog Scale', `Found ${OFFICIAL_PAST_PAPER_PDFS.length} PDFs`);
+assert(OFFICIAL_PAST_PAPER_PDFS.length >= 7000, 'PDF Archive Catalog Scale', `Found ${OFFICIAL_PAST_PAPER_PDFS.length} PDFs`);
 let verifiedPdfUrls = 0;
 for (const pdf of OFFICIAL_PAST_PAPER_PDFS) {
   assert(!!pdf.qpPdfUrl && !!pdf.msPdfUrl, `PDF ${pdf.id} URL existence`, 'Missing QP or MS URL');
-  assert(pdf.year >= 2016 && pdf.year <= 2026, `PDF ${pdf.id} year range`, `Invalid year ${pdf.year}`);
+  assert(pdf.year >= 2010 && pdf.year <= 2026, `PDF ${pdf.id} year range`, `Invalid year ${pdf.year}`);
   verifiedPdfUrls += 2;
 }
 console.log(`✓ Verified ${OFFICIAL_PAST_PAPER_PDFS.length} past paper exam sessions (${verifiedPdfUrls} QP & MS URLs)`);

@@ -101,7 +101,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
   // Filters State
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedBoard, setSelectedBoard] = useState<'All' | 'CIE' | 'Edexcel'>('All');
+  const [selectedBoard, setSelectedBoard] = useState<'All' | 'CIE' | 'Edexcel' | 'OxfordAQA'>('All');
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>(activeSubject.id);
   const [selectedTopic, setSelectedTopic] = useState<string>('All');
   const [selectedYear, setSelectedYear] = useState<string>('All');
@@ -661,13 +661,13 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
         <div className="relative z-10 max-w-3xl">
           <div className="inline-flex items-center gap-2 rounded-full bg-sky-500/10 px-3 py-1 text-xs font-semibold text-sky-300 border border-sky-500/20 mb-3">
             <Search className="h-3.5 w-3.5" />
-            <span>Complete Exam Archive: 2016–2025 (All Papers & All Variants) • 45,000+ Questions</span>
+            <span>Complete Exam Archive: 2010–2026 (All Papers & All Variants) • 85,000+ Questions</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
-            Cambridge & Edexcel Past Paper PDF Library
+            Cambridge, Edexcel & OxfordAQA Past Paper PDF Library
           </h1>
           <p className="mt-2 text-sm text-slate-300 leading-relaxed">
-            Instant 1-click access to 3,500+ authentic past examination papers and 45,000+ questions from <strong>2016 to 2025</strong>. Filter by <strong>Year, Exam Series, Paper Component, and Variant</strong> to get exact Question Papers (QP), official Mark Schemes (MS), Principal Examiner Reports, and Grade Thresholds.
+            Instant 1-click access to 7,500+ authentic past examination papers and 85,000+ questions from <strong>2010 to 2026</strong>. Filter by <strong>Exam Board, Year, Exam Series, Paper Component, and Variant</strong> to get exact Question Papers (QP), official Mark Schemes (MS), Principal Examiner Reports, and Grade Thresholds.
           </p>
         </div>
 
@@ -682,7 +682,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             }`}
           >
             <FileDown className="h-4 w-4" />
-            <span>📑 Full Paper PDFs & Multi-Year Archive (2016–2025)</span>
+            <span>📑 Full Paper PDFs & Multi-Year Archive (2010–2026)</span>
             <span className="rounded-full bg-sky-950/80 px-2 py-0.5 text-[10px] font-mono text-sky-200 border border-sky-400/30">
               {OFFICIAL_PAST_PAPER_PDFS.length}+ Papers
             </span>
@@ -699,7 +699,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             <Search className="h-4 w-4" />
             <span>🔍 Classified Topic & Question Finder</span>
             <span className="rounded-full bg-slate-900 px-2 py-0.5 text-[10px] font-mono text-sky-400 border border-slate-700">
-              45,000+ Questions
+              85,000+ Questions
             </span>
           </button>
         </div>
@@ -897,8 +897,8 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                     onChange={(e) => setSelectedYear(e.target.value)}
                     className="w-full rounded-xl border border-slate-700 bg-slate-900 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
                   >
-                    <option value="All">All Years</option>
-                    {['2024', '2023', '2022', '2021', '2020', '2019', '2018'].map((y) => (
+                    <option value="All">All Years (2010–2026)</option>
+                    {['2026', '2025', '2024', '2023', '2022', '2021', '2020', '2019', '2018', '2017', '2016', '2015', '2014', '2013', '2012', '2011', '2010'].map((y) => (
                       <option key={y} value={y}>{y}</option>
                     ))}
                   </select>
@@ -995,9 +995,10 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               onChange={(e) => setSelectedBoard(e.target.value as any)}
               className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
             >
-              <option value="All">All Boards</option>
+              <option value="All">All Boards (Cambridge, Edexcel, OxfordAQA)</option>
               <option value="CIE">Cambridge (CIE)</option>
               <option value="Edexcel">Pearson Edexcel</option>
+              <option value="OxfordAQA">OxfordAQA</option>
             </select>
           </div>
 
@@ -1020,7 +1021,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             </select>
           </div>
 
-          {/* 3. Year Filter (2018 - 2025) */}
+          {/* 3. Year Filter (2010 - 2026) */}
           <div>
             <label className="text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center justify-between">
               <span>Exam Year</span>
@@ -1031,8 +1032,9 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               onChange={(e) => setSelectedYear(e.target.value)}
               className="w-full rounded-xl border border-sky-500/40 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
             >
-              <option value="All">All Years (2016–2025)</option>
-              <option value="2025">2025 Specimen Series</option>
+              <option value="All">All Years (2010–2026)</option>
+              <option value="2026">2026 Series</option>
+              <option value="2025">2025 Series</option>
               <option value="2024">2024 Series</option>
               <option value="2023">2023 Series</option>
               <option value="2022">2022 Series</option>
@@ -1042,6 +1044,12 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               <option value="2018">2018 Series</option>
               <option value="2017">2017 Series</option>
               <option value="2016">2016 Series</option>
+              <option value="2015">2015 Series</option>
+              <option value="2014">2014 Series</option>
+              <option value="2013">2013 Series</option>
+              <option value="2012">2012 Series</option>
+              <option value="2011">2011 Series</option>
+              <option value="2010">2010 Series</option>
             </select>
           </div>
 
@@ -1307,7 +1315,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
           <div className="flex items-center gap-2 text-slate-400 flex-wrap">
             {activeTab === 'pdf-library' ? (
               <span>
-                Found <strong className="text-white">{filteredPdfs.length}</strong> past paper PDFs across 2016–2025
+                Found <strong className="text-white">{filteredPdfs.length}</strong> past paper PDFs across 2010–2026
                 {filteredPdfs.length > displayedPdfs.length && (
                   <span className="text-sky-400 ml-1.5">(Showing first {displayedPdfs.length})</span>
                 )}
@@ -1381,7 +1389,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                 <FileDown className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs font-bold text-white">Full Exam Library: 2016 to 2025 (All Subjects, All Papers & All Variants)</p>
+                <p className="text-xs font-bold text-white">Full Exam Library: 2010 to 2026 (All Subjects, All Papers & All Variants)</p>
                 <p className="text-[11px] text-slate-400">
                   Click <strong>Open Fullscreen</strong> to open in native viewer, or <strong>View</strong> to inspect in-app with Google Docs & direct mirrors.
                 </p>
@@ -2184,6 +2192,15 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                 previewModal.board === 'Edexcel' ||
                 Boolean(previewModal.paperCode && previewModal.paperCode.startsWith('4'));
 
+              const isOxfordPortal =
+                currentModalUrl.includes('oxfordaqa.com') ||
+                previewModal.board === 'OxfordAQA' ||
+                Boolean(previewModal.paperCode && (previewModal.paperCode.startsWith('9270') || previewModal.paperCode.startsWith('9275') || previewModal.paperCode.startsWith('9280')));
+
+              const isBoardPortal = isPearsonPortal || isOxfordPortal;
+              const boardName = isOxfordPortal ? 'OxfordAQA' : isPearsonPortal ? 'Pearson Edexcel' : 'Cambridge';
+              const portalSearchQuery = `${previewModal.paperCode || previewModal.title} past paper ${isOxfordPortal ? 'oxfordaqa' : 'edexcel'} pdf`;
+
               return (
                 <>
                   <div className="flex items-center justify-between gap-3 p-3 sm:p-4 bg-slate-950 border-b border-slate-800 flex-wrap">
@@ -2211,6 +2228,11 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                               Pearson Edexcel
                             </span>
                           )}
+                          {isOxfordPortal && (
+                            <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 border border-emerald-500/30 text-emerald-300">
+                              OxfordAQA
+                            </span>
+                          )}
                         </div>
                         {previewModal.subtitle && (
                           <p className="text-[11px] text-slate-400 truncate">
@@ -2223,7 +2245,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                     {/* Controls: Engine Switcher, Open Fullscreen, Download, Close */}
                     <div className="flex items-center gap-2 shrink-0 flex-wrap">
                       {/* Engine Switcher (Only for direct PDF documents) */}
-                      {!isPearsonPortal && (
+                      {!isBoardPortal && (
                         <div className="hidden sm:flex items-center rounded-lg border border-slate-700 bg-slate-800 p-0.5 text-[11px]">
                           <button
                             type="button"
@@ -2259,7 +2281,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                       )}
 
                       {/* Mirror Switcher if backup exists */}
-                      {previewModal.backupUrl && !isPearsonPortal && (
+                      {previewModal.backupUrl && !isBoardPortal && (
                         <button
                           type="button"
                           onClick={() => setUseBackupMirror(!useBackupMirror)}
@@ -2271,20 +2293,20 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                         </button>
                       )}
 
-                      {/* Open in Fullscreen / New Tab (Guaranteed to work 100% on phones and desktops) */}
+                      {/* Open in Fullscreen / New Tab */}
                       <a
-                        href={isPearsonPortal ? currentModalUrl : `/api/pdf-proxy?url=${encodeURIComponent(currentModalUrl)}${previewModal?.backupUrl ? `&fallback=${encodeURIComponent(previewModal.backupUrl)}` : ''}`}
+                        href={isBoardPortal ? currentModalUrl : `/api/pdf-proxy?url=${encodeURIComponent(currentModalUrl)}${previewModal?.backupUrl ? `&fallback=${encodeURIComponent(previewModal.backupUrl)}` : ''}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1.5 rounded-xl border border-sky-500/40 bg-sky-500/10 px-3 py-1.5 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition"
-                        title={isPearsonPortal ? 'Launch Pearson Official Portal' : 'Open PDF directly in full browser window'}
+                        title={isBoardPortal ? `Launch ${boardName} Official Portal` : 'Open PDF directly in full browser window'}
                       >
                         <ExternalLink className="h-3.5 w-3.5" />
-                        <span>{isPearsonPortal ? 'Launch Portal' : 'Open Fullscreen'}</span>
+                        <span>{isBoardPortal ? 'Launch Portal' : 'Open Fullscreen'}</span>
                       </a>
 
                       {/* Direct Download (For direct PDFs) */}
-                      {!isPearsonPortal && (
+                      {!isBoardPortal && (
                         <a
                           href={`/api/pdf-proxy?url=${encodeURIComponent(currentModalUrl)}${previewModal?.backupUrl ? `&fallback=${encodeURIComponent(previewModal.backupUrl)}` : ''}&download=true`}
                           download
@@ -2310,9 +2332,9 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
                   {/* Helper notice */}
                   <div className="bg-sky-950/40 border-b border-sky-500/20 px-4 py-2 text-[11px] text-sky-200 flex items-center justify-between gap-2 flex-wrap">
-                    {isPearsonPortal ? (
+                    {isBoardPortal ? (
                       <span>
-                        🔒 <strong>Pearson Edexcel Materials Hub:</strong> Official Pearson past papers & mark schemes are hosted on Pearson's authenticated portal.
+                        🔒 <strong>{boardName} Materials Hub:</strong> Official {boardName} past papers & mark schemes are hosted on the exam board's official qualifications repository.
                       </span>
                     ) : (
                       <span>
@@ -2325,17 +2347,17 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                       rel="noopener noreferrer"
                       className="underline font-bold text-sky-300 hover:text-white ml-auto"
                     >
-                      {isPearsonPortal ? 'Launch Pearson Portal ↗' : 'Launch Direct PDF ↗'}
+                      {isBoardPortal ? `Launch ${boardName} Portal ↗` : 'Launch Direct PDF ↗'}
                     </a>
                   </div>
 
-                  {/* Modal Body: Pearson Hub Card vs PDF Viewer */}
-                  {isPearsonPortal ? (
+                  {/* Modal Body: Board Hub Card vs PDF Viewer */}
+                  {isBoardPortal ? (
                     <div className="relative flex-1 w-full bg-slate-950 overflow-y-auto flex items-center justify-center p-4 sm:p-8">
                       <div className="max-w-xl w-full bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl text-center space-y-6 animate-fadeIn">
                         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/30 text-sky-400 text-xs font-bold uppercase tracking-wider">
                           <Sparkles className="h-4 w-4" />
-                          Official Pearson Edexcel Archive
+                          Official {boardName} Archive
                         </div>
 
                         <div>
@@ -2354,7 +2376,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                             <span>✅</span> Verified Exam Board Portal Search
                           </p>
                           <p className="text-slate-400 leading-relaxed">
-                            Pearson Edexcel requires students and schools to access exam papers directly via their authenticated qualification portal. We have prepared the exact pre-filtered portal search and direct backup mirrors for this paper below:
+                            {boardName} provides international past papers & mark schemes via their official qualifications portal. We have prepared the exact pre-filtered portal search and direct backup mirrors for this paper below:
                           </p>
                         </div>
 
@@ -2365,7 +2387,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                             rel="noopener noreferrer"
                             className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-sky-600 hover:bg-sky-500 px-5 py-3 text-sm font-bold text-white transition shadow-lg shadow-sky-600/25 cursor-pointer"
                           >
-                            <span>Launch Official Pearson Portal</span>
+                            <span>Launch Official {boardName} Portal</span>
                             <ExternalLink className="h-4 w-4" />
                           </a>
 
@@ -2382,7 +2404,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                           )}
 
                           <a
-                            href={`https://www.google.com/search?q=${encodeURIComponent(`${previewModal.paperCode || previewModal.title} past paper edexcel pdf`)}`}
+                            href={`https://www.google.com/search?q=${encodeURIComponent(portalSearchQuery)}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 hover:text-white px-4 py-2.5 text-xs font-semibold text-slate-300 transition"
