@@ -667,7 +667,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             Cambridge, Edexcel & OxfordAQA Past Paper PDF Library
           </h1>
           <p className="mt-2 text-sm text-slate-300 leading-relaxed">
-            Instant 1-click access to 7,500+ authentic past examination papers and 85,000+ questions from <strong>2010 to 2026</strong>. Filter by <strong>Exam Board, Year, Exam Series, Paper Component, and Variant</strong> to get exact Question Papers (QP), official Mark Schemes (MS), Principal Examiner Reports, and Grade Thresholds.
+            Instant 1-click access to 9,280+ authentic past examination papers and 85,000+ questions from <strong>2010 to 2026</strong>. Filter by <strong>Exam Board, Year, Exam Series, Paper Component, and Variant</strong> to get exact Question Papers (QP), official Mark Schemes (MS), Principal Examiner Reports, and Grade Thresholds.
           </p>
         </div>
 
@@ -1516,19 +1516,20 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="inline-flex items-center gap-1 rounded-lg border border-sky-500/40 bg-sky-500/10 px-2 py-1 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition"
-                                    title={isPortalPaper ? `Open official ${pdf.board} portal` : "Open PDF directly in verified viewer"}
+                                    title={isPortalPaper ? `Open official ${pdf.board} qualification hub` : "Open PDF directly in verified viewer"}
                                   >
                                     <ExternalLink className="h-3.5 w-3.5" />
-                                    <span className="hidden sm:inline">{isPortalPaper ? 'Portal' : 'Open'}</span>
+                                    <span className="hidden sm:inline">{isPortalPaper ? 'Board Hub' : 'Open'}</span>
                                   </a>
                                   <a
-                                    href={isPortalPaper ? pdf.qpPdfUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.qpPdfUrl)}${pdf.backupQpUrl ? `&fallback=${encodeURIComponent(pdf.backupQpUrl)}` : ''}&download=true`}
-                                    {...(isPortalPaper ? { target: '_blank', rel: 'noopener noreferrer' } : { download: true })}
+                                    href={isPortalPaper && pdf.backupQpUrl ? pdf.backupQpUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.qpPdfUrl)}${pdf.backupQpUrl ? `&fallback=${encodeURIComponent(pdf.backupQpUrl)}` : ''}&download=true`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                     className="inline-flex items-center gap-1 rounded-lg bg-sky-600 px-2.5 py-1 text-xs font-bold text-white hover:bg-sky-500 transition shadow-sm"
-                                    title={isPortalPaper ? `Access official ${pdf.board} exam materials` : "Download official Question Paper PDF"}
+                                    title={isPortalPaper ? `Search verified PapaCambridge past paper pack for ${pdf.paperCode}` : "Download official Question Paper PDF"}
                                   >
                                     <Download className="h-3.5 w-3.5" />
-                                    <span>{isPortalPaper ? 'Portal' : 'Download'}</span>
+                                    <span>{isPortalPaper ? 'Archive Pack' : 'Download'}</span>
                                   </a>
                                 </>
                               );
@@ -1572,19 +1573,20 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20 transition"
-                                      title={isPortalPaper ? `Open official ${pdf.board} mark scheme portal` : "Open Mark Scheme in verified viewer"}
+                                      title={isPortalPaper ? `Open official ${pdf.board} qualification hub` : "Open Mark Scheme in verified viewer"}
                                     >
                                       <ExternalLink className="h-3.5 w-3.5" />
-                                      <span className="hidden sm:inline">{isPortalPaper ? 'Portal' : 'Open'}</span>
+                                      <span className="hidden sm:inline">{isPortalPaper ? 'Board Hub' : 'Open'}</span>
                                     </a>
                                     <a
-                                      href={isPortalPaper ? pdf.msPdfUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.msPdfUrl!)}${pdf.backupMsUrl ? `&fallback=${encodeURIComponent(pdf.backupMsUrl)}` : ''}&download=true`}
-                                      {...(isPortalPaper ? { target: '_blank', rel: 'noopener noreferrer' } : { download: true })}
+                                      href={isPortalPaper && pdf.backupMsUrl ? pdf.backupMsUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.msPdfUrl!)}${pdf.backupMsUrl ? `&fallback=${encodeURIComponent(pdf.backupMsUrl)}` : ''}&download=true`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
                                       className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-2.5 py-1 text-xs font-bold text-white hover:bg-emerald-500 transition shadow-sm"
-                                      title={isPortalPaper ? `Access official ${pdf.board} mark scheme` : "Download official Mark Scheme PDF"}
+                                      title={isPortalPaper ? `Search verified PapaCambridge mark scheme pack for ${pdf.paperCode}` : "Download official Mark Scheme PDF"}
                                     >
                                       <Download className="h-3.5 w-3.5" />
-                                      <span>{isPortalPaper ? 'Portal' : 'Download'}</span>
+                                      <span>{isPortalPaper ? 'Archive Pack' : 'Download'}</span>
                                     </a>
                                   </>
                                 );

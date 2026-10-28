@@ -55,9 +55,9 @@ export const INITIAL_AUDIT_LOGS: AuditLogEntry[] = [
     action: 'PAST_PAPER_ARCHIVE_EXPANDED',
     actionLabel: 'Scaled Past Paper Engine',
     targetType: 'question',
-    targetLabel: '45,000+ Exam Questions',
-    details: 'Expanded Question Finder index across 3,500+ official Cambridge & Edexcel past papers (2016-2025).',
-    newValue: '3,500+ Papers Indexed'
+    targetLabel: '85,000+ Exam Questions',
+    details: 'Expanded Question Finder index across 9,280+ official Cambridge, Edexcel & OxfordAQA past papers (2010-2026).',
+    newValue: '9,280+ Papers Indexed'
   },
   {
     id: 'audit_init_003',

@@ -214,6 +214,14 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
   const currentQ = examQuestions[currentQuestionIndex];
   const currentAns = currentQ ? answers[currentQ.id] : null;
 
+  const isLanguageSubject = subject.category === 'Languages' ||
+    subject.id.includes('esl') ||
+    subject.id.includes('eng') ||
+    subject.code.includes('0510') ||
+    subject.code.includes('0500') ||
+    subject.code.includes('4ES1') ||
+    subject.code.includes('9270');
+
   return (
     <div className={`mx-auto max-w-5xl space-y-6 animate-fadeIn pb-12 ${isFullscreen ? 'p-4 bg-slate-950 min-h-screen' : ''}`}>
       {/* ───────────────────────────────────────────────────────────── */}
@@ -235,7 +243,7 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
                   Cambridge IGCSE™ Mock Examination
                 </h1>
                 <p className="text-sm font-semibold text-slate-300">
-                  {subject.name} ({subject.code}) • Extended Theory Paper
+                  {subject.name} ({subject.code}) • {isLanguageSubject ? 'Reading & Writing Mock Paper' : 'Extended Theory Paper'}
                 </p>
               </div>
 
@@ -253,13 +261,23 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
               <ShieldCheck className="h-4 w-4 text-amber-400" />
               <span>Official Examination Instructions</span>
             </h3>
-            <ul className="list-disc list-inside space-y-1.5 text-slate-400">
-              <li>Answer all questions in the spaces provided. Working must be shown for all calculation steps.</li>
-              <li>Omission of essential working will result in loss of <strong className="text-white">Method Marks [M1]</strong>.</li>
-              <li>Electronic non-programmable calculators may be used where appropriate.</li>
-              <li>Give non-exact numerical answers correct to <strong className="text-white">3 significant figures</strong>, or 1 decimal place for angles in degrees.</li>
-              <li>Upon completion, your raw score will be benchmarked against official Cambridge Grade Thresholds.</li>
-            </ul>
+            {isLanguageSubject ? (
+              <ul className="list-disc list-inside space-y-1.5 text-slate-400">
+                <li>Read each text carefully and answer all questions in the spaces provided.</li>
+                <li>For reading comprehension, write concisely and adhere to line limits; avoid lifting whole sentences where your own words are required.</li>
+                <li>For summary writing, observe the strict <strong className="text-white">100–120 word count limit</strong>. Points beyond 120 words are not credited.</li>
+                <li>Pay careful attention to spelling, punctuation, formal register, and discourse connectives.</li>
+                <li>Dictionaries and electronic translation aids are <strong className="text-white">not permitted</strong>.</li>
+              </ul>
+            ) : (
+              <ul className="list-disc list-inside space-y-1.5 text-slate-400">
+                <li>Answer all questions in the spaces provided. Working must be shown for all calculation steps.</li>
+                <li>Omission of essential working will result in loss of <strong className="text-white">Method Marks [M1]</strong>.</li>
+                <li>Electronic non-programmable calculators may be used where appropriate.</li>
+                <li>Give non-exact numerical answers correct to <strong className="text-white">3 significant figures</strong>, or 1 decimal place for angles in degrees.</li>
+                <li>Upon completion, your raw score will be benchmarked against official Cambridge Grade Thresholds.</li>
+              </ul>
+            )}
           </div>
 
           {/* Exam Configuration Selection */}

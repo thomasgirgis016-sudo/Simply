@@ -411,7 +411,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   <FileText className="h-4 w-4 sm:h-5 sm:w-5" />
                 </div>
                 <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-[9px] sm:text-[10px] font-bold text-amber-300 font-mono">
-                  9,500+
+                  9,280+
                 </span>
               </div>
               <h3 className="text-xs sm:text-base font-bold text-white group-hover:text-amber-300 transition line-clamp-1">

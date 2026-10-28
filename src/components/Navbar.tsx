@@ -430,42 +430,23 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </div>
 
-          {/* Mobile Right: Quick Action & Hamburger Menu */}
-          <div className="flex sm:hidden items-center gap-1.5 shrink-0">
-            {onOpenPayment && (
-              <button
-                onClick={onOpenPayment}
-                className={`flex items-center gap-1 rounded-xl px-2 py-1 text-[11px] font-extrabold transition cursor-pointer shrink-0 ${
-                  currentUser?.isPro
-                    ? 'border border-amber-500/40 bg-amber-500/10 text-amber-300'
-                    : 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-sm'
-                }`}
-                title="Pro Subscription"
-              >
-                <Crown className="h-3 w-3" />
-                <span>{currentUser?.isPro ? 'PRO' : 'PRO'}</span>
-              </button>
-            )}
-
-            {onToggleTheme && (
-              <button
-                onClick={onToggleTheme}
-                className="rounded-xl border border-slate-800 bg-slate-900/90 p-2 text-slate-400 hover:text-amber-400 transition shrink-0"
-                aria-label="Toggle Theme"
-              >
-                {theme === 'dark' ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-indigo-400" />}
-              </button>
+          {/* Mobile Right: Compact Profile & Hamburger Menu */}
+          <div className="flex sm:hidden items-center gap-2 shrink-0">
+            {currentUser?.isPro && (
+              <span className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-black text-amber-300">
+                PRO
+              </span>
             )}
 
             {currentUser ? (
               <button
                 onClick={onOpenProfile}
                 className="flex items-center gap-1.5 rounded-xl border border-slate-800 bg-slate-900/90 px-2 py-1.5 text-xs text-white shrink-0"
-                title="Profile"
+                title="Profile & Settings"
               >
-                <div className={`h-5 w-5 rounded-full flex items-center justify-center text-[10px] font-black uppercase ${
+                <div className={`h-6 w-6 rounded-full flex items-center justify-center text-[11px] font-black uppercase ${
                   currentUser.role === 'founder'
-                    ? 'bg-amber-400 text-slate-950'
+                    ? 'bg-amber-400 text-slate-950 shadow-sm'
                     : 'bg-gradient-to-tr from-[#FF5E62] to-[#FFA63A] text-slate-950'
                 }`}>
                   {currentUser.name.charAt(0)}
@@ -477,7 +458,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             ) : (
               <button
                 onClick={() => onOpenAuth('signin')}
-                className="rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-3 py-1.5 text-[11px] font-black text-slate-950 shadow-md hover:brightness-110 transition shrink-0"
+                className="rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-3 py-1.5 text-xs font-black text-slate-950 shadow-md hover:brightness-110 transition shrink-0"
               >
                 Sign In
               </button>

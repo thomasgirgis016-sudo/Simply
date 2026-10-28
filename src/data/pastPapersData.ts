@@ -650,6 +650,104 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
     finalAnswer: 'A high-scoring formal school magazine article with sophisticated discourse markers (furthermore, conversely, fundamentally).',
     examinerReportSnippet: 'Candidates who wrote in an overly informal email register (using slang or contracted forms like "gonna/wanna") were penalized in the Language mark band.'
   },
+  {
+    id: 'pp-esl-3',
+    subjectId: 'cie-esl-0510',
+    subjectName: 'English as a Second Language',
+    subjectCode: '0510',
+    board: 'CIE',
+    session: 'May/June 2024 Paper 12',
+    paperCode: '0510/12',
+    year: 2024,
+    questionNumber: 'Exercise 3',
+    topic: 'Exercise 3: Note-Taking Skills & Subheadings',
+    difficultyTier: 'Standard Extended',
+    componentType: 'Theory',
+    subParts: [
+      {
+        part: '(a)',
+        marks: 5,
+        prompt: 'Under Heading 1: "Benefits of electric vertical takeoff aircraft (eVTOL)":\nWrite 5 distinct factual points from the passage.',
+        markScheme: [
+          { markType: '[1-5]', requirement: 'Zero local emissions; reduced urban transit times; quieter than helicopters; uses existing helipads; lower operating costs per passenger.' }
+        ],
+        finalAnswer: '5 distinct factual bullet points under Heading 1.'
+      },
+      {
+        part: '(b)',
+        marks: 4,
+        prompt: 'Under Heading 2: "Regulatory and technical hurdles":\nWrite 4 distinct factual points from the passage.',
+        markScheme: [
+          { markType: '[1-4]', requirement: 'Air traffic control airspace integration; limited battery energy density; public noise perception; pilot licensing frameworks.' }
+        ],
+        finalAnswer: '4 distinct factual bullet points under Heading 2.'
+      }
+    ],
+    snippetQuery: 'note taking heading subheadings bullet points concise phrases facts evtol',
+    questionPrompt: 'Read the article about urban air mobility and the development of electric vertical takeoff aircraft.\nYou are preparing notes for a classroom presentation.\nComplete the notes below, writing one factual point on each line.\n\nHeading 1: Benefits of urban air mobility aircraft [5 marks]\nHeading 2: Challenges facing widespread implementation [4 marks]',
+    diagramOrMath: '5 + 4 = 9 \\text{ marks}',
+    marks: 9,
+    markScheme: [
+      { markType: '[1-5]', requirement: 'Award 1 mark per valid point for Benefits: zero emissions, reduced travel times, lower noise, operates from vertiports, cheaper maintenance.' },
+      { markType: '[1-4]', requirement: 'Award 1 mark per valid point for Challenges: air traffic management, battery weight/range, weather limits, passenger certification.' }
+    ],
+    finalAnswer: '9 concise bulleted notes grouped under correct subheadings.',
+    examinerReportSnippet: 'Candidates who wrote full continuous sentences instead of bulleted note-form lost marks for lacking brevity.'
+  },
+  {
+    id: 'pp-esl-4',
+    subjectId: 'cie-esl-0510',
+    subjectName: 'English as a Second Language',
+    subjectCode: '0510',
+    board: 'CIE',
+    session: 'May/June 2024 Paper 12',
+    paperCode: '0510/12',
+    year: 2024,
+    questionNumber: 'Exercise 1',
+    topic: 'Exercise 1: Reading Comprehension & Factual Scan',
+    difficultyTier: 'Core',
+    componentType: 'Theory',
+    subParts: [
+      {
+        part: '(a)',
+        marks: 2,
+        prompt: 'According to paragraph 2, what two features of the deep-sea submersible enabled scientists to withstand ocean trench pressure?',
+        markScheme: [
+          { markType: '[1-2]', requirement: 'Titanium spherical pressure hull AND specialised syntactic buoyancy foam.' }
+        ],
+        finalAnswer: 'Titanium spherical hull and syntactic buoyancy foam.'
+      },
+      {
+        part: '(b)',
+        marks: 3,
+        prompt: 'Give three reasons why the expedition team postponed their initial dive schedule.',
+        markScheme: [
+          { markType: '[1-3]', requirement: 'Severe surface ocean swells; hydraulic valve failure; unexpected typhoon warning.' }
+        ],
+        finalAnswer: 'High swells, valve defect, and approaching typhoon.'
+      },
+      {
+        part: '(c)',
+        marks: 3,
+        prompt: 'Identify three scientific discoveries recorded during the final descent to the seabed.',
+        markScheme: [
+          { markType: '[1-3]', requirement: 'New bioluminescent amphipod species; active hydrothermal mineral chimney; microbial mats surviving on hydrogen sulphide.' }
+        ],
+        finalAnswer: 'New amphipod species, mineral chimney, and chemosynthetic microbial mats.'
+      }
+    ],
+    snippetQuery: 'reading comprehension factual scan concise short answers paragraph search',
+    questionPrompt: 'Read the report about deep-ocean exploration in the Mariana Trench.\nAnswer questions (a) to (c) giving concise, factual responses based directly on the text.\n[8 marks total]',
+    diagramOrMath: '2 + 3 + 3 = 8 \\text{ marks}',
+    marks: 8,
+    markScheme: [
+      { markType: '[B2]', requirement: 'Award 1 mark each for titanium hull and syntactic foam.' },
+      { markType: '[B3]', requirement: 'Award 1 mark each for rough swells, hydraulic malfunction, and storm warning.' },
+      { markType: '[B3]', requirement: 'Award 1 mark each for amphipod discovery, hydrothermal spire, and chemosynthetic bacteria.' }
+    ],
+    finalAnswer: 'Precise short-answer responses addressing each subpart without unnecessary text lifting.',
+    examinerReportSnippet: 'Candidates who wrote concise phrases scored full marks while those copying whole lengthy paragraphs ran out of time.'
+  },
 
   // ─────────────────────────────────────────────────────────────
   // 8. ECONOMICS (CIE 0455 & EDEXCEL 4EC1)
@@ -1690,6 +1788,11 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
         const variantsForSeries = series.code === 'm' ? [2] : [1, 2, 3];
 
         for (const p of sub.papers) {
+          // Cambridge 0510 2024-2026 Syllabus Reform:
+          // Paper 1 is Reading & Writing (60 marks), Paper 2 is Listening (40 marks).
+          // Papers 3 and 4 were discontinued in 2024 and do not exist for 2024 or 2025.
+          if (sub.code === '0510' && yr >= 2024 && p.paperNumber > 2) continue;
+
           for (const v of p.variants) {
             if (!variantsForSeries.includes(v)) continue;
 
@@ -1712,6 +1815,22 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
               `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${erFilename}`;
             const gtUrl = `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${gtFilename}`;
 
+            // Syllabus-accurate paper component titles
+            let paperTitle = p.title;
+            if (sub.code === '0510') {
+              if (yr >= 2024) {
+                paperTitle = p.paperNumber === 1 ? 'Paper 1 (Reading & Writing)' : 'Paper 2 (Listening)';
+              } else {
+                paperTitle = p.paperNumber === 1
+                  ? 'Paper 1 (Reading & Writing Core)'
+                  : p.paperNumber === 2
+                  ? 'Paper 2 (Reading & Writing Extended)'
+                  : p.paperNumber === 3
+                  ? 'Paper 3 (Listening Core)'
+                  : 'Paper 4 (Listening Extended)';
+              }
+            }
+
             result.push({
               id: `pdf-${sub.code}-${series.code}${yy}-${compCode}`,
               subjectId: sub.id,
@@ -1723,9 +1842,9 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
               seasonCode: series.code,
               paperNumber: p.paperNumber,
               variant: v,
-              paperComponent: `${p.title} (Variant ${v})`,
+              paperComponent: `${paperTitle} (Variant ${v})`,
               paperCode,
-              tier: p.tier,
+              tier: sub.code === '0510' && yr >= 2024 ? 'General' : p.tier,
               qpPdfUrl: qpUrl,
               backupQpUrl: backupQp,
               msPdfUrl: msUrl,
@@ -1742,7 +1861,7 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
 
   // 2. Specimen Assessment Papers (2026 & 2023 - 2025 Series)
   result.unshift(
-    // 2026 Cambridge Specimen Series Papers
+    // 2026 Cambridge Specimen Series Papers (Linked to Official Board Qualification Portals)
     {
       id: 'pdf-0580-sp26-4',
       subjectId: 'cie-math-0580',
@@ -1757,9 +1876,11 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
       paperComponent: 'Paper 4 (Extended Calculator Specimen)',
       paperCode: '0580/04',
       tier: 'Extended',
-      qpPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_qp_42.pdf',
-      msPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_ms_42.pdf',
-      fileSizeBytes: '1.64 MB'
+      qpPdfUrl: 'https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-mathematics-0580/',
+      backupQpUrl: 'https://pastpapers.papacambridge.com/?s=0580+Specimen',
+      msPdfUrl: 'https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-mathematics-0580/',
+      backupMsUrl: 'https://pastpapers.papacambridge.com/?s=0580+Specimen+Mark+Scheme',
+      fileSizeBytes: 'Official Specimen'
     },
     {
       id: 'pdf-0580-sp26-2',
@@ -1775,9 +1896,11 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
       paperComponent: 'Paper 2 (Extended Non-Calculator Specimen)',
       paperCode: '0580/02',
       tier: 'Extended',
-      qpPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_qp_22.pdf',
-      msPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_ms_22.pdf',
-      fileSizeBytes: '1.65 MB'
+      qpPdfUrl: 'https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-mathematics-0580/',
+      backupQpUrl: 'https://pastpapers.papacambridge.com/?s=0580+Specimen',
+      msPdfUrl: 'https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-mathematics-0580/',
+      backupMsUrl: 'https://pastpapers.papacambridge.com/?s=0580+Specimen+Mark+Scheme',
+      fileSizeBytes: 'Official Specimen'
     },
     {
       id: 'pdf-0510-sp26-1',
@@ -1793,9 +1916,11 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
       paperComponent: 'Paper 1 (Reading & Writing Specimen)',
       paperCode: '0510/01',
       tier: 'General',
-      qpPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_s23_qp_11.pdf',
-      msPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_s23_ms_11.pdf',
-      fileSizeBytes: '1.42 MB'
+      qpPdfUrl: 'https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-english-second-language-oral-endorsement-0510/',
+      backupQpUrl: 'https://pastpapers.papacambridge.com/?s=0510+Specimen+Paper+1',
+      msPdfUrl: 'https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-english-second-language-oral-endorsement-0510/',
+      backupMsUrl: 'https://pastpapers.papacambridge.com/?s=0510+Specimen+Paper+1+MS',
+      fileSizeBytes: 'Official Specimen'
     },
     {
       id: 'pdf-0510-sp26-2',
@@ -1808,12 +1933,14 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
       seasonCode: 'sp',
       paperNumber: 2,
       variant: 2,
-      paperComponent: 'Paper 2 (Reading & Writing Extended Specimen)',
+      paperComponent: 'Paper 2 (Listening Specimen)',
       paperCode: '0510/02',
-      tier: 'Extended',
-      qpPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_s23_qp_22.pdf',
-      msPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_s23_ms_22.pdf',
-      fileSizeBytes: '1.48 MB'
+      tier: 'General',
+      qpPdfUrl: 'https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-english-second-language-oral-endorsement-0510/',
+      backupQpUrl: 'https://pastpapers.papacambridge.com/?s=0510+Specimen+Paper+2',
+      msPdfUrl: 'https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-english-second-language-oral-endorsement-0510/',
+      backupMsUrl: 'https://pastpapers.papacambridge.com/?s=0510+Specimen+Paper+2+MS',
+      fileSizeBytes: 'Official Specimen'
     },
     {
       id: 'pdf-0500-sp26-1',
@@ -1829,9 +1956,11 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
       paperComponent: 'Paper 1 (Reading Specimen)',
       paperCode: '0500/01',
       tier: 'General',
-      qpPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0500_s23_qp_12.pdf',
-      msPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0500_s23_ms_12.pdf',
-      fileSizeBytes: '1.30 MB'
+      qpPdfUrl: 'https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-english-first-language-0500/',
+      backupQpUrl: 'https://pastpapers.papacambridge.com/?s=0500+Specimen',
+      msPdfUrl: 'https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-english-first-language-0500/',
+      backupMsUrl: 'https://pastpapers.papacambridge.com/?s=0500+Specimen+MS',
+      fileSizeBytes: 'Official Specimen'
     },
     {
       id: 'pdf-0580-sp25-4',

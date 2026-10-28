@@ -89,7 +89,7 @@ export const AboutSimplyModal: React.FC<AboutSimplyModalProps> = ({
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/20 mb-3">
                   <FileText className="h-4.5 w-4.5" />
                 </div>
-                <h4 className="text-sm font-bold text-white mb-1.5">9,500+ Past Papers & Split Viewer</h4>
+                <h4 className="text-sm font-bold text-white mb-1.5">9,280+ Past Papers & Split Viewer</h4>
                 <p className="text-xs text-slate-400 leading-relaxed">
                   Real examination questions from 2010 through 2026 across all series (May/June, Oct/Nov, Feb/March) and variants. Practice in synchronized dual-pane mode alongside official mark schemes with method (<strong className="text-slate-300">M</strong>), accuracy (<strong className="text-slate-300">A</strong>), and independent (<strong className="text-slate-300">B</strong>) mark breakdowns.
                 </p>

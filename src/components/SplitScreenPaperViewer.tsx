@@ -168,7 +168,7 @@ const SAMPLE_EXAM_PAPERS: Record<string, ExamQuestionItem[]> = {
       number: 1,
       subpart: '(a)',
       marks: 3,
-      paperRef: 'CIE 0510/22 May/June 2023 Exercise 1',
+      paperRef: 'CIE 0510/12 May/June 2024 Paper 1 (Reading & Writing) Exercise 1',
       questionPrompt: 'Read the article about the discovery of deep-sea hydrothermal vents and answer the following questions:\n\n(i) According to paragraph 1, what unexpected feature did scientists observe on the seabed?\n(ii) Give two reasons why scientists initially thought animal life could not survive around the vents.',
       diagramOrMath: 'Syllabus Assessment Objectives: R1 (Identify factual details) & R2 (Understand ideas/opinions)',
       markSchemePoints: [
@@ -540,9 +540,10 @@ export const SplitScreenPaperViewer: React.FC<SplitScreenPaperViewerProps> = ({
         </div>
 
         {/* RIGHT PANE: Mark Scheme */}
-        <div className={`rounded-2xl border border-emerald-500/25 bg-slate-900/90 p-5 sm:p-6 shadow-xl flex flex-col justify-between ${
-          isMarkSchemeVisible ? 'md:col-span-6' : 'hidden'
-        } ${mobilePane === 'markscheme' ? 'block' : 'hidden md:flex'}`}>
+        {isMarkSchemeVisible && (
+          <div className={`rounded-2xl border border-emerald-500/25 bg-slate-900/90 p-5 sm:p-6 shadow-xl flex flex-col justify-between md:col-span-6 ${
+            mobilePane === 'markscheme' ? 'block' : 'hidden md:flex'
+          }`}>
           <div className="space-y-4">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div className="flex items-center gap-2">
@@ -602,6 +603,7 @@ export const SplitScreenPaperViewer: React.FC<SplitScreenPaperViewerProps> = ({
             Verified with published examiner mark criteria
           </div>
         </div>
+        )}
       </div>
     </div>
   );

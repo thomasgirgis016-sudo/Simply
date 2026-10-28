@@ -220,6 +220,33 @@ export function runPastPaperQaAgent(
         details: `Oct/Nov 2026 examination series has not concluded or been published yet.`
       });
     }
+
+    // Validate Cambridge 0510 syllabus reform (2024-2026): Papers 3 and 4 were discontinued
+    if (pdf.paperCode?.startsWith('0510') && pdf.year >= 2024) {
+      const pNum = pdf.paperNumber;
+      if (pNum === 3 || pNum === 4 || pdf.paperCode.includes('/3') || pdf.paperCode.includes('/4')) {
+        issues.push({
+          paperId: pdf.id,
+          paperCode: pdf.paperCode,
+          questionNumber: 'Syllabus Reform Rule (2024+)',
+          issueType: 'broken_link',
+          details: `Cambridge 0510 Papers 3 and 4 were discontinued from 2024 onwards under the new syllabus reform (Paper 1 = Reading & Writing, Paper 2 = Listening).`
+        });
+      }
+    }
+
+    // Validate cross-year filename mismatch on specimen papers
+    if ((pdf.year >= 2026 || pdf.id.includes('sp26')) && pdf.qpPdfUrl) {
+      if (pdf.qpPdfUrl.includes('_s23_') || pdf.qpPdfUrl.includes('_w23_') || pdf.qpPdfUrl.includes('_m23_')) {
+        issues.push({
+          paperId: pdf.id,
+          paperCode: pdf.paperCode,
+          questionNumber: 'Cross-Year Filename Mismatch',
+          issueType: 'broken_link',
+          details: `Specimen 2026 paper references 2023 exam session filename (${pdf.qpPdfUrl}). Must link to authentic specimen or portal.`
+        });
+      }
+    }
   }
 
   const totalScanned = activePapers.length;

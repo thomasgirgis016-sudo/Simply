@@ -30,14 +30,23 @@ export const NightBeforeCheatSheets: React.FC<NightBeforeCheatSheetsProps> = ({
   activeSubject,
   onSelectSubject,
 }) => {
-  const [selectedCode, setSelectedCode] = useState<string>(() => {
-    if (activeSubject && CHEAT_SHEETS_DATABASE.some((c) => c.subjectCode === activeSubject.code)) {
-      return activeSubject.code;
-    }
-    return '0580';
-  });
+  const resolveSubjectCode = (subj?: Subject): string => {
+    if (!subj) return '0580';
+    const num = subj.code.match(/\d{4}/)?.[0] || '';
+    const match = CHEAT_SHEETS_DATABASE.find(
+      (c) => c.subjectCode === num || subj.code.includes(c.subjectCode) || subj.id.includes(c.subjectCode)
+    );
+    return match ? match.subjectCode : '0580';
+  };
 
+  const [selectedCode, setSelectedCode] = useState<string>(() => resolveSubjectCode(activeSubject));
   const [searchQuery, setSearchQuery] = useState('');
+
+  React.useEffect(() => {
+    if (activeSubject) {
+      setSelectedCode(resolveSubjectCode(activeSubject));
+    }
+  }, [activeSubject]);
 
   const currentSheet = useMemo(() => {
     return getCheatSheetForSubject(selectedCode);

@@ -95,14 +95,14 @@ const HISTORIC_BOUNDARIES: Record<string, GradeBoundaryThreshold> = {
     grade3: 59,
   },
   'cie-esl-0510': {
-    totalMax: 150,
-    grade9: 128,
-    grade8: 116,
-    grade7: 104,
-    grade6: 91,
-    grade5: 78,
-    grade4: 65,
-    grade3: 52,
+    totalMax: 100,
+    grade9: 82,
+    grade8: 74,
+    grade7: 66,
+    grade6: 57,
+    grade5: 48,
+    grade4: 39,
+    grade3: 30,
   },
   'cie-econ-0455': {
     totalMax: 150,
@@ -196,6 +196,7 @@ export const GradeBoundariesCalculator: React.FC<GradeBoundariesCalculatorProps>
     id => activeSubject.id.includes(id) || activeSubject.code.includes('0625') || activeSubject.code.includes('0620') || activeSubject.code.includes('0610')
   );
   const isMath = activeSubject.id.includes('math') || activeSubject.code.includes('0580') || activeSubject.code.includes('4ma1');
+  const isEsl = activeSubject.id.includes('esl') || activeSubject.code.includes('0510') || activeSubject.code.includes('4es1');
 
   // Compute weighted mark according to official Cambridge syllabus weighting
   let weightedScore = 0;
@@ -208,8 +209,13 @@ export const GradeBoundariesCalculator: React.FC<GradeBoundariesCalculatorProps>
   } else if (isMath) {
     // Cambridge Math: Paper 2 (70 max, x1.0), Paper 4 (130 max, x1.0) -> Total 200
     weightedScore = Math.min(200, (Number(paper2Mark) || 0) + (Number(paper4Mark) || 0));
+  } else if (isEsl) {
+    // Cambridge ESL 0510: Paper 1 (Reading & Writing, 60 max) + Paper 2 (Listening, 40 max) -> Total 100
+    const p1 = Math.min(60, Number(paper2Mark) || 0);
+    const p2 = Math.min(40, Number(paper4Mark) || 0);
+    weightedScore = p1 + p2;
   } else {
-    // Other subjects (150 max or totalMax)
+    // Other subjects (totalMax)
     weightedScore = Math.min(boundary.totalMax, (Number(paper2Mark) || 0) + (Number(paper4Mark) || 0));
   }
 
@@ -329,55 +335,68 @@ export const GradeBoundariesCalculator: React.FC<GradeBoundariesCalculatorProps>
               <span className="text-xs font-normal text-slate-400">Total Scale: {boundary.totalMax} Marks</span>
             </h3>
 
-            {/* Paper 2 */}
+            {/* Paper 2 / Component 1 */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between text-xs">
                 <label className="font-semibold text-slate-200">
-                  {isScience ? 'Paper 2 (Multiple Choice Core/Ext)' : isMath ? 'Paper 2 (Short-Answer Structured)' : 'Paper 1 (Core Component)'}
+                  {isScience ? 'Paper 2 (Multiple Choice Core/Ext)' : isMath ? 'Paper 2 (Short-Answer Structured)' : isEsl ? 'Paper 1 (Reading & Writing)' : 'Paper 1 (Core Component)'}
                 </label>
                 <span className="font-mono font-bold text-indigo-400">
-                  {paper2Mark} / {isScience ? '40 (Weights to 60)' : isMath ? '70' : '60'}
+                  {paper2Mark} / {isScience ? '40 (Weights to 60)' : isMath ? '70' : isEsl ? '60' : '60'}
                 </span>
               </div>
               <input
                 type="range"
                 min="0"
-                max={isScience ? "40" : isMath ? "70" : "60"}
+                max={isScience ? "40" : isMath ? "70" : isEsl ? "60" : "60"}
                 value={paper2Mark}
                 onChange={(e) => setPaper2Mark(Number(e.target.value))}
                 className="w-full accent-indigo-500 cursor-pointer"
               />
               <div className="flex justify-between text-[10px] text-slate-500">
                 <span>0 marks</span>
-                <span>{isScience ? 'Raw 40 × 1.5 = 60 weighted marks (30%)' : 'Raw score entered directly'}</span>
-                <span>Max {isScience ? '40' : isMath ? '70' : '60'}</span>
+                <span>{isScience ? 'Raw 40 × 1.5 = 60 weighted marks (30%)' : isEsl ? 'Reading & Writing raw score (60% weight)' : 'Raw score entered directly'}</span>
+                <span>Max {isScience ? '40' : isMath ? '70' : isEsl ? '60' : '60'}</span>
               </div>
             </div>
 
-            {/* Paper 4 */}
+            {/* Paper 4 / Component 2 */}
             <div className="space-y-1.5 pt-2">
               <div className="flex items-center justify-between text-xs">
                 <label className="font-semibold text-slate-200">
-                  {isScience ? 'Paper 4 (Extended Theory)' : isMath ? 'Paper 4 (Long-Answer Structured)' : 'Paper 2 (Extended Component)'}
+                  {isScience ? 'Paper 4 (Extended Theory)' : isMath ? 'Paper 4 (Long-Answer Structured)' : isEsl ? 'Paper 2 (Listening)' : 'Paper 2 (Extended Component)'}
                 </label>
                 <span className="font-mono font-bold text-purple-400">
-                  {paper4Mark} / {isScience ? '80 (Weights to 100)' : isMath ? '130' : '90'}
+                  {paper4Mark} / {isScience ? '80 (Weights to 100)' : isMath ? '130' : isEsl ? '40' : '90'}
                 </span>
               </div>
               <input
                 type="range"
                 min="0"
-                max={isScience ? "80" : isMath ? "130" : "90"}
+                max={isScience ? "80" : isMath ? "130" : isEsl ? "40" : "90"}
                 value={paper4Mark}
                 onChange={(e) => setPaper4Mark(Number(e.target.value))}
                 className="w-full accent-purple-500 cursor-pointer"
               />
               <div className="flex justify-between text-[10px] text-slate-500">
                 <span>0 marks</span>
-                <span>{isScience ? 'Raw 80 × 1.25 = 100 weighted marks (50%)' : 'Structured working marks'}</span>
-                <span>Max {isScience ? '80' : isMath ? '130' : '90'}</span>
+                <span>{isScience ? 'Raw 80 × 1.25 = 100 weighted marks (50%)' : isEsl ? 'Listening comprehension raw score (40% weight)' : 'Structured working marks'}</span>
+                <span>Max {isScience ? '80' : isMath ? '130' : isEsl ? '40' : '90'}</span>
               </div>
             </div>
+
+            {/* ESL Assessment Structure Notice */}
+            {isEsl && (
+              <div className="rounded-xl border border-sky-500/30 bg-sky-500/10 p-3 text-xs text-sky-200 flex items-start gap-2 mt-2">
+                <AlertCircle className="h-4 w-4 text-sky-400 shrink-0 mt-0.5" />
+                <div className="space-y-0.5">
+                  <span className="font-bold">Cambridge IGCSE 0510 Assessment Structure:</span>
+                  <p className="text-[11px] text-sky-300 leading-relaxed">
+                    Written qualification grade is calculated out of <strong>100 marks</strong>: Paper 1 Reading & Writing (60 marks) + Paper 2 Listening (40 marks). Speaking is separately endorsed (Grades 1 to 5) and does not contribute to the written syllabus mark.
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Paper 6 (Sciences / Alternative to Practical) */}
             {isScience && (

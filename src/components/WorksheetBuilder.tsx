@@ -65,8 +65,8 @@ export const WorksheetBuilder: React.FC<WorksheetBuilderProps> = ({
 
     for (const q of pool) {
       const qMarks = q.marks || 4;
-      if (accumulatedMarks > 0 && accumulatedMarks + qMarks > targetMarks + 4) {
-        break;
+      if (accumulatedMarks > 0 && accumulatedMarks + qMarks > targetMarks + 2) {
+        continue;
       }
       selected.push(q);
       accumulatedMarks += qMarks;
@@ -78,10 +78,18 @@ export const WorksheetBuilder: React.FC<WorksheetBuilderProps> = ({
       const remainingPool = subjectPapers.filter(p => !selected.some(s => s.id === p.id));
       for (const q of remainingPool) {
         const qMarks = q.marks || 4;
+        if (accumulatedMarks > 0 && accumulatedMarks + qMarks > targetMarks + 2) {
+          continue;
+        }
         selected.push(q);
         accumulatedMarks += qMarks;
         if (accumulatedMarks >= targetMarks) break;
       }
+    }
+
+    // Fallback: If still under target and nothing fit within threshold, add closest candidate
+    if (selected.length === 0 && pool.length > 0) {
+      selected.push(pool[0]);
     }
 
     return selected.length > 0 ? selected : subjectPapers.slice(0, 2);
