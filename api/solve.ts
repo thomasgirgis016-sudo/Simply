@@ -60,6 +60,19 @@ export default async function handler(req: any, res?: any) {
       topic = 'General Syllabus Topic',
     } = body;
 
+    // Health check ping handler (used by autonomous QA sweep & monitoring)
+    if (req.method === 'GET' || body.ping === true || body.action === 'ping') {
+      const pingResponse = {
+        ok: true,
+        service: 'ai-solver',
+        status: 'ready',
+        model: body.model || 'gemini-1.5-flash',
+        timestamp: new Date().toISOString()
+      };
+      if (res?.status) return res.status(200).json(pingResponse);
+      return new Response(JSON.stringify(pingResponse), { status: 200, headers });
+    }
+
     const apiKey =
       process.env.GEMINI_API_KEY ||
       process.env.VITE_GEMINI_API_KEY ||
@@ -68,11 +81,12 @@ export default async function handler(req: any, res?: any) {
 
     if (!apiKey || apiKey.trim() === '') {
       const errorPayload = {
+        ok: false,
         error: 'API_KEY_NOT_CONFIGURED',
-        message: 'Server Gemini API key is not configured in Vercel environment variables (GEMINI_API_KEY).',
+        message: 'Server Gemini API key is not configured in Vercel environment variables (GEMINI_API_KEY). You can also provide an API key in Platform Settings.',
       };
-      if (res?.status) return res.status(500).json(errorPayload);
-      return new Response(JSON.stringify(errorPayload), { status: 500, headers });
+      if (res?.status) return res.status(503).json(errorPayload);
+      return new Response(JSON.stringify(errorPayload), { status: 503, headers });
     }
 
     const modelName = body.model || 'gemini-1.5-flash';

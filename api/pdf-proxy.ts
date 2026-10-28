@@ -60,7 +60,18 @@ function buildCandidateUrls(targetUrl: string, fallbackUrl?: string, examCode?: 
     candidates.push(fallbackUrl);
   }
 
+  const SIBLING_FALLBACK_MAP: Record<string, string> = {
+    '0510_s10_ms_13.pdf': '0510_s10_ms_11.pdf',
+    '0510_s10_ms_33.pdf': '0510_s10_ms_31.pdf',
+    '0510_w10_ms_42.pdf': '0510_w10_ms_41.pdf'
+  };
+
   if (filename) {
+    if (SIBLING_FALLBACK_MAP[filename]) {
+      const altFile = SIBLING_FALLBACK_MAP[filename];
+      candidates.push(`https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${altFile}`);
+    }
+
     const match = filename.match(/^([0-9]{4})_([smw])([0-9]{2})_([a-z]{2})(?:_([0-9]{1,2}))?\.pdf$/i);
 
     if (match) {

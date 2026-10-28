@@ -1270,6 +1270,8 @@ export function findQuestionByExamCode(input: string): PastPaperItem | null {
 // ==========================================================
 export const LOCAL_VERIFIED_PDFS: Record<string, string> = {
   '0510_s10_ms_13.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_s10_ms_11.pdf',
+  '0510_s10_ms_33.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_s10_ms_31.pdf',
+  '0510_w10_ms_42.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_w10_ms_41.pdf',
   '0510_s16_qp_12.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_s16_qp_11.pdf',
   '0510_w24_er.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_w23_er.pdf',
   '0580_s24_qp_41.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_qp_41.pdf',
@@ -1880,7 +1882,8 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
       backupQpUrl: 'https://pastpapers.papacambridge.com/?s=0580+Specimen',
       msPdfUrl: 'https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-mathematics-0580/',
       backupMsUrl: 'https://pastpapers.papacambridge.com/?s=0580+Specimen+Mark+Scheme',
-      fileSizeBytes: 'Official Specimen'
+      fileSizeBytes: 'Official Specimen',
+      isPortal: true
     },
     {
       id: 'pdf-0580-sp26-2',
@@ -1900,7 +1903,8 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
       backupQpUrl: 'https://pastpapers.papacambridge.com/?s=0580+Specimen',
       msPdfUrl: 'https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-mathematics-0580/',
       backupMsUrl: 'https://pastpapers.papacambridge.com/?s=0580+Specimen+Mark+Scheme',
-      fileSizeBytes: 'Official Specimen'
+      fileSizeBytes: 'Official Specimen',
+      isPortal: true
     },
     {
       id: 'pdf-0510-sp26-1',
@@ -1920,7 +1924,8 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
       backupQpUrl: 'https://pastpapers.papacambridge.com/?s=0510+Specimen+Paper+1',
       msPdfUrl: 'https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-english-second-language-oral-endorsement-0510/',
       backupMsUrl: 'https://pastpapers.papacambridge.com/?s=0510+Specimen+Paper+1+MS',
-      fileSizeBytes: 'Official Specimen'
+      fileSizeBytes: 'Official Specimen',
+      isPortal: true
     },
     {
       id: 'pdf-0510-sp26-2',
@@ -1940,7 +1945,8 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
       backupQpUrl: 'https://pastpapers.papacambridge.com/?s=0510+Specimen+Paper+2',
       msPdfUrl: 'https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-english-second-language-oral-endorsement-0510/',
       backupMsUrl: 'https://pastpapers.papacambridge.com/?s=0510+Specimen+Paper+2+MS',
-      fileSizeBytes: 'Official Specimen'
+      fileSizeBytes: 'Official Specimen',
+      isPortal: true
     },
     {
       id: 'pdf-0500-sp26-1',
@@ -1960,7 +1966,8 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
       backupQpUrl: 'https://pastpapers.papacambridge.com/?s=0500+Specimen',
       msPdfUrl: 'https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-english-first-language-0500/',
       backupMsUrl: 'https://pastpapers.papacambridge.com/?s=0500+Specimen+MS',
-      fileSizeBytes: 'Official Specimen'
+      fileSizeBytes: 'Official Specimen',
+      isPortal: true
     },
     {
       id: 'pdf-0580-sp25-4',
@@ -2120,8 +2127,9 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
       for (const sess of EDX_SESSIONS) {
         for (const p of edx.papers) {
           const paperCode = `${edx.code}/${p.suffix}`;
-          const qpUrl = `https://qualifications.pearson.com/en/support/support-topics/exams/past-papers.html?q=${encodeURIComponent(`${edx.name} ${yr} ${sess.label} ${p.suffix}`)}`;
-          const msUrl = `https://qualifications.pearson.com/en/support/support-topics/exams/past-papers.html?q=${encodeURIComponent(`${edx.name} ${yr} ${sess.label} ${p.suffix} Mark Scheme`)}`;
+          // Direct Pearson Subject Exam Materials Portal
+          const qpUrl = edx.specUrl;
+          const msUrl = edx.specUrl;
 
           result.push({
             id: `pdf-edx-${edx.code.toLowerCase()}-${yr}-${sess.sc}-${p.suffix.toLowerCase()}`,
@@ -2138,10 +2146,11 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
             paperCode,
             tier: p.tier,
             qpPdfUrl: qpUrl,
-            backupQpUrl: `https://pastpapers.papacambridge.com/?s=${encodeURIComponent(`${edx.code} ${yr} ${sess.label} ${p.suffix}`)}`,
+            backupQpUrl: `https://pastpapers.papacambridge.com/?s=${encodeURIComponent(`Edexcel ${edx.code} ${yr} ${sess.label} ${p.suffix}`)}`,
             msPdfUrl: msUrl,
-            backupMsUrl: `https://pastpapers.papacambridge.com/?s=${encodeURIComponent(`${edx.code} ${yr} ${sess.label} ${p.suffix} Mark Scheme`)}`,
-            fileSizeBytes: 'Official Exam Pack'
+            backupMsUrl: `https://pastpapers.papacambridge.com/?s=${encodeURIComponent(`Edexcel ${edx.code} ${yr} ${sess.label} ${p.suffix} Mark Scheme`)}`,
+            fileSizeBytes: 'Official Exam Pack',
+            isPortal: true
           });
         }
       }

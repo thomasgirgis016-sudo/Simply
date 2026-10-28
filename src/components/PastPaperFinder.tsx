@@ -1508,7 +1508,8 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                               <span className="hidden sm:inline">View</span>
                             </button>
                             {(() => {
-                              const isPortalPaper = pdf.board === 'Edexcel' || pdf.board === 'OxfordAQA' || pdf.qpPdfUrl.includes('pearson.com') || pdf.qpPdfUrl.includes('oxfordaqa.com');
+                              const isPortalPaper = Boolean(pdf.isPortal) || pdf.board === 'Edexcel' || pdf.board === 'OxfordAQA' || !pdf.qpPdfUrl.endsWith('.pdf') || pdf.qpPdfUrl.includes('cambridgeinternational.org') || pdf.qpPdfUrl.includes('pearson.com') || pdf.qpPdfUrl.includes('oxfordaqa.com');
+                              const portalHubLabel = pdf.board === 'Edexcel' ? 'Pearson Hub' : pdf.board === 'OxfordAQA' ? 'Oxford Hub' : 'Board Hub';
                               return (
                                 <>
                                   <a
@@ -1516,17 +1517,17 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="inline-flex items-center gap-1 rounded-lg border border-sky-500/40 bg-sky-500/10 px-2 py-1 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition"
-                                    title={isPortalPaper ? `Open official ${pdf.board} qualification hub` : "Open PDF directly in verified viewer"}
+                                    title={isPortalPaper ? `Open official ${pdf.board} qualification materials hub` : "Open PDF directly in verified viewer"}
                                   >
                                     <ExternalLink className="h-3.5 w-3.5" />
-                                    <span className="hidden sm:inline">{isPortalPaper ? 'Board Hub' : 'Open'}</span>
+                                    <span className="hidden sm:inline">{isPortalPaper ? portalHubLabel : 'Open'}</span>
                                   </a>
                                   <a
                                     href={isPortalPaper && pdf.backupQpUrl ? pdf.backupQpUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.qpPdfUrl)}${pdf.backupQpUrl ? `&fallback=${encodeURIComponent(pdf.backupQpUrl)}` : ''}&download=true`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="inline-flex items-center gap-1 rounded-lg bg-sky-600 px-2.5 py-1 text-xs font-bold text-white hover:bg-sky-500 transition shadow-sm"
-                                    title={isPortalPaper ? `Search verified PapaCambridge past paper pack for ${pdf.paperCode}` : "Download official Question Paper PDF"}
+                                    title={isPortalPaper ? `Search verified archive pack for ${pdf.paperCode}` : "Download official Question Paper PDF"}
                                   >
                                     <Download className="h-3.5 w-3.5" />
                                     <span>{isPortalPaper ? 'Archive Pack' : 'Download'}</span>
@@ -1565,7 +1566,8 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                 <span className="hidden sm:inline">View</span>
                               </button>
                               {(() => {
-                                const isPortalPaper = pdf.board === 'Edexcel' || pdf.board === 'OxfordAQA' || pdf.msPdfUrl!.includes('pearson.com') || pdf.msPdfUrl!.includes('oxfordaqa.com');
+                                const isPortalPaper = Boolean(pdf.isPortal) || pdf.board === 'Edexcel' || pdf.board === 'OxfordAQA' || !pdf.msPdfUrl!.endsWith('.pdf') || pdf.msPdfUrl!.includes('cambridgeinternational.org') || pdf.msPdfUrl!.includes('pearson.com') || pdf.msPdfUrl!.includes('oxfordaqa.com');
+                                const portalHubLabel = pdf.board === 'Edexcel' ? 'Pearson Hub' : pdf.board === 'OxfordAQA' ? 'Oxford Hub' : 'Board Hub';
                                 return (
                                   <>
                                     <a
@@ -1573,17 +1575,17 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20 transition"
-                                      title={isPortalPaper ? `Open official ${pdf.board} qualification hub` : "Open Mark Scheme in verified viewer"}
+                                      title={isPortalPaper ? `Open official ${pdf.board} qualification materials hub` : "Open Mark Scheme in verified viewer"}
                                     >
                                       <ExternalLink className="h-3.5 w-3.5" />
-                                      <span className="hidden sm:inline">{isPortalPaper ? 'Board Hub' : 'Open'}</span>
+                                      <span className="hidden sm:inline">{isPortalPaper ? portalHubLabel : 'Open'}</span>
                                     </a>
                                     <a
                                       href={isPortalPaper && pdf.backupMsUrl ? pdf.backupMsUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.msPdfUrl!)}${pdf.backupMsUrl ? `&fallback=${encodeURIComponent(pdf.backupMsUrl)}` : ''}&download=true`}
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-2.5 py-1 text-xs font-bold text-white hover:bg-emerald-500 transition shadow-sm"
-                                      title={isPortalPaper ? `Search verified PapaCambridge mark scheme pack for ${pdf.paperCode}` : "Download official Mark Scheme PDF"}
+                                      title={isPortalPaper ? `Search verified archive pack for ${pdf.paperCode} Mark Scheme` : "Download official Mark Scheme PDF"}
                                     >
                                       <Download className="h-3.5 w-3.5" />
                                       <span>{isPortalPaper ? 'Archive Pack' : 'Download'}</span>

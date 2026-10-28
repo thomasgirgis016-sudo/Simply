@@ -112,7 +112,7 @@ export const WorksheetBuilder: React.FC<WorksheetBuilderProps> = ({
   };
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6 animate-fadeIn pb-12">
+    <div className="mx-auto max-w-5xl space-y-6 animate-fadeIn pb-12 w-full max-w-full overflow-x-hidden">
       {/* ───────────────────────────────────────────────────────────── */}
       {/* Screen-Only Configuration Toolbar                             */}
       {/* ───────────────────────────────────────────────────────────── */}
@@ -257,10 +257,10 @@ export const WorksheetBuilder: React.FC<WorksheetBuilderProps> = ({
       {/* ───────────────────────────────────────────────────────────── */}
       {/* PRINTABLE DOCUMENT AREA                                      */}
       {/* ───────────────────────────────────────────────────────────── */}
-      <div className="rounded-3xl border border-slate-800 bg-slate-950 text-slate-100 p-6 sm:p-12 shadow-2xl print:bg-white print:text-black print:p-0 print:border-none print:shadow-none">
+      <div className="rounded-3xl border border-slate-800 bg-slate-950 text-slate-100 p-4 sm:p-8 md:p-12 shadow-2xl print:bg-white print:text-black print:p-0 print:border-none print:shadow-none w-full max-w-full overflow-hidden">
         {/* Cover Sheet Box */}
         <div className="border-b-2 border-black/80 pb-6 mb-8 text-black dark:text-white print:text-black">
-          <div className="flex justify-between items-start border-b border-black/40 pb-4 mb-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-3 border-b border-black/40 pb-4 mb-4">
             <div>
               <div className="text-sm font-black uppercase tracking-widest text-slate-500 print:text-black">
                 Cambridge Assessment International Education
@@ -273,17 +273,17 @@ export const WorksheetBuilder: React.FC<WorksheetBuilderProps> = ({
               </div>
             </div>
 
-            <div className="text-right font-mono text-xs border border-black/30 p-2 rounded">
+            <div className="text-left sm:text-right font-mono text-xs border border-black/30 p-2 rounded shrink-0">
               <div>MAXIMUM MARK: <strong className="text-base">{totalCalculatedMarks}</strong></div>
               <div>TIME: <strong>{Math.round(totalCalculatedMarks * 1.2)} minutes</strong></div>
             </div>
           </div>
 
           {activeView === 'student-qp' && (
-            <div className="grid grid-cols-2 gap-4 text-xs font-mono border border-black/40 p-3 rounded">
-              <div>CANDIDATE NAME: ___________________________</div>
-              <div>CENTRE NUMBER: ___________________________</div>
-              <div>CANDIDATE NUMBER: ___________________________</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-xs font-mono border border-black/40 p-3 rounded overflow-hidden">
+              <div className="truncate">CANDIDATE NAME: <span className="inline-block border-b border-black/60 w-28 sm:w-44 align-bottom"></span></div>
+              <div className="truncate">CENTRE NUMBER: <span className="inline-block border-b border-black/60 w-24 sm:w-36 align-bottom"></span></div>
+              <div className="truncate">CANDIDATE NUMBER: <span className="inline-block border-b border-black/60 w-24 sm:w-36 align-bottom"></span></div>
               <div>SCORE ATTAINED: _______ / {totalCalculatedMarks}</div>
             </div>
           )}
@@ -319,7 +319,7 @@ export const WorksheetBuilder: React.FC<WorksheetBuilderProps> = ({
                   <div className="border-b border-dashed border-slate-700/60 print:border-black/30 h-6" />
                   <div className="border-b border-dashed border-slate-700/60 print:border-black/30 h-6" />
                   <div className="flex justify-end pt-2 text-xs font-mono font-bold text-slate-400 print:text-black">
-                    Answer: _____________________________________
+                    Answer: <span className="inline-block border-b border-dashed border-slate-600/80 w-36 sm:w-64 align-bottom ml-2"></span>
                   </div>
                 </div>
               </div>

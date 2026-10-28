@@ -980,6 +980,37 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     validateKatexSyntax('\\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}')
   );
 
+  const overallHealthStatus = useMemo(() => {
+    if (fullQaSweepReport) {
+      if (fullQaSweepReport.failedCount > 0) {
+        return {
+          label: `${fullQaSweepReport.healthPercent}% Health (${fullQaSweepReport.failedCount} Failed)`,
+          color: 'bg-rose-500/20 text-rose-300 border-rose-500/30'
+        };
+      }
+      if (fullQaSweepReport.warningCount > 0) {
+        return {
+          label: `${fullQaSweepReport.healthPercent}% Health (${fullQaSweepReport.warningCount} Warnings)`,
+          color: 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+        };
+      }
+      return {
+        label: '100% Passed (0 Errors)',
+        color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+      };
+    }
+    if (qaReport.failedCount > 0) {
+      return {
+        label: `${qaReport.issues.length} Issues Detected`,
+        color: 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+      };
+    }
+    return {
+      label: '100% Passed (0 Errors)',
+      color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+    };
+  }, [fullQaSweepReport, qaReport]);
+
   const reloadBankTxs = () => {
     setBankTxs(getBankTransactions());
   };
@@ -1316,7 +1347,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <ShieldCheck className="h-4 w-4" />
           <span>Past Paper QA Agent</span>
           <span className="rounded-full bg-sky-500/20 px-2 py-0.5 text-[10px] text-sky-300 border border-sky-500/30">
-            {qaReport.failedCount === 0 ? '100% Passed' : `${qaReport.issues.length} Issues`}
+            {overallHealthStatus.label}
           </span>
         </button>
       </div>
@@ -3080,19 +3111,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <ShieldCheck className="h-4 w-4" />
                   </div>
                   <h2 className="text-lg font-bold text-white">Past Paper QA Verification Agent</h2>
-                  <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-black border ${
-                    qaReport.failedCount === 0
-                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
-                      : 'bg-amber-500/20 text-amber-300 border-amber-500/30'
-                  }`}>
-                    {qaReport.failedCount === 0 ? '100% Passed (0 Errors)' : `${qaReport.issues.length} Issues Detected`}
+                  <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-black border ${overallHealthStatus.color}`}>
+                    {overallHealthStatus.label}
                   </span>
                 </div>
                 <p className="text-xs text-slate-300">
-                  Internal verification engine scanning every question, sub-part, step mark scheme rubric, examiner report, and KaTeX math expression.
+                  Internal verification engine scanning past paper blueprints, step mark schemes, KaTeX math expressions, and proxy streaming endpoints.
                 </p>
                 <div className="text-[11px] font-mono text-slate-400">
-                  Last Scanned: {new Date(qaReport.scannedAt).toLocaleTimeString()} • Verified Against Cambridge (CIE) & Pearson Edexcel Syllabuses
+                  Last Scanned: {new Date(qaReport.scannedAt).toLocaleTimeString()} • Sample-tested live via proxy & CDN mirrors across Cambridge, Edexcel & OxfordAQA
                 </div>
               </div>
 
@@ -3273,7 +3300,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <FileText className="h-4 w-4 text-amber-400" />
               </div>
               <div className="text-2xl font-black text-amber-300 mt-1 font-mono">{qaReport.totalPdfsScanned} Papers</div>
-              <span className="text-[10px] text-slate-500">Linked to official PDFs</span>
+              <span className="text-[10px] text-slate-500">Sample-verified live via proxy & mirrors</span>
             </div>
           </div>
 
