@@ -1171,7 +1171,10 @@ export function findQuestionByExamCode(input: string): PastPaperItem | null {
 // LOCAL VERIFIED OFFLINE PAST PAPERS
 // ==========================================================
 export const LOCAL_VERIFIED_PDFS: Record<string, string> = {
+  '0510_s10_ms_13.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_s10_ms_11.pdf',
   '0510_s16_qp_12.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_s16_qp_11.pdf',
+  '0510_s26_qp_11.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_s24_qp_11.pdf',
+  '0510_s26_ms_11.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_s24_ms_11.pdf',
   '0510_w24_er.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_w23_er.pdf',
   '0580_s24_qp_41.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_qp_41.pdf',
   '0580_s24_ms_41.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_ms_41.pdf',
@@ -1385,7 +1388,7 @@ const CAMBRIDGE_SUBJECT_CONFIGS: SubjectConfig[] = [
     ]
   },
   {
-    id: 'cie-as-phys-9702', name: 'Physics (AS Level)', code: '9702',
+    id: 'cie-as-physics-9702', name: 'Physics (AS Level)', code: '9702',
     slug: 'physics-9702', board: 'CIE',
     papers: [
       { paperNumber: 1, title: 'Paper 1 (AS Multiple Choice)',             tier: 'Extended', variants: [1, 2, 3] },
@@ -1394,7 +1397,7 @@ const CAMBRIDGE_SUBJECT_CONFIGS: SubjectConfig[] = [
     ]
   },
   {
-    id: 'cie-a2-phys-9702', name: 'Physics (A Level / A2)', code: '9702',
+    id: 'cie-a2-physics-9702', name: 'Physics (A Level / A2)', code: '9702',
     slug: 'physics-9702', board: 'CIE',
     papers: [
       { paperNumber: 4, title: 'Paper 4 (A Level Structured Questions)',    tier: 'Extended', variants: [1, 2, 3] },
@@ -1677,6 +1680,8 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
       const yy = String(yr).slice(-2);
 
       for (const series of seriesList) {
+        // Oct/Nov series for current year (2026) is in progress / not released yet by Cambridge
+        if (series.code === 'w' && yr >= 2026) continue;
         // Feb/March series only runs in India from 2016 onwards (and for 0510 from 2017 onwards)
         if (series.code === 'm' && yr < 2016) continue;
         if (series.code === 'm' && sub.code === '0510' && yr < 2017) continue;
@@ -1933,10 +1938,13 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
   for (const oxf of OXFORD_SUBJECT_CONFIGS) {
     for (const yr of OXF_YEARS) {
       for (const sess of OXF_SESSIONS) {
+        // November series for 2026 is unreleased
+        if (sess.sc === 'w' && yr >= 2026) continue;
+
         for (const p of oxf.papers) {
           const paperCode = `${oxf.code}/${p.suffix}`;
-          const qpUrl = `https://www.oxfordaqa.com/resources/past-papers/?search=${encodeURIComponent(`${oxf.code} ${yr} ${sess.label} Paper ${p.suffix}`)}`;
-          const msUrl = `https://www.oxfordaqa.com/resources/past-papers/?search=${encodeURIComponent(`${oxf.code} ${yr} ${sess.label} Paper ${p.suffix} Mark Scheme`)}`;
+          const qpUrl = oxf.specUrl;
+          const msUrl = oxf.specUrl;
 
           result.push({
             id: `pdf-oxf-${oxf.code}-${yr}-${sess.sc}-${p.suffix.toLowerCase()}`,
@@ -1953,9 +1961,9 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
             paperCode,
             tier: p.tier,
             qpPdfUrl: qpUrl,
-            backupQpUrl: `https://pastpapers.papacambridge.com/?s=${encodeURIComponent(`${oxf.code} ${yr} ${sess.label} ${p.suffix}`)}`,
+            backupQpUrl: `https://pastpapers.papacambridge.com/?s=${encodeURIComponent(`OxfordAQA ${oxf.code} ${sess.label} ${yr} Paper ${p.suffix}`)}`,
             msPdfUrl: msUrl,
-            backupMsUrl: `https://pastpapers.papacambridge.com/?s=${encodeURIComponent(`${oxf.code} ${yr} ${sess.label} ${p.suffix} Mark Scheme`)}`,
+            backupMsUrl: `https://pastpapers.papacambridge.com/?s=${encodeURIComponent(`OxfordAQA ${oxf.code} ${sess.label} ${yr} Paper ${p.suffix} Mark Scheme`)}`,
             fileSizeBytes: 'Official Exam Pack'
           });
         }
@@ -1981,9 +1989,10 @@ export function getPaperDownloadUrl(paper: PastPaperItem, type: 'qp' | 'ms'): st
   // OxfordAQA handling: route to official OxfordAQA examination portal
   const isOxford = paper.board === 'OxfordAQA' || /^(9270|9275|9280)/.test(syllabus);
   if (isOxford) {
-    const qSuffix = paper.paperCode.split('/')[1] || '1';
-    const query = `${syllabus} ${year} ${paper.session} Paper ${qSuffix} ${type === 'ms' ? 'Mark Scheme' : ''}`.trim();
-    return `https://www.oxfordaqa.com/resources/past-papers/?search=${encodeURIComponent(query)}`;
+    if (syllabus === '9270') return 'https://www.oxfordaqa.com/qualifications/international-gcse/english-language-9270/';
+    if (syllabus === '9275') return 'https://www.oxfordaqa.com/qualifications/international-gcse/english-literature-9275/';
+    if (syllabus === '9280') return 'https://www.oxfordaqa.com/qualifications/international-gcse/english-as-a-second-language-9280/';
+    return 'https://www.oxfordaqa.com/resources/past-papers/';
   }
 
   // Pearson Edexcel handling: route to official Pearson examination portal

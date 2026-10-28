@@ -2583,6 +2583,124 @@ export function generate40McqQuestions(pdf: OfficialPaperPdf): PastPaperItem[] {
         correct = 'B';
         explanation = 'On average, approximately 10% of energy is incorporated into new biomass at the next level.';
       }
+    } else if (subjectCode === '0455' || subjectCode === '9708' || subjectCode === '4EC1') {
+      // Economics 0455 / 9708
+      if (q <= 10) {
+        topic = 'Basic Economic Problem & Factors of Production';
+        prompt = `Which factor of production earns interest as its financial reward?`;
+        optionA = 'Land';
+        optionB = 'Capital';
+        optionC = 'Labour';
+        optionD = 'Enterprise';
+        correct = 'B';
+        explanation = 'Capital equipment and investment funds earn interest as factor return.';
+      } else if (q <= 20) {
+        topic = 'Price Elasticity & Market Equilibrium';
+        prompt = `The price elasticity of demand (PED) for a good is $-0.4$. If the price increases by $10\\%$, what happens to total revenue?`;
+        optionA = 'Total revenue falls by 4%';
+        optionB = 'Total revenue rises';
+        optionC = 'Total revenue remains unchanged';
+        optionD = 'Total revenue falls to zero';
+        correct = 'B';
+        explanation = 'When demand is inelastic (|PED| < 1), a price rise leads to a proportionately smaller drop in quantity demanded, so total revenue increases.';
+      } else if (q <= 30) {
+        topic = 'Government Macroeconomic Objectives';
+        prompt = `Which policy measure is an example of an expansionary fiscal policy?`;
+        optionA = 'Increasing the rate of value-added tax (VAT)';
+        optionB = 'Increasing government capital expenditure on infrastructure';
+        optionC = 'Increasing the central bank interest rate';
+        optionD = 'Decreasing unemployment benefit payouts';
+        correct = 'B';
+        explanation = 'Fiscal policy involves government spending and taxation. Increasing infrastructure spending stimulates aggregate demand.';
+      } else {
+        topic = 'International Trade & Exchange Rates';
+        prompt = `A depreciation in a country's exchange rate will usually lead to which economic outcome?`;
+        optionA = 'Cheaper imports and dearer exports';
+        optionB = 'Dearer imports and cheaper exports in foreign currency';
+        optionC = 'Immediate decrease in domestic inflation';
+        optionD = 'A surplus on the capital account';
+        correct = 'B';
+        explanation = 'Depreciation lowers the export price in foreign currency and increases the domestic cost of imported goods.';
+      }
+    } else if (subjectCode === '0478' || subjectCode === '4CP0') {
+      // Computer Science 0478 / 4CP0
+      if (q <= 10) {
+        topic = 'Data Representation & Number Bases';
+        prompt = `What is the denary (base-10) equivalent of the 8-bit binary number $01011100_2$?`;
+        optionA = '$76_{10}$';
+        optionB = '$92_{10}$';
+        optionC = '$116_{10}$';
+        optionD = '$124_{10}$';
+        correct = 'B';
+        explanation = '64 + 16 + 8 + 4 = 92.';
+      } else if (q <= 20) {
+        topic = 'Logic Gates & Truth Tables';
+        prompt = `Which logic gate produces a HIGH output (1) ONLY when all of its inputs are LOW (0)?`;
+        optionA = 'NAND gate';
+        optionB = 'NOR gate';
+        optionC = 'XOR gate';
+        optionD = 'AND gate';
+        correct = 'B';
+        explanation = 'A NOR gate (NOT-OR) outputs 1 only when neither input is 1 (i.e. both inputs 0).';
+      } else if (q <= 30) {
+        topic = 'Hardware & Operating Systems';
+        prompt = `Which component in the CPU holds the address of the next instruction to be fetched from memory?`;
+        optionA = 'Memory Data Register (MDR)';
+        optionB = 'Program Counter (PC)';
+        optionC = 'Accumulator (ACC)';
+        optionD = 'Current Instruction Register (CIR)';
+        correct = 'B';
+        explanation = 'The Program Counter stores the address of the next instruction in the fetch-decode-execute cycle.';
+      } else {
+        topic = 'Network Security & Encryption';
+        prompt = `Which type of malware disguises itself as legitimate software to gain unauthorized access to a computer system?`;
+        optionA = 'Worm';
+        optionB = 'Trojan horse';
+        optionC = 'Spyware';
+        optionD = 'Ransomware';
+        correct = 'B';
+        explanation = 'A Trojan horse conceals its malicious payload inside harmless-looking files or programs.';
+      }
+    } else {
+      // General / Mathematics / Business / Humanities Discrete Item
+      const rot = q % 4;
+      if (rot === 0) {
+        topic = 'Syllabus Concepts & Core Working';
+        prompt = `Which statement correctly identifies an essential requirement for obtaining full method marks on multi-step Cambridge questions?`;
+        optionA = 'Stating the final answer only with no intermediate steps';
+        optionB = 'Showing complete substitution into the formula before calculation';
+        optionC = 'Rounding intermediate values to 1 significant figure';
+        optionD = 'Omitting SI units in physics calculations';
+        correct = 'B';
+        explanation = 'Method marks [M] require explicit evidence of formula substitution or algebraic rearrangement.';
+      } else if (rot === 1) {
+        topic = 'Data Analysis & Interpretation';
+        prompt = `A sample of data has values: $4, 7, 7, 8, 11, 14, 19$.\nWhat is the median of this distribution?`;
+        optionA = '$7.0$';
+        optionB = '$8.0$';
+        optionC = '$9.5$';
+        optionD = '$10.0$';
+        correct = 'B';
+        explanation = 'With 7 ordered values, the median is the 4th value: 8.';
+      } else if (rot === 2) {
+        topic = 'Percentages & Proportions';
+        prompt = `An item originally priced at $80$ is reduced by $15\\%$, then increased by $10\\%$.\nWhat is the final price of the item?`;
+        optionA = '$\\$74.80$';
+        optionB = '$\\$76.00$';
+        optionC = '$\\$78.20$';
+        optionD = '$\\$80.00$';
+        correct = 'A';
+        explanation = '80 * 0.85 = 68. Then 68 * 1.10 = 74.80.';
+      } else {
+        topic = 'Experimental Accuracy & Error Reduction';
+        prompt = `To reduce percentage uncertainty when measuring the time period of a simple pendulum, what procedure should be followed?`;
+        optionA = 'Time a single oscillation with a smartphone';
+        optionB = 'Time 20 complete oscillations and divide the measured time by 20';
+        optionC = 'Increase the angle of release to 90 degrees';
+        optionD = 'Use a heavier pendulum bob without timing oscillations';
+        correct = 'B';
+        explanation = 'Timing multiple oscillations spreads human reaction-time error across 20 cycles, significantly reducing percentage uncertainty.';
+      }
     }
 
     const questionPrompt = `[${pdf.paperCode} ${pdf.session} - Question ${q}]\n` +

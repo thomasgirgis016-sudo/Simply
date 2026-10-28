@@ -5,7 +5,7 @@ const STORAGE_KEY = 'simply_mistake_notebook';
 export const INITIAL_MISTAKES: MistakeItem[] = [
   {
     id: 'mstk-1',
-    subjectId: 'sub-math-0580',
+    subjectId: 'cie-math-0580',
     subjectCode: '0580',
     topic: 'Trigonometry & Bearings',
     paperCode: '0580/42/M/J/23',
@@ -23,7 +23,7 @@ export const INITIAL_MISTAKES: MistakeItem[] = [
   },
   {
     id: 'mstk-2',
-    subjectId: 'sub-chem-0620',
+    subjectId: 'cie-chem-0620',
     subjectCode: '0620',
     topic: 'Stoichiometry & Gas Volumes',
     paperCode: '0620/41/O/N/23',
@@ -41,7 +41,7 @@ export const INITIAL_MISTAKES: MistakeItem[] = [
   },
   {
     id: 'mstk-3',
-    subjectId: 'sub-phys-0625',
+    subjectId: 'cie-physics-0625',
     subjectCode: '0625',
     topic: 'Thermal Physics & Specific Heat Capacity',
     paperCode: '0625/42/M/J/22',
@@ -60,7 +60,7 @@ export const INITIAL_MISTAKES: MistakeItem[] = [
   },
   {
     id: 'mstk-4',
-    subjectId: 'sub-bio-0610',
+    subjectId: 'cie-bio-0610',
     subjectCode: '0610',
     topic: 'Enzymes & Temperature',
     paperCode: '0610/43/M/J/23',
@@ -78,7 +78,7 @@ export const INITIAL_MISTAKES: MistakeItem[] = [
   },
   {
     id: 'mstk-5',
-    subjectId: 'sub-math-0580',
+    subjectId: 'cie-math-0580',
     subjectCode: '0580',
     topic: 'Algebra & Quadratic Equations',
     paperCode: '0580/22/O/N/22',
@@ -91,6 +91,24 @@ export const INITIAL_MISTAKES: MistakeItem[] = [
     marksLost: 1,
     totalMarks: 3,
     addedAt: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString(),
+    isMastered: false,
+    rematchAttempts: 0,
+  },
+  {
+    id: 'mstk-6',
+    subjectId: 'cie-esl-0510',
+    subjectCode: '0510',
+    topic: 'Reading & Directed Writing',
+    paperCode: '0510/22/M/J/23',
+    questionNumber: 'Exercise 6',
+    questionPrompt: 'Write an article for your school magazine about the benefits and challenges of artificial intelligence in education.',
+    myMistakeAnswer: 'Wrote in an informal SMS style and forgot to organize arguments into paragraphs.',
+    markSchemeAnswer: 'Effective formal register, clear paragraphing (introduction, balanced body points, conclusion), accurate cohesive devices.',
+    examinerTip: 'Examiner Report: Failure to write in clear paragraphs automatically caps the organization criterion at Band 2.',
+    reason: 'misread_command',
+    marksLost: 3,
+    totalMarks: 16,
+    addedAt: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString(),
     isMastered: false,
     rematchAttempts: 0,
   }

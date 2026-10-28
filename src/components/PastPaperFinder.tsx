@@ -1507,25 +1507,32 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                               <Eye className="h-3.5 w-3.5 text-sky-400" />
                               <span className="hidden sm:inline">View</span>
                             </button>
-                            <a
-                              href={pdf.board === 'Edexcel' || pdf.qpPdfUrl.includes('pearson.com') ? pdf.qpPdfUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.qpPdfUrl)}${pdf.backupQpUrl ? `&fallback=${encodeURIComponent(pdf.backupQpUrl)}` : ''}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 rounded-lg border border-sky-500/40 bg-sky-500/10 px-2 py-1 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition"
-                              title="Open PDF directly in verified viewer"
-                            >
-                              <ExternalLink className="h-3.5 w-3.5" />
-                              <span className="hidden sm:inline">{pdf.board === 'Edexcel' ? 'Portal' : 'Open'}</span>
-                            </a>
-                            <a
-                              href={pdf.board === 'Edexcel' || pdf.qpPdfUrl.includes('pearson.com') ? pdf.qpPdfUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.qpPdfUrl)}${pdf.backupQpUrl ? `&fallback=${encodeURIComponent(pdf.backupQpUrl)}` : ''}&download=true`}
-                              {...(pdf.board === 'Edexcel' || pdf.qpPdfUrl.includes('pearson.com') ? { target: '_blank', rel: 'noopener noreferrer' } : { download: true })}
-                              className="inline-flex items-center gap-1 rounded-lg bg-sky-600 px-2.5 py-1 text-xs font-bold text-white hover:bg-sky-500 transition shadow-sm"
-                              title="Download official Question Paper PDF"
-                            >
-                              <Download className="h-3.5 w-3.5" />
-                              <span>{pdf.board === 'Edexcel' ? 'Portal' : 'Download'}</span>
-                            </a>
+                            {(() => {
+                              const isPortalPaper = pdf.board === 'Edexcel' || pdf.board === 'OxfordAQA' || pdf.qpPdfUrl.includes('pearson.com') || pdf.qpPdfUrl.includes('oxfordaqa.com');
+                              return (
+                                <>
+                                  <a
+                                    href={isPortalPaper ? pdf.qpPdfUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.qpPdfUrl)}${pdf.backupQpUrl ? `&fallback=${encodeURIComponent(pdf.backupQpUrl)}` : ''}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 rounded-lg border border-sky-500/40 bg-sky-500/10 px-2 py-1 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition"
+                                    title={isPortalPaper ? `Open official ${pdf.board} portal` : "Open PDF directly in verified viewer"}
+                                  >
+                                    <ExternalLink className="h-3.5 w-3.5" />
+                                    <span className="hidden sm:inline">{isPortalPaper ? 'Portal' : 'Open'}</span>
+                                  </a>
+                                  <a
+                                    href={isPortalPaper ? pdf.qpPdfUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.qpPdfUrl)}${pdf.backupQpUrl ? `&fallback=${encodeURIComponent(pdf.backupQpUrl)}` : ''}&download=true`}
+                                    {...(isPortalPaper ? { target: '_blank', rel: 'noopener noreferrer' } : { download: true })}
+                                    className="inline-flex items-center gap-1 rounded-lg bg-sky-600 px-2.5 py-1 text-xs font-bold text-white hover:bg-sky-500 transition shadow-sm"
+                                    title={isPortalPaper ? `Access official ${pdf.board} exam materials` : "Download official Question Paper PDF"}
+                                  >
+                                    <Download className="h-3.5 w-3.5" />
+                                    <span>{isPortalPaper ? 'Portal' : 'Download'}</span>
+                                  </a>
+                                </>
+                              );
+                            })()}
                           </div>
                         </div>
 
@@ -1556,25 +1563,32 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                 <Eye className="h-3.5 w-3.5 text-emerald-400" />
                                 <span className="hidden sm:inline">View</span>
                               </button>
-                              <a
-                                href={pdf.board === 'Edexcel' || pdf.msPdfUrl.includes('pearson.com') ? pdf.msPdfUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.msPdfUrl)}${pdf.backupMsUrl ? `&fallback=${encodeURIComponent(pdf.backupMsUrl)}` : ''}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20 transition"
-                                title="Open Mark Scheme in verified viewer"
-                              >
-                                <ExternalLink className="h-3.5 w-3.5" />
-                                <span className="hidden sm:inline">{pdf.board === 'Edexcel' ? 'Portal' : 'Open'}</span>
-                              </a>
-                              <a
-                                href={pdf.board === 'Edexcel' || pdf.msPdfUrl.includes('pearson.com') ? pdf.msPdfUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.msPdfUrl)}${pdf.backupMsUrl ? `&fallback=${encodeURIComponent(pdf.backupMsUrl)}` : ''}&download=true`}
-                                {...(pdf.board === 'Edexcel' || pdf.msPdfUrl.includes('pearson.com') ? { target: '_blank', rel: 'noopener noreferrer' } : { download: true })}
-                                className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-2.5 py-1 text-xs font-bold text-white hover:bg-emerald-500 transition shadow-sm"
-                                title="Download official Mark Scheme PDF"
-                              >
-                                <Download className="h-3.5 w-3.5" />
-                                <span>{pdf.board === 'Edexcel' ? 'Portal' : 'Download'}</span>
-                              </a>
+                              {(() => {
+                                const isPortalPaper = pdf.board === 'Edexcel' || pdf.board === 'OxfordAQA' || pdf.msPdfUrl!.includes('pearson.com') || pdf.msPdfUrl!.includes('oxfordaqa.com');
+                                return (
+                                  <>
+                                    <a
+                                      href={isPortalPaper ? pdf.msPdfUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.msPdfUrl!)}${pdf.backupMsUrl ? `&fallback=${encodeURIComponent(pdf.backupMsUrl)}` : ''}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20 transition"
+                                      title={isPortalPaper ? `Open official ${pdf.board} mark scheme portal` : "Open Mark Scheme in verified viewer"}
+                                    >
+                                      <ExternalLink className="h-3.5 w-3.5" />
+                                      <span className="hidden sm:inline">{isPortalPaper ? 'Portal' : 'Open'}</span>
+                                    </a>
+                                    <a
+                                      href={isPortalPaper ? pdf.msPdfUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.msPdfUrl!)}${pdf.backupMsUrl ? `&fallback=${encodeURIComponent(pdf.backupMsUrl)}` : ''}&download=true`}
+                                      {...(isPortalPaper ? { target: '_blank', rel: 'noopener noreferrer' } : { download: true })}
+                                      className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-2.5 py-1 text-xs font-bold text-white hover:bg-emerald-500 transition shadow-sm"
+                                      title={isPortalPaper ? `Access official ${pdf.board} mark scheme` : "Download official Mark Scheme PDF"}
+                                    >
+                                      <Download className="h-3.5 w-3.5" />
+                                      <span>{isPortalPaper ? 'Portal' : 'Download'}</span>
+                                    </a>
+                                  </>
+                                );
+                              })()}
                             </div>
                           </div>
                         )}

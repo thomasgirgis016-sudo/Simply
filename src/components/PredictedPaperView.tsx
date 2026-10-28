@@ -28,7 +28,7 @@ export const PredictedPaperView: React.FC<PredictedPaperViewProps> = ({
   profile,
   onSitPredictedMock,
 }) => {
-  const [selectedSeries, setSelectedSeries] = useState<'May/June 2025' | 'Oct/Nov 2025'>('May/June 2025');
+  const [selectedSeries, setSelectedSeries] = useState<'May/June 2026' | 'Oct/Nov 2026' | 'May/June 2025 (Archive)'>('May/June 2026');
   const [activeTab, setActiveTab] = useState<'overview' | 'paper-view'>('overview');
 
   const subjectPapers = useMemo(() => {
@@ -72,7 +72,7 @@ export const PredictedPaperView: React.FC<PredictedPaperViewProps> = ({
               Cambridge {selectedSeries} Predicted Paper
             </h1>
             <p className="text-xs sm:text-sm text-slate-300 max-w-2xl">
-              Algorithmic exam prediction based on historical topic appearances across 2016–2024 Cambridge series for <strong className="text-white">{subject.name} ({subject.code})</strong>.
+              Algorithmic exam prediction based on historical topic appearances across 2016–2025 Cambridge series for <strong className="text-white">{subject.name} ({subject.code})</strong>.
             </p>
           </div>
 
@@ -92,7 +92,7 @@ export const PredictedPaperView: React.FC<PredictedPaperViewProps> = ({
       {/* Series Switcher & Mode Tabs */}
       <div className="flex items-center justify-between gap-3 border-b border-slate-800 pb-3 flex-wrap">
         <div className="flex items-center gap-2">
-          {(['May/June 2025', 'Oct/Nov 2025'] as const).map(series => (
+          {(['May/June 2026', 'Oct/Nov 2026', 'May/June 2025 (Archive)'] as const).map(series => (
             <button
               key={series}
               type="button"
@@ -103,7 +103,7 @@ export const PredictedPaperView: React.FC<PredictedPaperViewProps> = ({
                   : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
               }`}
             >
-              {series} Series
+              {series}
             </button>
           ))}
         </div>

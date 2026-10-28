@@ -89,9 +89,9 @@ export const AboutSimplyModal: React.FC<AboutSimplyModalProps> = ({
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/20 mb-3">
                   <FileText className="h-4.5 w-4.5" />
                 </div>
-                <h4 className="text-sm font-bold text-white mb-1.5">3,500+ Past Papers & Split Viewer</h4>
+                <h4 className="text-sm font-bold text-white mb-1.5">9,500+ Past Papers & Split Viewer</h4>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Real examination questions from 2016 through 2025 across all series (May/June, Oct/Nov) and variants. Practice in synchronized dual-pane mode alongside official mark schemes with method (<strong className="text-slate-300">M</strong>), accuracy (<strong className="text-slate-300">A</strong>), and independent (<strong className="text-slate-300">B</strong>) mark breakdowns.
+                  Real examination questions from 2010 through 2026 across all series (May/June, Oct/Nov, Feb/March) and variants. Practice in synchronized dual-pane mode alongside official mark schemes with method (<strong className="text-slate-300">M</strong>), accuracy (<strong className="text-slate-300">A</strong>), and independent (<strong className="text-slate-300">B</strong>) mark breakdowns.
                 </p>
               </div>
             </div>
@@ -225,7 +225,7 @@ export const AboutSimplyModal: React.FC<AboutSimplyModalProps> = ({
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-800 pt-5">
           <div className="flex items-center gap-2 text-xs text-slate-400">
             <ShieldCheck className="h-4 w-4 text-emerald-400" />
-            <span>Strict Mark Scheme Compliance • Zero AI Speculation • 100% Free Access</span>
+            <span>Strict Mark Scheme Compliance • Zero AI Speculation • Free Core Access & Optional AI Pro</span>
           </div>
 
           <div className="flex items-center gap-2.5 w-full sm:w-auto">

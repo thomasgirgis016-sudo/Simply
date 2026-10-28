@@ -148,11 +148,11 @@ const DEFAULT_THRESHOLD: GradeBoundaryThreshold = {
 };
 
 const SERIES_OFFSETS: Record<string, number> = {
-  'November 2024 Exam Series (Latest Confirmed)': 1,
-  'June 2024 Exam Series': 0,
-  'November 2023 Exam Series': -1,
-  'June 2023 Exam Series': -2,
-  '2025 Projected Thresholds (Standard Alignment)': 2,
+  'June 2025 Exam Series (Latest Confirmed)': 1,
+  'November 2024 Exam Series': 0,
+  'June 2024 Exam Series': -1,
+  'November 2023 Exam Series': -2,
+  '2026 Projected Thresholds (Current Cycle)': 2,
 };
 
 const VARIANT_OFFSETS: Record<string, number> = {
@@ -173,7 +173,7 @@ export const GradeBoundariesCalculator: React.FC<GradeBoundariesCalculatorProps>
   const [paper2Mark, setPaper2Mark] = useState<number>(34);
   const [paper4Mark, setPaper4Mark] = useState<number>(68);
   const [paper6Mark, setPaper6Mark] = useState<number>(32);
-  const [selectedSeries, setSelectedSeries] = useState<string>('November 2024 Exam Series (Latest Confirmed)');
+  const [selectedSeries, setSelectedSeries] = useState<string>('June 2025 Exam Series (Latest Confirmed)');
   const [selectedVariant, setSelectedVariant] = useState<string>('Variant 2 (12, 22, 42, 62)');
 
   const baseBoundary = HISTORIC_BOUNDARIES[activeSubject.id] || DEFAULT_THRESHOLD;
@@ -291,11 +291,11 @@ export const GradeBoundariesCalculator: React.FC<GradeBoundariesCalculatorProps>
               onChange={(e) => setSelectedSeries(e.target.value)}
               className="rounded-xl border border-slate-700 bg-slate-900/90 px-3 py-2 text-xs font-semibold text-slate-200 focus:border-amber-500 focus:outline-none cursor-pointer"
             >
-              <option value="November 2024 Exam Series (Latest Confirmed)">November 2024 (Latest Confirmed)</option>
+              <option value="June 2025 Exam Series (Latest Confirmed)">June 2025 (Latest Confirmed)</option>
+              <option value="November 2024 Exam Series">November 2024 Series</option>
               <option value="June 2024 Exam Series">June 2024 Series</option>
               <option value="November 2023 Exam Series">November 2023 Series</option>
-              <option value="June 2023 Exam Series">June 2023 Series</option>
-              <option value="2025 Projected Thresholds (Standard Alignment)">2025 Projected Standards</option>
+              <option value="2026 Projected Thresholds (Current Cycle)">2026 Projected Standards</option>
             </select>
 
             {/* Variant selector */}

@@ -124,8 +124,13 @@ export function completeDailyChallenge(params: {
 // Deterministically picks today's high-yield Cambridge challenge question for a subject
 export function getDailyChallengeQuestion(subject: Subject): PastPaperItem {
   const all = getAllPastPapers();
-  const matched = all.filter(p => p.subjectId === subject.id || p.subjectId.includes(subject.code));
-  const pool = matched.length > 0 ? matched : all;
+  const matched = all.filter(p => {
+    const isSub = p.subjectId === subject.id || p.subjectId.includes(subject.code) || Boolean(p.subjectCode && subject.id.includes(p.subjectCode));
+    const hasValidContent = Boolean(p.finalAnswer && p.finalAnswer.trim().length > 0 && !p.questionPrompt.includes('Option A statement'));
+    return isSub && hasValidContent;
+  });
+  const fallback = all.filter(p => p.finalAnswer && p.finalAnswer.trim().length > 0 && !p.questionPrompt.includes('Option A statement'));
+  const pool = matched.length > 0 ? matched : fallback.length > 0 ? fallback : all;
 
   // Use date hash for consistent question of the day across all users
   const today = getTodayDateString();

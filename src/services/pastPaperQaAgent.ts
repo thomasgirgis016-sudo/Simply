@@ -200,6 +200,26 @@ export function runPastPaperQaAgent(
         details: `Invalid Examiner Report PDF link: ${pdf.examinerReportUrl}`
       });
     }
+
+    // Validate syllabus timeline and unreleased series constraints
+    if (pdf.seasonCode === 'm' && pdf.year < 2016) {
+      issues.push({
+        paperId: pdf.id,
+        paperCode: pdf.paperCode,
+        questionNumber: 'Feb/March Series Timeline',
+        issueType: 'broken_link',
+        details: `Feb/March series did not exist before 2016 in Cambridge curriculum.`
+      });
+    }
+    if (pdf.seasonCode === 'w' && pdf.year >= 2026) {
+      issues.push({
+        paperId: pdf.id,
+        paperCode: pdf.paperCode,
+        questionNumber: 'Oct/Nov 2026 Series Release Status',
+        issueType: 'broken_link',
+        details: `Oct/Nov 2026 examination series has not concluded or been published yet.`
+      });
+    }
   }
 
   const totalScanned = activePapers.length;

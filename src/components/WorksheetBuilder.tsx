@@ -30,7 +30,7 @@ export const WorksheetBuilder: React.FC<WorksheetBuilderProps> = ({
   const [worksheetTitle, setWorksheetTitle] = useState(`${subject.name} Unit Revision & Mastery Test`);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [difficultyFilter, setDifficultyFilter] = useState<'All' | 'Core' | 'Extended' | 'Grade 9 Challenge'>('All');
-  const [targetMarks, setTargetMarks] = useState<number>(30);
+  const [targetMarks, setTargetMarks] = useState<number>(25);
   const [activeView, setActiveView] = useState<'student-qp' | 'teacher-ms'>('student-qp');
 
   const subjectPapers = useMemo(() => {
@@ -64,12 +64,17 @@ export const WorksheetBuilder: React.FC<WorksheetBuilderProps> = ({
     const selected: PastPaperItem[] = [];
 
     for (const q of pool) {
-      if (accumulatedMarks >= targetMarks) break;
+      const qMarks = q.marks || 4;
+      // If we already have questions and adding this one exceeds the target significantly, stop
+      if (accumulatedMarks > 0 && accumulatedMarks + qMarks > targetMarks + 4) {
+        break;
+      }
       selected.push(q);
-      accumulatedMarks += (q.marks || 4);
+      accumulatedMarks += qMarks;
+      if (accumulatedMarks >= targetMarks) break;
     }
 
-    return selected.length > 0 ? selected : subjectPapers.slice(0, 4);
+    return selected.length > 0 ? selected : subjectPapers.slice(0, 2);
   }, [subjectPapers, selectedTopics, difficultyFilter, targetMarks]);
 
   const totalCalculatedMarks = useMemo(() => {
@@ -145,6 +150,7 @@ export const WorksheetBuilder: React.FC<WorksheetBuilderProps> = ({
               >
                 <option value={15}>15 Marks (~20 mins)</option>
                 <option value={25}>25 Marks (~30 mins)</option>
+                <option value={30}>30 Marks (~35 mins)</option>
                 <option value={40}>40 Marks (~50 mins)</option>
                 <option value={60}>60 Marks (~1 hour 15 mins)</option>
                 <option value={80}>80 Marks (~Full Extended Paper)</option>

@@ -61,10 +61,17 @@ export const CompleteRevisionKitModal: React.FC<CompleteRevisionKitModalProps> =
   const unmasteredMistakes = useMemo(() => {
     try {
       const all = getMistakeNotebook();
-      return all.filter((m) => {
-        const matchSub = m.subjectId === selectedSubject.id || m.subjectCode === selectedSubject.code;
+      const subCodeNum = selectedSubject.code.match(/\d{4}/)?.[0] || selectedSubject.code;
+      const subjectMistakes = all.filter((m) => {
+        const matchSub =
+          m.subjectId === selectedSubject.id ||
+          m.subjectCode === selectedSubject.code ||
+          m.subjectCode === subCodeNum ||
+          selectedSubject.code.includes(m.subjectCode) ||
+          selectedSubject.id.includes(m.subjectCode);
         return matchSub && !m.isMastered;
       });
+      return subjectMistakes.length > 0 ? subjectMistakes : all.filter(m => !m.isMastered).slice(0, 3);
     } catch {
       return [];
     }

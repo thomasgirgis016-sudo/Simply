@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { Subject, UserProfile } from '../types';
 import { MathRenderer } from './MathRenderer';
+import { OFFICIAL_PAST_PAPER_PDFS } from '../data/pastPapersData';
 
 interface ExamQuestionItem {
   number: number;
@@ -161,6 +162,59 @@ const SAMPLE_EXAM_PAPERS: Record<string, ExamQuestionItem[]> = {
       finalAnswer: '$1.0\\text{ m/s}$',
       examinerTrap: 'Forgetting to include the "in the absence of external forces" clause in the definition loses the definition mark in almost 60% of scripts.'
     }
+  ],
+  'cie-esl-0510': [
+    {
+      number: 1,
+      subpart: '(a)',
+      marks: 3,
+      paperRef: 'CIE 0510/22 May/June 2023 Exercise 1',
+      questionPrompt: 'Read the article about the discovery of deep-sea hydrothermal vents and answer the following questions:\n\n(i) According to paragraph 1, what unexpected feature did scientists observe on the seabed?\n(ii) Give two reasons why scientists initially thought animal life could not survive around the vents.',
+      diagramOrMath: 'Syllabus Assessment Objectives: R1 (Identify factual details) & R2 (Understand ideas/opinions)',
+      markSchemePoints: [
+        {
+          markType: '[1] Content Mark',
+          requirement: 'Chimneys / mineral towers emitting black clouds of hot mineral-rich fluid / mineral smoke.',
+          guidance: 'Award 1 mark for mentioning chimneys/towers or black smoke fluid.'
+        },
+        {
+          markType: '[2] Content Marks',
+          requirement: 'Extreme pressure (at great depth) AND total absence of sunlight / complete darkness (preventing photosynthesis).',
+          guidance: 'Award 1 mark for each valid reason. Allow boiling temperatures / toxic chemicals.'
+        }
+      ],
+      finalAnswer: '(i) Mineral chimneys emitting black mineral-rich fluid; (ii) Total absence of sunlight and extreme water pressure.',
+      examinerTrap: 'Lifting long whole sentences from the text instead of isolating the precise factual answer risks exceeding the line boundary and losing the mark.'
+    }
+  ],
+  'cie-bio-0610': [
+    {
+      number: 1,
+      subpart: '(a)',
+      marks: 3,
+      paperRef: 'CIE 0610/42 May/June 2023 Q1(a)',
+      questionPrompt: 'Explain how the structure of a red blood cell is adapted to its function of transporting oxygen throughout the body.',
+      diagramOrMath: 'Biconcave disc \\implies \\text{high surface area:volume ratio} \\quad | \\quad \\text{Haemoglobin} \\implies \\text{oxygen binding}',
+      markSchemePoints: [
+        {
+          markType: '[B1] Independent Mark',
+          requirement: 'Biconcave disc shape increases the surface area to volume ratio for faster diffusion of oxygen.',
+          guidance: 'Must connect biconcave shape to surface area and diffusion rate.'
+        },
+        {
+          markType: '[B1] Independent Mark',
+          requirement: 'Contains haemoglobin which binds reversibly with oxygen to form oxyhaemoglobin.',
+          guidance: 'Mention of haemoglobin required.'
+        },
+        {
+          markType: '[B1] Independent Mark',
+          requirement: 'Absence of nucleus allows more space to pack haemoglobin molecules.',
+          guidance: 'Accept flexible membrane to squeeze through narrow capillaries.'
+        }
+      ],
+      finalAnswer: 'Biconcave disc shape increases surface area:volume ratio; packed with haemoglobin; no nucleus maximizes oxygen capacity.',
+      examinerTrap: 'Stating "red blood cells carry oxygen" without explaining the structural adaptations (biconcave, haemoglobin, no nucleus) awards 0 marks.'
+    }
   ]
 };
 
@@ -221,8 +275,15 @@ export const SplitScreenPaperViewer: React.FC<SplitScreenPaperViewerProps> = ({
   const currentQ = questions[activeQuestionIndex] || questions[0];
   const targetTimeMinutes = Math.round(currentQ.marks * 1.5); // 1.5 min per mark standard
 
-  // Official PDF Fallback URL for paper
-  const officialPdfUrl = `https://papers.gceguide.com/Cambridge%20IGCSE/${activeSubject.code.match(/\d{4}/)?.[0] || '0580'}/2023/${activeSubject.code.match(/\d{4}/)?.[0] || '0580'}_s23_qp_42.pdf`;
+  // Official PDF Fallback URL for paper matched directly to the active subject
+  const matchingPdf = OFFICIAL_PAST_PAPER_PDFS.find(
+    (p) => p.subjectId === activeSubject.id && p.year === 2023 && p.seasonCode === 's'
+  ) || OFFICIAL_PAST_PAPER_PDFS.find(
+    (p) => p.subjectId === activeSubject.id
+  );
+  const subjectNumCode = activeSubject.code.match(/\d{4}/)?.[0] || '0580';
+  const defaultComp = activeSubject.id.includes('esl') || subjectNumCode === '0510' ? '22' : '42';
+  const officialPdfUrl = matchingPdf?.qpPdfUrl || `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${subjectNumCode}_s23_qp_${defaultComp}.pdf`;
 
   useEffect(() => {
     let interval: any = null;
