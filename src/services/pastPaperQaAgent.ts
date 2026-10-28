@@ -202,7 +202,7 @@ export function runPastPaperQaAgent(
     }
 
     // Validate syllabus timeline and unreleased series constraints
-    if (pdf.seasonCode === 'm' && pdf.year < 2016) {
+    if (pdf.board === 'CIE' && pdf.seasonCode === 'm' && pdf.year < 2016) {
       issues.push({
         paperId: pdf.id,
         paperCode: pdf.paperCode,

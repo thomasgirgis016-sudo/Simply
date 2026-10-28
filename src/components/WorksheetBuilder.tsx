@@ -65,13 +65,23 @@ export const WorksheetBuilder: React.FC<WorksheetBuilderProps> = ({
 
     for (const q of pool) {
       const qMarks = q.marks || 4;
-      // If we already have questions and adding this one exceeds the target significantly, stop
       if (accumulatedMarks > 0 && accumulatedMarks + qMarks > targetMarks + 4) {
         break;
       }
       selected.push(q);
       accumulatedMarks += qMarks;
       if (accumulatedMarks >= targetMarks) break;
+    }
+
+    // If filtered pool didn't reach target, pull from broader subject papers
+    if (accumulatedMarks < targetMarks) {
+      const remainingPool = subjectPapers.filter(p => !selected.some(s => s.id === p.id));
+      for (const q of remainingPool) {
+        const qMarks = q.marks || 4;
+        selected.push(q);
+        accumulatedMarks += qMarks;
+        if (accumulatedMarks >= targetMarks) break;
+      }
     }
 
     return selected.length > 0 ? selected : subjectPapers.slice(0, 2);
@@ -142,7 +152,10 @@ export const WorksheetBuilder: React.FC<WorksheetBuilderProps> = ({
             </div>
 
             <div>
-              <label className="text-[11px] font-bold text-slate-400 block mb-1">Target Total Marks</label>
+              <label className="text-[11px] font-bold text-slate-400 flex items-center justify-between mb-1">
+                <span>Target Total Marks</span>
+                <span className="text-[10px] text-amber-400 font-mono font-bold">Generated: {totalCalculatedMarks} Marks</span>
+              </label>
               <select
                 value={targetMarks}
                 onChange={(e) => setTargetMarks(parseInt(e.target.value, 10))}

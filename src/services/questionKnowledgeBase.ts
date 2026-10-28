@@ -2661,6 +2661,56 @@ export function generate40McqQuestions(pdf: OfficialPaperPdf): PastPaperItem[] {
         correct = 'B';
         explanation = 'A Trojan horse conceals its malicious payload inside harmless-looking files or programs.';
       }
+    } else if (
+      subjectCode === '0510' ||
+      subjectCode === '0511' ||
+      subjectCode === '0500' ||
+      subjectCode === '4ES1' ||
+      subjectCode === '9270' ||
+      subjectCode === '9275' ||
+      subjectCode === '9280' ||
+      pdf.subjectId.includes('esl') ||
+      pdf.subjectId.includes('eng')
+    ) {
+      // English Language & ESL Authentic Cambridge / Edexcel / OxfordAQA Items
+      const rot = q % 4;
+      if (rot === 0) {
+        topic = 'Summary Writing & Conciseness';
+        prompt = `When completing the summary writing exercise (Exercise 4 in Paper 2), what is the most important rule regarding word count and content?`;
+        optionA = 'Include direct quotations and personal examples from your own life';
+        optionB = 'Write strictly within 100-120 words using your own words where possible and avoiding unnecessary background details';
+        optionC = 'Copy full sentences directly from the passage to ensure zero grammatical errors';
+        optionD = 'Write at least 250 words to demonstrate advanced vocabulary depth';
+        correct = 'B';
+        explanation = 'Cambridge examiners penalize lifting full sentences and stop marking content points beyond the 120-word limit.';
+      } else if (rot === 1) {
+        topic = 'Formal vs Informal Register & Style';
+        prompt = `Which closing phrase and register is appropriate for a formal school magazine report or principal letter?`;
+        optionA = '"Cheers mate, catch you later!"';
+        optionB = '"In conclusion, it is strongly recommended that the administration implement these measures."';
+        optionC = '"BTW let me know ASAP what you think :)"';
+        optionD = '"Wanna hang out this weekend after classes?"';
+        correct = 'B';
+        explanation = 'Formal reports require passive constructions, objective academic phrasing, and absence of colloquial slang or contractions.';
+      } else if (rot === 2) {
+        topic = 'Discourse Markers & Sentence Connectors';
+        prompt = `Choose the most effective transition connective to link two contrasting viewpoints in an extended essay:\n"Many teenagers enjoy competitive gaming. ______, excessive screen time can impair sleep quality."`;
+        optionA = 'Furthermore';
+        optionB = 'Nevertheless';
+        optionC = 'Consequently';
+        optionD = 'In addition';
+        correct = 'B';
+        explanation = '"Nevertheless" or "However" establishes a contrast between the enjoyment of gaming and its adverse impact on sleep.';
+      } else {
+        topic = 'Reading Comprehension & Inference';
+        prompt = `In Cambridge Reading Comprehension, what is the best strategy when asked to "give two reasons in your own words" why an initiative succeeded?`;
+        optionA = 'Paraphrase the two underlying factual causes without lifting entire verbatim sentences';
+        optionB = 'Copy the first two paragraphs word-for-word';
+        optionC = 'Invent creative fictional reasons not mentioned in the text';
+        optionD = 'State your personal opinion rather than referencing the author\'s facts';
+        correct = 'A';
+        explanation = 'Candidate answers must accurately reflect the passage facts while expressing the concepts in the student\'s own vocabulary.';
+      }
     } else {
       // General / Mathematics / Business / Humanities Discrete Item
       const rot = q % 4;
@@ -2685,10 +2735,10 @@ export function generate40McqQuestions(pdf: OfficialPaperPdf): PastPaperItem[] {
       } else if (rot === 2) {
         topic = 'Percentages & Proportions';
         prompt = `An item originally priced at $80$ is reduced by $15\\%$, then increased by $10\\%$.\nWhat is the final price of the item?`;
-        optionA = '$\\$74.80$';
-        optionB = '$\\$76.00$';
-        optionC = '$\\$78.20$';
-        optionD = '$\\$80.00$';
+        optionA = '$74.80';
+        optionB = '$76.00';
+        optionC = '$78.20';
+        optionD = '$80.00';
         correct = 'A';
         explanation = '80 * 0.85 = 68. Then 68 * 1.10 = 74.80.';
       } else {

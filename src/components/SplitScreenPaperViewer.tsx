@@ -275,15 +275,29 @@ export const SplitScreenPaperViewer: React.FC<SplitScreenPaperViewerProps> = ({
   const currentQ = questions[activeQuestionIndex] || questions[0];
   const targetTimeMinutes = Math.round(currentQ.marks * 1.5); // 1.5 min per mark standard
 
-  // Official PDF Fallback URL for paper matched directly to the active subject
+  // Official PDF URL extracted directly from the question's paper reference
+  const paperRefMatch = currentQ.paperRef.match(/(\d{4})\/(\d{2})/);
+  const yearMatch = currentQ.paperRef.match(/\b(20\d{2})\b/);
+  const qSyllabus = paperRefMatch ? paperRefMatch[1] : (activeSubject.code.match(/\d{4}/)?.[0] || '0580');
+  const qComp = paperRefMatch ? paperRefMatch[2] : (activeSubject.id.includes('esl') || qSyllabus === '0510' ? '22' : '42');
+  const qYear = yearMatch ? parseInt(yearMatch[1], 10) : 2023;
+  const qSeasonCode = currentQ.paperRef.toLowerCase().includes('oct') || currentQ.paperRef.toLowerCase().includes('nov')
+    ? 'w'
+    : currentQ.paperRef.toLowerCase().includes('feb') || currentQ.paperRef.toLowerCase().includes('march')
+    ? 'm'
+    : 's';
+  const qYy = String(qYear).slice(-2);
+
   const matchingPdf = OFFICIAL_PAST_PAPER_PDFS.find(
-    (p) => p.subjectId === activeSubject.id && p.year === 2023 && p.seasonCode === 's'
+    (p) => p.paperCode === `${qSyllabus}/${qComp}` && p.year === qYear && p.seasonCode === qSeasonCode
+  ) || OFFICIAL_PAST_PAPER_PDFS.find(
+    (p) => p.subjectCode === qSyllabus && p.paperCode.endsWith(qComp)
   ) || OFFICIAL_PAST_PAPER_PDFS.find(
     (p) => p.subjectId === activeSubject.id
   );
-  const subjectNumCode = activeSubject.code.match(/\d{4}/)?.[0] || '0580';
-  const defaultComp = activeSubject.id.includes('esl') || subjectNumCode === '0510' ? '22' : '42';
-  const officialPdfUrl = matchingPdf?.qpPdfUrl || `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${subjectNumCode}_s23_qp_${defaultComp}.pdf`;
+
+  const officialPdfUrl = matchingPdf?.qpPdfUrl ||
+    `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${qSyllabus}_${qSeasonCode}${qYy}_qp_${qComp}.pdf`;
 
   useEffect(() => {
     let interval: any = null;

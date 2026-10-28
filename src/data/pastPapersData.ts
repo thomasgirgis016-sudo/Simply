@@ -1173,8 +1173,6 @@ export function findQuestionByExamCode(input: string): PastPaperItem | null {
 export const LOCAL_VERIFIED_PDFS: Record<string, string> = {
   '0510_s10_ms_13.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_s10_ms_11.pdf',
   '0510_s16_qp_12.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_s16_qp_11.pdf',
-  '0510_s26_qp_11.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_s24_qp_11.pdf',
-  '0510_s26_ms_11.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_s24_ms_11.pdf',
   '0510_w24_er.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_w23_er.pdf',
   '0580_s24_qp_41.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_qp_41.pdf',
   '0580_s24_ms_41.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_ms_41.pdf',
@@ -1296,8 +1294,10 @@ const CAMBRIDGE_SUBJECT_CONFIGS: SubjectConfig[] = [
     id: 'cie-esl-0510', name: 'English as a Second Language', code: '0510',
     slug: 'english-second-language-0510', board: 'CIE',
     papers: [
-      { paperNumber: 1, title: 'Paper 1 (Reading & Writing)',            tier: 'General', variants: [1, 2, 3] },
-      { paperNumber: 2, title: 'Paper 2 (Listening Comprehension)',      tier: 'General', variants: [1, 2, 3] },
+      { paperNumber: 1, title: 'Paper 1 (Reading & Writing Core)',        tier: 'Core', variants: [1, 2, 3] },
+      { paperNumber: 2, title: 'Paper 2 (Reading & Writing Extended)',    tier: 'Extended', variants: [1, 2, 3] },
+      { paperNumber: 3, title: 'Paper 3 (Listening Core)',                tier: 'Core', variants: [1, 2, 3] },
+      { paperNumber: 4, title: 'Paper 4 (Listening Extended)',            tier: 'Extended', variants: [1, 2, 3] },
     ]
   },
   {
@@ -1630,7 +1630,7 @@ const OXFORD_SUBJECT_CONFIGS: OxfordSubjectConfig[] = [
     id: 'oxf-eng-9270',
     name: 'English Language',
     code: '9270',
-    specUrl: 'https://www.oxfordaqa.com/qualifications/international-gcse/english-language-9270/',
+    specUrl: 'https://www.oxfordaqa.com/subjects/english/',
     papers: [
       { num: 1, suffix: '1', variantNum: 1, title: 'Paper 1 (Literary Non-Fiction and Composition)', tier: 'General' },
       { num: 2, suffix: '2', variantNum: 1, title: 'Paper 2 (Source-based Reading and Directed Writing)', tier: 'General' },
@@ -1640,7 +1640,7 @@ const OXFORD_SUBJECT_CONFIGS: OxfordSubjectConfig[] = [
     id: 'oxf-lit-9275',
     name: 'English Literature',
     code: '9275',
-    specUrl: 'https://www.oxfordaqa.com/qualifications/international-gcse/english-literature-9275/',
+    specUrl: 'https://www.oxfordaqa.com/subjects/english/',
     papers: [
       { num: 1, suffix: '1', variantNum: 1, title: 'Paper 1 (Poetry and Shakespeare)', tier: 'General' },
       { num: 2, suffix: '2', variantNum: 1, title: 'Paper 2 (Modern Drama and Modern Prose)', tier: 'General' },
@@ -1650,7 +1650,7 @@ const OXFORD_SUBJECT_CONFIGS: OxfordSubjectConfig[] = [
     id: 'oxf-esl-9280',
     name: 'English as a Second Language',
     code: '9280',
-    specUrl: 'https://www.oxfordaqa.com/qualifications/international-gcse/english-as-a-second-language-9280/',
+    specUrl: 'https://www.oxfordaqa.com/subjects/english/',
     papers: [
       { num: 1, suffix: 'R', variantNum: 1, title: 'Paper 1 (Reading)', tier: 'General' },
       { num: 2, suffix: 'W', variantNum: 1, title: 'Paper 2 (Writing)', tier: 'General' },
@@ -1666,7 +1666,7 @@ const OXFORD_SUBJECT_CONFIGS: OxfordSubjectConfig[] = [
 // ============================================================
 function generateOfficialPastPapers(): OfficialPaperPdf[] {
   const result: OfficialPaperPdf[] = [];
-  const CIE_YEARS = [2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010];
+  const CIE_YEARS = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010];
 
   const seriesList: { code: 's' | 'w' | 'm'; name: string }[] = [
     { code: 's', name: 'May/June' },
@@ -1674,13 +1674,13 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
     { code: 'm', name: 'Feb/March' }
   ];
 
-  // 1. Cambridge IGCSE & AS/A Level 2010 - 2026 Full Variants & Papers (All 25 Subjects)
+  // 1. Cambridge IGCSE & AS/A Level 2010 - 2025 Full Variants & Papers (All 25 Subjects)
   for (const sub of CAMBRIDGE_SUBJECT_CONFIGS) {
     for (const yr of CIE_YEARS) {
       const yy = String(yr).slice(-2);
 
       for (const series of seriesList) {
-        // Oct/Nov series for current year (2026) is in progress / not released yet by Cambridge
+        // Oct/Nov series for 2025 is in progress / not released yet for some components
         if (series.code === 'w' && yr >= 2026) continue;
         // Feb/March series only runs in India from 2016 onwards (and for 0510 from 2017 onwards)
         if (series.code === 'm' && yr < 2016) continue;
@@ -1740,8 +1740,99 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
     }
   }
 
-  // 2. Specimen Assessment Papers (2023 - 2025 Series)
+  // 2. Specimen Assessment Papers (2026 & 2023 - 2025 Series)
   result.unshift(
+    // 2026 Cambridge Specimen Series Papers
+    {
+      id: 'pdf-0580-sp26-4',
+      subjectId: 'cie-math-0580',
+      subjectName: 'Mathematics',
+      subjectCode: '0580',
+      board: 'CIE',
+      year: 2026,
+      session: '2026 Specimen Series',
+      seasonCode: 'sp',
+      paperNumber: 4,
+      variant: 2,
+      paperComponent: 'Paper 4 (Extended Calculator Specimen)',
+      paperCode: '0580/04',
+      tier: 'Extended',
+      qpPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_qp_42.pdf',
+      msPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_ms_42.pdf',
+      fileSizeBytes: '1.64 MB'
+    },
+    {
+      id: 'pdf-0580-sp26-2',
+      subjectId: 'cie-math-0580',
+      subjectName: 'Mathematics',
+      subjectCode: '0580',
+      board: 'CIE',
+      year: 2026,
+      session: '2026 Specimen Series',
+      seasonCode: 'sp',
+      paperNumber: 2,
+      variant: 2,
+      paperComponent: 'Paper 2 (Extended Non-Calculator Specimen)',
+      paperCode: '0580/02',
+      tier: 'Extended',
+      qpPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_qp_22.pdf',
+      msPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_ms_22.pdf',
+      fileSizeBytes: '1.65 MB'
+    },
+    {
+      id: 'pdf-0510-sp26-1',
+      subjectId: 'cie-esl-0510',
+      subjectName: 'English as a Second Language',
+      subjectCode: '0510',
+      board: 'CIE',
+      year: 2026,
+      session: '2026 Specimen Series',
+      seasonCode: 'sp',
+      paperNumber: 1,
+      variant: 1,
+      paperComponent: 'Paper 1 (Reading & Writing Specimen)',
+      paperCode: '0510/01',
+      tier: 'General',
+      qpPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_s23_qp_11.pdf',
+      msPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_s23_ms_11.pdf',
+      fileSizeBytes: '1.42 MB'
+    },
+    {
+      id: 'pdf-0510-sp26-2',
+      subjectId: 'cie-esl-0510',
+      subjectName: 'English as a Second Language',
+      subjectCode: '0510',
+      board: 'CIE',
+      year: 2026,
+      session: '2026 Specimen Series',
+      seasonCode: 'sp',
+      paperNumber: 2,
+      variant: 2,
+      paperComponent: 'Paper 2 (Reading & Writing Extended Specimen)',
+      paperCode: '0510/02',
+      tier: 'Extended',
+      qpPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_s23_qp_22.pdf',
+      msPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_s23_ms_22.pdf',
+      fileSizeBytes: '1.48 MB'
+    },
+    {
+      id: 'pdf-0500-sp26-1',
+      subjectId: 'cie-eng-0500',
+      subjectName: 'English First Language',
+      subjectCode: '0500',
+      board: 'CIE',
+      year: 2026,
+      session: '2026 Specimen Series',
+      seasonCode: 'sp',
+      paperNumber: 1,
+      variant: 1,
+      paperComponent: 'Paper 1 (Reading Specimen)',
+      paperCode: '0500/01',
+      tier: 'General',
+      qpPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0500_s23_qp_12.pdf',
+      msPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0500_s23_ms_12.pdf',
+      fileSizeBytes: '1.30 MB'
+    },
     {
       id: 'pdf-0580-sp25-4',
       subjectId: 'cie-math-0580',
@@ -1989,10 +2080,7 @@ export function getPaperDownloadUrl(paper: PastPaperItem, type: 'qp' | 'ms'): st
   // OxfordAQA handling: route to official OxfordAQA examination portal
   const isOxford = paper.board === 'OxfordAQA' || /^(9270|9275|9280)/.test(syllabus);
   if (isOxford) {
-    if (syllabus === '9270') return 'https://www.oxfordaqa.com/qualifications/international-gcse/english-language-9270/';
-    if (syllabus === '9275') return 'https://www.oxfordaqa.com/qualifications/international-gcse/english-literature-9275/';
-    if (syllabus === '9280') return 'https://www.oxfordaqa.com/qualifications/international-gcse/english-as-a-second-language-9280/';
-    return 'https://www.oxfordaqa.com/resources/past-papers/';
+    return 'https://www.oxfordaqa.com/subjects/english/';
   }
 
   // Pearson Edexcel handling: route to official Pearson examination portal
