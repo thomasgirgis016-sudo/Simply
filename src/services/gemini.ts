@@ -2,6 +2,7 @@ import { SolverResult, Flashcard, QuizQuestion, RevisionTopic, HandwrittenReview
 import { searchUniversalKnowledge } from './knowledgeEngine';
 import { findPastPaperQuestionByReference, evaluateStudentAnswerAgainstMarkScheme } from './examQuestionEngine';
 import { evaluateStudentWorking, evaluateSafeArithmetic } from './mathWorkingValidator';
+import { evaluateEslStudentAnswer } from './eslAnswerEvaluator';
 import { verifyAndAuditSolverResult } from './examinerVerificationAgent';
 
 export interface GeminiSolveParams {
@@ -237,6 +238,14 @@ DO NOT wrap your output in markdown code blocks like \`\`\`json. Return only raw
           relatedTopic: 'Number & Arithmetic Operations'
         };
       }
+    }
+  }
+
+  // 0a-3. Instant ESL / English Candidate Answer Evaluation (e.g. contrast connective evaluation)
+  if (studentWorking && !imageBase64) {
+    const eslEval = evaluateEslStudentAnswer(studentWorking, questionText || '', promptSpecifiedMarks || 1);
+    if (eslEval) {
+      return eslEval;
     }
   }
 
@@ -1371,6 +1380,12 @@ function generateSimulatedSolution(
 
     if (isContrastOrConnective && !lower.includes('summary') && !lower.includes('100-120')) {
       const marks = promptSpecifiedMarks || 1;
+      const possibleAnswerMatch = query.match(/(?:student working|my answer|answer|candidate working|i wrote|wrote):\s*(.+)/i);
+      const studentAnswer = possibleAnswerMatch ? possibleAnswerMatch[1] : (query.length < 50 && (lower === 'but' || lower.startsWith('but ') || lower.includes('although')) ? query : undefined);
+      if (studentAnswer) {
+        const eslEval = evaluateEslStudentAnswer(studentAnswer, query, marks);
+        if (eslEval) return eslEval;
+      }
       return {
         questionText: query,
         subject: 'English as a Second Language (CIE 0510 / Edexcel 4ES1)',

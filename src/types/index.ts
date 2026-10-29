@@ -540,7 +540,7 @@ export interface PastPaperQaItemIssue {
   paperId: string;
   paperCode: string;
   questionNumber: string;
-  issueType: 'missing_diagram' | 'invalid_katex' | 'missing_markscheme' | 'zero_marks' | 'count_mismatch' | 'broken_link';
+  issueType: 'missing_diagram' | 'invalid_katex' | 'missing_markscheme' | 'zero_marks' | 'count_mismatch' | 'broken_link' | 'format_mismatch';
   details: string;
   snippet?: string;
 }

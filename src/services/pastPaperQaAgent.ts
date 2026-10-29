@@ -130,6 +130,23 @@ export function runPastPaperQaAgent(
       });
     }
 
+    // Check ESL 0510 Paper 1 vs Paper 2 reform (Writing belongs to Paper 1, Listening to Paper 2)
+    if (
+      (paper.subjectId?.includes('esl') || paper.subjectCode === '0510') &&
+      (paper.topic?.toLowerCase().includes('writing') || paper.questionNumber?.toLowerCase().includes('exercise 4') || paper.questionNumber?.toLowerCase().includes('exercise 6')) &&
+      (paper.paperCode?.includes('/2') || paper.session?.includes('Paper 2'))
+    ) {
+      formatMismatches++;
+      issues.push({
+        paperId: paper.id,
+        paperCode: paper.paperCode,
+        questionNumber: paper.questionNumber,
+        issueType: 'format_mismatch',
+        details: 'ESL writing question misassigned to Paper 2 (Listening). Under 2024–2026 reform, writing is strictly Paper 1.',
+        snippet: paper.questionPrompt.substring(0, 60),
+      });
+    }
+
     // Check sub-parts if present
     if (paper.subParts && paper.subParts.length > 0) {
       let subPartSum = 0;

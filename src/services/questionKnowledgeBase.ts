@@ -2375,6 +2375,189 @@ const ESL_BLUEPRINTS: QuestionBlueprint[] = [
   }
 ];
 
+const ESL_LISTENING_BLUEPRINTS: QuestionBlueprint[] = [
+  {
+    qNum: 1,
+    topic: 'Listening Exercise 1: Short Spoken Dialogues & Instructions',
+    difficultyTier: 'Standard Extended',
+    componentType: 'Theory',
+    marks: 8,
+    prompt: () =>
+      `You will hear four short recordings. For questions (a)–(d), give the answer to each question according to the audio information.\n` +
+      `(a) Where will the student volunteer orientation be held tomorrow? [2]\n` +
+      `(b) Which piece of protective equipment is strictly required in the robotics workshop? [2]\n` +
+      `(c) How much does the discounted student transit card cost per month? [2]\n` +
+      `(d) What time does the campus library close on Friday evenings? [2]`,
+    subParts: () => [
+      {
+        part: '(a)',
+        marks: 2,
+        prompt: 'Location of orientation and room number.',
+        markScheme: [{ markType: '[B2]', requirement: 'Main auditorium, room 204' }],
+        finalAnswer: 'Main auditorium, room 204'
+      },
+      {
+        part: '(b)',
+        marks: 2,
+        prompt: 'Required protective equipment.',
+        markScheme: [{ markType: '[B2]', requirement: 'Safety goggles and closed-toe footwear' }],
+        finalAnswer: 'Safety goggles and closed-toe footwear'
+      },
+      {
+        part: '(c)',
+        marks: 2,
+        prompt: 'Cost of transit card.',
+        markScheme: [{ markType: '[B2]', requirement: '$24.50' }],
+        finalAnswer: '$24.50'
+      },
+      {
+        part: '(d)',
+        marks: 2,
+        prompt: 'Library closing time on Friday.',
+        markScheme: [{ markType: '[B2]', requirement: '8:30 pm / 20:30' }],
+        finalAnswer: '8:30 pm'
+      }
+    ],
+    markScheme: () => [
+      { markType: '[B8]', requirement: 'Accurate retrieval of factual dialogue data' }
+    ],
+    finalAnswer: () => 'Accurate short answers based on spoken instructions',
+    examinerReportSnippet: () =>
+      'Write targeted, concise notes. Do not write full sentences where only a short phrase or time is required.'
+  },
+  {
+    qNum: 2,
+    topic: 'Listening Exercise 2: Spoken Interview Note Completion',
+    difficultyTier: 'Standard Extended',
+    componentType: 'Theory',
+    marks: 8,
+    prompt: () =>
+      `You will hear a wildlife photographer giving a talk about photographing snow leopards in the Himalayas.\n` +
+      `Complete the sentences with one or two words, or a number, from the recording.\n` +
+      `(a) The expedition base camp was set up at an elevation of ______ metres. [2]\n` +
+      `(b) The team used thermal imaging cameras to track the cats during ______ hours. [2]\n` +
+      `(c) Local guides warned the crew that sudden ______ was the most dangerous weather hazard. [2]\n` +
+      `(d) The project successfully secured funding from an international ______ charity. [2]`,
+    subParts: () => [
+      {
+        part: '(a)',
+        marks: 2,
+        prompt: 'Elevation in metres.',
+        markScheme: [{ markType: '[B2]', requirement: '4,200 / 4200' }],
+        finalAnswer: '4,200 metres'
+      },
+      {
+        part: '(b)',
+        marks: 2,
+        prompt: 'Hours of tracking.',
+        markScheme: [{ markType: '[B2]', requirement: 'night-time / nocturnal' }],
+        finalAnswer: 'night-time'
+      },
+      {
+        part: '(c)',
+        marks: 2,
+        prompt: 'Weather hazard.',
+        markScheme: [{ markType: '[B2]', requirement: 'blizzards / snow storms' }],
+        finalAnswer: 'blizzards'
+      },
+      {
+        part: '(d)',
+        marks: 2,
+        prompt: 'Charity type.',
+        markScheme: [{ markType: '[B2]', requirement: 'conservation' }],
+        finalAnswer: 'conservation'
+      }
+    ],
+    markScheme: () => [
+      { markType: '[B8]', requirement: 'Accurate gap-fill based on verbatim spoken phrases' }
+    ],
+    finalAnswer: () => 'Accurate gap-fill completion',
+    examinerReportSnippet: () =>
+      'Check that your spelling does not create an unintended English word that alters the meaning.'
+  },
+  {
+    qNum: 3,
+    topic: 'Listening Exercise 3: Multiple Matching Speakers & Attitudes',
+    difficultyTier: 'Grade 9 Challenge',
+    componentType: 'Theory',
+    marks: 6,
+    prompt: () =>
+      `You will hear six teenagers talking about participating in an environmental youth council.\n` +
+      `Match each speaker (1–6) to their stated opinion (A–G). There is one extra letter.\n` +
+      `A: Gained valuable public speaking confidence\n` +
+      `B: Surprised by the amount of municipal administrative paperwork\n` +
+      `C: Felt their opinions were ignored by city planners\n` +
+      `D: Enjoyed collaborating with peers from diverse backgrounds\n` +
+      `E: Recommended lowering the minimum age for participation\n` +
+      `F: Found the scheduled meeting times difficult to balance with exams\n` +
+      `G: Were inspired to pursue an environmental science career`,
+    subParts: () => [
+      {
+        part: '(a)',
+        marks: 6,
+        prompt: 'Match speakers 1–6 to statements A–G.',
+        markScheme: [{ markType: '[B6]', requirement: 'Speaker 1: D, Speaker 2: A, Speaker 3: F, Speaker 4: B, Speaker 5: G, Speaker 6: E' }],
+        finalAnswer: '1-D, 2-A, 3-F, 4-B, 5-G, 6-E'
+      }
+    ],
+    markScheme: () => [
+      { markType: '[B6]', requirement: 'Correct identification of speaker attitudes' }
+    ],
+    finalAnswer: () => 'Matched statements D, A, F, B, G, E',
+    examinerReportSnippet: () =>
+      'Listen for qualifying words like "although" or "initially" which signal that a speaker is rejecting an option before stating their genuine viewpoint.'
+  },
+  {
+    qNum: 4,
+    topic: 'Listening Exercise 4: Extended Interview Discussion',
+    difficultyTier: 'Grade 9 Challenge',
+    componentType: 'Theory',
+    marks: 8,
+    prompt: () =>
+      `You will hear a radio interview with Dr Sophie Vance, an expert in ocean microplastics.\n` +
+      `(a) What inspired Dr Vance to investigate marine microplastics rather than macro-debris? [2]\n` +
+      `(b) Why do standard wastewater treatment facilities struggle to filter synthetic textile fibres? [2]\n` +
+      `(c) What surprising discovery did Dr Vance's team make regarding deep-sea coral polyps? [2]\n` +
+      `(d) According to Dr Vance, what regulatory measure would have the greatest immediate impact? [2]`,
+    subParts: () => [
+      {
+        part: '(a)',
+        marks: 2,
+        prompt: 'Inspiration for microplastics research.',
+        markScheme: [{ markType: '[B2]', requirement: 'Invisible ecological toxicity entering food chains' }],
+        finalAnswer: 'Invisible ecological toxicity in food chains'
+      },
+      {
+        part: '(b)',
+        marks: 2,
+        prompt: 'Why treatment facilities struggle.',
+        markScheme: [{ markType: '[B2]', requirement: 'Fibres are too microscopic to be caught by standard mesh filters' }],
+        finalAnswer: 'Fibres bypass standard mesh filters due to microscopic diameter'
+      },
+      {
+        part: '(c)',
+        marks: 2,
+        prompt: 'Deep-sea coral polyps discovery.',
+        markScheme: [{ markType: '[B2]', requirement: 'Corals actively ingest plastics mistaking them for food' }],
+        finalAnswer: 'Corals actively ingest synthetic fibres mistaking them for food'
+      },
+      {
+        part: '(d)',
+        marks: 2,
+        prompt: 'Most impactful regulatory measure.',
+        markScheme: [{ markType: '[B2]', requirement: 'Mandating built-in micro-filters in commercial washing machines' }],
+        finalAnswer: 'Mandating built-in micro-filters in washing machines'
+      }
+    ],
+    markScheme: () => [
+      { markType: '[B8]', requirement: 'Accurate comprehension of scientific discussion' }
+    ],
+    finalAnswer: () => 'Accurate comprehension of interview arguments',
+    examinerReportSnippet: () =>
+      'Answers must be specific; vague answers such as "they are small" fail to earn the accuracy mark.'
+  }
+];
+
 // ============================================================
 // 6. MULTIPLE CHOICE BLUEPRINT GENERATOR (40 Questions)
 // Sciences (0620, 0625, 0610), Econ (0455), CS (0478), Accounting (0452)
@@ -2673,43 +2856,87 @@ export function generate40McqQuestions(pdf: OfficialPaperPdf): PastPaperItem[] {
       pdf.subjectId.includes('eng')
     ) {
       // English Language & ESL Authentic Cambridge / Edexcel / OxfordAQA Items
+      const isListening = pdf.paperNumber === 2 || pdf.paperCode.includes('/02') || pdf.paperCode.includes('/2') || pdf.paperComponent?.toLowerCase().includes('listening');
       const rot = q % 4;
-      if (rot === 0) {
-        topic = 'Summary Writing & Conciseness';
-        prompt = `When completing the summary writing exercise (Exercise 4 in Paper 2), what is the most important rule regarding word count and content?`;
-        optionA = 'Include direct quotations and personal examples from your own life';
-        optionB = 'Write strictly within 100-120 words using your own words where possible and avoiding unnecessary background details';
-        optionC = 'Copy full sentences directly from the passage to ensure zero grammatical errors';
-        optionD = 'Write at least 250 words to demonstrate advanced vocabulary depth';
-        correct = 'B';
-        explanation = 'Cambridge examiners penalize lifting full sentences and stop marking content points beyond the 120-word limit.';
-      } else if (rot === 1) {
-        topic = 'Formal vs Informal Register & Style';
-        prompt = `Which closing phrase and register is appropriate for a formal school magazine report or principal letter?`;
-        optionA = '"Cheers mate, catch you later!"';
-        optionB = '"In conclusion, it is strongly recommended that the administration implement these measures."';
-        optionC = '"BTW let me know ASAP what you think :)"';
-        optionD = '"Wanna hang out this weekend after classes?"';
-        correct = 'B';
-        explanation = 'Formal reports require passive constructions, objective academic phrasing, and absence of colloquial slang or contractions.';
-      } else if (rot === 2) {
-        topic = 'Discourse Markers & Sentence Connectors';
-        prompt = `Choose the most effective transition connective to link two contrasting viewpoints in an extended essay:\n"Many teenagers enjoy competitive gaming. ______, excessive screen time can impair sleep quality."`;
-        optionA = 'Furthermore';
-        optionB = 'Nevertheless';
-        optionC = 'Consequently';
-        optionD = 'In addition';
-        correct = 'B';
-        explanation = '"Nevertheless" or "However" establishes a contrast between the enjoyment of gaming and its adverse impact on sleep.';
+
+      if (isListening) {
+        // Authentic Cambridge 0510 Paper 2 (Listening) Multiple Choice items
+        if (rot === 0) {
+          topic = 'Listening Comprehension: Numerical Data & Times';
+          prompt = `In Cambridge 0510 Paper 2 (Listening), what is the most reliable strategy when listening for specific appointment times, prices, or numerical data?`;
+          optionA = 'Write full long sentences while the speaker is talking';
+          optionB = 'Jot down the exact figure during the first listening, then verify spelling and grammar during the second broadcast';
+          optionC = 'Wait until the second broadcast finishes before writing anything';
+          optionD = 'Guess the numbers beforehand without listening to the audio';
+          correct = 'B';
+          explanation = 'Cambridge Paper 2 recordings play twice; candidates should record targeted numerical notes during the first play and review accuracy on the second.';
+        } else if (rot === 1) {
+          topic = 'Listening Comprehension: Speaker Attitude & Tone';
+          prompt = `During an interview in Exercise 3 (Listening), the speaker says: "Well, I suppose the plan has some merit, though whether it's genuinely workable is another matter." What is the speaker's attitude?`;
+          optionA = 'Enthusiastic and unquestioning support';
+          optionB = 'Skeptical and reserved despite acknowledging potential benefits';
+          optionC = 'Completely hostile and dismissive';
+          optionD = 'Indifferent and unconcerned';
+          correct = 'B';
+          explanation = 'The concession "has some merit" paired with "though whether it\'s workable is another matter" conveys qualified skepticism.';
+        } else if (rot === 2) {
+          topic = 'Listening: Identifying Key Dialogue Facts';
+          prompt = `In a recorded announcement about a delayed flight, which detail is essential to record for full comprehension marks?`;
+          optionA = 'The weather forecast for next week';
+          optionB = 'The revised boarding gate number and departure time';
+          optionC = 'The captain\'s flying hours';
+          optionD = 'The history of the airport terminal';
+          correct = 'B';
+          explanation = 'Cambridge listening tasks test identification of crucial practical data: time, place, and operational changes.';
+        } else {
+          topic = 'Listening: Note-Taking from Spoken Lectures';
+          prompt = `When completing gap-fill notes in Paper 2 (Listening Exercise 2), how should words be recorded?`;
+          optionA = 'Write exactly what you hear using 1 to 3 words as instructed on the paper';
+          optionB = 'Write an entire paragraph explaining the speaker\'s background';
+          optionC = 'Use slang abbreviations not recognised in standard English';
+          optionD = 'Change every word into a foreign language equivalent';
+          correct = 'A';
+          explanation = 'Official Cambridge instructions stipulate: "Write one or two words, or a number, in each gap. Write what the speaker actually says."';
+        }
       } else {
-        topic = 'Reading Comprehension & Inference';
-        prompt = `In Cambridge Reading Comprehension, what is the best strategy when asked to "give two reasons in your own words" why an initiative succeeded?`;
-        optionA = 'Paraphrase the two underlying factual causes without lifting entire verbatim sentences';
-        optionB = 'Copy the first two paragraphs word-for-word';
-        optionC = 'Invent creative fictional reasons not mentioned in the text';
-        optionD = 'State your personal opinion rather than referencing the author\'s facts';
-        correct = 'A';
-        explanation = 'Candidate answers must accurately reflect the passage facts while expressing the concepts in the student\'s own vocabulary.';
+        // Authentic Cambridge 0510 Paper 1 (Reading & Writing) Multiple Choice items
+        if (rot === 0) {
+          topic = 'Summary Writing & Conciseness';
+          prompt = `When completing the summary writing exercise (Exercise 4 in Paper 1), what is the most important rule regarding word count and content?`;
+          optionA = 'Include direct quotations and personal examples from your own life';
+          optionB = 'Write strictly within 100-120 words using your own words where possible and avoiding unnecessary background details';
+          optionC = 'Copy full sentences directly from the passage to ensure zero grammatical errors';
+          optionD = 'Write at least 250 words to demonstrate advanced vocabulary depth';
+          correct = 'B';
+          explanation = 'In Cambridge 0510 Paper 1 (Reading & Writing), examiners penalize verbatim lifting and stop marking content points beyond the 120-word limit.';
+        } else if (rot === 1) {
+          topic = 'Formal vs Informal Register & Style';
+          prompt = `Which closing phrase and register is appropriate for a formal school magazine report or principal letter?`;
+          optionA = '"Cheers mate, catch you later!"';
+          optionB = '"In conclusion, it is strongly recommended that the administration implement these measures."';
+          optionC = '"BTW let me know ASAP what you think :)"';
+          optionD = '"Wanna hang out this weekend after classes?"';
+          correct = 'B';
+          explanation = 'Formal reports require passive constructions, objective academic phrasing, and absence of colloquial slang or contractions.';
+        } else if (rot === 2) {
+          topic = 'Discourse Markers & Sentence Connectors';
+          prompt = `Choose the most effective transition connective to link two contrasting viewpoints in an extended essay:\n"Many teenagers enjoy competitive gaming. ______, excessive screen time can impair sleep quality."`;
+          optionA = 'Furthermore';
+          optionB = 'Nevertheless';
+          optionC = 'Consequently';
+          optionD = 'In addition';
+          correct = 'B';
+          explanation = '"Nevertheless" or "However" establishes a contrast between the enjoyment of gaming and its adverse impact on sleep.';
+        } else {
+          topic = 'Reading Comprehension & Inference';
+          prompt = `In Cambridge Reading Comprehension, what is the best strategy when asked to "give two reasons in your own words" why an initiative succeeded?`;
+          optionA = 'Paraphrase the two underlying factual causes without lifting entire verbatim sentences';
+          optionB = 'Copy the first two paragraphs word-for-word';
+          optionC = 'Invent creative fictional reasons not mentioned in the text';
+          optionD = 'State your personal opinion rather than referencing the author\'s facts';
+          correct = 'A';
+          explanation = 'Candidate answers must accurately reflect the passage facts while expressing the concepts in the student\'s own vocabulary.';
+        }
       }
     } else {
       // General / Mathematics / Business / Humanities Discrete Item
@@ -2829,6 +3056,7 @@ export function getBlueprintsForSubjectAndPaper(
   }
 
   if (subjectCode === '0510' || subjectCode === '0511') {
+    if (paperNumber === 2) return ESL_LISTENING_BLUEPRINTS;
     return ESL_BLUEPRINTS;
   }
 

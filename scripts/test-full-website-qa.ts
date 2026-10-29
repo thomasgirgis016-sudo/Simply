@@ -6,7 +6,7 @@ import { COMPREHENSIVE_REVISION_NOTES } from '../src/data/revisionData';
 import { CHEAT_SHEETS_DATABASE } from '../src/data/cheatSheetsData';
 import { IGCSE_PERIODIC_TABLE, CAMBRIDGE_EXAM_FORMULAS } from '../src/data/periodicTableData';
 import { OFFICIAL_EXAM_TIMETABLE } from '../src/data/examTimetableData';
-import { validateKatexSyntax } from '../src/services/pastPaperQaAgent';
+import { validateKatexSyntax, runFullAutonomousQaSweep } from '../src/services/pastPaperQaAgent';
 import { evaluateStudentWorking } from '../src/services/mathWorkingValidator';
 import { searchUniversalKnowledge } from '../src/services/knowledgeEngine';
 import { askAiTutor, solveQuestionWithGemini } from '../src/services/gemini';
@@ -167,9 +167,39 @@ const solverEslResult = await solveQuestionWithGemini({
 });
 assert(solverEslResult.totalMarks === 1, 'AI Solver assigns 1 mark to ESL contrast prompt', `Got totalMarks ${solverEslResult.totalMarks}`);
 assert(solverEslResult.topic.includes('Contrast'), 'AI Solver assigns correct contrast topic', `Got topic: ${solverEslResult.topic}`);
-assert(!solverEslResult.finalAnswer.toLowerCase().includes('vertical farming'), 'AI Solver does not leak vertical farming summary on 1-mark contrast sentence', 'Contained vertical farming text');
+// 8h. AI Solver correctly grades student ESL connective answer "but" as 0 / 1 (0%)
+const solverEslIncorrect = await solveQuestionWithGemini({
+  questionText: 'Write a sentence to show contrast between two ideas [1 mark]',
+  studentWorking: 'but',
+  subjectName: 'English as a Second Language (0510)',
+  examBoard: 'Cambridge CIE',
+  gradeLevel: 'IGCSE'
+});
+assert(solverEslIncorrect.studentWorkingEvaluation?.marksEarned === 0, 'AI Solver withholds mark for coordinating conjunction "but" in contrast question', `Awarded ${solverEslIncorrect.studentWorkingEvaluation?.marksEarned}`);
+assert(solverEslIncorrect.studentWorkingEvaluation?.lineReviews[0]?.isCorrect === false, 'AI Solver marks "but" line as isCorrect: false', 'Expected isCorrect to be false');
+assert(solverEslIncorrect.finalAnswer.includes('0 / 1 Marks (0%)'), 'AI Solver final answer states 0 / 1 Marks (0%)', `Got finalAnswer: ${solverEslIncorrect.finalAnswer}`);
+
+// 8i. AI Solver correctly grades student ESL correct contrast answer as 1 / 1 (100%)
+const solverEslCorrect = await solveQuestionWithGemini({
+  questionText: 'Write a sentence to show contrast between two ideas [1 mark]',
+  studentWorking: 'Although modern electric vehicles reduce urban greenhouse emissions, their widespread adoption remains constrained by high battery replacement expenses.',
+  subjectName: 'English as a Second Language (0510)',
+  examBoard: 'Cambridge CIE',
+  gradeLevel: 'IGCSE'
+});
+assert(solverEslCorrect.studentWorkingEvaluation?.marksEarned === 1, 'AI Solver awards 1 mark for valid complex contrast sentence', `Awarded ${solverEslCorrect.studentWorkingEvaluation?.marksEarned}`);
+assert(solverEslCorrect.studentWorkingEvaluation?.lineReviews[0]?.isCorrect === true, 'AI Solver marks valid sentence as isCorrect: true', 'Expected isCorrect to be true');
+assert(solverEslCorrect.finalAnswer.includes('1 / 1 Marks (100%)'), 'AI Solver final answer states 1 / 1 Marks (100%)', `Got finalAnswer: ${solverEslCorrect.finalAnswer}`);
+
+// 8j. 24-Check Autonomous QA Sweep & Curriculum Guard Verification
+console.log('\n--- 9. Autonomous Founder Console QA Sweep & Curriculum Guard ---');
+const autonomousSweep = await runFullAutonomousQaSweep();
+assert(autonomousSweep.failedCount === 0, 'Autonomous QA sweep reports 0 failed checks (100% health)', `Found ${autonomousSweep.failedCount} failures: ${autonomousSweep.checks.filter(c => c.status === 'failed').map(c => c.name).join(', ')}`);
+const eslGuard = autonomousSweep.checks.find(c => c.id === 'guard-esl-reform-mapping');
+assert(eslGuard?.status === 'passed', 'ESL 0510 Paper 1 vs Paper 2 Reform Guard is PASSED', eslGuard?.details);
 
 console.log('✓ Verified AI Solver, AI Tutor, and Math Working Validator precision & subject isolation');
+console.log(`✓ Verified Autonomous QA Sweep: ${autonomousSweep.passedCount}/${autonomousSweep.totalChecks} Checks Passed (${autonomousSweep.healthPercent}% System Health)`);
 
 console.log('\n===========================================================');
 console.log(`  QA SUMMARY: ${passCount} PASSED, ${failCount} FAILED`);

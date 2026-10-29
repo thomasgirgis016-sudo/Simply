@@ -24,7 +24,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onChangeFontSize,
 }) => {
   const [apiKey, setApiKey] = useState(profile.geminiApiKey || '');
-  const [model, setModel] = useState(profile.selectedModel || 'gemini-2.5-flash');
+  const [model, setModel] = useState(profile.selectedModel?.includes('2.5') ? 'gemini-1.5-flash' : (profile.selectedModel || 'gemini-1.5-flash'));
   const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -216,9 +216,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               onChange={(e) => setModel(e.target.value)}
               className="w-full rounded-xl border border-slate-700 bg-slate-950/80 py-2.5 px-3 text-sm text-white focus:border-indigo-500 focus:outline-none"
             >
-              <option value="gemini-2.5-flash">Gemini 2.5 Flash (Ultra-fast, Multimodal vision, Best for IGCSE)</option>
-              <option value="gemini-1.5-flash">Gemini 1.5 Flash (High speed, reliable)</option>
+              <option value="gemini-1.5-flash">Gemini 1.5 Flash (Ultra-fast, Multimodal vision, Best for IGCSE)</option>
               <option value="gemini-1.5-pro">Gemini 1.5 Pro (Deep complex mathematical reasoning)</option>
+              <option value="gemini-2.0-flash">Gemini 2.0 Flash (Next-Gen Gemini)</option>
             </select>
           </div>
 

@@ -87,7 +87,7 @@ const DEFAULT_PROFILE: UserProfile = {
     'cie-bio-0610'
   ],
   geminiApiKey: '',
-  selectedModel: 'gemini-2.5-flash',
+  selectedModel: 'gemini-1.5-flash',
 };
 
 export function App() {
@@ -107,12 +107,16 @@ export function App() {
         targetGrade: active.targetGrade,
         selectedSubjectIds: active.selectedSubjectIds,
         geminiApiKey: '',
-        selectedModel: 'gemini-2.5-flash',
+        selectedModel: 'gemini-1.5-flash',
       };
     }
     try {
       const saved = localStorage.getItem('simply_igcse_profile');
-      if (saved) return { ...DEFAULT_PROFILE, ...JSON.parse(saved) };
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.selectedModel?.includes('2.5')) parsed.selectedModel = 'gemini-1.5-flash';
+        return { ...DEFAULT_PROFILE, ...parsed };
+      }
     } catch (e) {
       console.error(e);
     }

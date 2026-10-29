@@ -999,15 +999,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
       };
     }
+    if (qaReport.issues && qaReport.issues.length > 0) {
+      return {
+        label: `${qaReport.issues.length} Issues Detected`,
+        color: 'bg-rose-500/20 text-rose-300 border-rose-500/30'
+      };
+    }
     if (livePdfResult && livePdfResult.failed > 0) {
       return {
         label: `${livePdfResult.passed}/${livePdfResult.checked} Mirrors OK (${livePdfResult.failed} Inaccessible)`,
-        color: 'bg-amber-500/20 text-amber-300 border-amber-500/30'
-      };
-    }
-    if (qaReport.failedCount > 0) {
-      return {
-        label: `${qaReport.issues.length} Issues Detected`,
         color: 'bg-amber-500/20 text-amber-300 border-amber-500/30'
       };
     }

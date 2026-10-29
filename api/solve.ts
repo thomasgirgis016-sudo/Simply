@@ -90,7 +90,8 @@ export default async function handler(req: any, res?: any) {
       return new Response(JSON.stringify(errorPayload), { status: 503, headers });
     }
 
-    const modelName = body.model || 'gemini-1.5-flash';
+    const rawModel = body.model || 'gemini-1.5-flash';
+    const modelName = rawModel.includes('2.5') ? 'gemini-1.5-flash' : rawModel;
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey.trim()}`;
 
     let systemInstruction = SENIOR_CAMBRIDGE_SYSTEM_PROMPT;
@@ -101,7 +102,7 @@ export default async function handler(req: any, res?: any) {
     if (action === 'solve_question') {
       userPrompt = `You are marking a student question for ${examBoard} IGCSE ${subjectName} (${gradeLevel}).
 Question: "${questionText || 'Given Question in Image'}"
-${studentWorking ? `Student Working Provided: "${studentWorking}"` : ''}
+${studentWorking ? `CANDIDATE SUBMITTED ANSWER / WORKING: "${studentWorking}"\nCRITICAL: The candidate has entered their own answer/working. You MUST evaluate whether "${studentWorking}" is correct according to official ${examBoard} mark schemes, determine the exact score earned, and provide clear examiner feedback.` : ''}
 
 Output STRICTLY a valid JSON object matching this schema:
 {
@@ -122,7 +123,7 @@ Output STRICTLY a valid JSON object matching this schema:
       "markAwarded": "[M1] Method Mark"
     }
   ],
-  "finalAnswer": "Concise final answer with exact SI units and rounded to 3 significant figures",
+  "finalAnswer": "Concise final answer with exact SI units and rounded to 3 significant figures.${studentWorking ? ' Include clear statement of marks awarded to candidate (e.g. Candidate Score: X / ' + totalMarks + ' Marks) and brief verdict.' : ''}",
   "examinerTraps": [
     "Common student errors reported in examiner reports"
   ],
@@ -136,7 +137,23 @@ Output STRICTLY a valid JSON object matching this schema:
   "commonMistakes": [
     "Frequent pitfall to avoid"
   ],
-  "relatedTopic": "Related syllabus subtopic"
+  "relatedTopic": "Related syllabus subtopic"${studentWorking ? `,
+  "studentWorkingEvaluation": {
+    "marksEarned": 0,
+    "marksPossible": ${totalMarks},
+    "percentageScore": 0,
+    "overallVerdict": "Concise assessment of candidate answer",
+    "lineReviews": [
+      {
+        "lineNumber": 1,
+        "rawText": "${studentWorking.replace(/"/g, '\\"')}",
+        "isCorrect": false,
+        "markBadge": "[M0]",
+        "exactReason": "Specific examiner explanation of why candidate answer is right or wrong",
+        "exactCorrection": "The exact correction required"
+      }
+    ]
+  }` : ''}
 }`;
     } else if (action === 'handwritten_marking') {
       userPrompt = `You are evaluating a student's handwritten or typed working for ${examBoard} IGCSE ${subjectName}.
