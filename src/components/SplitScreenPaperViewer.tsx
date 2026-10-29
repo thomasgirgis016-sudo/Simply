@@ -279,7 +279,7 @@ export const SplitScreenPaperViewer: React.FC<SplitScreenPaperViewerProps> = ({
   const paperRefMatch = currentQ.paperRef.match(/(\d{4})\/(\d{2})/);
   const yearMatch = currentQ.paperRef.match(/\b(20\d{2})\b/);
   const qSyllabus = paperRefMatch ? paperRefMatch[1] : (activeSubject.code.match(/\d{4}/)?.[0] || '0580');
-  const qComp = paperRefMatch ? paperRefMatch[2] : (activeSubject.id.includes('esl') || qSyllabus === '0510' ? '22' : '42');
+  const qComp = paperRefMatch ? paperRefMatch[2] : (activeSubject.id.includes('esl') || qSyllabus === '0510' ? '12' : '42');
   const qYear = yearMatch ? parseInt(yearMatch[1], 10) : 2023;
   const qSeasonCode = currentQ.paperRef.toLowerCase().includes('oct') || currentQ.paperRef.toLowerCase().includes('nov')
     ? 'w'

@@ -99,7 +99,7 @@ export const INITIAL_MISTAKES: MistakeItem[] = [
     subjectId: 'cie-esl-0510',
     subjectCode: '0510',
     topic: 'Reading & Directed Writing',
-    paperCode: '0510/22/M/J/23',
+    paperCode: '0510/12/M/J/24 Paper 1',
     questionNumber: 'Exercise 6',
     questionPrompt: 'Write an article for your school magazine about the benefits and challenges of artificial intelligence in education.',
     myMistakeAnswer: 'Wrote in an informal SMS style and forgot to organize arguments into paragraphs.',

@@ -20,7 +20,7 @@ export interface ExaminerPitfall {
   id: string;
   subjectCode: string; // e.g. "0580", "0625", "0620", "0610", "0510"
   subjectName: string;
-  paperType: 'Paper 2 (MCQ/Extended)' | 'Paper 4 (Theory Extended)' | 'Paper 6 (Alternative to Practical)';
+  paperType: 'Paper 1 (Reading & Writing)' | 'Paper 2 (MCQ/Extended)' | 'Paper 4 (Theory Extended)' | 'Paper 6 (Alternative to Practical)';
   topic: string;
   questionRef: string;
   candidateFailureRate: string; // e.g. "72% of candidates lost marks"
@@ -185,9 +185,9 @@ export const EXAMINER_PITFALLS_DATABASE: ExaminerPitfall[] = [
     id: 'esl-1',
     subjectCode: '0510',
     subjectName: 'Cambridge IGCSE ESL',
-    paperType: 'Paper 2 (MCQ/Extended)',
+    paperType: 'Paper 1 (Reading & Writing)',
     topic: 'Exercise 6: Formal vs Informal Tone',
-    questionRef: '0510/22/M/J/23 Ex 6',
+    questionRef: '0510/12/M/J/24 Paper 1 Ex 6',
     candidateFailureRate: '60% lost Content & Language marks due to tone mixing',
     severity: 'high',
     commonError: 'Using informal slang ("hey guys", "gonna", emojis) when writing a formal letter or school magazine report.',

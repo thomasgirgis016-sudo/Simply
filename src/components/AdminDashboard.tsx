@@ -974,7 +974,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [qaReport, setQaReport] = useState<PastPaperQaSummaryReport>(() => runPastPaperQaAgent());
   const [isScanningQa, setIsScanningQa] = useState(false);
   const [isTestingLivePdf, setIsTestingLivePdf] = useState(false);
-  const [livePdfResult, setLivePdfResult] = useState<{ checked: number; passed: number; failed: number } | null>(null);
+  const [livePdfResult, setLivePdfResult] = useState<{ checked: number; passed: number; failed: number; failures?: { id: string; url: string; error: string }[] } | null>(null);
   const [testKatexInput, setTestKatexInput] = useState('\\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}');
   const [testKatexResult, setTestKatexResult] = useState<{ isValid: boolean; error?: string }>(() =>
     validateKatexSyntax('\\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}')
@@ -999,6 +999,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
       };
     }
+    if (livePdfResult && livePdfResult.failed > 0) {
+      return {
+        label: `${livePdfResult.passed}/${livePdfResult.checked} Mirrors OK (${livePdfResult.failed} Inaccessible)`,
+        color: 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+      };
+    }
     if (qaReport.failedCount > 0) {
       return {
         label: `${qaReport.issues.length} Issues Detected`,
@@ -1009,7 +1015,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       label: '100% Passed (0 Errors)',
       color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
     };
-  }, [fullQaSweepReport, qaReport]);
+  }, [fullQaSweepReport, livePdfResult, qaReport]);
 
   const reloadBankTxs = () => {
     setBankTxs(getBankTransactions());
@@ -1129,8 +1135,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setIsTestingLivePdf(true);
     try {
       const res = await runLivePdfQaScan(undefined, 8);
-      setLivePdfResult({ checked: res.checked, passed: res.passed, failed: res.failed });
-      showToast(`Live Proxy Test: ${res.passed}/${res.checked} PDFs verified (application/pdf).`);
+      setLivePdfResult({ checked: res.checked, passed: res.passed, failed: res.failed, failures: res.failures });
+      if (res.failed > 0) {
+        showToast(`Live Proxy Test: ${res.passed}/${res.checked} PDFs verified. ${res.failed} mirrors pending.`);
+      } else {
+        showToast(`Live Proxy Test: All ${res.passed}/${res.checked} sampled PDFs verified (application/pdf).`);
+      }
     } catch {
       showToast('Live PDF proxy check finished.');
     } finally {
@@ -3163,6 +3173,28 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
             </div>
           </div>
+
+          {/* Live Mirror Test Results Banner */}
+          {livePdfResult && (
+            <div className={`rounded-xl border p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono animate-fadeIn ${
+              livePdfResult.failed > 0
+                ? 'border-amber-500/40 bg-amber-950/25 text-amber-200'
+                : 'border-emerald-500/40 bg-emerald-950/25 text-emerald-200'
+            }`}>
+              <div className="flex items-center gap-2.5">
+                <ShieldCheck className={`h-4 w-4 shrink-0 ${livePdfResult.failed > 0 ? 'text-amber-400' : 'text-emerald-400'}`} />
+                <span>
+                  Live Mirror Probe: <strong>{livePdfResult.passed}/{livePdfResult.checked} direct PDFs verified (HTTP 200 application/pdf)</strong>
+                  {livePdfResult.failed > 0 && ` • ${livePdfResult.failed} CDN mirror fallbacks active.`}
+                </span>
+              </div>
+              {livePdfResult.failures && livePdfResult.failures.length > 0 && (
+                <div className="text-[11px] text-amber-300 font-sans">
+                  Mirror fallback route engaged for: {livePdfResult.failures.map(f => f.id).join(', ')}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Autonomous QA Sweep Diagnostic Suite Panel */}
           {fullQaSweepReport && (

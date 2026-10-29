@@ -50,7 +50,7 @@ export const WorksheetBuilder: React.FC<WorksheetBuilderProps> = ({
   // Initialize with all topics if empty
   const activeSelectedTopics = selectedTopics.length > 0 ? selectedTopics : availableTopics;
 
-  // Selected questions that fit target mark quota
+  // Selected questions that fit target mark quota exactly
   const generatedQuestions = useMemo(() => {
     let pool = subjectPapers.filter(p => {
       const matchTopic = selectedTopics.length === 0 || selectedTopics.includes(p.topic);
@@ -60,39 +60,71 @@ export const WorksheetBuilder: React.FC<WorksheetBuilderProps> = ({
 
     if (pool.length === 0) pool = subjectPapers;
 
-    let accumulatedMarks = 0;
-    const selected: PastPaperItem[] = [];
-
-    for (const q of pool) {
-      const qMarks = q.marks || 4;
-      if (accumulatedMarks > 0 && accumulatedMarks + qMarks > targetMarks + 2) {
-        continue;
+    // Available question candidates (allows multiple questions when building large worksheets like 60 or 80 marks)
+    const availablePool: PastPaperItem[] = [];
+    const repeatCount = targetMarks > 40 ? 6 : targetMarks > 25 ? 4 : 2;
+    for (let r = 0; r < repeatCount; r++) {
+      for (const q of pool) {
+        availablePool.push({
+          ...q,
+          id: r === 0 ? q.id : `${q.id}-r${r}`
+        });
       }
-      selected.push(q);
-      accumulatedMarks += qMarks;
-      if (accumulatedMarks >= targetMarks) break;
-    }
-
-    // If filtered pool didn't reach target, pull from broader subject papers
-    if (accumulatedMarks < targetMarks) {
-      const remainingPool = subjectPapers.filter(p => !selected.some(s => s.id === p.id));
-      for (const q of remainingPool) {
-        const qMarks = q.marks || 4;
-        if (accumulatedMarks > 0 && accumulatedMarks + qMarks > targetMarks + 2) {
-          continue;
+      // Also bring in other subject papers if pool is small
+      if (pool.length < 5 && subjectPapers.length > pool.length) {
+        for (const extra of subjectPapers) {
+          if (!pool.some(p => p.id === extra.id)) {
+            availablePool.push({
+              ...extra,
+              id: `${extra.id}-suppl-r${r}`
+            });
+          }
         }
-        selected.push(q);
-        accumulatedMarks += qMarks;
-        if (accumulatedMarks >= targetMarks) break;
       }
     }
 
-    // Fallback: If still under target and nothing fit within threshold, add closest candidate
-    if (selected.length === 0 && pool.length > 0) {
-      selected.push(pool[0]);
+    // Exact Subset-Sum Search
+    let bestSubset: PastPaperItem[] = [];
+    let bestDiff = Infinity;
+
+    function dfs(idx: number, current: PastPaperItem[], currentSum: number) {
+      if (currentSum === targetMarks) {
+        bestSubset = [...current];
+        bestDiff = 0;
+        return true;
+      }
+
+      const diff = Math.abs(currentSum - targetMarks);
+      if (diff < bestDiff) {
+        bestDiff = diff;
+        bestSubset = [...current];
+      }
+
+      if (currentSum > targetMarks || idx >= availablePool.length) return false;
+      if (bestDiff === 0) return true;
+
+      // Search candidates
+      const searchLimit = Math.min(idx + 15, availablePool.length);
+      for (let i = idx; i < searchLimit; i++) {
+        const q = availablePool[i];
+        const qMarks = q.marks || 4;
+        if (currentSum + qMarks <= targetMarks) {
+          current.push(q);
+          if (dfs(i + 1, current, currentSum + qMarks)) return true;
+          current.pop();
+        } else if (bestDiff > 0 && currentSum + qMarks <= targetMarks + 1) {
+          // Allow closest within 1 mark only if no exact match found yet
+          current.push(q);
+          dfs(i + 1, current, currentSum + qMarks);
+          current.pop();
+        }
+      }
+      return false;
     }
 
-    return selected.length > 0 ? selected : subjectPapers.slice(0, 2);
+    dfs(0, [], 0);
+
+    return bestSubset.length > 0 ? bestSubset : pool.slice(0, 2);
   }, [subjectPapers, selectedTopics, difficultyFilter, targetMarks]);
 
   const totalCalculatedMarks = useMemo(() => {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Calculator,
   Award,
@@ -170,11 +170,31 @@ export const GradeBoundariesCalculator: React.FC<GradeBoundariesCalculatorProps>
   activeSubject,
   profile,
 }) => {
-  const [paper2Mark, setPaper2Mark] = useState<number>(34);
-  const [paper4Mark, setPaper4Mark] = useState<number>(68);
+  const isScience = ['cie-physics-0625', 'cie-chem-0620', 'cie-bio-0610', 'edx-physics-4ph1', 'edx-chem-4ch1'].some(
+    id => activeSubject.id.includes(id) || activeSubject.code.includes('0625') || activeSubject.code.includes('0620') || activeSubject.code.includes('0610')
+  );
+  const isMath = activeSubject.id.includes('math') || activeSubject.code.includes('0580') || activeSubject.code.includes('4ma1');
+  const isEsl = activeSubject.id.includes('esl') || activeSubject.code.includes('0510') || activeSubject.code.includes('4es1');
+
+  const p1Max = isScience ? 40 : isMath ? 70 : isEsl ? 60 : 60;
+  const p2Max = isScience ? 80 : isMath ? 130 : isEsl ? 40 : 90;
+  const p3Max = 40;
+
+  const defaultP1 = isScience ? 28 : isMath ? 52 : isEsl ? 42 : 40;
+  const defaultP2 = isScience ? 56 : isMath ? 96 : isEsl ? 28 : 64;
+  const defaultP3 = 28;
+
+  const [paper2Mark, setPaper2Mark] = useState<number>(() => isEsl ? defaultP1 : 34);
+  const [paper4Mark, setPaper4Mark] = useState<number>(() => isEsl ? defaultP2 : 68);
   const [paper6Mark, setPaper6Mark] = useState<number>(32);
   const [selectedSeries, setSelectedSeries] = useState<string>('June 2025 Exam Series (Latest Confirmed)');
   const [selectedVariant, setSelectedVariant] = useState<string>('Variant 2 (12, 22, 42, 62)');
+
+  // Ensure marks are immediately clamped within valid bounds when subject switches
+  useEffect(() => {
+    setPaper2Mark(prev => Math.min(prev, p1Max));
+    setPaper4Mark(prev => Math.min(prev, p2Max));
+  }, [activeSubject.id, p1Max, p2Max]);
 
   const baseBoundary = HISTORIC_BOUNDARIES[activeSubject.id] || DEFAULT_THRESHOLD;
   const seriesOffset = SERIES_OFFSETS[selectedSeries] || 0;
@@ -192,31 +212,27 @@ export const GradeBoundariesCalculator: React.FC<GradeBoundariesCalculatorProps>
     grade3: Math.min(baseBoundary.totalMax, baseBoundary.grade3 + netOffset),
   };
 
-  const isScience = ['cie-physics-0625', 'cie-chem-0620', 'cie-bio-0610', 'edx-physics-4ph1', 'edx-chem-4ch1'].some(
-    id => activeSubject.id.includes(id) || activeSubject.code.includes('0625') || activeSubject.code.includes('0620') || activeSubject.code.includes('0610')
-  );
-  const isMath = activeSubject.id.includes('math') || activeSubject.code.includes('0580') || activeSubject.code.includes('4ma1');
-  const isEsl = activeSubject.id.includes('esl') || activeSubject.code.includes('0510') || activeSubject.code.includes('4es1');
+  const clampedP1 = Math.min(paper2Mark, p1Max);
+  const clampedP2 = Math.min(paper4Mark, p2Max);
+  const clampedP3 = Math.min(paper6Mark, p3Max);
 
   // Compute weighted mark according to official Cambridge syllabus weighting
   let weightedScore = 0;
   if (isScience) {
     // Cambridge Science: Paper 2 (x1.5 = 60 max), Paper 4 (x1.25 = 100 max), Paper 6 (x1.0 = 40 max) -> Total 200
-    const weightedP2 = Math.min(40, paper2Mark) * 1.5;
-    const weightedP4 = Math.min(80, paper4Mark) * 1.25;
-    const weightedP6 = Math.min(40, paper6Mark) * 1.0;
+    const weightedP2 = clampedP1 * 1.5;
+    const weightedP4 = clampedP2 * 1.25;
+    const weightedP6 = clampedP3 * 1.0;
     weightedScore = Math.round(weightedP2 + weightedP4 + weightedP6);
   } else if (isMath) {
     // Cambridge Math: Paper 2 (70 max, x1.0), Paper 4 (130 max, x1.0) -> Total 200
-    weightedScore = Math.min(200, (Number(paper2Mark) || 0) + (Number(paper4Mark) || 0));
+    weightedScore = Math.min(200, clampedP1 + clampedP2);
   } else if (isEsl) {
     // Cambridge ESL 0510: Paper 1 (Reading & Writing, 60 max) + Paper 2 (Listening, 40 max) -> Total 100
-    const p1 = Math.min(60, Number(paper2Mark) || 0);
-    const p2 = Math.min(40, Number(paper4Mark) || 0);
-    weightedScore = p1 + p2;
+    weightedScore = clampedP1 + clampedP2;
   } else {
     // Other subjects (totalMax)
-    weightedScore = Math.min(boundary.totalMax, (Number(paper2Mark) || 0) + (Number(paper4Mark) || 0));
+    weightedScore = Math.min(boundary.totalMax, clampedP1 + clampedP2);
   }
 
   const percentage = Math.round((weightedScore / boundary.totalMax) * 100);
@@ -261,15 +277,9 @@ export const GradeBoundariesCalculator: React.FC<GradeBoundariesCalculatorProps>
   }
 
   const handleReset = () => {
-    if (isScience) {
-      setPaper2Mark(32);
-      setPaper4Mark(64);
-      setPaper6Mark(30);
-    } else {
-      setPaper2Mark(50);
-      setPaper4Mark(95);
-      setPaper6Mark(28);
-    }
+    setPaper2Mark(defaultP1);
+    setPaper4Mark(defaultP2);
+    setPaper6Mark(defaultP3);
   };
 
   return (
@@ -342,21 +352,21 @@ export const GradeBoundariesCalculator: React.FC<GradeBoundariesCalculatorProps>
                   {isScience ? 'Paper 2 (Multiple Choice Core/Ext)' : isMath ? 'Paper 2 (Short-Answer Structured)' : isEsl ? 'Paper 1 (Reading & Writing)' : 'Paper 1 (Core Component)'}
                 </label>
                 <span className="font-mono font-bold text-indigo-400">
-                  {paper2Mark} / {isScience ? '40 (Weights to 60)' : isMath ? '70' : isEsl ? '60' : '60'}
+                  {clampedP1} / {p1Max}
                 </span>
               </div>
               <input
                 type="range"
                 min="0"
-                max={isScience ? "40" : isMath ? "70" : isEsl ? "60" : "60"}
-                value={paper2Mark}
+                max={p1Max}
+                value={clampedP1}
                 onChange={(e) => setPaper2Mark(Number(e.target.value))}
                 className="w-full accent-indigo-500 cursor-pointer"
               />
               <div className="flex justify-between text-[10px] text-slate-500">
                 <span>0 marks</span>
                 <span>{isScience ? 'Raw 40 × 1.5 = 60 weighted marks (30%)' : isEsl ? 'Reading & Writing raw score (60% weight)' : 'Raw score entered directly'}</span>
-                <span>Max {isScience ? '40' : isMath ? '70' : isEsl ? '60' : '60'}</span>
+                <span>Max {p1Max}</span>
               </div>
             </div>
 
@@ -367,21 +377,21 @@ export const GradeBoundariesCalculator: React.FC<GradeBoundariesCalculatorProps>
                   {isScience ? 'Paper 4 (Extended Theory)' : isMath ? 'Paper 4 (Long-Answer Structured)' : isEsl ? 'Paper 2 (Listening)' : 'Paper 2 (Extended Component)'}
                 </label>
                 <span className="font-mono font-bold text-purple-400">
-                  {paper4Mark} / {isScience ? '80 (Weights to 100)' : isMath ? '130' : isEsl ? '40' : '90'}
+                  {clampedP2} / {p2Max}
                 </span>
               </div>
               <input
                 type="range"
                 min="0"
-                max={isScience ? "80" : isMath ? "130" : isEsl ? "40" : "90"}
-                value={paper4Mark}
+                max={p2Max}
+                value={clampedP2}
                 onChange={(e) => setPaper4Mark(Number(e.target.value))}
                 className="w-full accent-purple-500 cursor-pointer"
               />
               <div className="flex justify-between text-[10px] text-slate-500">
                 <span>0 marks</span>
                 <span>{isScience ? 'Raw 80 × 1.25 = 100 weighted marks (50%)' : isEsl ? 'Listening comprehension raw score (40% weight)' : 'Structured working marks'}</span>
-                <span>Max {isScience ? '80' : isMath ? '130' : isEsl ? '40' : '90'}</span>
+                <span>Max {p2Max}</span>
               </div>
             </div>
 

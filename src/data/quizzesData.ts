@@ -285,7 +285,7 @@ export const COMPREHENSIVE_QUIZZES: QuizQuestion[] = [
     id: 'qesl-2',
     subjectId: 'cie-esl-0510',
     topic: 'Exercise 5: Informal Email / Letter Writing (Friendly Register)',
-    paperReference: 'CIE 0510/22 Oct/Nov 2023',
+    paperReference: 'CIE 0510/12 May/June 2024 Paper 1 (Reading & Writing)',
     questionText: 'Which phrase is most appropriate for the opening paragraph of an informal email to a friend in IGCSE ESL?',
     options: [
       { id: 'opt-a', text: '"I am writing this communication to bring to your urgent attention my recent excursion."' },
