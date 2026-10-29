@@ -29,7 +29,9 @@ import {
   RefreshCw,
   Copy,
   Check,
-  Edit3
+  Edit3,
+  Headphones,
+  Volume2
 } from 'lucide-react';
 import { Subject, UserProfile, PastPaperItem, BookmarkItem, OfficialPaperPdf, PastPaperSubPart } from '../types';
 import {
@@ -41,6 +43,14 @@ import {
   TOTAL_ARCHIVE_PAPERS_COUNT,
   TOTAL_ARCHIVE_QUESTIONS_COUNT
 } from '../data/pastPapersData';
+import {
+  getPapersForSubject,
+  getSubjectPaperSpec,
+  getListeningAudioUrls,
+  normalizeSubjectCode,
+  SUBJECT_PAPER_SPECIFICATIONS,
+  SubjectPaperSpec
+} from '../data/subjectPaperSpecs';
 import { synthesizeQuestion } from '../services/questionKnowledgeBase';
 import { evaluateStudentAnswerAgainstMarkScheme, ExamGradingResult } from '../services/examQuestionEngine';
 import { MathRenderer } from './MathRenderer';
@@ -81,6 +91,9 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
     paperCode?: string;
     board?: string;
     type: 'qp' | 'ms' | 'er' | 'gt';
+    hasAudio?: boolean;
+    audioStreamUrl?: string;
+    audioDownloadUrl?: string;
   } | null>(null);
 
   // Viewer Engine in Modal: 'proxy' (Verified Proxy Stream) vs 'gdocs' vs 'direct'
@@ -154,10 +167,43 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
     setGradingReports((prev) => ({ ...prev, [paper.id]: report }));
   };
 
-  // Reset topic whenever active subject or board changes
+  // Reset topic and paper number whenever active subject or board changes
   useEffect(() => {
     setSelectedTopic('All');
+    setSelectedPaperNumber('All');
   }, [selectedSubjectId, selectedBoard]);
+
+  // Identify currently selected subject or active subject
+  const currentSubjectObj = useMemo(() => {
+    if (selectedSubjectId === 'all') return activeSubject;
+    return subjects.find((s) => s.id === selectedSubjectId) ||
+      subjects.find((s) => s.code.toLowerCase().includes(selectedSubjectId.toLowerCase())) ||
+      activeSubject;
+  }, [selectedSubjectId, subjects, activeSubject]);
+
+  const currentSubjectCode = useMemo(() => {
+    return currentSubjectObj?.code || (selectedSubjectId !== 'all' ? selectedSubjectId : activeSubject?.code) || '0580';
+  }, [currentSubjectObj, selectedSubjectId, activeSubject?.code]);
+
+  const currentSubjectSpec = useMemo(() => {
+    const targetCode = selectedSubjectId !== 'all' ? currentSubjectCode : activeSubject?.code || '0580';
+    const norm = normalizeSubjectCode(targetCode);
+    return SUBJECT_PAPER_SPECIFICATIONS[norm];
+  }, [selectedSubjectId, currentSubjectCode, activeSubject?.code]);
+
+  const availablePapers = useMemo(() => {
+    if (selectedSubjectId === 'all') {
+      return [
+        { paperNumber: 1, name: 'Paper 1', title: 'Paper 1 (MCQ / Short Answer / Foundation)', marks: 40, duration: '1 hour', tier: 'General' as const, description: 'Component 1 written examination' },
+        { paperNumber: 2, name: 'Paper 2', title: 'Paper 2 (Extended / Theory / Calculator / Listening)', marks: 80, duration: '2 hours', tier: 'General' as const, description: 'Component 2 structured examination' },
+        { paperNumber: 3, name: 'Paper 3', title: 'Paper 3 (Core Structured / Theory)', marks: 60, duration: '1h 30m', tier: 'General' as const, description: 'Component 3 examination' },
+        { paperNumber: 4, name: 'Paper 4', title: 'Paper 4 (Extended Theory / Calc / Alt)', marks: 100, duration: '2h 15m', tier: 'General' as const, description: 'Component 4 examination' },
+        { paperNumber: 5, name: 'Paper 5', title: 'Paper 5 (Practical Test)', marks: 40, duration: '1h 15m', tier: 'General' as const, description: 'Component 5 practical test' },
+        { paperNumber: 6, name: 'Paper 6', title: 'Paper 6 (Alternative to Practical)', marks: 40, duration: '1 hour', tier: 'General' as const, description: 'Component 6 alternative to practical' },
+      ];
+    }
+    return getPapersForSubject(currentSubjectCode);
+  }, [selectedSubjectId, currentSubjectCode]);
 
   // Pagination / Page Limit for rendering performance
   const [pageLimit, setPageLimit] = useState<number>(24);
@@ -270,8 +316,12 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
       }
 
       // Paper Number filter
-      if (selectedPaperNumber !== 'All' && pdf.paperNumber !== undefined) {
-        if (pdf.paperNumber.toString() !== selectedPaperNumber) {
+      if (selectedPaperNumber !== 'All') {
+        const pNumStr = pdf.paperNumber !== undefined ? pdf.paperNumber.toString() : '';
+        const matchNumber = pNumStr === selectedPaperNumber;
+        const matchCode = pdf.paperCode.includes(selectedPaperNumber);
+        const matchComponent = pdf.paperComponent.toLowerCase().includes(selectedPaperNumber.toLowerCase());
+        if (!matchNumber && !matchCode && !matchComponent) {
           return false;
         }
       }
@@ -624,7 +674,12 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
     backupUrl?: string,
     type: 'qp' | 'ms' | 'er' | 'gt' = 'qp',
     board?: string,
-    paperCode?: string
+    paperCode?: string,
+    audioOptions?: {
+      hasAudio?: boolean;
+      audioStreamUrl?: string;
+      audioDownloadUrl?: string;
+    }
   ) => {
     setUseBackupMirror(false);
     setPreviewModal({
@@ -634,7 +689,10 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
       subtitle,
       type,
       board,
-      paperCode
+      paperCode,
+      hasAudio: audioOptions?.hasAudio,
+      audioStreamUrl: audioOptions?.audioStreamUrl,
+      audioDownloadUrl: audioOptions?.audioDownloadUrl
     });
   };
 
@@ -1086,13 +1144,12 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                   onChange={(e) => setSelectedPaperNumber(e.target.value)}
                   className="w-full rounded-xl border border-sky-500/40 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
                 >
-                  <option value="All">All Papers</option>
-                  <option value="1">Paper 1 (MCQ / Short / Foundation)</option>
-                  <option value="2">Paper 2 (Extended / Theory / Calculator)</option>
-                  <option value="3">Paper 3 (Core Structured)</option>
-                  <option value="4">Paper 4 (Extended Theory / Calc)</option>
-                  <option value="5">Paper 5 (Practical Test)</option>
-                  <option value="6">Paper 6 (Alternative to Practical)</option>
+                  <option value="All">All Papers ({availablePapers.length} Components)</option>
+                  {availablePapers.map((p) => (
+                    <option key={String(p.paperNumber)} value={String(p.paperNumber)}>
+                      {p.title} • {p.marks} Marks ({p.duration})
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -1310,6 +1367,100 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
           </div>
         )}
 
+        {/* Subject Exam Paper Structure Banner */}
+        {currentSubjectSpec && (
+          <div className="rounded-2xl border border-sky-500/30 bg-gradient-to-r from-sky-950/40 via-slate-900 to-indigo-950/40 p-3.5 space-y-3">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-sky-500/20 text-sky-400 font-black text-xs border border-sky-500/30">
+                  📋
+                </div>
+                <div>
+                  <h4 className="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
+                    <span>{currentSubjectSpec.subjectName} ({currentSubjectSpec.subjectCode})</span>
+                    <span className="rounded bg-sky-500/20 px-1.5 py-0.2 text-[9px] font-bold text-sky-300 border border-sky-500/30">
+                      {currentSubjectSpec.board} Exam Structure
+                    </span>
+                  </h4>
+                  <p className="text-[11px] text-slate-400">
+                    Required components: {currentSubjectSpec.totalPapersRequired}
+                  </p>
+                </div>
+              </div>
+
+              {selectedPaperNumber !== 'All' && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedPaperNumber('All')}
+                  className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-300 hover:text-white bg-sky-500/10 hover:bg-sky-500/20 px-2.5 py-1 rounded-lg border border-sky-500/30 transition cursor-pointer"
+                >
+                  <RotateCcw className="h-3 w-3" />
+                  <span>Show All Papers ({currentSubjectSpec.papers.length})</span>
+                </button>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+              {currentSubjectSpec.papers.map((p) => {
+                const isSelected = selectedPaperNumber === String(p.paperNumber);
+                return (
+                  <button
+                    key={String(p.paperNumber)}
+                    type="button"
+                    onClick={() => setSelectedPaperNumber(isSelected ? 'All' : String(p.paperNumber))}
+                    className={`text-left p-3 rounded-xl border transition cursor-pointer flex flex-col justify-between group ${
+                      isSelected
+                        ? 'bg-sky-500/25 border-sky-400 text-white shadow-md shadow-sky-500/10 ring-1 ring-sky-400'
+                        : 'bg-slate-950/70 border-slate-800/80 hover:border-sky-500/40 text-slate-300 hover:bg-slate-900'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2 mb-1.5">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-black text-sky-300 group-hover:text-sky-200">
+                          {typeof p.paperNumber === 'number' ? `Paper ${p.paperNumber}` : p.paperNumber}
+                        </span>
+                        {p.codeSuffix && (
+                          <span className="text-[10px] font-mono text-slate-500">
+                            (/{p.codeSuffix})
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        {p.isListening && (
+                          <span className="rounded bg-sky-500/20 px-1.5 py-0.5 text-[9px] font-bold text-sky-300 border border-sky-500/30 flex items-center gap-1">
+                            <Headphones className="h-2.5 w-2.5 animate-pulse" /> Audio Track
+                          </span>
+                        )}
+                        {p.weightPercent && (
+                          <span className="text-[10px] font-bold text-slate-400">
+                            {p.weightPercent}%
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="text-xs font-extrabold text-white mb-1.5 line-clamp-1">
+                      {p.name}
+                    </div>
+
+                    <div className="text-[10px] text-slate-400 flex items-center gap-1.5 flex-wrap">
+                      <span className="font-semibold text-slate-300">{p.marks} Marks</span>
+                      <span>•</span>
+                      <span>{p.duration}</span>
+                      <span>•</span>
+                      <span className="text-sky-400/90">{p.tier}</span>
+                    </div>
+
+                    <p className="text-[10px] text-slate-400/90 mt-2 line-clamp-2 leading-relaxed border-t border-slate-800/60 pt-1.5">
+                      {p.description}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Action & Results count bar */}
         <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-800 text-xs">
           <div className="flex items-center gap-2 text-slate-400 flex-wrap">
@@ -1428,6 +1579,17 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {displayedPdfs.map((pdf) => {
                   const isCie = pdf.board === 'CIE';
+                  const isListeningPaper = Boolean(
+                    pdf.isListening ||
+                    pdf.paperComponent?.toLowerCase().includes('listening') ||
+                    (pdf.subjectCode === '0510' && pdf.paperNumber === 2) ||
+                    (pdf.subjectCode === '0511' && pdf.paperNumber === 2) ||
+                    (pdf.subjectCode === '4ES1' && pdf.paperNumber === 2) ||
+                    (pdf.subjectCode === '9280' && (pdf.paperNumber === 3 || pdf.paperCode?.includes('L'))) ||
+                    (['0520', '0544', '0530', '0525'].includes(pdf.subjectCode) && (pdf.paperNumber === 1 || pdf.paperNumber === 2 || pdf.paperComponent?.toLowerCase().includes('listening')))
+                  );
+                  const audioUrls = isListeningPaper ? getListeningAudioUrls(pdf.subjectCode, pdf.seasonCode || 's', pdf.year, pdf.paperNumber || 1, pdf.variant || 1) : null;
+
                   return (
                     <div
                       key={pdf.id}
@@ -1452,6 +1614,12 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                             {pdf.variant && (
                               <span className="rounded-lg bg-sky-950/60 text-sky-300 px-2 py-0.5 text-[10px] font-semibold border border-sky-500/30">
                                 Variant {pdf.variant}
+                              </span>
+                            )}
+                            {isListeningPaper && (
+                              <span className="rounded-lg bg-indigo-950/80 text-indigo-300 px-2 py-0.5 text-[10px] font-bold border border-indigo-500/40 flex items-center gap-1">
+                                <Headphones className="h-2.5 w-2.5 animate-pulse text-indigo-400" />
+                                Audio Track
                               </span>
                             )}
                           </div>
@@ -1479,8 +1647,47 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                         </p>
                       </div>
 
-                      {/* Action Buttons: QP, MS, ER, GT */}
+                      {/* Action Buttons: Audio, QP, MS, ER, GT */}
                       <div className="mt-5 pt-4 border-t border-slate-800/80 space-y-2">
+                        {/* Listening Audio Track Stream & Download Box */}
+                        {isListeningPaper && audioUrls && (
+                          <div className="bg-gradient-to-r from-sky-950/70 via-indigo-950/50 to-slate-950/80 rounded-xl p-3 border border-sky-500/30 space-y-2 mb-2">
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-2 text-xs font-bold text-sky-300">
+                                <Headphones className="h-4 w-4 text-sky-400 shrink-0 animate-pulse" />
+                                <span>Official Examination Listening Track</span>
+                              </div>
+                              <span className="text-[9px] font-bold text-sky-400 uppercase tracking-wider bg-sky-950 px-2 py-0.5 rounded border border-sky-500/30">
+                                MP3 Audio
+                              </span>
+                            </div>
+
+                            <audio
+                              controls
+                              preload="none"
+                              src={audioUrls.streamUrl}
+                              className="w-full h-8 rounded-lg"
+                            />
+
+                            <div className="flex items-center justify-between gap-2 pt-0.5 text-[11px]">
+                              <span className="text-slate-400 text-[10px]">
+                                Full recording with pauses & repetitions
+                              </span>
+                              <a
+                                href={audioUrls.downloadUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                download
+                                className="inline-flex items-center gap-1 text-[11px] text-sky-300 hover:text-white font-bold bg-sky-500/20 hover:bg-sky-500/30 px-2 py-1 rounded-md border border-sky-500/40 transition"
+                                title="Download official listening exam MP3 track"
+                              >
+                                <Download className="h-3 w-3" />
+                                <span>Download MP3</span>
+                              </a>
+                            </div>
+                          </div>
+                        )}
+
                         {/* Question Paper Row */}
                         <div className="flex items-center justify-between gap-2 bg-slate-950/60 rounded-xl p-2.5 border border-slate-800">
                           <div className="flex items-center gap-2 text-xs font-bold text-slate-200">
@@ -1498,7 +1705,12 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                   pdf.backupQpUrl,
                                   'qp',
                                   pdf.board,
-                                  pdf.paperCode
+                                  pdf.paperCode,
+                                  isListeningPaper && audioUrls ? {
+                                    hasAudio: true,
+                                    audioStreamUrl: audioUrls.streamUrl,
+                                    audioDownloadUrl: audioUrls.downloadUrl
+                                  } : undefined
                                 )
                               }
                               className="inline-flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-800 px-2 py-1 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition cursor-pointer"
@@ -2347,6 +2559,31 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                       </button>
                     </div>
                   </div>
+
+                  {/* Floating Audio Player HUD in Modal Viewer */}
+                  {previewModal.hasAudio && previewModal.audioStreamUrl && (
+                    <div className="bg-gradient-to-r from-sky-950/95 via-indigo-950/90 to-slate-950 border-b border-sky-500/30 px-4 py-2.5 flex items-center justify-between gap-3 flex-wrap shadow-inner">
+                      <div className="flex items-center gap-2 text-xs font-bold text-sky-300">
+                        <Headphones className="h-4 w-4 text-sky-400 animate-pulse shrink-0" />
+                        <span>Official Listening Exam Track:</span>
+                      </div>
+                      <div className="flex-1 min-w-[220px] max-w-md">
+                        <audio controls preload="metadata" src={previewModal.audioStreamUrl} className="w-full h-8 rounded-lg" />
+                      </div>
+                      {previewModal.audioDownloadUrl && (
+                        <a
+                          href={previewModal.audioDownloadUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          download
+                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-sky-600 hover:bg-sky-500 text-xs font-bold text-white transition shadow-sm"
+                        >
+                          <Download className="h-3.5 w-3.5" />
+                          <span>Download MP3</span>
+                        </a>
+                      )}
+                    </div>
+                  )}
 
                   {/* Helper notice */}
                   <div className="bg-sky-950/40 border-b border-sky-500/20 px-4 py-2 text-[11px] text-sky-200 flex items-center justify-between gap-2 flex-wrap">

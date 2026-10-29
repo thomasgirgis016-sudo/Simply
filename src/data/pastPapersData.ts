@@ -1292,6 +1292,10 @@ export const LOCAL_VERIFIED_PDFS: Record<string, string> = {
   '0610_sp23_ms_4.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0610_s23_ms_42.pdf',
   '0478_sp23_qp_1.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0478_s23_qp_12.pdf',
   '0478_sp23_qp_2.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0478_s23_qp_22.pdf',
+  '9702_m25_qp_32.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/9702_m24_qp_33.pdf',
+  '9701_m25_qp_32.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/9701_m24_qp_33.pdf',
+  '9700_m25_qp_32.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/9700_m24_qp_33.pdf',
+  '9708_s24_qp_12.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/9708_s24_qp_11.pdf',
 };
 
 interface SubjectConfig {
@@ -1920,12 +1924,12 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
       paperComponent: 'Paper 1 (Reading & Writing Specimen)',
       paperCode: '0510/01',
       tier: 'General',
-      qpPdfUrl: 'https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-english-second-language-oral-endorsement-0510/',
+      qpPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_s24_qp_12.pdf',
       backupQpUrl: 'https://pastpapers.papacambridge.com/?s=0510+Specimen+Paper+1',
-      msPdfUrl: 'https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-english-second-language-oral-endorsement-0510/',
+      msPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_s24_ms_12.pdf',
       backupMsUrl: 'https://pastpapers.papacambridge.com/?s=0510+Specimen+Paper+1+MS',
       fileSizeBytes: 'Official Specimen',
-      isPortal: true
+      isPortal: false
     },
     {
       id: 'pdf-0510-sp26-2',
@@ -2157,8 +2161,8 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
     }
   }
 
-  // 4. OxfordAQA International GCSEs (English Suite 2016 - 2026)
-  const OXF_YEARS = [2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016];
+  // 4. OxfordAQA International GCSEs (English Suite 2010 - 2026)
+  const OXF_YEARS = [2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010];
   const OXF_SESSIONS: { label: string; sc: 's' | 'w' }[] = [
     { label: 'May/June', sc: 's' },
     { label: 'November', sc: 'w' }

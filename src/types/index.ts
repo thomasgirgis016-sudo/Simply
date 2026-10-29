@@ -350,6 +350,10 @@ export interface OfficialPaperPdf {
   paperComponent: string; // e.g. "Paper 4 (Extended Theory Calculator)"
   paperCode: string; // e.g. "0580/42"
   tier: 'Core' | 'Extended' | 'General';
+  isListening?: boolean;
+  hasAudio?: boolean;
+  audioStreamUrl?: string;
+  audioDownloadUrl?: string;
   qpPdfUrl: string;
   msPdfUrl?: string;
   examinerReportUrl?: string;
