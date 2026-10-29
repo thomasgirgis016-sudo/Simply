@@ -7,6 +7,9 @@ import { CHEAT_SHEETS_DATABASE } from '../src/data/cheatSheetsData';
 import { IGCSE_PERIODIC_TABLE, CAMBRIDGE_EXAM_FORMULAS } from '../src/data/periodicTableData';
 import { OFFICIAL_EXAM_TIMETABLE } from '../src/data/examTimetableData';
 import { validateKatexSyntax } from '../src/services/pastPaperQaAgent';
+import { evaluateStudentWorking } from '../src/services/mathWorkingValidator';
+import { searchUniversalKnowledge } from '../src/services/knowledgeEngine';
+import { askAiTutor, solveQuestionWithGemini } from '../src/services/gemini';
 
 console.log('===========================================================');
 console.log('  SIMPLY IGCSE — COMPLETE WEBSITE FUNCTIONALITY & CONTENT QA');
@@ -118,7 +121,55 @@ assert(OFFICIAL_EXAM_TIMETABLE.length >= 10, 'Exam Timetable Entries', `Found ${
 for (const entry of OFFICIAL_EXAM_TIMETABLE) {
   assert(!!entry.paperCode && !!entry.examDate && !!entry.timeOfDay, `Timetable entry ${entry.paperCode}`, 'Missing examDate/timeOfDay');
 }
-console.log(`✓ Verified official Cambridge exam dates & timings`);
+// TEST SUITE 8: AI SOLVER, AI TUTOR & MATH VALIDATOR REGRESSION TESTS
+console.log('\n--- 8. AI Solver, Tutor & Working Validator Rigour ---');
+
+// 8a. Math Working Validator: single line calculation 2 + 2 = 4
+const singleLineEval = evaluateStudentWorking('2 + 2 = 4', 1);
+assert(singleLineEval.hasEvaluatedMath, 'Single-line math equation detection (2+2=4)', 'Failed to evaluate equation');
+assert(singleLineEval.marksEarned === 1 && singleLineEval.marksPossible === 1, 'Math working 2+2=4 awards 1/1 marks', `Earned ${singleLineEval.marksEarned}/${singleLineEval.marksPossible}`);
+assert(singleLineEval.percentageScore === 100, 'Math working 2+2=4 achieves 100%', `Scored ${singleLineEval.percentageScore}%`);
+
+// 8b. Math Working Validator: arithmetic error detection 10 + 2 = 8
+const incorrectMathEval = evaluateStudentWorking('10 + 2 = 8', 1);
+assert(incorrectMathEval.hasEvaluatedMath, 'Math equation contradiction detection (10+2=8)', 'Failed to detect contradiction');
+assert(incorrectMathEval.marksEarned === 0, 'Incorrect math 10+2=8 correctly receives 0 marks', `Awarded ${incorrectMathEval.marksEarned}`);
+
+// 8c. Knowledge Engine subject affinity: arithmetic query must not trigger chemistry ions
+const mathKnowledge = searchUniversalKnowledge('What is 2 + 2? Answer the question', 'Mathematics (0580)');
+assert(!mathKnowledge || (!mathKnowledge.toLowerCase().includes('precipitate') && !mathKnowledge.toLowerCase().includes('cation')), 'Math query in KnowledgeEngine does not leak chemistry qualitative analysis table', 'Contained chemistry terms');
+
+// 8d. Knowledge Engine ESL query returns contrast connectors
+const eslKnowledge = searchUniversalKnowledge('contrast sentence connectors', 'English as a Second Language (0510)');
+assert(!!eslKnowledge && (eslKnowledge.toLowerCase().includes('although') || eslKnowledge.toLowerCase().includes('contrast')), 'ESL contrast query in KnowledgeEngine returns linking devices', 'Missing contrast guides');
+
+// 8e. AI Tutor answers arithmetic questions directly with LaTeX and method marks
+const tutorMathReply = await askAiTutor([{ role: 'user', content: 'What is 2 + 2?' }], 'Mathematics (0580)', 'Cambridge CIE');
+assert(tutorMathReply.includes('4') && tutorMathReply.includes('[M1]'), 'AI Tutor answers 2+2 directly with 4 and [M1] mark breakdown', `Received: ${tutorMathReply.slice(0, 100)}...`);
+assert(!tutorMathReply.toLowerCase().includes('aqueous sodium hydroxide'), 'AI Tutor does not confuse math arithmetic with chemistry qualitative tests', 'Contained qualitative analysis');
+
+// 8f. AI Solver correctly handles single-line student working 2 + 2 = 4
+const solverMathResult = await solveQuestionWithGemini({
+  studentWorking: '2 + 2 = 4',
+  subjectName: 'Mathematics (0580)',
+  examBoard: 'Cambridge CIE',
+  gradeLevel: 'IGCSE'
+});
+assert(solverMathResult.totalMarks === 1, 'AI Solver gives 1 mark for single-line 2+2=4 working', `Got totalMarks ${solverMathResult.totalMarks}`);
+assert(solverMathResult.finalAnswer.includes('1 / 1 Marks (100%)'), 'AI Solver marks 2+2=4 as 100%', `Got finalAnswer: ${solverMathResult.finalAnswer}`);
+
+// 8g. AI Solver handles ESL contrast prompt without vertical farming summary leak
+const solverEslResult = await solveQuestionWithGemini({
+  questionText: 'Write a sentence to show contrast between two ideas [1 mark]',
+  subjectName: 'English as a Second Language (0510)',
+  examBoard: 'Cambridge CIE',
+  gradeLevel: 'IGCSE'
+});
+assert(solverEslResult.totalMarks === 1, 'AI Solver assigns 1 mark to ESL contrast prompt', `Got totalMarks ${solverEslResult.totalMarks}`);
+assert(solverEslResult.topic.includes('Contrast'), 'AI Solver assigns correct contrast topic', `Got topic: ${solverEslResult.topic}`);
+assert(!solverEslResult.finalAnswer.toLowerCase().includes('vertical farming'), 'AI Solver does not leak vertical farming summary on 1-mark contrast sentence', 'Contained vertical farming text');
+
+console.log('✓ Verified AI Solver, AI Tutor, and Math Working Validator precision & subject isolation');
 
 console.log('\n===========================================================');
 console.log(`  QA SUMMARY: ${passCount} PASSED, ${failCount} FAILED`);

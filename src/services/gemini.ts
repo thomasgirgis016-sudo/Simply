@@ -1,7 +1,7 @@
 import { SolverResult, Flashcard, QuizQuestion, RevisionTopic, HandwrittenReviewResult, EslSpeakingEvaluation } from '../types';
 import { searchUniversalKnowledge } from './knowledgeEngine';
 import { findPastPaperQuestionByReference, evaluateStudentAnswerAgainstMarkScheme } from './examQuestionEngine';
-import { evaluateStudentWorking } from './mathWorkingValidator';
+import { evaluateStudentWorking, evaluateSafeArithmetic } from './mathWorkingValidator';
 import { verifyAndAuditSolverResult } from './examinerVerificationAgent';
 
 export interface GeminiSolveParams {
@@ -32,6 +32,9 @@ export async function connectPuterSession(): Promise<boolean> {
 // Unified Server-Side AI caller: sends requests directly to internal /api/solve route
 // Eliminates client Puter popups and student key requirements
 export async function callServerSolveApi(action: string, payload: any): Promise<any> {
+  if (typeof window === 'undefined') {
+    throw new Error('Server route /api/solve is only reachable in browser environment');
+  }
   const res = await fetch('/api/solve', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -133,9 +136,21 @@ Ensure standard IGCSE marking criteria: [M] method mark, [A] accuracy mark, [B] 
 DO NOT wrap your output in markdown code blocks like \`\`\`json. Return only raw parseable JSON.
 `;
 
-  // 0a. Check if input is a direct arithmetic / algebraic statement or student working (e.g. "10-2=8", "10+2=8", "x = 10 + 2 = 8")
+  // 0a. Check if input is a direct arithmetic / algebraic statement or student working (e.g. "10-2=8", "10+2=8", "x = 10 + 2 = 8", "2 + 2 = 4")
   const textToCheckForMath = (studentWorking || questionText || '').trim();
-  const directMathEval = textToCheckForMath ? evaluateStudentWorking(textToCheckForMath, 4) : null;
+
+  // Extract explicit marks from prompt if provided (e.g. "1 mark", "[1 mark]", "(1)", "[1]")
+  const markRegex = /\[(\d+)\s*(?:marks?|m)?\]|\((\d+)\s*(?:marks?|m)?\)|\b(\d+)\s*(?:marks?|m)\b/i;
+  const promptMarksMatch = (questionText || studentWorking || '').match(markRegex);
+  const promptSpecifiedMarks = promptMarksMatch
+    ? parseInt(promptMarksMatch[1] || promptMarksMatch[2] || promptMarksMatch[3], 10)
+    : undefined;
+
+  // Single-line equations default to 1 mark, multi-line equations default to promptSpecifiedMarks || lineCount || 4
+  const lineCount = textToCheckForMath.split(/\r?\n/).filter((l) => l.trim().length > 0).length;
+  const targetMathMarks = promptSpecifiedMarks || (lineCount <= 1 ? 1 : Math.min(4, Math.max(1, lineCount)));
+
+  const directMathEval = textToCheckForMath ? evaluateStudentWorking(textToCheckForMath, targetMathMarks) : null;
 
   if (directMathEval && directMathEval.hasEvaluatedMath && !imageBase64) {
     const isShortDirectEquation = textToCheckForMath.split('\n').length <= 3 && textToCheckForMath.length < 80;
@@ -175,6 +190,53 @@ DO NOT wrap your output in markdown code blocks like \`\`\`json. Return only raw
         ],
         relatedTopic: 'Arithmetic & Algebraic Rearrangement',
       };
+    }
+  }
+
+  // 0a-2. Standalone arithmetic without equals sign (e.g. "What is 2 + 2?", "Calculate 2 + 2 [1 mark]")
+  const standaloneArithmeticMatch = textToCheckForMath.match(/^(?:what\s+(?:is|does)|calculate|evaluate|solve|find|compute)?\s*(-?\d+(?:\.\d+)?\s*[\+\-\*\/\^×÷−]\s*-?\d+(?:\.\d+)?(?:\s*[\+\-\*\/\^×÷−]\s*-?\d+(?:\.\d+)?)*)\s*(?:\[(\d+)\s*(?:marks?|m)?\]|\((\d+)\s*(?:marks?|m)?\))?\s*\??$/i);
+  if (standaloneArithmeticMatch && !textToCheckForMath.includes('=')) {
+    const rawExpr = standaloneArithmeticMatch[1].trim();
+    if (!/\b\d{4}\/\d{2}\b/.test(rawExpr)) {
+      const val = evaluateSafeArithmetic(rawExpr);
+      if (val !== null && !isNaN(val) && isFinite(val)) {
+        const marks = promptSpecifiedMarks || 1;
+        const cleanExpr = rawExpr.replace(/\s+/g, ' ');
+        return {
+          questionText: textToCheckForMath,
+          subject: subjectName,
+          topic: 'Basic Arithmetic & Number Operations',
+          totalMarks: marks,
+          coreConceptAndFormula: {
+            concept: 'Fundamental Arithmetic Operations',
+            formula: `${cleanExpr} = ${val}`,
+          },
+          stepByStepSolution: [
+            {
+              stepNumber: 1,
+              title: `Evaluate Expression: ${cleanExpr}`,
+              explanation: `Compute the arithmetic operation: ${cleanExpr} = ${val}.`,
+              mathOrCode: `${cleanExpr} = ${val}`,
+              markAwarded: `[M1] / [A1] Correct calculation (${marks}/${marks} Marks)`
+            }
+          ],
+          finalAnswer: `${val}`,
+          examinerTraps: [
+            'Arithmetic calculation slip under exam pressure.',
+            'Writing only the final number without showing the operation in multi-step questions.'
+          ],
+          markSchemeBreakdown: [
+            `[${marks} Mark] Evaluation of ${cleanExpr} = ${val}`
+          ],
+          examinerTips: [
+            'In Cambridge IGCSE, always write the full line of calculation to secure method marks.'
+          ],
+          commonMistakes: [
+            'Premature rounding or sign confusion.'
+          ],
+          relatedTopic: 'Number & Arithmetic Operations'
+        };
+      }
     }
   }
 
@@ -276,7 +338,9 @@ DO NOT wrap your output in markdown code blocks like \`\`\`json. Return only raw
       return validated;
     }
   } catch (err) {
-    console.warn('Server /api/solve not reachable, trying client options:', err);
+    if (typeof window !== 'undefined') {
+      console.warn('Server /api/solve not reachable, trying client options:', err);
+    }
   }
 
   // 2. Try client-provided Gemini API key if present
@@ -732,6 +796,31 @@ ${ok.rawText}
     }
   }
 
+  // 0c. Direct Arithmetic Calculation Questions (e.g. "What is 2 + 2?", "Calculate 2 + 2", "2 + 2")
+  const arithmeticExprMatch = lastUserMessage.match(/(?:what\s+(?:is|does)|calculate|evaluate|solve|find|compute)?\s*(-?\d+(?:\.\d+)?\s*[\+\-\*\/\^×÷−]\s*-?\d+(?:\.\d+)?(?:\s*[\+\-\*\/\^×÷−]\s*-?\d+(?:\.\d+)?)*)\s*\??$/i);
+  if (arithmeticExprMatch && !lastUserMessage.includes('=')) {
+    const rawExpr = arithmeticExprMatch[1].trim();
+    if (!/\b\d{4}\/\d{2}\b/.test(rawExpr)) {
+      const evaluatedVal = evaluateSafeArithmetic(rawExpr);
+      if (evaluatedVal !== null && !isNaN(evaluatedVal) && isFinite(evaluatedVal)) {
+        const cleanExpr = rawExpr.replace(/\s+/g, ' ');
+        return `### 🧮 Mathematics Co-Pilot: Calculation & Method
+
+$$${cleanExpr} = ${evaluatedVal}$$
+
+---
+
+#### 🎯 Step-by-Step Result:
+- **Expression**: $${cleanExpr}$
+- **Final Answer:** **$${evaluatedVal}$**
+- **Marks Awarded**: **[M1]** method / **[A1]** accuracy mark awarded for exact arithmetic calculation ($${cleanExpr} = ${evaluatedVal}$).
+
+> 💡 **Cambridge Examiner Tip:**  
+> In Cambridge IGCSE Mathematics (0580 / 4MA1), always write the full working line ($${cleanExpr} = ${evaluatedVal}$) rather than stating an unsupported number. Showing this step explicitly ensures you secure method marks even on multi-step questions!`;
+      }
+    }
+  }
+
   // 1. Check Universal Syllabus Knowledge Engine for Instant High-Yield Mark-Scheme Breakdown
   const instantMatch = searchUniversalKnowledge(lastUserMessage, subjectName, examBoard);
   if (instantMatch) {
@@ -917,6 +1006,13 @@ function generateSimulatedSolution(
   gradeLevel: string
 ): SolverResult {
   const lower = query.toLowerCase();
+
+  // Extract explicit marks from query if specified
+  const markRegex = /\[(\d+)\s*(?:marks?|m)?\]|\((\d+)\s*(?:marks?|m)?\)|\b(\d+)\s*(?:marks?|m)\b/i;
+  const promptMarksMatch = query.match(markRegex);
+  const promptSpecifiedMarks = promptMarksMatch
+    ? parseInt(promptMarksMatch[1] || promptMarksMatch[2] || promptMarksMatch[3], 10)
+    : undefined;
 
   // Redox problem
   if (lower.includes('redox') || lower.includes('fe2+') || lower.includes('mno4') || lower.includes('oxidation')) {
@@ -1253,57 +1349,267 @@ function generateSimulatedSolution(
     };
   }
 
-  // English as a Second Language Summary
-  if (lower.includes('vertical farming') || lower.includes('summary') || lower.includes('esl') || subjectName.toLowerCase().includes('english') || subjectName.includes('0510')) {
+  // English as a Second Language (CIE 0510 / Edexcel 4ES1)
+  const isEslQuery =
+    subjectName.toLowerCase().includes('english') ||
+    subjectName.includes('0510') ||
+    subjectName.includes('4es1') ||
+    lower.includes('esl');
+
+  if (isEslQuery) {
+    // 1. Contrast Sentences & Linking Connectors (e.g. contrast, however, although, whereas, despite)
+    const isContrastOrConnective =
+      lower.includes('contrast') ||
+      lower.includes('however') ||
+      lower.includes('although') ||
+      lower.includes('whereas') ||
+      lower.includes('despite') ||
+      lower.includes('in spite of') ||
+      lower.includes('connective') ||
+      lower.includes('linking') ||
+      lower.includes('sentence');
+
+    if (isContrastOrConnective && !lower.includes('summary') && !lower.includes('100-120')) {
+      const marks = promptSpecifiedMarks || 1;
+      return {
+        questionText: query,
+        subject: 'English as a Second Language (CIE 0510 / Edexcel 4ES1)',
+        topic: 'Sentence Synthesis & Cohesive Contrast Connectors',
+        totalMarks: marks,
+        coreConceptAndFormula: {
+          concept: 'Forming complex contrast clauses using subordinate conjunctions (although, whereas) or adverbial linkers (however, conversely) with precise comma punctuation and formal register.',
+          formula: '\\text{Subordinate Clause: } \\text{Although } [A], [B] \\quad \\text{or} \\quad [A]. \\text{ However, } [B].',
+        },
+        stepByStepSolution: [
+          {
+            stepNumber: 1,
+            title: 'Identify Contrasting Propositions',
+            explanation: 'Select two opposing clauses or ideas (e.g. an advantage vs a limitation) to synthesize into a single compound-complex structure.',
+            markAwarded: '[M1] Valid contrasting ideas established'
+          },
+          {
+            stepNumber: 2,
+            title: 'Apply Formal Contrast Connective & Punctuation',
+            explanation: 'When placing "Although" or "Whereas" at the start, separate the subordinate and main clauses with a comma. When using "However", precede with a full stop or semicolon and follow with a comma.',
+            mathOrCode: '\\text{"Although [clause 1], [clause 2]."}',
+            markAwarded: '[A1] Accurate connective and comma placement'
+          }
+        ],
+        finalAnswer: 'Model Contrast Sentence:\n"Although modern electric vehicles significantly diminish urban greenhouse emissions, their widespread adoption remains constrained by high battery replacement expenses and limited charging infrastructure."',
+        examinerTraps: [
+          'Double-linking error: Never write "Although" and "but" in the same sentence (e.g. writing "Although it was expensive, but they purchased it" forfeits accuracy marks).',
+          'Using informal colloquialisms like "anyways" or "though" at the end of formal examination sentences.',
+          'Omitting the comma after an introductory subordinate clause starting with "Although".'
+        ],
+        markSchemeBreakdown: [
+          `[${marks} Mark] Grammatically flawless sentence establishing a clear, effective contrast between two related ideas with accurate punctuation and formal register.`
+        ],
+        examinerTips: [
+          'In Cambridge 0510 Reading & Writing, varied sentence structures (simple, compound, complex) directly boost your Language Band.',
+          'When using "despite" or "in spite of", follow with a noun phrase or gerund: "Despite the high cost...", never "Despite it was expensive...".'
+        ],
+        commonMistakes: [
+          'Writing "Although X, but Y." (combining two contrasting conjunctions).',
+          'Forgetting the comma before "however" when used as an adverbial conjunct.'
+        ],
+        relatedTopic: 'Complex Sentences, Subordinate Clauses and Cohesion'
+      };
+    }
+
+    // 2. Exercise 5: Informal Email / Friendly Letter
+    if (lower.includes('email') || lower.includes('informal') || lower.includes('letter') || lower.includes('exercise 5')) {
+      return {
+        questionText: query,
+        subject: 'English as a Second Language (CIE 0510)',
+        topic: 'Exercise 5: Informal Email Writing',
+        totalMarks: 12,
+        coreConceptAndFormula: {
+          concept: 'Informal register, conversational contractions, and cohesive paragraphs responding to 3 prompt bullet points',
+          formula: '\\text{Target Length: } 120 - 160 \\text{ words} \\implies 6 \\text{ Content} + 6 \\text{ Language}'
+        },
+        stepByStepSolution: [
+          {
+            stepNumber: 1,
+            title: 'Friendly Opening & Purpose',
+            explanation: 'Begin with a warm, natural greeting ("Hi Alex!") and acknowledge past correspondence before stating the reason for writing.',
+            markAwarded: '[B2] Natural friendly register'
+          },
+          {
+            stepNumber: 2,
+            title: 'Address All 3 Bullet Prompts with Lively Detail',
+            explanation: 'Dedicate a well-developed paragraph to each prompt bullet, using enthusiastic adjectives and natural contractions (I\'d, haven\'t, won\'t).',
+            markAwarded: '[B4] Content fully addressed'
+          },
+          {
+            stepNumber: 3,
+            title: 'Appropriate Sign-Off',
+            explanation: 'Conclude with a forward-looking sign-off ("Drop me a line soon!", "Can\'t wait to hear from you!") and a friendly sign-off.',
+            markAwarded: '[B6] Cohesive structure & tone'
+          }
+        ],
+        finalAnswer: 'Model Informal Email (140 words):\n"Hi Sam,\n\nHope everything is going well with your exams! I\'m writing because you won\'t believe what happened at our school science exhibition yesterday.\n\nOur team built an automated solar irrigation model. At first, the water pump refused to start, which caused utter panic! Fortunately, we discovered a loose wire, and once reconnected, the sprinkler system functioned flawlessly. The judges were genuinely impressed, especially when they saw how much water it saved.\n\nTo celebrate, our teacher treated us all to pizza after the fair. You really missed out on an unforgettable afternoon!\n\nAnyway, how did your basketball tournament go? Write back soon and let me know all the gossip!\n\nBest wishes,\nAlex"',
+        examinerTraps: [
+          'Using an overly formal or business-letter tone ("Dear Sir", "I am writing to inform you").',
+          'Omitting one of the 3 bullet points, which caps Content marks.'
+        ],
+        markSchemeBreakdown: [
+          '[6 Content Marks] All 3 prompt bullet points developed with relevant, engaging details.',
+          '[6 Language Marks] Natural informal register, conversational idioms, appropriate contractions, and cohesive paragraph flow.'
+        ],
+        examinerTips: [
+          'Use contractions naturally in Exercise 5 (don\'t, haven\'t, I\'ll) to show authentic informal register.'
+        ],
+        commonMistakes: [
+          'Writing in bullet points rather than paragraphs.',
+          'Using textbook formality in an email to a friend.'
+        ],
+        relatedTopic: 'Informal Email and Letter Writing'
+      };
+    }
+
+    // 3. Exercise 6: Formal Article & Report
+    if (lower.includes('article') || lower.includes('report') || lower.includes('review') || lower.includes('formal') || lower.includes('exercise 6')) {
+      return {
+        questionText: query,
+        subject: 'English as a Second Language (CIE 0510)',
+        topic: 'Exercise 6: Formal Article & Report Writing',
+        totalMarks: 16,
+        coreConceptAndFormula: {
+          concept: 'Advanced formal register, passive voice, academic discourse markers, and balanced persuasive structure',
+          formula: '\\text{Target Length: } 150 - 200 \\text{ words} \\implies 8 \\text{ Content} + 8 \\text{ Language}'
+        },
+        stepByStepSolution: [
+          {
+            stepNumber: 1,
+            title: 'Formal Headline / Title & Introduction',
+            explanation: 'Provide an engaging title and a clear thesis statement introducing the topic and scope.',
+            markAwarded: '[B2] Formal register established'
+          },
+          {
+            stepNumber: 2,
+            title: 'Balanced Arguments & Sophisticated Vocabulary',
+            explanation: 'Present reasoned arguments using formal collocations and discourse markers ("Furthermore", "Conversely", "Consequently"). Avoid contractions.',
+            markAwarded: '[B4] Discursive development'
+          },
+          {
+            stepNumber: 3,
+            title: 'Definitive Conclusion / Recommendation',
+            explanation: 'Synthesize the main findings and offer forward-looking recommendations in a formal tone.',
+            markAwarded: '[B2] Clear concluding synthesis'
+          }
+        ],
+        finalAnswer: 'Model Formal Article (175 words):\n"Fostering Youth Civic Engagement: A Blueprint for Secondary Schools\n\nParticipation in community volunteering initiatives provides secondary students with indispensable developmental benefits that extend well beyond the traditional classroom curriculum.\n\nFirstly, hands-on community engagement enhances interpersonal confidence and leadership abilities. By collaborating with local charitable organizations, young people cultivate crucial real-world problem-solving skills, resilience, and collaborative teamwork. Furthermore, community programs generate tangible societal advantages. Whether tutoring underprivileged primary pupils or assisting elderly residents, student volunteers substantially alleviate operational pressure on local support services.\n\nConversely, academic time constraints often deter pupils from participating consistently. To overcome this obstacle, school administrations should incorporate structured volunteering modules into existing extracurricular timetables rather than expecting pupils to coordinate projects independently after school.\n\nIn conclusion, integrating civic engagement into secondary education enriches student maturity while actively strengthening the broader community. Establishing formal school partnerships with local charities represents an urgent priority that warrants full institutional commitment."',
+        examinerTraps: [
+          'Using informal slang, contractions ("can\'t", "won\'t"), or conversational greetings in a formal article.',
+          'Failing to organize writing into distinct paragraphs.'
+        ],
+        markSchemeBreakdown: [
+          '[8 Content Marks] Fully develops the topic with persuasive arguments, relevant examples, and realistic recommendations.',
+          '[8 Language Marks] Broad sophisticated vocabulary, complex grammatical structures, precise passive voice, and flawless formal register.'
+        ],
+        examinerTips: [
+          'Never use contractions in Exercise 6 formal writing. Write "cannot" and "will not" instead of "can\'t" and "won\'t".'
+        ],
+        commonMistakes: [
+          'Mixing informal tone into a formal report to the principal.'
+        ],
+        relatedTopic: 'Formal Writing, Discursive Articles and Reports'
+      };
+    }
+
+    // 4. Exercise 4: Summary Writing (Explicit)
+    if (lower.includes('summary') || lower.includes('vertical farming') || lower.includes('100-120') || lower.includes('exercise 4')) {
+      return {
+        questionText: query.length > 30 ? query : 'Summary Writing: Benefits and operational challenges of urban vertical farming (100-120 words).',
+        subject: 'English as a Second Language (CIE 0510)',
+        topic: 'Exercise 4: Summary Writing & Cohesion',
+        totalMarks: 16,
+        coreConceptAndFormula: {
+          concept: 'Exercise 4: Informational text synthesis, selective note-taking, and cohesive paragraph drafting',
+          formula: '\\text{Word Limit Target: } 100 - 120 \\text{ words (Strict Examiner Penalty at 121+ words)}'
+        },
+        stepByStepSolution: [
+          {
+            stepNumber: 1,
+            title: 'Extract Content Points (Aspect 1: Environmental Benefits)',
+            explanation: 'Identify 4 distinct points from the passage: 1) Reduced water usage via recycling; 2) Zero pesticides needed; 3) Lower transportation carbon emissions (locally grown); 4) Year-round harvest unaffected by severe weather.',
+            markAwarded: '[B4] 4 Content Points'
+          },
+          {
+            stepNumber: 2,
+            title: 'Extract Content Points (Aspect 2: Economic & Operational Challenges)',
+            explanation: 'Identify 4 distinct points: 5) Extremely high initial setup capital; 6) Substantial electricity costs for artificial LED lighting; 7) Limited variety of suitable crops (mostly leafy greens); 8) High technical expertise required to manage automated nutrient systems.',
+            markAwarded: '[B4] 4 Content Points'
+          },
+          {
+            stepNumber: 3,
+            title: 'Paraphrase & Synthesise with Formal Linkers',
+            explanation: 'Rewrite points into connected sentences using cohesive devices (e.g. "Firstly...", "Moreover...", "Conversely...", "Consequently..."). Ensure word count stays strictly between 100-120 words.',
+            mathOrCode: '\\text{Word Count: 114 words (Optimal Band 5-6 Language)}',
+            markAwarded: '[L6] Top Band Language & Style'
+          }
+        ],
+        finalAnswer: 'Model Summary (114 words):\n"Vertical farming offers several remarkable environmental advantages. Firstly, it conserves substantial quantities of water through recycling systems and eliminates the necessity for chemical pesticides. Furthermore, cultivating crops within urban centres drastically diminishes transportation emissions while ensuring consistent, weather-independent yields year-round. Conversely, operators encounter significant operational hurdles. Setting up indoor facilities demands exorbitant financial capital, and maintaining continuous artificial lighting results in immense electricity expenditure. In addition, current technology restricts production largely to leafy vegetables, whilst sophisticated automated irrigation requires highly trained technical personnel to oversee operations effectively."',
+        examinerTraps: [
+          'Direct copying / lifting of whole phrases from the prompt, which severely downgrades your language mark.',
+          'Exceeding 120 words — examiners draw a line after 120 words and disregard all subsequent points.',
+          'Using bullet points or numbered lists instead of a continuous formal prose paragraph.'
+        ],
+        markSchemeBreakdown: [
+          '[10 Content Marks] 8+ distinct points identified across both aspects (awarded 10/10)',
+          '[6 Language Marks] Cohesive paragraph structure, excellent paraphrasing with no lifting, word count strictly 100-120 words'
+        ],
+        examinerTips: [
+          'Count your words precisely before submitting! If you write 121+ words, examiners draw a line and ignore all subsequent points.',
+          'Never use bullet points in Exercise 4; it must be written as a continuous prose paragraph.'
+        ],
+        commonMistakes: [
+          'Direct lifting of entire sentences from the text (costs all 6 language marks).',
+          'Focusing only on benefits and forgetting the challenges aspect.'
+        ],
+        relatedTopic: 'Reading for Detail, Paraphrasing, and Cohesive Connectives'
+      };
+    }
+
+    // 5. Default General English / Reading Comprehension Question
+    const marks = promptSpecifiedMarks || 2;
     return {
-      questionText: 'Summary Writing: Benefits and operational challenges of urban vertical farming (100-120 words).',
-      subject: 'English as a Second Language (CIE 0510)',
-      topic: 'Exercise 4: Summary Writing & Cohesion',
-      totalMarks: 16,
+      questionText: query,
+      subject: 'English as a Second Language (CIE 0510 / Edexcel 4ES1)',
+      topic: 'Reading Comprehension & Language Analysis',
+      totalMarks: marks,
       coreConceptAndFormula: {
-        concept: 'Exercise 4: Informational text synthesis, selective note-taking, and cohesive paragraph drafting',
-        formula: '\\text{Word Limit Target: } 100 - 120 \\text{ words (Strict Examiner Penalty at 121+ words)}'
+        concept: 'Skimming for gist, scanning for specific factual details, and precise grammatical deduction',
+        formula: '\\text{Marks Allocated: } ' + marks + ' \\text{ Marks}'
       },
       stepByStepSolution: [
         {
           stepNumber: 1,
-          title: 'Extract Content Points (Aspect 1: Environmental Benefits)',
-          explanation: 'Identify 4 distinct points from the passage: 1) Reduced water usage via recycling; 2) Zero pesticides needed; 3) Lower transportation carbon emissions (locally grown); 4) Year-round harvest unaffected by severe weather.',
-          markAwarded: '[B4] 4 Content Points'
+          title: 'Analyze Prompt & Identify Key Information',
+          explanation: 'Identify the command focus of the question and locate the relevant factual evidence without unnecessary lifting.',
+          markAwarded: `[B1] Relevant detail identified`
         },
         {
           stepNumber: 2,
-          title: 'Extract Content Points (Aspect 2: Economic & Operational Challenges)',
-          explanation: 'Identify 4 distinct points: 5) Extremely high initial setup capital; 6) Substantial electricity costs for artificial LED lighting; 7) Limited variety of suitable crops (mostly leafy greens); 8) High technical expertise required to manage automated nutrient systems.',
-          markAwarded: '[B4] 4 Content Points'
-        },
-        {
-          stepNumber: 3,
-          title: 'Paraphrase & Synthesise with Formal Linkers',
-          explanation: 'Rewrite points into connected sentences using cohesive devices (e.g. "Firstly...", "Moreover...", "Conversely...", "Consequently..."). Ensure word count stays strictly between 100-120 words.',
-          mathOrCode: '\\text{Word Count: 114 words (Optimal Band 5-6 Language)}',
-          markAwarded: '[L6] Top Band Language & Style'
+          title: 'Draft Clear, Concise Response',
+          explanation: 'Formulate an accurate, grammatically sound answer directly addressing the prompt using appropriate vocabulary.',
+          markAwarded: marks > 1 ? `[B1] High language accuracy and precision` : `[A1] Exact response`
         }
       ],
-      finalAnswer: 'Model Summary (114 words):\n"Vertical farming offers several remarkable environmental advantages. Firstly, it conserves substantial quantities of water through recycling systems and eliminates the necessity for chemical pesticides. Furthermore, cultivating crops within urban centres drastically diminishes transportation emissions while ensuring consistent, weather-independent yields year-round. Conversely, operators encounter significant operational hurdles. Setting up indoor facilities demands exorbitant financial capital, and maintaining continuous artificial lighting results in immense electricity expenditure. In addition, current technology restricts production largely to leafy vegetables, whilst sophisticated automated irrigation requires highly trained technical personnel to oversee operations effectively."',
+      finalAnswer: 'Accurate and concise response aligned with Cambridge mark scheme criteria.',
       examinerTraps: [
-        'Direct copying / lifting of whole phrases from the prompt, which severely downgrades your language mark.',
-        'Exceeding 120 words — examiners draw a line after 120 words and disregard all subsequent points.',
-        'Using bullet points or numbered lists instead of a continuous formal prose paragraph.'
+        'Writing excessive irrelevant background information that obscures the key answer point.'
       ],
       markSchemeBreakdown: [
-        '[10 Content Marks] 8+ distinct points identified across both aspects (awarded 10/10)',
-        '[6 Language Marks] Cohesive paragraph structure, excellent paraphrasing with no lifting, word count strictly 100-120 words'
+        `[${marks} Marks] Accurate response with precise detail and clear phrasing.`
       ],
       examinerTips: [
-        'Count your words precisely before submitting! If you write 121+ words, examiners draw a line and ignore all subsequent points.',
-        'Never use bullet points in Exercise 4; it must be written as a continuous prose paragraph.'
+        'Keep answers concise in short-answer reading comprehension; examiners look for exact keywords.'
       ],
       commonMistakes: [
-        'Direct lifting of entire sentences from the text (costs all 6 language marks).',
-        'Focusing only on benefits and forgetting the challenges aspect.'
+        'Lifting whole sentences when only a short phrase or single fact is required.'
       ],
-      relatedTopic: 'Reading for Detail, Paraphrasing, and Cohesive Connectives'
+      relatedTopic: 'Reading Comprehension and Factual Scanning'
     };
   }
 

@@ -10,13 +10,21 @@ export interface TopicExplanation {
 
 export function searchUniversalKnowledge(query: string, activeSubjectName: string, examBoard: string): string | null {
   const q = query.toLowerCase().trim();
+  const sub = (activeSubjectName || '').toLowerCase();
+
+  const isMathSubject = sub.includes('math') || sub.includes('0580') || sub.includes('4ma1');
+  const isChemSubject = sub.includes('chem') || sub.includes('0620') || sub.includes('4ch1');
+  const isPhysSubject = sub.includes('phys') || sub.includes('0625') || sub.includes('4ph1');
+  const isBioSubject = sub.includes('bio') || sub.includes('0610') || sub.includes('4bi1');
+  const isEslSubject = sub.includes('english') || sub.includes('esl') || sub.includes('0510') || sub.includes('4es1');
+  const isScienceSubject = isChemSubject || isPhysSubject || isBioSubject || sub.includes('science');
 
   // -------------------------------------------------------------
-  // CHEMISTRY TOPICS
+  // CHEMISTRY TOPICS (Only accessible if in Chemistry/Science or explicit chemistry query)
   // -------------------------------------------------------------
-
-  // 1. Electrolysis
-  if (q.includes('electrolysis') || q.includes('electrolyte') || q.includes('cathode') || q.includes('anode') || q.includes('brine') || q.includes('electroplat')) {
+  if (!isMathSubject && !isEslSubject) {
+    // 1. Electrolysis
+    if (q.includes('electrolysis') || q.includes('electrolyte') || q.includes('cathode') || q.includes('anode') || q.includes('brine') || q.includes('electroplat')) {
     return `### ⚡ Electrolysis: IGCSE Chemistry Master Guide (${examBoard})
 
 **Electrolysis** is the decomposition of an ionic compound (molten or aqueous) by the passage of an electric current.
@@ -337,7 +345,14 @@ $$\\%\\text{ Purity} = \\frac{\\text{Mass of pure substance}}{\\text{Total mass 
   }
 
   // 9. Identification of Ions & Flame Tests
-  if (q.includes('flame test') || q.includes('test for') || q.includes('ion') || q.includes('gas test') || q.includes('precipitate') || q.includes('cation') || q.includes('anion')) {
+  const isQualitativeChem = (isChemSubject || isScienceSubject || q.includes('chem')) &&
+    (q.includes('flame test') ||
+     q.includes('gas test') ||
+     /\b(cation|cations|anion|anions|precipitates?)\b/i.test(q) ||
+     (/\btest for\b/i.test(q) && /\b(metal|ion|ions|gas|gases|halide|cation|anion)\b/i.test(q)) ||
+     q.includes('qualitative analysis'));
+
+  if (isQualitativeChem) {
     return `### 🔍 Qualitative Analysis: Gas & Ion Identification Table
 
 ---
@@ -376,12 +391,14 @@ $$\\%\\text{ Purity} = \\frac{\\text{Mass of pure substance}}{\\text{Total mass 
 - **Carbon Dioxide ($CO_2$)**: Bubble through limewater $\\rightarrow$ **Turns limewater cloudy / milky**.
 - **Chlorine ($Cl_2$)**: Damp litmus paper $\\rightarrow$ **Bleaches white**.`;
   }
+  } // end of Chemistry topics guard
 
   // -------------------------------------------------------------
   // PHYSICS TOPICS
   // -------------------------------------------------------------
-  if (q.includes('newton') || q.includes('gravity') || q.includes('momentum') || q.includes('terminal velocity') || q.includes('acceleration') || q.includes('speed') || q.includes('velocity')) {
-    return `### 🚀 Forces & Motion: IGCSE Physics Master Guide (${examBoard})
+  if (!isMathSubject && !isEslSubject && (isPhysSubject || isScienceSubject || q.includes('phys'))) {
+    if (q.includes('newton') || q.includes('gravity') || q.includes('momentum') || q.includes('terminal velocity') || q.includes('acceleration') || q.includes('speed') || q.includes('velocity')) {
+      return `### 🚀 Forces & Motion: IGCSE Physics Master Guide (${examBoard})
 
 ---
 
@@ -408,13 +425,15 @@ When a parachutist jumps out of an aircraft:
 2. As speed increases, **Air Resistance (upwards)** increases.
 3. The resultant force downwards decreases $\\rightarrow$ acceleration decreases (gradient of v-t graph flattens).
 4. Eventually, **Air Resistance = Weight** $\\rightarrow$ Resultant force is **ZERO** $\\rightarrow$ Acceleration is zero $\\rightarrow$ Constant **Terminal Velocity** is reached.`;
+    }
   }
 
   // -------------------------------------------------------------
   // BIOLOGY TOPICS
   // -------------------------------------------------------------
-  if (q.includes('osmosis') || q.includes('diffusion') || q.includes('active transport') || q.includes('turgid') || q.includes('water potential')) {
-    return `### 💧 Movement In and Out of Cells: IGCSE Biology
+  if (!isMathSubject && !isEslSubject && (isBioSubject || isScienceSubject || q.includes('bio'))) {
+    if (q.includes('osmosis') || q.includes('diffusion') || q.includes('active transport') || q.includes('turgid') || q.includes('water potential')) {
+      return `### 💧 Movement In and Out of Cells: IGCSE Biology
 
 ---
 
@@ -439,13 +458,57 @@ When a parachutist jumps out of an aircraft:
 - **Plant Cell in Pure Water**: Water enters by osmosis $\\rightarrow$ vacuole swells $\\rightarrow$ cytoplasm pushes against rigid cellulose cell wall $\\rightarrow$ cell becomes **turgid** (wall prevents bursting).
 - **Plant Cell in Concentrated Salt Solution**: Water leaves by osmosis $\\rightarrow$ cytoplasm shrinks away from cell wall $\\rightarrow$ **plasmolysed** (cell is **flaccid**).
 - **Animal Cell (RBC) in Pure Water**: Water enters by osmosis $\\rightarrow$ cell swells and **bursts (lysis)** because it has no cell wall!`;
+    }
+  }
+
+  // -------------------------------------------------------------
+  // ENGLISH AS A SECOND LANGUAGE (ESL 0510 / 4ES1)
+  // -------------------------------------------------------------
+  if (isEslSubject || q.includes('esl') || q.includes('0510') || q.includes('4es1')) {
+    if (q.includes('contrast') || q.includes('however') || q.includes('although') || q.includes('whereas') || q.includes('despite') || q.includes('connector') || q.includes('linking word') || q.includes('sentence')) {
+      return `### ✍️ Contrast Sentences & Cohesive Connectors: IGCSE ESL Guide (${examBoard})
+
+In Cambridge IGCSE 0510 (Paper 1: Reading & Writing), using varied and accurate contrast connectors directly boosts your Language Band!
+
+---
+
+#### 1. The Two Main Contrast Structures
+
+##### A. Subordinate Conjunctions: *Although / Even though / Whereas / While*
+- Join two clauses in **one single sentence**.
+- When placed at the start, place a comma before the main clause:
+  $$\\text{"Although urban vertical farming requires high setup capital, it drastically diminishes water usage."}$$
+- **CRITICAL EXAMINER TRAP**: Never pair *"Although"* with *"but"*!
+  - ❌ *Incorrect*: *"Although it was raining, but they played football."*
+  - ✅ *Correct*: *"Although it was raining, they played football."*
+
+##### B. Adverbial Connectors: *However / Conversely / On the other hand / In contrast*
+- Connect two separate independent sentences or clauses.
+- Require punctuation (full stop/semicolon before, comma after):
+  $$\\text{"The renewable energy installation requires significant initial funding. However, long-term operational costs are minimal."}$$
+
+##### C. Prepositional Phrases: *Despite / In spite of*
+- MUST be followed by a **noun phrase** or a **gerund (-ing verb)**:
+  - ✅ *"Despite the exorbitant price, the system was adopted."*
+  - ✅ *"In spite of facing severe weather, crops flourished."*
+  - ❌ Never write: *"Despite it was expensive..."* (use *"Despite the fact that it was expensive..."*).
+
+---
+
+#### 2. High-Scoring Model Sentence (1-Mark / Accuracy Benchmark)
+$$\\text{"Although public transport networks reduce traffic congestion, their efficiency depends heavily on regular municipal investment."}$$
+
+> 💡 **Examiner Tip for Paper 1:**
+> Demonstrating mastery of complex contrast clauses in Exercise 5 (Email) and Exercise 6 (Article/Report) secures marks in the top Language criteria band.`;
+    }
   }
 
   // -------------------------------------------------------------
   // MATHEMATICS TOPICS
   // -------------------------------------------------------------
-  if (q.includes('circle theorem') || q.includes('tangent') || q.includes('cyclic') || q.includes('subtend')) {
-    return `### ⭕ The 7 Circle Theorems Master Sheet (${examBoard})
+  if (isMathSubject || q.includes('math') || (!isScienceSubject && !isEslSubject)) {
+    if (q.includes('circle theorem') || q.includes('tangent') || q.includes('cyclic') || q.includes('subtend')) {
+      return `### ⭕ The 7 Circle Theorems Master Sheet (${examBoard})
 
 To earn full marks in Cambridge 0580 & Edexcel 4MA1, you MUST state the exact geometric reason in words!
 
@@ -472,6 +535,25 @@ To earn full marks in Cambridge 0580 & Edexcel 4MA1, you MUST state the exact ge
 7. **Alternate Segment Theorem**:
    - The angle between a tangent and a chord equals the angle subtended by that chord in the alternate segment.
    - *Reason*: *"Alternate segment theorem"*.`;
+    }
+
+    if (q.includes('quadratic') || q.includes('completing the square') || q.includes('parabola') || q.includes('turning point')) {
+      return `### 📐 Quadratic Equations & Completing the Square (${examBoard})
+
+---
+
+#### 1. Completing the Square: $x^2 + bx + c$
+1. Halve the coefficient of $x$: $p = \\frac{b}{2}$.
+2. Form $(x + p)^2$.
+3. Subtract $p^2$ and add $c$:
+   $$x^2 + bx + c = \\left(x + \\frac{b}{2}\\right)^2 - \\left(\\frac{b}{2}\\right)^2 + c$$
+
+#### 2. Deducing the Turning Point (Vertex)
+For $y = a(x - h)^2 + k$:
+- **Turning Point**: $(h, k)$
+- If $a > 0$, the curve is U-shaped with a **minimum** at $(h, k)$.
+- If $a < 0$, the curve is inverted with a **maximum** at $(h, k)$.`;
+    }
   }
 
   // Fallback: If not explicitly matched, return null to let dynamic generator build it

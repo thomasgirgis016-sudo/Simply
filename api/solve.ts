@@ -60,24 +60,25 @@ export default async function handler(req: any, res?: any) {
       topic = 'General Syllabus Topic',
     } = body;
 
+    const apiKey =
+      process.env.GEMINI_API_KEY ||
+      process.env.VITE_GEMINI_API_KEY ||
+      process.env.GOOGLE_API_KEY ||
+      body.apiKey;
+
     // Health check ping handler (used by autonomous QA sweep & monitoring)
     if (req.method === 'GET' || body.ping === true || body.action === 'ping') {
       const pingResponse = {
         ok: true,
         service: 'ai-solver',
         status: 'ready',
+        hasServerKey: Boolean(apiKey && apiKey.trim() !== ''),
         model: body.model || 'gemini-1.5-flash',
         timestamp: new Date().toISOString()
       };
       if (res?.status) return res.status(200).json(pingResponse);
       return new Response(JSON.stringify(pingResponse), { status: 200, headers });
     }
-
-    const apiKey =
-      process.env.GEMINI_API_KEY ||
-      process.env.VITE_GEMINI_API_KEY ||
-      process.env.GOOGLE_API_KEY ||
-      body.apiKey;
 
     if (!apiKey || apiKey.trim() === '') {
       const errorPayload = {

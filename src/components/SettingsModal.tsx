@@ -27,6 +27,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [model, setModel] = useState(profile.selectedModel || 'gemini-2.5-flash');
   const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   if (!isOpen) return null;
 
@@ -36,33 +37,57 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   const handleTestKey = async () => {
-    if (!apiKey.trim()) {
-      setTestStatus('error');
-      setErrorMessage('Please enter an API key first.');
+    setTestStatus('testing');
+    setErrorMessage('');
+    setSuccessMessage('');
+
+    if (apiKey.trim()) {
+      // User entered a personal key: test directly with Google Gemini
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey.trim()}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: 'Test connection: reply with "OK".' }] }]
+          })
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err?.error?.message || `Google API error (HTTP ${res.status}). Please check that the key is valid and has Gemini API enabled.`);
+        }
+
+        setTestStatus('success');
+        setSuccessMessage('Personal API Key is valid and connected to Google Gemini successfully!');
+      } catch (err: any) {
+        setTestStatus('error');
+        setErrorMessage(err.message || 'Failed to authenticate key with Google AI Studio.');
+      }
       return;
     }
 
-    setTestStatus('testing');
-    setErrorMessage('');
-
+    // No key entered in input: check server route
     try {
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey.trim()}`, {
+      const res = await fetch('/api/solve', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: 'Test connection: reply with "OK".' }] }]
-        })
+        body: JSON.stringify({ ping: true, checkKey: true })
       });
 
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err?.error?.message || `HTTP error ${res.status}`);
+      if (res.ok) {
+        const data = await res.json().catch(() => ({}));
+        if (data.hasServerKey) {
+          setTestStatus('success');
+          setSuccessMessage('Connected to server-side Gemini AI engine (Zero-Key student access active).');
+          return;
+        }
       }
 
-      setTestStatus('success');
-    } catch (err: any) {
       setTestStatus('error');
-      setErrorMessage(err.message || 'Failed to authenticate key.');
+      setErrorMessage('No Gemini API key is configured. Please enter your free Google Gemini API key above (get one in 30 seconds at aistudio.google.com/app/apikey), or set GEMINI_API_KEY in Vercel environment variables.');
+    } catch {
+      setTestStatus('error');
+      setErrorMessage('No Gemini API key configured. Enter your free Google Gemini API key above to enable live AI responses.');
     }
   };
 
@@ -207,7 +232,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           {testStatus === 'success' && (
             <div className="flex items-center gap-2 rounded-lg bg-emerald-500/10 border border-emerald-500/30 p-2 text-xs text-emerald-300">
               <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
-              API Key is valid and connected to Gemini successfully!
+              <span>{successMessage || 'API Key is valid and connected to Gemini successfully!'}</span>
             </div>
           )}
           {testStatus === 'error' && (
