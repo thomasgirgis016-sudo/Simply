@@ -1292,10 +1292,7 @@ export const LOCAL_VERIFIED_PDFS: Record<string, string> = {
   '0610_sp23_ms_4.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0610_s23_ms_42.pdf',
   '0478_sp23_qp_1.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0478_s23_qp_12.pdf',
   '0478_sp23_qp_2.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0478_s23_qp_22.pdf',
-  '9702_m25_qp_32.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/9702_m24_qp_33.pdf',
-  '9701_m25_qp_32.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/9701_m24_qp_33.pdf',
-  '9700_m25_qp_32.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/9700_m24_qp_33.pdf',
-  '9708_s24_qp_12.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/9708_s24_qp_11.pdf',
+  '9708_s24_qp_12.pdf': 'https://bestexamhelp.com/exam/cambridge-international-a-level/economics-9708/2024/9708_s24_qp_12.pdf',
 };
 
 interface SubjectConfig {
@@ -1794,6 +1791,10 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
         const variantsForSeries = series.code === 'm' ? [2] : [1, 2, 3];
 
         for (const p of sub.papers) {
+          // Cambridge AS Level Sciences (9702, 9701, 9700): Paper 3 Practical does NOT run in Feb/March
+          if (series.code === 'm' && ['9702', '9701', '9700'].includes(sub.code) && p.paperNumber === 3) continue;
+          if (series.code === 'm' && yr >= 2025 && p.paperNumber >= 3) continue;
+
           // Cambridge 0510 2024-2026 Syllabus Reform:
           // Paper 1 is Reading & Writing (60 marks), Paper 2 is Listening (40 marks).
           // Papers 3 and 4 were discontinued in 2024 and do not exist for 2024 or 2025.
@@ -1801,6 +1802,8 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
 
           for (const v of p.variants) {
             if (!variantsForSeries.includes(v)) continue;
+            // In June 2010, Cambridge 0510 only administered Variants 1 and 2 (no Variant 3 existed)
+            if (sub.code === '0510' && yr === 2010 && series.code === 's' && v === 3) continue;
 
             const compCode = `${p.paperNumber}${v}`;
             const paperCode = `${sub.code}/${compCode}`;
@@ -1921,15 +1924,15 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
       seasonCode: 'sp',
       paperNumber: 1,
       variant: 1,
-      paperComponent: 'Paper 1 (Reading & Writing Specimen)',
+      paperComponent: 'Paper 1 (Reading & Writing Specimen Exam Materials)',
       paperCode: '0510/01',
       tier: 'General',
-      qpPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_s24_qp_12.pdf',
+      qpPdfUrl: 'https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-english-second-language-speaking-endorsement-0510/specimen-exams',
       backupQpUrl: 'https://pastpapers.papacambridge.com/?s=0510+Specimen+Paper+1',
-      msPdfUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_s24_ms_12.pdf',
+      msPdfUrl: 'https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-english-second-language-speaking-endorsement-0510/specimen-exams',
       backupMsUrl: 'https://pastpapers.papacambridge.com/?s=0510+Specimen+Paper+1+MS',
       fileSizeBytes: 'Official Specimen',
-      isPortal: false
+      isPortal: true
     },
     {
       id: 'pdf-0510-sp26-2',

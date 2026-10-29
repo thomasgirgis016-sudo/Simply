@@ -659,33 +659,69 @@ Output strictly valid JSON matching this schema:
   }
 
   // 3. Fallback simulated revision guide
+  const subLower = (subjectName || '').toLowerCase();
+  const isEsl = subLower.includes('english') || subLower.includes('second language') || subLower.includes('esl');
+  const isMath = subLower.includes('math');
+  const isPhysics = subLower.includes('physics');
+  const isChemistry = subLower.includes('chemistry');
+  const isBio = subLower.includes('biology');
+
+  let defaultWarnings = [
+    'Always check the marks allocation (e.g. 3 marks requires 3 distinct points).',
+    'Structure answers with clear cause-and-effect logical steps using official command words.'
+  ];
+
+  if (isEsl) {
+    defaultWarnings = [
+      'Ensure spelling, punctuation, and grammar (SPaG) are precise; avoid informal abbreviations and slang.',
+      'Keep strictly within recommended word counts (e.g. 120–160 words) and address every required prompt bullet point.'
+    ];
+  } else if (isChemistry) {
+    defaultWarnings = [
+      'Avoid vague statements like "it affects the reaction" without stating whether rate increases or decreases.',
+      'Ensure state symbols ((s), (l), (g), (aq)) and equation balancing numbers are accurate.'
+    ];
+  } else if (isMath) {
+    defaultWarnings = [
+      'Round non-exact values to 3 significant figures and angles to 1 decimal place unless stated otherwise.',
+      'Always write down the formula before substituting values to secure method [M] marks.'
+    ];
+  } else if (isPhysics) {
+    defaultWarnings = [
+      'Always state standard SI units for all numerical answers (e.g. N, m/s^2, J, W).',
+      'Distinguish clearly between scalar and vector quantities (e.g. speed vs velocity).'
+    ];
+  } else if (isBio) {
+    defaultWarnings = [
+      'Use precise biological terminology (e.g. "denatured" rather than "killed" or "died" for enzymes).',
+      'Explain the specific function of organelles or organs rather than vague descriptions.'
+    ];
+  }
+
   return {
-      id: `rev-ai-${Date.now()}`,
-      subjectId: subjectId,
-      title: `${topic} Comprehensive Summary`,
-      chapter: 'Syllabus Core & Extended Focus',
-      keyConcepts: [
-        {
-          heading: `${topic} - Core Principles & Mechanisms`,
-          points: [
-            `Understand the underlying scientific / theoretical principles governing ${topic}.`,
-            'Ensure accurate recall of standard definitions, units, and conditions required by the examination board.',
-            'Structure extended responses with clear cause-and-effect logical steps using official command words.'
-          ],
-          formula: '\\text{Mark Scheme Standard: Precision & Technical Terminology}'
-        }
-      ],
-      mustKnowDefinitions: [
-        {
-          term: topic,
-          definition: `The fundamental syllabus concept in ${subjectName} requiring exact recall in Paper 2/4 examinations.`
-        }
-      ],
-      examinerWarnings: [
-        'Avoid vague statements like "it affects the reaction" without stating whether it increases or decreases.',
-        'Always check the marks allocation (e.g. 3 marks requires 3 distinct points).'
-      ]
-    };
+    id: `rev-ai-${Date.now()}`,
+    subjectId: subjectId,
+    title: `${topic} Comprehensive Summary`,
+    chapter: 'Syllabus Core & Extended Focus',
+    keyConcepts: [
+      {
+        heading: `${topic} - Core Principles & Mechanisms`,
+        points: [
+          `Understand the underlying syllabus principles governing ${topic}.`,
+          'Ensure accurate recall of standard definitions, units, and conditions required by the examination board.',
+          'Structure extended responses with clear cause-and-effect logical steps using official command words.'
+        ],
+        formula: isMath ? 'y = mx + c' : (isChemistry ? 'n = \\frac{m}{M}' : (isPhysics ? 'F = ma' : '\\text{Mark Scheme Standard: Precision & Technical Terminology}'))
+      }
+    ],
+    mustKnowDefinitions: [
+      {
+        term: topic,
+        definition: `The fundamental syllabus concept in ${subjectName} requiring exact recall in examination papers.`
+      }
+    ],
+    examinerWarnings: defaultWarnings
+  };
 }
 
 export async function askAiTutor(

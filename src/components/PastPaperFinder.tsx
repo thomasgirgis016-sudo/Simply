@@ -929,7 +929,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               <div className="text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-2">
                 Row 1: Sketched Exam Filter Blocks
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 text-xs">
                 {/* 1. Subject */}
                 <div>
                   <label className="text-[10px] font-bold text-slate-400 mb-1 block">Subject</label>
@@ -947,7 +947,24 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                   </select>
                 </div>
 
-                {/* 2. Year */}
+                {/* 2. Paper Component */}
+                <div>
+                  <label className="text-[10px] font-bold text-sky-400 mb-1 block">Paper Component</label>
+                  <select
+                    value={selectedPaperNumber}
+                    onChange={(e) => setSelectedPaperNumber(e.target.value)}
+                    className="w-full rounded-xl border border-sky-500/40 bg-slate-900 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none truncate"
+                  >
+                    <option value="All">All Papers ({availablePapers.length})</option>
+                    {availablePapers.map((p) => (
+                      <option key={String(p.paperNumber)} value={String(p.paperNumber)}>
+                        {p.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* 3. Year */}
                 <div>
                   <label className="text-[10px] font-bold text-slate-400 mb-1 block">Year</label>
                   <select
@@ -962,7 +979,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                   </select>
                 </div>
 
-                {/* 3. Variant (1, 2, 3) */}
+                {/* 4. Variant (1, 2, 3) */}
                 <div>
                   <label className="text-[10px] font-bold text-slate-400 mb-1 block">Variant</label>
                   <select
@@ -977,7 +994,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                   </select>
                 </div>
 
-                {/* 4. Month / Series */}
+                {/* 5. Month / Series */}
                 <div>
                   <label className="text-[10px] font-bold text-slate-400 mb-1 block">Month / Series</label>
                   <select

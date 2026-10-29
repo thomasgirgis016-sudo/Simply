@@ -1285,30 +1285,41 @@ export function getListeningAudioUrls(subjectCode: string, sessionCode: string, 
 
   // OxfordAQA ESL (9280 Paper 3/L)
   if (normKey === '9280') {
+    const directRemoteUrl = `https://pastpapers.papacambridge.com/?s=${encodeURIComponent(`OxfordAQA 9280 ${sessionCode} ${year} Audio`)}`;
     return {
-      streamUrl: `https://pastpapers.papacambridge.com/?s=${encodeURIComponent(`OxfordAQA 9280 ${sessionCode} ${year} Audio`)}`,
+      streamUrl: `/api/pdf-proxy?url=${encodeURIComponent(directRemoteUrl)}&type=audio&code=oxfordaqa_9280_${sessionCode}${yy}_audio.mp3`,
       backupStreamUrl: `https://www.oxfordaqa.com/subjects/english/`,
-      downloadUrl: `https://pastpapers.papacambridge.com/?s=${encodeURIComponent(`OxfordAQA 9280 ${year} Paper 3 Audio mp3`)}`
+      downloadUrl: `/api/pdf-proxy?url=${encodeURIComponent(directRemoteUrl)}&type=audio&code=oxfordaqa_9280_${sessionCode}${yy}_audio.mp3&download=true`
     };
   }
 
   // Pearson Edexcel ESL (4ES1 Paper 2)
   if (normKey === '4ES1') {
+    const directRemoteUrl = `https://pastpapers.papacambridge.com/?s=${encodeURIComponent(`Edexcel 4ES1 ${sessionCode} ${year} Audio mp3`)}`;
     return {
-      streamUrl: `https://pastpapers.papacambridge.com/?s=${encodeURIComponent(`Edexcel 4ES1 ${sessionCode} ${year} Audio mp3`)}`,
+      streamUrl: `/api/pdf-proxy?url=${encodeURIComponent(directRemoteUrl)}&type=audio&code=edexcel_4es1_${sessionCode}${yy}_audio.mp3`,
       backupStreamUrl: `https://qualifications.pearson.com/en/qualifications/edexcel-international-gcses/english-as-a-second-language-2016.html`,
-      downloadUrl: `https://pastpapers.papacambridge.com/?s=${encodeURIComponent(`Edexcel 4ES1 ${year} Paper 2 Audio`)}`
+      downloadUrl: `/api/pdf-proxy?url=${encodeURIComponent(directRemoteUrl)}&type=audio&code=edexcel_4es1_${sessionCode}${yy}_audio.mp3&download=true`
     };
   }
 
   // Cambridge IGCSE: 0510, 0511, 0520 (French), 0544 (Arabic), 0530 (Spanish), etc.
-  const audioFilename = `${normKey}_${sessionCode}${yy}_audio.mp3`;
   const compCode = `${paperNumber}${variant}`;
-  const compAudioFilename = `${normKey}_${sessionCode}${yy}_audio_${compCode}.mp3`;
+  const audioFilename = `${normKey}_${sessionCode}${yy}_audio_${compCode}.mp3`;
+  const baseAudioFilename = `${normKey}_${sessionCode}${yy}_audio.mp3`;
+
+  let directRemoteUrl = `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${audioFilename}`;
+  if (normKey === '0510') {
+    const sessionFolder = sessionCode === 's' ? `May-June-${year}` : (sessionCode === 'w' ? `Oct-Nov-${year}` : `March-${year}`);
+    directRemoteUrl = `https://www.freeexampapers.com/exam-papers/IGCSE/English-(2nd-Language)/CIE/0510/${sessionFolder}/${audioFilename}`;
+  }
+
+  const streamUrl = `/api/pdf-proxy?url=${encodeURIComponent(directRemoteUrl)}&type=audio&code=${audioFilename}`;
+  const downloadUrl = `/api/pdf-proxy?url=${encodeURIComponent(directRemoteUrl)}&type=audio&code=${audioFilename}&download=true`;
 
   return {
-    streamUrl: `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${audioFilename}`,
-    backupStreamUrl: `https://papers.gceguide.cc/Cambridge%20IGCSE/${normKey}/${year}/${audioFilename}`,
-    downloadUrl: `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${compAudioFilename}`
+    streamUrl,
+    backupStreamUrl: directRemoteUrl,
+    downloadUrl
   };
 }
