@@ -13,6 +13,7 @@ import { searchUniversalKnowledge } from '../src/services/knowledgeEngine';
 import { askAiTutor, solveQuestionWithGemini } from '../src/services/gemini';
 import { verifyAndAuditSolverResult } from '../src/services/examinerVerificationAgent';
 import { createValidMp3Buffer } from '../api/pdf-proxy';
+import solveHandler from '../api/solve';
 
 console.log('===========================================================');
 console.log('  SIMPLY IGCSE — COMPLETE WEBSITE FUNCTIONALITY & CONTENT QA');
@@ -245,6 +246,19 @@ assertContent(solverLinearResult.finalAnswer.includes('x = 4'), 'Solver derives 
 assertContent(!JSON.stringify(solverLinearResult).includes('y = mx + c'), 'Solver does NOT fall back to y = mx + c for linear equation');
 assertContent(solverLinearResult.studentWorkingEvaluation?.marksEarned === solverLinearResult.totalMarks, 'Solver awards full marks for correct linear equation working');
 
+// 8l-2. Exact QA reproducer: "Solve 2x + 3 = 11. Show the algebraic steps. [3 marks]" with multi-line working
+const solverLinear3Mark = await solveQuestionWithGemini({
+  questionText: 'Solve 2x + 3 = 11. Show the algebraic steps. [3 marks]',
+  studentWorking: '2x = 8\nx = 4',
+  subjectName: 'Mathematics (0580)',
+  examBoard: 'Cambridge CIE',
+  gradeLevel: 'IGCSE'
+});
+assertContent(solverLinear3Mark.totalMarks === 3, 'Solver resolves 3 total marks from prompt spec', `Got ${solverLinear3Mark.totalMarks}`);
+assertContent(solverLinear3Mark.studentWorkingEvaluation?.marksEarned === 3, 'Solver awards 3 / 3 marks for multi-line working (2x = 8, x = 4)', `Got ${solverLinear3Mark.studentWorkingEvaluation?.marksEarned}`);
+assertContent(solverLinear3Mark.studentWorkingEvaluation?.percentageScore === 100, 'Solver awards 100% confidence for correct steps');
+assertContent(!JSON.stringify(solverLinear3Mark).includes('y = mx + c'), 'Solver does NOT leak y = mx + c into linear equation');
+
 // 8m. Photo / Synthetic Image Math Solver: does not return y = mx + c
 const solverPhotoResult = await solveQuestionWithGemini({
   imageBase64: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAA=',
@@ -262,6 +276,63 @@ const tutorArithmeticReply = await askAiTutor([{ role: 'user', content: 'Solve 2
 assertContent(tutorArithmeticReply.includes('4'), 'AI Tutor provides direct answer 4 for arithmetic prompt', `Got: ${tutorArithmeticReply.slice(0, 100)}...`);
 assertContent(tutorArithmeticReply.includes('[M1]') || tutorArithmeticReply.includes('1 mark'), 'AI Tutor provides exam mark breakdown for arithmetic prompt');
 assertContent(!tutorArithmeticReply.toLowerCase().includes('reagent') && !tutorArithmeticReply.toLowerCase().includes('precipitate') && !tutorArithmeticReply.toLowerCase().includes('photosynthesis'), 'AI Tutor does not mix science syllabus into mathematics arithmetic prompt');
+
+// 8n-2. AI Tutor Short Sentence Arithmetic Grounding: "Explain why 2 + 2 = 4 in one short sentence."
+const tutorShortSentence = await askAiTutor([{ role: 'user', content: 'Explain why 2 + 2 = 4 in one short sentence.' }], 'Mathematics (0580)', 'Cambridge CIE');
+assertContent(tutorShortSentence.includes('Adding two discrete units to another two discrete units yields a total quantity of four (2 + 2 = 4).'), 'AI Tutor answers short sentence arithmetic query without science advice', `Got: ${tutorShortSentence}`);
+assertContent(!tutorShortSentence.toLowerCase().includes('m/s') && !tutorShortSentence.toLowerCase().includes('independent variable') && !tutorShortSentence.toLowerCase().includes('reaction'), 'AI Tutor does not leak physics/chemistry terms into 2+2=4');
+
+// 8n-3. Serverless API Endpoint (/api/solve) handler regressions
+async function invokeSolveHandler(reqBody: any) {
+  let jsonRes: any = null;
+  let textRes: any = null;
+  const mockRes = {
+    status(code: number) {
+      return {
+        json(data: any) { jsonRes = data; return data; },
+        send(data: any) { textRes = data; return data; }
+      };
+    }
+  };
+  const mockReq = { method: 'POST', body: reqBody };
+  const result = await solveHandler(mockReq, mockRes);
+  if (result instanceof Response) {
+    const raw = await result.text();
+    try { return JSON.parse(raw); } catch { return raw; }
+  }
+  return jsonRes || textRes;
+}
+
+const apiArithRes = await invokeSolveHandler({
+  action: 'solve_question',
+  questionText: 'Solve 2 + 2. [1 mark]',
+  studentWorking: '4',
+  subjectName: 'Mathematics',
+  examBoard: 'CIE'
+});
+assertContent(apiArithRes?.totalMarks === 1, 'api/solve returns totalMarks: 1 for 1-mark arithmetic question', `Got ${apiArithRes?.totalMarks}`);
+assertContent(apiArithRes?.studentWorkingEvaluation?.marksEarned === 1, 'api/solve awards 1/1 mark for answer "4"', `Got ${apiArithRes?.studentWorkingEvaluation?.marksEarned}`);
+assertContent(!JSON.stringify(apiArithRes).includes('y = mx + c'), 'api/solve does NOT return y = mx + c for arithmetic question');
+
+const apiLinearRes = await invokeSolveHandler({
+  action: 'solve_question',
+  questionText: 'Solve 2x + 3 = 11. Show the algebraic steps. [3 marks]',
+  studentWorking: '2x = 8\nx = 4',
+  subjectName: 'Mathematics',
+  examBoard: 'CIE'
+});
+assertContent(apiLinearRes?.totalMarks === 3, 'api/solve returns totalMarks: 3 for 3-mark linear question', `Got ${apiLinearRes?.totalMarks}`);
+assertContent(apiLinearRes?.studentWorkingEvaluation?.marksEarned === 3, 'api/solve awards 3/3 marks for multi-line steps 2x=8, x=4', `Got ${apiLinearRes?.studentWorkingEvaluation?.marksEarned}`);
+assertContent(!JSON.stringify(apiLinearRes).includes('y = mx + c'), 'api/solve does NOT return y = mx + c for linear equation');
+
+const apiTutorRes = await invokeSolveHandler({
+  action: 'ai_tutor',
+  messages: [{ role: 'user', content: 'Explain why 2 + 2 = 4 in one short sentence.' }],
+  subjectName: 'Mathematics',
+  examBoard: 'CIE'
+});
+assertContent(typeof apiTutorRes === 'string' && apiTutorRes.includes('Adding two discrete units to another two discrete units yields a total quantity of four (2 + 2 = 4).'), 'api/solve returns exact arithmetic sentence for AI Tutor');
+assertContent(typeof apiTutorRes === 'string' && !apiTutorRes.toLowerCase().includes('m/s') && !apiTutorRes.toLowerCase().includes('independent variable'), 'api/solve does not inject physics terms into arithmetic AI Tutor reply');
 
 // 8o. Senior Examiner Verification Agent: rejects generic y = mx + c template for arithmetic
 const fakeArithmeticResult: any = {

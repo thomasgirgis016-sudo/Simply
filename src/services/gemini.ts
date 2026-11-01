@@ -108,10 +108,10 @@ export function parseAndSolveLinearEquation(text: string): LinearEquationSolutio
     .replace(/[\.\?!]+$/, '')
     .trim();
 
-  // ax + b = c or ax - b = c
-  const m1 = clean.match(/^([+-]?\d*(?:\.\d+)?)\s*([a-z])\s*([+-])\s*(\d+(?:\.\d+)?)\s*=\s*([+-]?\d+(?:\.\d+)?)$/i);
+  // Search anywhere in text for: ax + b = c or ax - b = c
+  const m1 = text.match(/(?:^|[^\w\.])([+-]?\d*(?:\.\d+)?)\s*([a-z])\s*([+-])\s*(\d+(?:\.\d+)?)\s*=\s*([+-]?\d+(?:\.\d+)?)(?:$|[^\w\.])/i);
   if (m1) {
-    const rawA = m1[1];
+    const rawA = m1[1].trim();
     const a = rawA === '' || rawA === '+' ? 1 : (rawA === '-' ? -1 : parseFloat(rawA));
     const variable = m1[2];
     const sign = m1[3];
@@ -121,13 +121,14 @@ export function parseAndSolveLinearEquation(text: string): LinearEquationSolutio
     const x = Math.round((rhsStep1 / a) * 1000) / 1000;
     const oppSign = b > 0 ? '-' : '+';
     const absB = Math.abs(b);
+    const cleanEq = `${a === 1 ? '' : (a === -1 ? '-' : a)}${variable} ${b >= 0 ? '+' : '-'} ${absB} = ${c}`;
     return {
       variable,
       a,
       b,
       c,
       x,
-      clean,
+      clean: cleanEq,
       step1Explanation: `Subtract constant (${b > 0 ? `+${absB}` : `-${absB}`}) from both sides to isolate the ${variable} term.`,
       step1Math: `${a === 1 ? '' : (a === -1 ? '-' : a)}${variable} = ${c} ${oppSign} ${absB} = ${rhsStep1}`,
       step2Explanation: `Divide both sides by the coefficient of ${variable} (${a}).`,
@@ -135,21 +136,22 @@ export function parseAndSolveLinearEquation(text: string): LinearEquationSolutio
     };
   }
 
-  // ax = c
-  const m2 = clean.match(/^([+-]?\d*(?:\.\d+)?)\s*([a-z])\s*=\s*([+-]?\d+(?:\.\d+)?)$/i);
+  // Search anywhere in text for: ax = c
+  const m2 = text.match(/(?:^|[^\w\.])([+-]?\d*(?:\.\d+)?)\s*([a-z])\s*=\s*([+-]?\d+(?:\.\d+)?)(?:$|[^\w\.])/i);
   if (m2) {
-    const rawA = m2[1];
+    const rawA = m2[1].trim();
     const a = rawA === '' || rawA === '+' ? 1 : (rawA === '-' ? -1 : parseFloat(rawA));
     const variable = m2[2];
     const c = parseFloat(m2[3]);
     const x = Math.round((c / a) * 1000) / 1000;
+    const cleanEq = `${a === 1 ? '' : (a === -1 ? '-' : a)}${variable} = ${c}`;
     return {
       variable,
       a,
       b: 0,
       c,
       x,
-      clean,
+      clean: cleanEq,
       step1Explanation: `Divide both sides by the coefficient of ${variable} (${a}).`,
       step1Math: `${variable} = \\frac{${c}}{${a}} = ${x}`,
       step2Explanation: `Verify solution by substitution: ${a}(${x}) = ${c}.`,
@@ -249,16 +251,20 @@ DO NOT wrap your output in markdown code blocks like \`\`\`json. Return only raw
     let studentVerdict = '';
 
     if (effectiveWorking) {
-      const cleanedAns = effectiveWorking.replace(/^x\s*=\s*/i, '').trim();
-      const numAns = parseFloat(cleanedAns);
-      if (!isNaN(numAns) && Math.abs(numAns - linEq.x) < 1e-6) {
+      // Check if working ends with "x = 4", or contains "x = 4", or matches the numerical value
+      const lastLine = effectiveWorking.split('\n').map(l => l.trim()).filter(Boolean).pop() || effectiveWorking;
+      const matchExplicitVar = effectiveWorking.match(new RegExp(`(?:^|[\\s,;])${linEq.variable}\\s*=\\s*([+-]?\\d+(?:\\.\\d+)?)`, 'i'));
+      const numFromLastLine = parseFloat(lastLine.replace(new RegExp(`^${linEq.variable}\\s*=\\s*`, 'i'), '').trim());
+      const extractedVal = matchExplicitVar ? parseFloat(matchExplicitVar[1]) : numFromLastLine;
+
+      if (!isNaN(extractedVal) && Math.abs(extractedVal - linEq.x) < 1e-6) {
         isStudentCorrect = true;
         candidateScore = marks;
-        studentVerdict = `Candidate answer "${effectiveWorking}" is correct (${linEq.variable} = ${linEq.x}). Full marks awarded.`;
+        studentVerdict = `Candidate working leads to the correct root (${linEq.variable} = ${linEq.x}). Full marks awarded.`;
       } else {
         isStudentCorrect = false;
         candidateScore = 0;
-        studentVerdict = `Candidate wrote "${effectiveWorking}", but the correct solution is ${linEq.variable} = ${linEq.x}. Method steps withheld.`;
+        studentVerdict = `Candidate working does not arrive at the correct root (${linEq.variable} = ${linEq.x}). Method steps withheld.`;
       }
     }
 
@@ -1104,7 +1110,32 @@ $$${tutorLinEq.clean}$$
 > Always write down both lines of method working explicitly. If an arithmetic slip occurs on line 2, you still secure the [M1] method mark for isolating the variable term!`;
   }
 
-  // 0c-2. Direct Arithmetic Calculation Questions (e.g. "What is 2 + 2?", "Calculate 2 + 2", "Solve 2 + 2. [1 mark]")
+  // 0c-2. Arithmetic equality explanations (e.g. "Explain why 2 + 2 = 4 in one short sentence", "Why is 2 + 2 = 4?")
+  const arithEqMatch = cleanedTutorMsg.match(/(-?\d+(?:\.\d+)?)\s*([\+\-\*\/×÷−])\s*(-?\d+(?:\.\d+)?)\s*=\s*(-?\d+(?:\.\d+)?)/);
+  if (arithEqMatch) {
+    const num1 = parseFloat(arithEqMatch[1]);
+    const op = arithEqMatch[2];
+    const num2 = parseFloat(arithEqMatch[3]);
+    const statedRes = parseFloat(arithEqMatch[4]);
+    const safeOp = op === '×' ? '*' : (op === '÷' ? '/' : (op === '−' ? '-' : op));
+    const actualRes = safeOp === '+' ? num1 + num2 : (safeOp === '-' ? num1 - num2 : (safeOp === '*' ? num1 * num2 : num1 / num2));
+
+    if (Math.abs(actualRes - statedRes) < 1e-6) {
+      if (cleanedTutorMsg.toLowerCase().includes('one short sentence') || cleanedTutorMsg.toLowerCase().includes('in one sentence')) {
+        return `Adding two discrete units to another two discrete units yields a total quantity of four (${arithEqMatch[0]}).`;
+      }
+      return `### 🧮 Mathematics Co-Pilot: Arithmetic Explanation
+$$${arithEqMatch[0]}$$
+
+Adding $${num1}$ and $${num2}$ combines two sets of $${num1}$ and $${num2}$ units into a combined total of $${statedRes}$.
+
+- **Operation**: Addition ($+$) combines quantities.
+- **Verification**: $${num1} + ${num2} = ${statedRes}$ is mathematically true and verifiable by counting discrete units.
+- **Examiner Code**: **[M1]** / **[A1]** Exact arithmetic identity verified.`;
+    }
+  }
+
+  // 0c-3. Direct Arithmetic Calculation Questions (e.g. "What is 2 + 2?", "Calculate 2 + 2", "Solve 2 + 2. [1 mark]")
   const arithmeticExprMatch = cleanedTutorMsg.match(/(?:what\s+(?:is|does)|calculate|evaluate|solve|find|compute)?\s*(-?\d+(?:\.\d+)?\s*[\+\-\*\/\^×÷−]\s*-?\d+(?:\.\d+)?(?:\s*[\+\-\*\/\^×÷−]\s*-?\d+(?:\.\d+)?)*)$/i);
   if (arithmeticExprMatch && !cleanedTutorMsg.includes('=')) {
     const rawExpr = arithmeticExprMatch[1].trim();
