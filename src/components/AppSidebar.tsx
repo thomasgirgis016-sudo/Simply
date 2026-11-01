@@ -111,7 +111,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
         { id: 'finder', label: 'Past Paper Vault', icon: Search, color: 'text-amber-400' },
         { id: 'split', label: 'Split-Screen Papers', icon: Columns, color: 'text-sky-400' },
         { id: 'mock', label: 'Timed Mock Simulator', icon: Clock, color: 'text-amber-400' },
-        { id: 'predicted', label: '2025 Predicted Papers', icon: Sparkles, color: 'text-purple-400' },
+        { id: 'predicted', label: '2026 Predicted Papers', icon: Sparkles, color: 'text-purple-400' },
         { id: 'worksheet', label: 'Worksheet Builder', icon: Printer, color: 'text-indigo-400' },
       ]
     },

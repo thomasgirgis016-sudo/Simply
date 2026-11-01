@@ -61,7 +61,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       case 'finder': return 'Past Paper Vault';
       case 'split': return 'Split-Screen QP/MS';
       case 'mock': return 'Timed Mock Simulator';
-      case 'predicted': return '2025 Predicted Papers';
+      case 'predicted': return '2026 Predicted Papers';
       case 'worksheet': return 'Worksheet Builder';
       case 'solver': return 'AI Solver & Grader';
       case 'chat': return 'AI Examiner Tutor Chat';

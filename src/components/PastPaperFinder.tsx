@@ -31,7 +31,8 @@ import {
   Check,
   Edit3,
   Headphones,
-  Volume2
+  Volume2,
+  Info
 } from 'lucide-react';
 import { Subject, UserProfile, PastPaperItem, BookmarkItem, OfficialPaperPdf, PastPaperSubPart } from '../types';
 import {
@@ -315,14 +316,20 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
         }
       }
 
-      // Paper Number filter
+      // Paper Number filter (strict component boundary matching)
       if (selectedPaperNumber !== 'All') {
-        const pNumStr = pdf.paperNumber !== undefined ? pdf.paperNumber.toString() : '';
-        const matchNumber = pNumStr === selectedPaperNumber;
-        const matchCode = pdf.paperCode.includes(selectedPaperNumber);
-        const matchComponent = pdf.paperComponent.toLowerCase().includes(selectedPaperNumber.toLowerCase());
-        if (!matchNumber && !matchCode && !matchComponent) {
-          return false;
+        const cleanTarget = selectedPaperNumber.replace(/^paper\s*/i, '').trim();
+        if (pdf.paperNumber !== undefined && pdf.paperNumber !== null) {
+          if (pdf.paperNumber.toString() !== cleanTarget) {
+            return false;
+          }
+        } else {
+          const matchCode = new RegExp('[/_]0?' + cleanTarget + '[0-9]?($|[^0-9])').test(pdf.paperCode);
+          const matchComponent = new RegExp('\\bpaper\\s*0?' + cleanTarget + '\\b', 'i').test(pdf.paperComponent || '') ||
+                                 (pdf.paperComponent && pdf.paperComponent.toLowerCase() === cleanTarget.toLowerCase());
+          if (!matchCode && !matchComponent) {
+            return false;
+          }
         }
       }
 
@@ -719,13 +726,13 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
         <div className="relative z-10 max-w-3xl">
           <div className="inline-flex items-center gap-2 rounded-full bg-sky-500/10 px-3 py-1 text-xs font-semibold text-sky-300 border border-sky-500/20 mb-3">
             <Search className="h-3.5 w-3.5" />
-            <span>Complete Exam Archive: 2010–2026 (All Papers & All Variants) • 85,000+ Questions</span>
+            <span>Complete Exam Archive: 2010–2025 Administered Series &amp; 2026 Specimen Releases • 85,000+ Questions</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
             Cambridge, Edexcel & OxfordAQA Past Paper PDF Library
           </h1>
           <p className="mt-2 text-sm text-slate-300 leading-relaxed">
-            Instant 1-click access to 9,280+ authentic past examination papers and 85,000+ questions from <strong>2010 to 2026</strong>. Filter by <strong>Exam Board, Year, Exam Series, Paper Component, and Variant</strong> to get exact Question Papers (QP), official Mark Schemes (MS), Principal Examiner Reports, and Grade Thresholds.
+            Instant 1-click access to {OFFICIAL_PAST_PAPER_PDFS.length.toLocaleString()}+ authentic past examination papers and 85,000+ questions across <strong>2010 to 2025 administered series and 2026 specimen papers</strong>. Filter by <strong>Exam Board, Year, Exam Series, Paper Component, and Variant</strong> to get exact Question Papers (QP), official Mark Schemes (MS), Principal Examiner Reports, and Grade Thresholds.
           </p>
         </div>
 
@@ -1107,8 +1114,8 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               onChange={(e) => setSelectedYear(e.target.value)}
               className="w-full rounded-xl border border-sky-500/40 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
             >
-              <option value="All">All Years (2010–2026)</option>
-              <option value="2026">2026 Series</option>
+              <option value="All">All Years (2010–2026 Archive)</option>
+              <option value="2026">2026 (Specimen &amp; Forecast Series)</option>
               <option value="2025">2025 Series</option>
               <option value="2024">2024 Series</option>
               <option value="2023">2023 Series</option>
@@ -1599,8 +1606,10 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                   const isListeningPaper = Boolean(
                     pdf.isListening ||
                     pdf.paperComponent?.toLowerCase().includes('listening') ||
-                    (pdf.subjectCode === '0510' && pdf.paperNumber === 2) ||
-                    (pdf.subjectCode === '0511' && pdf.paperNumber === 2) ||
+                    ((pdf.subjectCode === '0510' || pdf.subjectCode === '0511') && (
+                      (pdf.year >= 2024 && pdf.paperNumber === 2) ||
+                      (pdf.year < 2024 && (pdf.paperNumber === 3 || pdf.paperNumber === 4))
+                    )) ||
                     (pdf.subjectCode === '4ES1' && pdf.paperNumber === 2) ||
                     (pdf.subjectCode === '9280' && (pdf.paperNumber === 3 || pdf.paperCode?.includes('L'))) ||
                     (['0520', '0544', '0530', '0525'].includes(pdf.subjectCode) && (pdf.paperNumber === 1 || pdf.paperNumber === 2 || pdf.paperComponent?.toLowerCase().includes('listening')))
@@ -1633,6 +1642,12 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                 Variant {pdf.variant}
                               </span>
                             )}
+                            {Boolean(pdf.isPortal || !pdf.qpPdfUrl?.endsWith('.pdf') || pdf.board === 'Edexcel' || pdf.board === 'OxfordAQA') && (
+                              <span className="rounded-lg bg-amber-950/80 text-amber-300 px-2 py-0.5 text-[10px] font-semibold border border-amber-500/40 flex items-center gap-1">
+                                <ExternalLink className="h-2.5 w-2.5 text-amber-400" />
+                                Official Board Hub
+                              </span>
+                            )}
                             {isListeningPaper && (
                               <span className="rounded-lg bg-indigo-950/80 text-indigo-300 px-2 py-0.5 text-[10px] font-bold border border-indigo-500/40 flex items-center gap-1">
                                 <Headphones className="h-2.5 w-2.5 animate-pulse text-indigo-400" />
@@ -1662,6 +1677,14 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                         <p className="text-xs text-slate-300 mt-1 leading-relaxed">
                           {pdf.paperComponent}
                         </p>
+                        {Boolean(pdf.isPortal) && (
+                          <div className="mt-2.5 flex items-start gap-1.5 rounded-lg bg-amber-950/40 border border-amber-500/30 p-2 text-[11px] text-amber-200/90 leading-snug">
+                            <Info className="h-3.5 w-3.5 text-amber-400 shrink-0 mt-0.5" />
+                            <span>
+                              <strong>Publisher Material:</strong> Direct in-app PDF preview is unavailable for this external board entry. Access through the official {pdf.board} qualification hub or search archive packs below.
+                            </span>
+                          </div>
+                        )}
                       </div>
 
                       {/* Action Buttons: Audio, QP, MS, ER, GT */}
@@ -1712,32 +1735,39 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                             <span>Question Paper (QP)</span>
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                handleOpenPdf(
-                                  pdf.qpPdfUrl,
-                                  `${pdf.paperCode} Question Paper`,
-                                  `${pdf.subjectName} • ${pdf.session}`,
-                                  pdf.backupQpUrl,
-                                  'qp',
-                                  pdf.board,
-                                  pdf.paperCode,
-                                  isListeningPaper && audioUrls ? {
-                                    hasAudio: true,
-                                    audioStreamUrl: audioUrls.streamUrl,
-                                    audioDownloadUrl: audioUrls.downloadUrl
-                                  } : undefined
-                                )
-                              }
-                              className="inline-flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-800 px-2 py-1 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition cursor-pointer"
-                              title="Preview in-app viewer"
-                            >
-                              <Eye className="h-3.5 w-3.5 text-sky-400" />
-                              <span className="hidden sm:inline">View</span>
-                            </button>
+                            {Boolean(pdf.isPortal) ? (
+                              <span className="text-[11px] text-amber-300/80 font-medium px-1">External Board Resource</span>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleOpenPdf(
+                                    pdf.qpPdfUrl,
+                                    `${pdf.paperCode} Question Paper`,
+                                    `${pdf.subjectName} • ${pdf.session}`,
+                                    pdf.backupQpUrl,
+                                    'qp',
+                                    pdf.board,
+                                    pdf.paperCode,
+                                    isListeningPaper && audioUrls ? {
+                                      hasAudio: true,
+                                      audioStreamUrl: audioUrls.streamUrl,
+                                      audioDownloadUrl: audioUrls.downloadUrl
+                                    } : undefined
+                                  )
+                                }
+                                className="inline-flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-800 px-2 py-1 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition cursor-pointer"
+                                title="Preview in-app viewer"
+                              >
+                                <Eye className="h-3.5 w-3.5 text-sky-400" />
+                                <span className="hidden sm:inline">View</span>
+                              </button>
+                            )}
                             {(() => {
-                              const isPortalPaper = Boolean(pdf.isPortal) || pdf.board === 'Edexcel' || pdf.board === 'OxfordAQA' || !pdf.qpPdfUrl.endsWith('.pdf') || pdf.qpPdfUrl.includes('cambridgeinternational.org') || pdf.qpPdfUrl.includes('pearson.com') || pdf.qpPdfUrl.includes('oxfordaqa.com');
+                              const isPortalPaper = Boolean(pdf.isPortal) ||
+                                (!pdf.qpPdfUrl.endsWith('.pdf') && !pdf.qpPdfUrl.includes('.pdf?')) ||
+                                pdf.qpPdfUrl.includes('qualifications.pearson.com') ||
+                                pdf.qpPdfUrl.includes('oxfordaqa.com');
                               const portalHubLabel = pdf.board === 'Edexcel' ? 'Pearson Hub' : pdf.board === 'OxfordAQA' ? 'Oxford Hub' : 'Board Hub';
                               return (
                                 <>
@@ -1759,7 +1789,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                     title={isPortalPaper ? `Search verified archive pack for ${pdf.paperCode}` : "Download official Question Paper PDF"}
                                   >
                                     <Download className="h-3.5 w-3.5" />
-                                    <span>{isPortalPaper ? 'Archive Pack' : 'Download'}</span>
+                                    <span>{isPortalPaper ? 'Search Archive' : 'Download'}</span>
                                   </a>
                                 </>
                               );
@@ -1775,27 +1805,34 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                               <span>Mark Scheme (MS)</span>
                             </div>
                             <div className="flex items-center gap-1.5">
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleOpenPdf(
-                                    pdf.msPdfUrl!,
-                                    `${pdf.paperCode} Mark Scheme`,
-                                    `${pdf.subjectName} • ${pdf.session}`,
-                                    pdf.backupMsUrl,
-                                    'ms',
-                                    pdf.board,
-                                    pdf.paperCode
-                                  )
-                                }
-                                className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-950/40 px-2 py-1 text-xs font-semibold text-emerald-300 hover:bg-emerald-900/60 transition cursor-pointer"
-                                title="Preview Mark Scheme in-app"
-                              >
-                                <Eye className="h-3.5 w-3.5 text-emerald-400" />
-                                <span className="hidden sm:inline">View</span>
-                              </button>
+                              {Boolean(pdf.isPortal) ? (
+                                <span className="text-[11px] text-amber-300/80 font-medium px-1">External Board Resource</span>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    handleOpenPdf(
+                                      pdf.msPdfUrl!,
+                                      `${pdf.paperCode} Mark Scheme`,
+                                      `${pdf.subjectName} • ${pdf.session}`,
+                                      pdf.backupMsUrl,
+                                      'ms',
+                                      pdf.board,
+                                      pdf.paperCode
+                                    )
+                                  }
+                                  className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-950/40 px-2 py-1 text-xs font-semibold text-emerald-300 hover:bg-emerald-900/60 transition cursor-pointer"
+                                  title="Preview Mark Scheme in-app"
+                                >
+                                  <Eye className="h-3.5 w-3.5 text-emerald-400" />
+                                  <span className="hidden sm:inline">View</span>
+                                </button>
+                              )}
                               {(() => {
-                                const isPortalPaper = Boolean(pdf.isPortal) || pdf.board === 'Edexcel' || pdf.board === 'OxfordAQA' || !pdf.msPdfUrl!.endsWith('.pdf') || pdf.msPdfUrl!.includes('cambridgeinternational.org') || pdf.msPdfUrl!.includes('pearson.com') || pdf.msPdfUrl!.includes('oxfordaqa.com');
+                                const isPortalPaper = Boolean(pdf.isPortal) ||
+                                  (!pdf.msPdfUrl!.endsWith('.pdf') && !pdf.msPdfUrl!.includes('.pdf?')) ||
+                                  pdf.msPdfUrl!.includes('qualifications.pearson.com') ||
+                                  pdf.msPdfUrl!.includes('oxfordaqa.com');
                                 const portalHubLabel = pdf.board === 'Edexcel' ? 'Pearson Hub' : pdf.board === 'OxfordAQA' ? 'Oxford Hub' : 'Board Hub';
                                 return (
                                   <>
@@ -1817,7 +1854,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                       title={isPortalPaper ? `Search verified archive pack for ${pdf.paperCode} Mark Scheme` : "Download official Mark Scheme PDF"}
                                     >
                                       <Download className="h-3.5 w-3.5" />
-                                      <span>{isPortalPaper ? 'Archive Pack' : 'Download'}</span>
+                                      <span>{isPortalPaper ? 'Search Archive' : 'Download'}</span>
                                     </a>
                                   </>
                                 );

@@ -1269,11 +1269,6 @@ export function findQuestionByExamCode(input: string): PastPaperItem | null {
 // LOCAL VERIFIED OFFLINE PAST PAPERS
 // ==========================================================
 export const LOCAL_VERIFIED_PDFS: Record<string, string> = {
-  '0510_s10_ms_13.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_s10_ms_11.pdf',
-  '0510_s10_ms_33.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_s10_ms_31.pdf',
-  '0510_w10_ms_42.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_w10_ms_41.pdf',
-  '0510_s16_qp_12.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_s16_qp_11.pdf',
-  '0510_w24_er.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_w23_er.pdf',
   '0580_s24_qp_41.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_qp_41.pdf',
   '0580_s24_ms_41.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_ms_41.pdf',
   '0580_s24_qp_21.pdf': 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0580_s24_qp_21.pdf',
@@ -1802,8 +1797,13 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
 
           for (const v of p.variants) {
             if (!variantsForSeries.includes(v)) continue;
-            // In June 2010, Cambridge 0510 only administered Variants 1 and 2 (no Variant 3 existed)
+            // Historical Cambridge 0510 non-administered examination variants:
+            // 1. In June 2010, Cambridge 0510 only administered Variants 1 and 2 (no Variant 3 existed)
             if (sub.code === '0510' && yr === 2010 && series.code === 's' && v === 3) continue;
+            // 2. In May/June 2016, Cambridge 0510 Paper 1 only ran Variants 1 and 3 (Variant 12 was never administered)
+            if (sub.code === '0510' && yr === 2016 && series.code === 's' && p.paperNumber === 1 && v === 2) continue;
+            // 3. In Oct/Nov 2010, Cambridge 0510 Paper 4 only ran Variant 1 (Variant 42 was never administered)
+            if (sub.code === '0510' && yr === 2010 && series.code === 'w' && p.paperNumber === 4 && v === 2) continue;
 
             const compCode = `${p.paperNumber}${v}`;
             const paperCode = `${sub.code}/${compCode}`;
@@ -1924,15 +1924,15 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
       seasonCode: 'sp',
       paperNumber: 1,
       variant: 1,
-      paperComponent: 'Paper 1 (Reading & Writing Specimen Exam Materials)',
+      paperComponent: 'Paper 1 (Reading & Writing Specimen)',
       paperCode: '0510/01',
       tier: 'General',
-      qpPdfUrl: 'https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-english-second-language-speaking-endorsement-0510/specimen-exams',
-      backupQpUrl: 'https://pastpapers.papacambridge.com/?s=0510+Specimen+Paper+1',
-      msPdfUrl: 'https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-english-second-language-speaking-endorsement-0510/specimen-exams',
-      backupMsUrl: 'https://pastpapers.papacambridge.com/?s=0510+Specimen+Paper+1+MS',
-      fileSizeBytes: 'Official Specimen',
-      isPortal: true
+      qpPdfUrl: 'https://www.cambridgeinternational.org/Images/637263-2024-specimen-paper-1.pdf',
+      backupQpUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_sp24_qp_1.pdf',
+      msPdfUrl: 'https://www.cambridgeinternational.org/Images/637270-2024-specimen-paper-1-mark-scheme.pdf',
+      backupMsUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_sp24_ms_1.pdf',
+      fileSizeBytes: '1.28 MB',
+      isPortal: false
     },
     {
       id: 'pdf-0510-sp26-2',
@@ -1948,12 +1948,12 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
       paperComponent: 'Paper 2 (Listening Specimen)',
       paperCode: '0510/02',
       tier: 'General',
-      qpPdfUrl: 'https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-english-second-language-oral-endorsement-0510/',
-      backupQpUrl: 'https://pastpapers.papacambridge.com/?s=0510+Specimen+Paper+2',
-      msPdfUrl: 'https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-english-second-language-oral-endorsement-0510/',
-      backupMsUrl: 'https://pastpapers.papacambridge.com/?s=0510+Specimen+Paper+2+MS',
-      fileSizeBytes: 'Official Specimen',
-      isPortal: true
+      qpPdfUrl: 'https://www.cambridgeinternational.org/Images/638100-2024-specimen-paper-2.pdf',
+      backupQpUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_sp24_qp_2.pdf',
+      msPdfUrl: 'https://www.cambridgeinternational.org/Images/638098-2024-specimen-paper-2-markscheme.pdf',
+      backupMsUrl: 'https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/0510_sp24_ms_2.pdf',
+      fileSizeBytes: '3.22 MB',
+      isPortal: false
     },
     {
       id: 'pdf-0500-sp26-1',
@@ -2200,7 +2200,8 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
             backupQpUrl: `https://pastpapers.papacambridge.com/?s=${encodeURIComponent(`OxfordAQA ${oxf.code} ${sess.label} ${yr} Paper ${p.suffix}`)}`,
             msPdfUrl: msUrl,
             backupMsUrl: `https://pastpapers.papacambridge.com/?s=${encodeURIComponent(`OxfordAQA ${oxf.code} ${sess.label} ${yr} Paper ${p.suffix} Mark Scheme`)}`,
-            fileSizeBytes: 'Official Exam Pack'
+            fileSizeBytes: 'Official Exam Pack',
+            isPortal: true
           });
         }
       }

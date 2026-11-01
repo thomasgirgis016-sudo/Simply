@@ -391,7 +391,18 @@ export function App() {
         'boundaries',
         'split',
         'analytics',
-        'admin'
+        'admin',
+        'atp',
+        'roadmap',
+        'traps',
+        'pitfalls',
+        'blitz',
+        'mistakes',
+        'cheatsheets',
+        'mock',
+        'worksheet',
+        'radar',
+        'predicted'
       ];
 
       if (tabParam === 'classroom' || tabParam === 'analytics') {

@@ -130,6 +130,40 @@ export function verifyAndAuditSolverResult(rawResult: SolverResult): VerifiedSol
   const checks: VerificationCheck[] = [];
   const cloned: SolverResult = JSON.parse(JSON.stringify(rawResult));
 
+  // ── PASS 0: Question-Solution Topic Relevance & Generic Template Audit ───
+  let hasTopicMismatch = false;
+  const qLower = (cloned.questionText || '').toLowerCase();
+  const solText = JSON.stringify(cloned).toLowerCase();
+  const isArithmeticQuery = /(-?\d+\s*[\+\-\*\/\^×÷−]\s*-?\d+)/.test(qLower) || qLower.includes('2 + 2') || qLower.includes('2+2');
+  const isLinearEqQuery = /[0-9a-z]\s*[\+\-]\s*[0-9a-z]\s*=/i.test(qLower) || qLower.includes('2x+3=11') || qLower.includes('2x + 3 = 11');
+  const mentionsYmxC = solText.includes('y = mx + c') || solText.includes('y=mx+c');
+  const isGenericTemplate = cloned.topic === 'Key Syllabus Concepts & Problem Solving' || cloned.topic === 'Core Examination Methodology';
+
+  if ((isArithmeticQuery || isLinearEqQuery) && mentionsYmxC && !qLower.includes('line') && !qLower.includes('gradient')) {
+    hasTopicMismatch = true;
+    checks.push({
+      checkId: 'topic-relevance-audit',
+      name: 'Question-Solution Topic Relevance Audit',
+      status: 'warning',
+      details: 'Unrelated straight-line formula (y = mx + c) detected for an arithmetic or algebraic question. Confidence suppressed.'
+    });
+  } else if (isGenericTemplate) {
+    hasTopicMismatch = true;
+    checks.push({
+      checkId: 'template-relevance-audit',
+      name: 'Question-Specific Grounding Audit',
+      status: 'warning',
+      details: 'Generic fallback template detected. Confidence restricted pending question-specific mark scheme grounding.'
+    });
+  } else {
+    checks.push({
+      checkId: 'topic-relevance-audit',
+      name: 'Question-Solution Topic Relevance Audit',
+      status: 'passed',
+      details: 'Solution steps directly address the specific syllabus topic and mathematical operations in the prompt.'
+    });
+  }
+
   // ── PASS 1: Step-by-Step Arithmetic & Math Equality Check ─────────
   let totalMathErrors = 0;
   if (Array.isArray(cloned.stepByStepSolution)) {
@@ -232,11 +266,13 @@ export function verifyAndAuditSolverResult(rawResult: SolverResult): VerifiedSol
   const accuracyScorePercent = Math.round((passedCount / checks.length) * 100);
 
   return {
-    isVerified: totalMathErrors === 0,
-    accuracyScorePercent,
+    isVerified: totalMathErrors === 0 && !hasTopicMismatch,
+    accuracyScorePercent: hasTopicMismatch ? Math.min(accuracyScorePercent, 50) : accuracyScorePercent,
     checks,
     correctedResult: cloned,
     verifiedAt: new Date().toISOString(),
-    examinerSeal: 'SENIOR_CAMBRIDGE_AI_VERIFIED_ZERO_ERROR'
+    examinerSeal: hasTopicMismatch
+      ? 'NEEDS_EXAMINER_REVIEW'
+      : (totalMathErrors === 0 ? 'SENIOR_CAMBRIDGE_AI_VERIFIED_ZERO_ERROR' : 'MATHEMATICAL_DISCREPANCY_FLAGGED')
   };
 }

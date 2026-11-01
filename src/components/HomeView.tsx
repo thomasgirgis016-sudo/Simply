@@ -39,7 +39,7 @@ import {
   Smartphone
 } from 'lucide-react';
 import { Subject, UserProfile, BookmarkItem, UserAccount } from '../types';
-import { PAST_PAPERS_DATABASE } from '../data/pastPapersData';
+import { PAST_PAPERS_DATABASE, OFFICIAL_PAST_PAPER_PDFS } from '../data/pastPapersData';
 import { INITIAL_REVISION_NOTES, INITIAL_FORMULAS } from '../data/initialData';
 import { ActiveTab } from './Navbar';
 import { getDailyStreak, getDailyChallengeQuestion, completeDailyChallenge, DailyStreakState } from '../services/dailyStreak';
@@ -411,7 +411,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   <FileText className="h-4 w-4 sm:h-5 sm:w-5" />
                 </div>
                 <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-[9px] sm:text-[10px] font-bold text-amber-300 font-mono">
-                  9,280+
+                  {OFFICIAL_PAST_PAPER_PDFS.length.toLocaleString()}+
                 </span>
               </div>
               <h3 className="text-xs sm:text-base font-bold text-white group-hover:text-amber-300 transition line-clamp-1">
@@ -722,7 +722,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
           )}
 
-          {/* 2025 Predicted Papers */}
+          {/* 2026 Predicted Papers */}
           {(activeHub === 'papers' || activeHub === 'all') && (
             <div
               onClick={() => onNavigateTab('predicted')}
@@ -738,7 +738,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   </span>
                 </div>
                 <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-purple-300 transition">
-                  2025 Predicted Papers
+                  2026 Predicted Papers
                 </h3>
                 <p className="text-xs text-slate-400 mt-1 leading-relaxed">
                   Exam predictions calculated from Cambridge topic recurrence cycles for upcoming series.

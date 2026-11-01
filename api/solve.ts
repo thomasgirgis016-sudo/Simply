@@ -390,8 +390,13 @@ Output STRICTLY JSON array:
     const isBiology = subLower.includes('biology') || subLower.includes('0610') || subLower.includes('9700');
     const isEcon = subLower.includes('econ') || subLower.includes('business') || subLower.includes('account');
 
+    // Extract prompt-specified marks if present (e.g. "Solve 2 + 2. [1 mark]" -> 1 mark)
+    const combinedPrompt = `${questionText || ''} ${studentWorking || ''}`;
+    const markMatch = combinedPrompt.match(/\[(\d+)\s*(?:marks?|m)?\]|\((\d+)\s*(?:marks?|m)?\)|\b(\d+)\s*(?:marks?|m)\b/i);
+    const resolvedTotalMarks = markMatch ? parseInt(markMatch[1] || markMatch[2] || markMatch[3], 10) : totalMarks;
+
     let defaultConcept = `${examBoard} ${subjectName} Core Principles`;
-    let defaultFormula = 'y = mx + c';
+    let defaultFormula = '\\text{State base formula} \\rightarrow \\text{Substitute values} \\rightarrow \\text{Evaluate to 3 s.f.}';
 
     if (isEsl) {
       defaultConcept = 'Cambridge IGCSE ESL Assessment Criteria & Cohesive Devices';
@@ -409,17 +414,95 @@ Output STRICTLY JSON array:
       defaultConcept = 'Market Equilibrium & Microeconomic Elasticity';
       defaultFormula = '\\text{PED} = \\frac{\\% \\Delta Q_d}{\\% \\Delta P}';
     } else if (isMath) {
-      defaultConcept = 'Algebraic Operations & Linear Functions';
-      defaultFormula = 'y = mx + c';
+      const qLower = combinedPrompt.toLowerCase();
+      if (qLower.includes('gradient') || qLower.includes('slope') || qLower.includes('straight line') || qLower.includes('line equation') || qLower.includes('intercept')) {
+        defaultConcept = 'Linear Graphs & Coordinate Geometry';
+        defaultFormula = 'y = mx + c';
+      } else {
+        defaultConcept = 'Algebraic Operations & Problem Solving';
+        defaultFormula = '\\text{State base formula} \\rightarrow \\text{Substitute values} \\rightarrow \\text{Evaluate to 3 s.f.}';
+      }
     }
 
-    // Dynamic Student Working Evaluation
+    // Dynamic Student Working Evaluation & Arithmetic / Linear Eq Grounding
     let candidateScore = 0;
     let lineReason = 'Candidate answer reviewed against official mark scheme.';
     let lineCorrection = 'Review required formula steps and check arithmetic.';
     let isStudentCorrect = false;
 
-    if (studentWorking) {
+    // Check for Arithmetic in Question (e.g. "Solve 2 + 2. [1 mark]")
+    const qArithClean = (questionText || '')
+      .replace(/^(?:what\s+(?:is|does)|calculate|evaluate|solve|find|compute)?\s*/i, '')
+      .replace(/\s*(?:\[\d+\s*(?:marks?|m)?\]|\(\d+\s*(?:marks?|m)?\))\s*$/i, '')
+      .replace(/[\.\?!]+$/, '')
+      .trim();
+
+    let arithVal: number | null = null;
+    if (!/\b\d{4}\/\d{2}\b/.test(qArithClean) && /[\+\-\*\/\^×÷−]/.test(qArithClean)) {
+      try {
+        const safeExpr = qArithClean.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-');
+        if (/^[0-9\s\+\-\*\/\.\(\)]+$/.test(safeExpr)) {
+          const evalNum = Number(Function(`"use strict"; return (${safeExpr})`)());
+          if (!isNaN(evalNum) && isFinite(evalNum)) {
+            arithVal = evalNum;
+          }
+        }
+      } catch {
+        // arithmetic eval error
+      }
+    }
+
+    // Check for Linear Equation in Question or Working (e.g. "2x + 3 = 11", "Solve 2x+3=11")
+    const linEqMatch = combinedPrompt.match(/([+-]?\d*(?:\.\d+)?)\s*([a-z])\s*([+-])\s*(\d+(?:\.\d+)?)\s*=\s*([+-]?\d+(?:\.\d+)?)/i);
+    let linEqSolution: { variable: string; x: number; clean: string } | null = null;
+    if (linEqMatch) {
+      const rawA = linEqMatch[1];
+      const a = rawA === '' || rawA === '+' ? 1 : (rawA === '-' ? -1 : parseFloat(rawA));
+      const variable = linEqMatch[2];
+      const sign = linEqMatch[3];
+      const b = (sign === '-' ? -1 : 1) * parseFloat(linEqMatch[4]);
+      const c = parseFloat(linEqMatch[5]);
+      const x = Math.round(((c - b) / a) * 1000) / 1000;
+      linEqSolution = { variable, x, clean: linEqMatch[0] };
+    }
+
+    if (arithVal !== null) {
+      defaultConcept = 'Fundamental Arithmetic & Number Operations';
+      defaultFormula = `${qArithClean} = ${arithVal}`;
+      if (studentWorking) {
+        const cleanStudentAns = String(studentWorking).replace(/^=\s*/, '').trim();
+        const studentNum = parseFloat(cleanStudentAns);
+        if (!isNaN(studentNum) && Math.abs(studentNum - arithVal) < 1e-6) {
+          isStudentCorrect = true;
+          candidateScore = resolvedTotalMarks;
+          lineReason = `Mathematically correct answer: ${qArithClean} = ${arithVal}. Candidate answer matches official mark scheme.`;
+          lineCorrection = 'Step verified.';
+        } else {
+          isStudentCorrect = false;
+          candidateScore = 0;
+          lineReason = `${qArithClean} = ${arithVal}, not ${cleanStudentAns}. Calculation slip.`;
+          lineCorrection = `Write instead: ${arithVal}`;
+        }
+      }
+    } else if (linEqSolution !== null) {
+      defaultConcept = 'Linear Equations & Algebraic Operations';
+      defaultFormula = `${linEqSolution.clean} \\implies ${linEqSolution.variable} = ${linEqSolution.x}`;
+      if (studentWorking) {
+        const cleanStudentAns = String(studentWorking).replace(/^[a-z]\s*=\s*/i, '').trim();
+        const studentNum = parseFloat(cleanStudentAns);
+        if (!isNaN(studentNum) && Math.abs(studentNum - linEqSolution.x) < 1e-6) {
+          isStudentCorrect = true;
+          candidateScore = resolvedTotalMarks;
+          lineReason = `Accurate algebraic solution: ${linEqSolution.variable} = ${linEqSolution.x}. All method steps satisfied.`;
+          lineCorrection = 'Step verified.';
+        } else {
+          isStudentCorrect = false;
+          candidateScore = 0;
+          lineReason = `Candidate wrote "${studentWorking}", but the correct solution is ${linEqSolution.variable} = ${linEqSolution.x}.`;
+          lineCorrection = `Write instead: ${linEqSolution.variable} = ${linEqSolution.x}`;
+        }
+      }
+    } else if (studentWorking) {
       const trimmedWorking = String(studentWorking).trim();
       const eqMatch = trimmedWorking.match(/^([0-9\s\+\-\*\/\.\(\)]+)=([0-9\s\+\-\*\/\.\(\)]+)$/);
 
@@ -433,7 +516,7 @@ Output STRICTLY JSON array:
             if (!isNaN(lhsVal) && !isNaN(rhsVal)) {
               if (Math.abs(lhsVal - rhsVal) < 1e-6) {
                 isStudentCorrect = true;
-                candidateScore = totalMarks;
+                candidateScore = resolvedTotalMarks;
                 lineReason = `Mathematically correct calculation: ${lhsStr} = ${rhsVal}.`;
                 lineCorrection = 'Step verified.';
                 defaultConcept = 'Elementary Arithmetic & Calculation Integrity';
@@ -460,7 +543,7 @@ Output STRICTLY JSON array:
           lineCorrection = 'Write instead: 10 - 2 = 8';
           isStudentCorrect = false;
         } else if (/10\s*-\s*2\s*=\s*8/.test(trimmedWorking) || /2\s*\+\s*2\s*=\s*4/.test(trimmedWorking)) {
-          candidateScore = totalMarks;
+          candidateScore = resolvedTotalMarks;
           lineReason = 'Mathematically true calculation and method.';
           lineCorrection = 'Step verified.';
           isStudentCorrect = true;
@@ -470,13 +553,13 @@ Output STRICTLY JSON array:
           lineCorrection = 'Use a subordinating conjunction: "Although [Idea A], [Idea B]."';
           isStudentCorrect = false;
         } else if (/although/i.test(trimmedWorking) && trimmedWorking.length > 25) {
-          candidateScore = totalMarks;
+          candidateScore = resolvedTotalMarks;
           lineReason = 'Valid complex sentence demonstrating contrasting ideas with sophisticated syntax.';
           lineCorrection = 'Sentence verified against Cambridge Band 9 assessment criteria.';
           isStudentCorrect = true;
         } else {
-          candidateScore = Math.max(1, Math.floor(totalMarks / 2));
-          lineReason = 'Method partially identified; check precision and syllabus criteria.';
+          candidateScore = 0;
+          lineReason = 'Candidate answer does not match the required mark scheme criteria.';
           isStudentCorrect = false;
         }
       }
@@ -590,11 +673,17 @@ Output STRICTLY JSON array:
     }
 
     if (action === 'ai_tutor') {
-      const tutorText = `I am reviewing your question for ${examBoard} ${subjectName}.\n\n` +
-        `**Method Step [M1]:** Ensure you state the syllabus formula and define variables clearly.\n` +
-        `**Substitution [M1]:** Carefully substitute numerical values into the equation.\n` +
-        `**Accuracy [A1]:** Provide final values to 3 significant figures with standard SI units.\n\n` +
-        (studentWorking ? `Regarding your answer ("${studentWorking}"): ${lineReason}` : 'Ask any specific step if you would like me to guide you through!');
+      const tutorText = isMath
+        ? `I am reviewing your Mathematics question (${examBoard} ${subjectName}).\n\n` +
+          `**Method Step [M1]:** State the governing formula or equation clearly.\n` +
+          `**Substitution [M1]:** Substitute numerical values carefully without intermediate rounding.\n` +
+          `**Accuracy [A1]:** State your final answer rounded to 3 significant figures (or exact fraction).\n\n` +
+          (studentWorking ? `Regarding your answer ("${studentWorking}"): ${lineReason}` : 'Ask any specific step if you would like me to guide you through!')
+        : `I am reviewing your question for ${examBoard} ${subjectName}.\n\n` +
+          `**Method Step [M1]:** Ensure you state the syllabus formula and define variables clearly.\n` +
+          `**Substitution [M1]:** Carefully substitute numerical values into the equation.\n` +
+          `**Accuracy [A1]:** Provide final values to 3 significant figures with standard SI units.\n\n` +
+          (studentWorking ? `Regarding your answer ("${studentWorking}"): ${lineReason}` : 'Ask any specific step if you would like me to guide you through!');
       if (res?.status) return res.status(200).send(tutorText);
       return new Response(tutorText, { status: 200, headers: { ...headers, 'Content-Type': 'text/plain' } });
     }
@@ -602,8 +691,8 @@ Output STRICTLY JSON array:
     const fallbackSolution = {
       questionText: questionText.slice(0, 100),
       subject: subjectName,
-      topic: isEsl ? 'Language Mechanics & Cohesion' : 'Core Examination Methodology',
-      totalMarks,
+      topic: isEsl ? 'Language Mechanics & Cohesion' : (isMath ? defaultConcept : 'Core Examination Methodology'),
+      totalMarks: resolvedTotalMarks,
       coreConceptAndFormula: {
         concept: defaultConcept,
         formula: defaultFormula
@@ -624,7 +713,7 @@ Output STRICTLY JSON array:
           markAwarded: '[A1] Accuracy Mark'
         }
       ],
-      finalAnswer: `Verified Solution. ${studentWorking ? `Candidate Score: ${candidateScore} / ${totalMarks} Marks. ${lineReason}` : 'Ensure answer is rounded to 3 s.f. with correct SI units.'}`,
+      finalAnswer: `Verified Solution. ${studentWorking ? `Candidate Score: ${candidateScore} / ${resolvedTotalMarks} Marks. ${lineReason}` : 'Ensure answer is rounded to 3 s.f. with correct SI units.'}`,
       examinerTraps: isEsl ? [
         'Using informal vocabulary or slang in formal extended writing',
         'Incomplete sentences or run-on comma splices'
@@ -645,15 +734,15 @@ Output STRICTLY JSON array:
       relatedTopic: isEsl ? 'English Syntax & Discourse' : 'Problem Solving & Verification',
       studentWorkingEvaluation: studentWorking ? {
         marksEarned: candidateScore,
-        marksPossible: totalMarks,
-        percentageScore: Math.round((candidateScore / totalMarks) * 100),
+        marksPossible: resolvedTotalMarks,
+        percentageScore: Math.round((candidateScore / resolvedTotalMarks) * 100),
         overallVerdict: lineReason,
         lineReviews: [
           {
             lineNumber: 1,
             rawText: String(studentWorking),
             isCorrect: isStudentCorrect,
-            markBadge: isStudentCorrect ? '[M1]' : '[M0]',
+            markBadge: isStudentCorrect ? `[A${resolvedTotalMarks}]` : '[A0]',
             exactReason: lineReason,
             exactCorrection: lineCorrection
           }

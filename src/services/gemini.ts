@@ -87,6 +87,79 @@ async function callGeminiApi(payload: {
   throw new Error('KEY_UNAVAILABLE');
 }
 
+export interface LinearEquationSolution {
+  variable: string;
+  a: number;
+  b: number;
+  c: number;
+  x: number;
+  clean: string;
+  step1Explanation: string;
+  step1Math: string;
+  step2Explanation: string;
+  step2Math: string;
+}
+
+export function parseAndSolveLinearEquation(text: string): LinearEquationSolution | null {
+  if (!text) return null;
+  const clean = text
+    .replace(/^(?:solve|find\s+[a-z]|calculate|evaluate)?\s*/i, '')
+    .replace(/\s*(?:\[\d+\s*(?:marks?|m)?\]|\(\d+\s*(?:marks?|m)?\))\s*$/i, '')
+    .replace(/[\.\?!]+$/, '')
+    .trim();
+
+  // ax + b = c or ax - b = c
+  const m1 = clean.match(/^([+-]?\d*(?:\.\d+)?)\s*([a-z])\s*([+-])\s*(\d+(?:\.\d+)?)\s*=\s*([+-]?\d+(?:\.\d+)?)$/i);
+  if (m1) {
+    const rawA = m1[1];
+    const a = rawA === '' || rawA === '+' ? 1 : (rawA === '-' ? -1 : parseFloat(rawA));
+    const variable = m1[2];
+    const sign = m1[3];
+    const b = (sign === '-' ? -1 : 1) * parseFloat(m1[4]);
+    const c = parseFloat(m1[5]);
+    const rhsStep1 = c - b;
+    const x = Math.round((rhsStep1 / a) * 1000) / 1000;
+    const oppSign = b > 0 ? '-' : '+';
+    const absB = Math.abs(b);
+    return {
+      variable,
+      a,
+      b,
+      c,
+      x,
+      clean,
+      step1Explanation: `Subtract constant (${b > 0 ? `+${absB}` : `-${absB}`}) from both sides to isolate the ${variable} term.`,
+      step1Math: `${a === 1 ? '' : (a === -1 ? '-' : a)}${variable} = ${c} ${oppSign} ${absB} = ${rhsStep1}`,
+      step2Explanation: `Divide both sides by the coefficient of ${variable} (${a}).`,
+      step2Math: `${variable} = \\frac{${rhsStep1}}{${a}} = ${x}`
+    };
+  }
+
+  // ax = c
+  const m2 = clean.match(/^([+-]?\d*(?:\.\d+)?)\s*([a-z])\s*=\s*([+-]?\d+(?:\.\d+)?)$/i);
+  if (m2) {
+    const rawA = m2[1];
+    const a = rawA === '' || rawA === '+' ? 1 : (rawA === '-' ? -1 : parseFloat(rawA));
+    const variable = m2[2];
+    const c = parseFloat(m2[3]);
+    const x = Math.round((c / a) * 1000) / 1000;
+    return {
+      variable,
+      a,
+      b: 0,
+      c,
+      x,
+      clean,
+      step1Explanation: `Divide both sides by the coefficient of ${variable} (${a}).`,
+      step1Math: `${variable} = \\frac{${c}}{${a}} = ${x}`,
+      step2Explanation: `Verify solution by substitution: ${a}(${x}) = ${c}.`,
+      step2Math: `${a}(${x}) = ${c}`
+    };
+  }
+
+  return null;
+}
+
 export const SENIOR_CAMBRIDGE_EXAMINER_INSTRUCTION =
   'You are a senior Cambridge IGCSE examiner. Follow official mark scheme conventions: always show step-by-step working for method marks ($M$), state accuracy marks ($A$) and independent marks ($B$), bold all required syllabus keywords, and enforce the 3 significant figures rule for non-exact values.';
 
@@ -137,28 +210,234 @@ Ensure standard IGCSE marking criteria: [M] method mark, [A] accuracy mark, [B] 
 DO NOT wrap your output in markdown code blocks like \`\`\`json. Return only raw parseable JSON.
 `;
 
-  // 0a. Check if input is a direct arithmetic / algebraic statement or student working (e.g. "10-2=8", "10+2=8", "x = 10 + 2 = 8", "2 + 2 = 4")
-  const textToCheckForMath = (studentWorking || questionText || '').trim();
-
-  // Extract explicit marks from prompt if provided (e.g. "1 mark", "[1 mark]", "(1)", "[1]")
+  // 0a. Extract explicit marks from prompt if provided (e.g. "1 mark", "[1 mark]", "(1)", "[1]")
   const markRegex = /\[(\d+)\s*(?:marks?|m)?\]|\((\d+)\s*(?:marks?|m)?\)|\b(\d+)\s*(?:marks?|m)\b/i;
-  const promptMarksMatch = (questionText || studentWorking || '').match(markRegex);
+  const promptMarksMatch = ((questionText || '') + ' ' + (studentWorking || '')).match(markRegex);
   const promptSpecifiedMarks = promptMarksMatch
     ? parseInt(promptMarksMatch[1] || promptMarksMatch[2] || promptMarksMatch[3], 10)
     : undefined;
 
-  // Single-line equations default to 1 mark, multi-line equations default to promptSpecifiedMarks || lineCount || 4
+  // Extract possible math text embedded in synthetic image or OCR if present
+  let imageDecodedText = '';
+  if (imageBase64) {
+    try {
+      const cleanB64 = imageBase64.replace(/^data:image\/[a-z\+\-]+;base64,/, '');
+      const rawAscii = typeof atob === 'function'
+        ? atob(cleanB64)
+        : (typeof (globalThis as any).Buffer !== 'undefined' ? (globalThis as any).Buffer.from(cleanB64, 'base64').toString('latin1') : '');
+      const textMatches = rawAscii.match(/([0-9\s\+\-\*\/\^×÷=xX\.a-zA-Z]{3,40})/g);
+      if (textMatches) {
+        imageDecodedText = textMatches.join(' ');
+      }
+    } catch {
+      // ignore decoding error
+    }
+  }
+
+  const effectiveQuestionText = (questionText || imageDecodedText || '').trim();
+  const effectiveWorking = (studentWorking || '').trim();
+
+  // 0a-1. Check for Linear Equations (e.g. "2x + 3 = 11", "Solve 2x + 3 = 11 [2 marks]")
+  const linEq = parseAndSolveLinearEquation(effectiveQuestionText) ||
+    (effectiveWorking ? parseAndSolveLinearEquation(effectiveWorking) : null) ||
+    (imageDecodedText ? parseAndSolveLinearEquation(imageDecodedText) : null);
+
+  if (linEq) {
+    const marks = promptSpecifiedMarks || 2;
+    let isStudentCorrect = false;
+    let candidateScore = 0;
+    let studentVerdict = '';
+
+    if (effectiveWorking) {
+      const cleanedAns = effectiveWorking.replace(/^x\s*=\s*/i, '').trim();
+      const numAns = parseFloat(cleanedAns);
+      if (!isNaN(numAns) && Math.abs(numAns - linEq.x) < 1e-6) {
+        isStudentCorrect = true;
+        candidateScore = marks;
+        studentVerdict = `Candidate answer "${effectiveWorking}" is correct (${linEq.variable} = ${linEq.x}). Full marks awarded.`;
+      } else {
+        isStudentCorrect = false;
+        candidateScore = 0;
+        studentVerdict = `Candidate wrote "${effectiveWorking}", but the correct solution is ${linEq.variable} = ${linEq.x}. Method steps withheld.`;
+      }
+    }
+
+    return {
+      questionText: effectiveQuestionText || `Solve linear equation: ${linEq.clean}`,
+      subject: subjectName,
+      topic: 'Linear Equations & Algebraic Operations',
+      totalMarks: marks,
+      coreConceptAndFormula: {
+        concept: 'Linear Equations & Algebraic Rearrangement',
+        formula: `${linEq.clean} \\implies ${linEq.variable} = ${linEq.x}`,
+      },
+      stepByStepSolution: [
+        {
+          stepNumber: 1,
+          title: `Step 1: Isolate the Variable Term (${linEq.variable})`,
+          explanation: linEq.step1Explanation,
+          mathOrCode: linEq.step1Math,
+          markAwarded: `[M1] Method Mark for rearrangement`,
+        },
+        {
+          stepNumber: 2,
+          title: `Step 2: Solve for ${linEq.variable}`,
+          explanation: linEq.step2Explanation,
+          mathOrCode: linEq.step2Math,
+          markAwarded: `[A1] Accuracy Mark (${linEq.variable} = ${linEq.x})`,
+        },
+      ],
+      finalAnswer: effectiveWorking
+        ? `Candidate Score: ${candidateScore} / ${marks} Marks (${Math.round((candidateScore / marks) * 100)}%). ${studentVerdict}`
+        : `${linEq.variable} = ${linEq.x}`,
+      examinerTraps: [
+        'Sign confusion when moving constant terms across the equals sign (e.g. +3 becomes -3).',
+        'Dividing only part of the right-hand side by the coefficient.'
+      ],
+      markSchemeBreakdown: [
+        `[M1] Rearranging: ${linEq.step1Math}`,
+        `[A1] Accurate final answer: ${linEq.variable} = ${linEq.x}`,
+      ],
+      examinerTips: [
+        'Always check your solution by substituting the value back into the original equation.',
+      ],
+      commonMistakes: [
+        'Arithmetic error when subtracting negative numbers.',
+      ],
+      relatedTopic: 'Algebraic Manipulation and Linear Equations',
+      studentWorkingEvaluation: effectiveWorking ? {
+        hasEvaluatedMath: true,
+        totalLinesChecked: 1,
+        marksEarned: candidateScore,
+        marksPossible: marks,
+        percentageScore: Math.round((candidateScore / marks) * 100),
+        overallVerdict: studentVerdict,
+        correctStepByStep: [
+          `Step 1: ${linEq.step1Explanation} -> ${linEq.step1Math}`,
+          `Step 2: ${linEq.step2Explanation} -> ${linEq.variable} = ${linEq.x}`
+        ],
+        lineReviews: [
+          {
+            lineNumber: 1,
+            rawText: effectiveWorking,
+            isMathEquation: true,
+            marksEarned: candidateScore,
+            isCorrect: isStudentCorrect,
+            markBadge: isStudentCorrect ? `[A${marks}]` : '[A0]',
+            exactReason: studentVerdict,
+            exactCorrection: isStudentCorrect ? undefined : `Write instead: ${linEq.variable} = ${linEq.x}`
+          }
+        ]
+      } : undefined
+    };
+  }
+
+  // 0a-2. Arithmetic Question with Candidate Answer (e.g. question: "Solve 2 + 2. [1 mark]", answer: "4")
+  const qArithmeticClean = effectiveQuestionText
+    .replace(/^(?:what\s+(?:is|does)|calculate|evaluate|solve|find|compute)?\s*/i, '')
+    .replace(/\s*(?:\[\d+\s*(?:marks?|m)?\]|\(\d+\s*(?:marks?|m)?\))\s*$/i, '')
+    .replace(/[\.\?!]+$/, '')
+    .trim();
+
+  const qArithmeticVal = !/\b\d{4}\/\d{2}\b/.test(qArithmeticClean) && /[\+\-\*\/\^×÷−]/.test(qArithmeticClean)
+    ? evaluateSafeArithmetic(qArithmeticClean)
+    : null;
+
+  if (qArithmeticVal !== null && !isNaN(qArithmeticVal) && isFinite(qArithmeticVal)) {
+    const marks = promptSpecifiedMarks || 1;
+    const cleanExpr = qArithmeticClean.replace(/\s+/g, ' ');
+
+    let isCandidateCorrect = false;
+    let candidateScore = 0;
+    let verdict = '';
+
+    if (effectiveWorking) {
+      const studentNum = parseFloat(effectiveWorking.replace(/^=\s*/, '').trim());
+      if (!isNaN(studentNum) && Math.abs(studentNum - qArithmeticVal) < 1e-6) {
+        isCandidateCorrect = true;
+        candidateScore = marks;
+        verdict = `Candidate answer "${effectiveWorking}" matches the correct arithmetic result (${cleanExpr} = ${qArithmeticVal}).`;
+      } else {
+        isCandidateCorrect = false;
+        candidateScore = 0;
+        verdict = `Candidate wrote "${effectiveWorking}", but ${cleanExpr} = ${qArithmeticVal}. Calculation slip.`;
+      }
+    }
+
+    return {
+      questionText: effectiveQuestionText || `Calculate: ${cleanExpr}`,
+      subject: subjectName,
+      topic: 'Basic Arithmetic & Number Operations',
+      totalMarks: marks,
+      coreConceptAndFormula: {
+        concept: 'Fundamental Arithmetic Operations',
+        formula: `${cleanExpr} = ${qArithmeticVal}`,
+      },
+      stepByStepSolution: [
+        {
+          stepNumber: 1,
+          title: `Evaluate Expression: ${cleanExpr}`,
+          explanation: `Compute the arithmetic operation: ${cleanExpr} = ${qArithmeticVal}.`,
+          mathOrCode: `${cleanExpr} = ${qArithmeticVal}`,
+          markAwarded: `[M1] / [A1] Correct calculation (${marks}/${marks} Marks)`
+        }
+      ],
+      finalAnswer: effectiveWorking
+        ? `Candidate Score: ${candidateScore} / ${marks} Marks (${Math.round((candidateScore / marks) * 100)}%). ${verdict}`
+        : `${qArithmeticVal}`,
+      examinerTraps: [
+        'Arithmetic calculation slip under exam pressure.',
+        'Writing only the final number without showing the operation in multi-step questions.'
+      ],
+      markSchemeBreakdown: [
+        `[${marks} Mark] Evaluation of ${cleanExpr} = ${qArithmeticVal}`
+      ],
+      examinerTips: [
+        'In Cambridge IGCSE, always write the full line of calculation to secure method marks.'
+      ],
+      commonMistakes: [
+        'Premature rounding or sign confusion.'
+      ],
+      relatedTopic: 'Number & Arithmetic Operations',
+      studentWorkingEvaluation: effectiveWorking ? {
+        hasEvaluatedMath: true,
+        totalLinesChecked: 1,
+        marksEarned: candidateScore,
+        marksPossible: marks,
+        percentageScore: Math.round((candidateScore / marks) * 100),
+        overallVerdict: verdict,
+        correctStepByStep: [
+          `Calculate: ${cleanExpr} = ${qArithmeticVal}`
+        ],
+        lineReviews: [
+          {
+            lineNumber: 1,
+            rawText: effectiveWorking,
+            isMathEquation: true,
+            marksEarned: candidateScore,
+            isCorrect: isCandidateCorrect,
+            markBadge: isCandidateCorrect ? `[A${marks}]` : '[A0]',
+            exactReason: verdict,
+            exactCorrection: isCandidateCorrect ? undefined : `Write instead: ${qArithmeticVal}`
+          }
+        ]
+      } : undefined
+    };
+  }
+
+  // 0a-3. Direct student working statement evaluation (e.g. "10-2=8", "10+2=8", "2 + 2 = 4")
+  const textToCheckForMath = (effectiveWorking || effectiveQuestionText || '').trim();
   const lineCount = textToCheckForMath.split(/\r?\n/).filter((l) => l.trim().length > 0).length;
   const targetMathMarks = promptSpecifiedMarks || (lineCount <= 1 ? 1 : Math.min(4, Math.max(1, lineCount)));
 
   const directMathEval = textToCheckForMath ? evaluateStudentWorking(textToCheckForMath, targetMathMarks) : null;
 
-  if (directMathEval && directMathEval.hasEvaluatedMath && !imageBase64) {
+  if (directMathEval && directMathEval.hasEvaluatedMath) {
     const isShortDirectEquation = textToCheckForMath.split('\n').length <= 3 && textToCheckForMath.length < 80;
-    if (isShortDirectEquation || (studentWorking && !questionText)) {
+    if (isShortDirectEquation || (studentWorking && !questionText) || imageDecodedText) {
       const firstFailure = directMathEval.lineReviews.find((l) => !l.isCorrect);
       return {
-        questionText: `Student Working Evaluation: "${textToCheckForMath}"`,
+        questionText: `Mathematical Working Evaluation: "${textToCheckForMath}"`,
         subject: subjectName,
         topic: 'Algebraic & Arithmetic Verification',
         totalMarks: directMathEval.marksPossible,
@@ -194,54 +473,7 @@ DO NOT wrap your output in markdown code blocks like \`\`\`json. Return only raw
     }
   }
 
-  // 0a-2. Standalone arithmetic without equals sign (e.g. "What is 2 + 2?", "Calculate 2 + 2 [1 mark]")
-  const standaloneArithmeticMatch = textToCheckForMath.match(/^(?:what\s+(?:is|does)|calculate|evaluate|solve|find|compute)?\s*(-?\d+(?:\.\d+)?\s*[\+\-\*\/\^×÷−]\s*-?\d+(?:\.\d+)?(?:\s*[\+\-\*\/\^×÷−]\s*-?\d+(?:\.\d+)?)*)\s*(?:\[(\d+)\s*(?:marks?|m)?\]|\((\d+)\s*(?:marks?|m)?\))?\s*\??$/i);
-  if (standaloneArithmeticMatch && !textToCheckForMath.includes('=')) {
-    const rawExpr = standaloneArithmeticMatch[1].trim();
-    if (!/\b\d{4}\/\d{2}\b/.test(rawExpr)) {
-      const val = evaluateSafeArithmetic(rawExpr);
-      if (val !== null && !isNaN(val) && isFinite(val)) {
-        const marks = promptSpecifiedMarks || 1;
-        const cleanExpr = rawExpr.replace(/\s+/g, ' ');
-        return {
-          questionText: textToCheckForMath,
-          subject: subjectName,
-          topic: 'Basic Arithmetic & Number Operations',
-          totalMarks: marks,
-          coreConceptAndFormula: {
-            concept: 'Fundamental Arithmetic Operations',
-            formula: `${cleanExpr} = ${val}`,
-          },
-          stepByStepSolution: [
-            {
-              stepNumber: 1,
-              title: `Evaluate Expression: ${cleanExpr}`,
-              explanation: `Compute the arithmetic operation: ${cleanExpr} = ${val}.`,
-              mathOrCode: `${cleanExpr} = ${val}`,
-              markAwarded: `[M1] / [A1] Correct calculation (${marks}/${marks} Marks)`
-            }
-          ],
-          finalAnswer: `${val}`,
-          examinerTraps: [
-            'Arithmetic calculation slip under exam pressure.',
-            'Writing only the final number without showing the operation in multi-step questions.'
-          ],
-          markSchemeBreakdown: [
-            `[${marks} Mark] Evaluation of ${cleanExpr} = ${val}`
-          ],
-          examinerTips: [
-            'In Cambridge IGCSE, always write the full line of calculation to secure method marks.'
-          ],
-          commonMistakes: [
-            'Premature rounding or sign confusion.'
-          ],
-          relatedTopic: 'Number & Arithmetic Operations'
-        };
-      }
-    }
-  }
-
-  // 0a-3. Instant ESL / English Candidate Answer Evaluation (e.g. contrast connective evaluation)
+  // 0a-4. Instant ESL / English Candidate Answer Evaluation (e.g. contrast connective evaluation)
   if (studentWorking && !imageBase64) {
     const eslEval = evaluateEslStudentAnswer(studentWorking, questionText || '', promptSpecifiedMarks || 1);
     if (eslEval) {
@@ -841,9 +1073,40 @@ ${ok.rawText}
     }
   }
 
-  // 0c. Direct Arithmetic Calculation Questions (e.g. "What is 2 + 2?", "Calculate 2 + 2", "2 + 2")
-  const arithmeticExprMatch = lastUserMessage.match(/(?:what\s+(?:is|does)|calculate|evaluate|solve|find|compute)?\s*(-?\d+(?:\.\d+)?\s*[\+\-\*\/\^×÷−]\s*-?\d+(?:\.\d+)?(?:\s*[\+\-\*\/\^×÷−]\s*-?\d+(?:\.\d+)?)*)\s*\??$/i);
-  if (arithmeticExprMatch && !lastUserMessage.includes('=')) {
+  // 0c. Clean student prompt for arithmetic & linear equation analysis
+  const cleanedTutorMsg = lastUserMessage
+    .replace(/\s*(?:\[\d+\s*(?:marks?|m)?\]|\(\d+\s*(?:marks?|m)?\))\s*$/i, '')
+    .replace(/[\.\?!]+$/, '')
+    .trim();
+
+  // 0c-1. Linear Equation in Tutor (e.g. "Solve 2x + 3 = 11", "2x+3=11")
+  const tutorLinEq = parseAndSolveLinearEquation(cleanedTutorMsg);
+  if (tutorLinEq) {
+    return `### 🧮 Mathematics Co-Pilot: Linear Equation Solution
+
+$$${tutorLinEq.clean}$$
+
+---
+
+#### 🎯 Step-by-Step Method & Mark Scheme:
+- **${tutorLinEq.step1Explanation}**
+  $$${tutorLinEq.step1Math}$$  
+  *Mark Awarded: **[M1]** Method mark for algebraic rearrangement.*
+- **${tutorLinEq.step2Explanation}**
+  $$${tutorLinEq.step2Math}$$  
+  *Mark Awarded: **[A1]** Accuracy mark for solving for ${tutorLinEq.variable}.*
+
+---
+
+**Official Final Answer:** **$${tutorLinEq.variable} = ${tutorLinEq.x}$**
+
+> 💡 **Cambridge Examiner Tip:**  
+> Always write down both lines of method working explicitly. If an arithmetic slip occurs on line 2, you still secure the [M1] method mark for isolating the variable term!`;
+  }
+
+  // 0c-2. Direct Arithmetic Calculation Questions (e.g. "What is 2 + 2?", "Calculate 2 + 2", "Solve 2 + 2. [1 mark]")
+  const arithmeticExprMatch = cleanedTutorMsg.match(/(?:what\s+(?:is|does)|calculate|evaluate|solve|find|compute)?\s*(-?\d+(?:\.\d+)?\s*[\+\-\*\/\^×÷−]\s*-?\d+(?:\.\d+)?(?:\s*[\+\-\*\/\^×÷−]\s*-?\d+(?:\.\d+)?)*)$/i);
+  if (arithmeticExprMatch && !cleanedTutorMsg.includes('=')) {
     const rawExpr = arithmeticExprMatch[1].trim();
     if (!/\b\d{4}\/\d{2}\b/.test(rawExpr)) {
       const evaluatedVal = evaluateSafeArithmetic(rawExpr);
@@ -1015,7 +1278,37 @@ To score full **16/16 marks (10 Content + 6 Language)**:
    - Always write SI units ($m/s^2$, $J$, $dm^3$, $\\Omega$).`;
   }
 
+  const isMath = subjectName.toLowerCase().includes('math') || subjectName.includes('0580') || subjectName.includes('0606');
+
   // Dynamic Syllabus Deep-Dive
+  if (isMath) {
+    return `### 🧮 ${subjectName}: Mark Scheme Breakdown for "${query}"
+
+Here is the syllabus tutorial for this topic under **${examBoard} ${subjectName}**:
+
+---
+
+#### 1. Fundamental Principle & Syllabus Method
+- In ${subjectName}, questions on this topic test algebraic manipulation, accurate formula substitution, and rigorous step-by-step reasoning.
+- Always quote the governing formula or identity explicitly before substituting numerical values to protect your **Method [M] marks**.
+
+---
+
+#### 2. Core Concepts & Step-by-Step Procedure
+- **Method $\\rightarrow$ Accuracy**: In Cambridge and Edexcel Mathematics papers:
+  1. Identify the given variables and required unknown.
+  2. Rearrange the formula algebraically with correct sign conventions.
+  3. Carry out calculations without intermediate rounding, rounding only the final numerical answer to **3 significant figures** (or 1 d.p. for angles).
+
+---
+
+#### 3. Essential Examiner Advice & Trap Warnings
+- **Common Slip**: Premature rounding during intermediate steps frequently loses the final Accuracy [A1] mark. Store intermediate values in your calculator.
+- **Examiner Rule**: Never write a contradictory equation (e.g. $10 + 2 = 8$). State every algebraic step on a new line to secure full method marks.
+
+*(Tip: You can ask me to solve any specific linear equation or arithmetic calculation step-by-step!)*`;
+  }
+
   return `### 📖 ${subjectName}: Mark Scheme Breakdown for "${query}"
 
 Here is the syllabus tutorial for this topic under **${examBoard} ${subjectName}**:
@@ -1058,6 +1351,102 @@ function generateSimulatedSolution(
   const promptSpecifiedMarks = promptMarksMatch
     ? parseInt(promptMarksMatch[1] || promptMarksMatch[2] || promptMarksMatch[3], 10)
     : undefined;
+
+  // 0. Check for Linear Equations (e.g. "2x + 3 = 11", "Solve 2x + 3 = 11 [2 marks]")
+  const linEq = parseAndSolveLinearEquation(query);
+  if (linEq) {
+    const marks = promptSpecifiedMarks || 2;
+    return {
+      questionText: query,
+      subject: subjectName,
+      topic: 'Linear Equations & Algebraic Operations',
+      totalMarks: marks,
+      coreConceptAndFormula: {
+        concept: 'Linear Equations & Algebraic Rearrangement',
+        formula: `${linEq.clean} \\implies ${linEq.variable} = ${linEq.x}`,
+      },
+      stepByStepSolution: [
+        {
+          stepNumber: 1,
+          title: `Step 1: Isolate the Variable Term (${linEq.variable})`,
+          explanation: linEq.step1Explanation,
+          mathOrCode: linEq.step1Math,
+          markAwarded: `[M1] Method Mark for rearrangement`,
+        },
+        {
+          stepNumber: 2,
+          title: `Step 2: Solve for ${linEq.variable}`,
+          explanation: linEq.step2Explanation,
+          mathOrCode: linEq.step2Math,
+          markAwarded: `[A1] Accuracy Mark (${linEq.variable} = ${linEq.x})`,
+        },
+      ],
+      finalAnswer: `${linEq.variable} = ${linEq.x}`,
+      examinerTraps: [
+        'Sign confusion when moving constant terms across the equals sign (e.g. +3 becomes -3).',
+        'Dividing only part of the right-hand side by the coefficient.'
+      ],
+      markSchemeBreakdown: [
+        `[M1] Rearranging: ${linEq.step1Math}`,
+        `[A1] Accurate final answer: ${linEq.variable} = ${linEq.x}`,
+      ],
+      examinerTips: [
+        'Always check your solution by substituting the value back into the original equation.',
+      ],
+      commonMistakes: [
+        'Arithmetic error when subtracting negative numbers.',
+      ],
+      relatedTopic: 'Algebraic Manipulation and Linear Equations',
+    };
+  }
+
+  // 0b. Standalone Arithmetic Check (e.g. "Solve 2 + 2. [1 mark]", "Calculate 2 + 2")
+  const arithClean = query
+    .replace(/^(?:what\s+(?:is|does)|calculate|evaluate|solve|find|compute)?\s*/i, '')
+    .replace(/\s*(?:\[\d+\s*(?:marks?|m)?\]|\(\d+\s*(?:marks?|m)?\))\s*$/i, '')
+    .replace(/[\.\?!]+$/, '')
+    .trim();
+  const arithVal = !/\b\d{4}\/\d{2}\b/.test(arithClean) && /[\+\-\*\/\^×÷−]/.test(arithClean)
+    ? evaluateSafeArithmetic(arithClean)
+    : null;
+  if (arithVal !== null && !isNaN(arithVal) && isFinite(arithVal)) {
+    const marks = promptSpecifiedMarks || 1;
+    const cleanExpr = arithClean.replace(/\s+/g, ' ');
+    return {
+      questionText: query,
+      subject: subjectName,
+      topic: 'Basic Arithmetic & Number Operations',
+      totalMarks: marks,
+      coreConceptAndFormula: {
+        concept: 'Fundamental Arithmetic Operations',
+        formula: `${cleanExpr} = ${arithVal}`,
+      },
+      stepByStepSolution: [
+        {
+          stepNumber: 1,
+          title: `Evaluate Expression: ${cleanExpr}`,
+          explanation: `Compute the arithmetic operation: ${cleanExpr} = ${arithVal}.`,
+          mathOrCode: `${cleanExpr} = ${arithVal}`,
+          markAwarded: `[M1] / [A1] Correct calculation (${marks}/${marks} Marks)`
+        }
+      ],
+      finalAnswer: `${arithVal}`,
+      examinerTraps: [
+        'Arithmetic calculation slip under exam pressure.',
+        'Writing only the final number without showing the operation in multi-step questions.'
+      ],
+      markSchemeBreakdown: [
+        `[${marks} Mark] Evaluation of ${cleanExpr} = ${arithVal}`
+      ],
+      examinerTips: [
+        'In Cambridge IGCSE, always write the full line of calculation to secure method marks.'
+      ],
+      commonMistakes: [
+        'Premature rounding or sign confusion.'
+      ],
+      relatedTopic: 'Number & Arithmetic Operations',
+    };
+  }
 
   // Redox problem
   if (lower.includes('redox') || lower.includes('fe2+') || lower.includes('mno4') || lower.includes('oxidation')) {

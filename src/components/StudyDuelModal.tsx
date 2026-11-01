@@ -96,12 +96,9 @@ export const StudyDuelModal: React.FC<StudyDuelModalProps> = ({
   const [peerScore, setPeerScore] = useState<number>(0);
   const [peerStatus, setPeerStatus] = useState<string>('Solving Question 1...');
 
-  if (!isOpen) return null;
-
-  const currentQ = SAMPLE_DUEL_QUESTIONS[currentQuestionIndex];
-
   // Timer countdown
   useEffect(() => {
+    if (!isOpen) return;
     let interval: any = null;
     if (timerRunning && timeLeft > 0) {
       interval = setInterval(() => {
@@ -111,17 +108,22 @@ export const StudyDuelModal: React.FC<StudyDuelModalProps> = ({
       handleTimeUp();
     }
     return () => clearInterval(interval);
-  }, [timerRunning, timeLeft]);
+  }, [isOpen, timerRunning, timeLeft]);
 
   // Peer simulator to give real-time multiplayer feel
   useEffect(() => {
+    if (!isOpen) return;
     if (duelState === 'active') {
       const peerTimer = setTimeout(() => {
         setPeerStatus('Submitted answer! Awaiting mark scheme...');
       }, 35000);
       return () => clearTimeout(peerTimer);
     }
-  }, [duelState, currentQuestionIndex]);
+  }, [isOpen, duelState, currentQuestionIndex]);
+
+  if (!isOpen) return null;
+
+  const currentQ = SAMPLE_DUEL_QUESTIONS[currentQuestionIndex];
 
   const handleStartDuel = () => {
     setDuelState('active');

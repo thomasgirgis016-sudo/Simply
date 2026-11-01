@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 import { IGCSE_SUBJECTS } from '../src/data/subjects';
-import { PAST_PAPERS_DATABASE, OFFICIAL_PAST_PAPER_PDFS } from '../src/data/pastPapersData';
+import { PAST_PAPERS_DATABASE, OFFICIAL_PAST_PAPER_PDFS, LOCAL_VERIFIED_PDFS } from '../src/data/pastPapersData';
 import { COMPREHENSIVE_REVISION_NOTES } from '../src/data/revisionData';
 import { CHEAT_SHEETS_DATABASE } from '../src/data/cheatSheetsData';
 import { IGCSE_PERIODIC_TABLE, CAMBRIDGE_EXAM_FORMULAS } from '../src/data/periodicTableData';
@@ -10,6 +11,8 @@ import { validateKatexSyntax, runFullAutonomousQaSweep } from '../src/services/p
 import { evaluateStudentWorking } from '../src/services/mathWorkingValidator';
 import { searchUniversalKnowledge } from '../src/services/knowledgeEngine';
 import { askAiTutor, solveQuestionWithGemini } from '../src/services/gemini';
+import { verifyAndAuditSolverResult } from '../src/services/examinerVerificationAgent';
+import { createValidMp3Buffer } from '../api/pdf-proxy';
 
 console.log('===========================================================');
 console.log('  SIMPLY IGCSE — COMPLETE WEBSITE FUNCTIONALITY & CONTENT QA');
@@ -17,15 +20,37 @@ console.log('===========================================================');
 
 let passCount = 0;
 let failCount = 0;
+let transportPassCount = 0;
+let transportFailCount = 0;
+let contentPassCount = 0;
+let contentFailCount = 0;
 const failures: string[] = [];
 
 function assert(condition: boolean, testName: string, errorDetail?: string) {
+  assertContent(condition, testName, errorDetail);
+}
+
+function assertContent(condition: boolean, testName: string, errorDetail?: string) {
   if (condition) {
     passCount++;
+    contentPassCount++;
   } else {
     failCount++;
-    failures.push(`${testName}: ${errorDetail || 'Condition failed'}`);
-    console.error(`❌ FAIL: ${testName} - ${errorDetail || ''}`);
+    contentFailCount++;
+    failures.push(`[CONTENT] ${testName}: ${errorDetail || 'Condition failed'}`);
+    console.error(`❌ FAIL [CONTENT]: ${testName} - ${errorDetail || ''}`);
+  }
+}
+
+function assertTransport(condition: boolean, testName: string, errorDetail?: string) {
+  if (condition) {
+    passCount++;
+    transportPassCount++;
+  } else {
+    failCount++;
+    transportFailCount++;
+    failures.push(`[TRANSPORT] ${testName}: ${errorDetail || 'Condition failed'}`);
+    console.error(`❌ FAIL [TRANSPORT]: ${testName} - ${errorDetail || ''}`);
   }
 }
 
@@ -191,23 +216,231 @@ assert(solverEslCorrect.studentWorkingEvaluation?.marksEarned === 1, 'AI Solver 
 assert(solverEslCorrect.studentWorkingEvaluation?.lineReviews[0]?.isCorrect === true, 'AI Solver marks valid sentence as isCorrect: true', 'Expected isCorrect to be true');
 assert(solverEslCorrect.finalAnswer.includes('1 / 1 Marks (100%)'), 'AI Solver final answer states 1 / 1 Marks (100%)', `Got finalAnswer: ${solverEslCorrect.finalAnswer}`);
 
-// 8j. 24-Check Autonomous QA Sweep & Curriculum Guard Verification
-console.log('\n--- 9. Autonomous Founder Console QA Sweep & Curriculum Guard ---');
+// 8k. AI Solver specificity: Solve 2 + 2. [1 mark] with student working "4"
+console.log('\n--- 8k-8o. AI Solver & AI Tutor Specificity Regressions ---');
+const solverArithmeticResult = await solveQuestionWithGemini({
+  questionText: 'Solve 2 + 2. [1 mark]',
+  studentWorking: '4',
+  subjectName: 'Mathematics (0580)',
+  examBoard: 'Cambridge CIE',
+  gradeLevel: 'IGCSE'
+});
+assertContent(solverArithmeticResult.totalMarks === 1, 'Solver awards 1 total mark for "Solve 2 + 2. [1 mark]"', `Got ${solverArithmeticResult.totalMarks}`);
+assertContent(solverArithmeticResult.studentWorkingEvaluation?.marksEarned === 1, 'Solver awards 1 mark earned for answer "4"', `Got ${solverArithmeticResult.studentWorkingEvaluation?.marksEarned}`);
+assertContent(solverArithmeticResult.studentWorkingEvaluation?.percentageScore === 100, 'Solver gives 100% accuracy for 2+2=4', `Got ${solverArithmeticResult.studentWorkingEvaluation?.percentageScore}%`);
+assertContent(!JSON.stringify(solverArithmeticResult).includes('y = mx + c'), 'Solver does NOT leak generic "y = mx + c" into arithmetic response');
+assertContent(!solverArithmeticResult.finalAnswer.includes('2 / 4'), 'Solver does NOT award generic fallback 2/4 marks for 1-mark arithmetic question', `Got ${solverArithmeticResult.finalAnswer}`);
+assertContent(solverArithmeticResult.topic.includes('Arithmetic'), 'Solver classifies topic as Basic Arithmetic & Number Operations', `Got ${solverArithmeticResult.topic}`);
+
+// 8l. AI Solver specificity: Linear equation 2x + 3 = 11 with student working "x = 4"
+const solverLinearResult = await solveQuestionWithGemini({
+  questionText: '2x + 3 = 11',
+  studentWorking: 'x = 4',
+  subjectName: 'Mathematics (0580)',
+  examBoard: 'Cambridge CIE',
+  gradeLevel: 'IGCSE'
+});
+assertContent(solverLinearResult.topic.includes('Linear Equations'), 'Solver classifies 2x+3=11 under Linear Equations', `Got ${solverLinearResult.topic}`);
+assertContent(solverLinearResult.finalAnswer.includes('x = 4'), 'Solver derives correct root x = 4', `Got ${solverLinearResult.finalAnswer}`);
+assertContent(!JSON.stringify(solverLinearResult).includes('y = mx + c'), 'Solver does NOT fall back to y = mx + c for linear equation');
+assertContent(solverLinearResult.studentWorkingEvaluation?.marksEarned === solverLinearResult.totalMarks, 'Solver awards full marks for correct linear equation working');
+
+// 8m. Photo / Synthetic Image Math Solver: does not return y = mx + c
+const solverPhotoResult = await solveQuestionWithGemini({
+  imageBase64: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAA=',
+  questionText: '2 + 2 = 4',
+  subjectName: 'Mathematics (0580)',
+  examBoard: 'Cambridge CIE',
+  gradeLevel: 'IGCSE'
+});
+assertContent(solverPhotoResult.totalMarks === 1, 'Photo Solver resolves 1 mark for 2+2=4 image text', `Got ${solverPhotoResult.totalMarks}`);
+assertContent(!JSON.stringify(solverPhotoResult).includes('y = mx + c'), 'Photo Solver does NOT fall back to y = mx + c for arithmetic image');
+assertContent(solverPhotoResult.topic.includes('Arithmetic'), 'Photo Solver classifies arithmetic image topic accurately', `Got ${solverPhotoResult.topic}`);
+
+// 8n. AI Tutor Direct Arithmetic Grounding: "Solve 2 + 2. [1 mark]"
+const tutorArithmeticReply = await askAiTutor([{ role: 'user', content: 'Solve 2 + 2. [1 mark]' }], 'Mathematics (0580)', 'Cambridge CIE');
+assertContent(tutorArithmeticReply.includes('4'), 'AI Tutor provides direct answer 4 for arithmetic prompt', `Got: ${tutorArithmeticReply.slice(0, 100)}...`);
+assertContent(tutorArithmeticReply.includes('[M1]') || tutorArithmeticReply.includes('1 mark'), 'AI Tutor provides exam mark breakdown for arithmetic prompt');
+assertContent(!tutorArithmeticReply.toLowerCase().includes('reagent') && !tutorArithmeticReply.toLowerCase().includes('precipitate') && !tutorArithmeticReply.toLowerCase().includes('photosynthesis'), 'AI Tutor does not mix science syllabus into mathematics arithmetic prompt');
+
+// 8o. Senior Examiner Verification Agent: rejects generic y = mx + c template for arithmetic
+const fakeArithmeticResult: any = {
+  id: 'fake-test',
+  questionText: 'Solve 2 + 2. [1 mark]',
+  subject: 'Mathematics (0580)',
+  topic: 'Key Syllabus Concepts & Problem Solving',
+  formulaUsed: 'y = mx + c',
+  steps: [{ stepNumber: 1, explanation: 'Apply formula y = mx + c', mathExpression: 'y = mx + c' }],
+  finalAnswer: '2 / 4 Marks',
+  totalMarks: 4,
+  accuracyScorePercent: 100
+};
+const examinerReport = verifyAndAuditSolverResult(fakeArithmeticResult);
+assertContent(!examinerReport.isVerified, 'Examiner Agent rejects generic template on arithmetic prompt', `isVerified was ${examinerReport.isVerified}`);
+assertContent(examinerReport.accuracyScorePercent <= 50, 'Examiner Agent docks accuracy score for generic template mismatch', `Score was ${examinerReport.accuracyScorePercent}%`);
+assertContent(examinerReport.examinerSeal === 'NEEDS_EXAMINER_REVIEW', 'Examiner Agent marks template mismatch as NEEDS_EXAMINER_REVIEW', `Seal was ${examinerReport.examinerSeal}`);
+
+// TEST SUITE 10: ESL AUDIO ASSET MAPPING & DISTINCT IDENTITY
+console.log('\n--- 10. ESL Audio Asset Mapping & Distinct Identity ---');
+const audioSp26 = createValidMp3Buffer(120, '0510_sp26_audio_22');
+const audioS17 = createValidMp3Buffer(120, '0510_s17_audio_42');
+const audioW10 = createValidMp3Buffer(120, '0510_w10_audio_41');
+
+// Transport health assertions
+assertTransport(audioSp26.subarray(0, 3).toString('ascii') === 'ID3', '0510 sp26 audio buffer has valid ID3v2 header');
+assertTransport(audioS17.subarray(0, 3).toString('ascii') === 'ID3', '0510 s17 audio buffer has valid ID3v2 header');
+assertTransport(audioW10.subarray(0, 3).toString('ascii') === 'ID3', '0510 w10 audio buffer has valid ID3v2 header');
+assertTransport(audioSp26.length > 1000 && audioS17.length > 1000 && audioW10.length > 1000, 'Audio buffers have valid non-zero transport lengths');
+
+// Content correctness assertions
+const hashSp26 = crypto.createHash('sha256').update(audioSp26).digest('hex');
+const hashS17 = crypto.createHash('sha256').update(audioS17).digest('hex');
+const hashW10 = crypto.createHash('sha256').update(audioW10).digest('hex');
+const oldStaticHash = '13676888803580ed2a9a5a31ecdcdf48e114dc754b86a9e0444f231d898bb89b';
+
+assertContent(hashSp26 !== hashS17, 'Audio track 0510_sp26_audio_22 hash differs from 0510_s17_audio_42');
+assertContent(hashS17 !== hashW10, 'Audio track 0510_s17_audio_42 hash differs from 0510_w10_audio_41');
+assertContent(hashSp26 !== hashW10, 'Audio track 0510_sp26_audio_22 hash differs from 0510_w10_audio_41');
+assertContent(hashSp26 !== oldStaticHash && hashS17 !== oldStaticHash && hashW10 !== oldStaticHash, 'Audio tracks do not match the old static 1.25MB byte-identical hash');
+assertContent(audioSp26.includes('0510_sp26_audio_22'), 'Audio buffer contains embedded metadata title matching track code');
+
+// TEST SUITE 11: ESL PAPER IDENTITY MAPPINGS & CROSS-VARIANT PURITY
+console.log('\n--- 11. ESL Paper Identity Mappings & Cross-Variant Purity ---');
+// Verify fake cross-variant aliases are eliminated from LOCAL_VERIFIED_PDFS
+assertContent(!('0510_s16_qp_12.pdf' in LOCAL_VERIFIED_PDFS), 'LOCAL_VERIFIED_PDFS does not contain fake alias for 0510_s16_qp_12.pdf');
+assertContent(!('0510_w10_ms_42.pdf' in LOCAL_VERIFIED_PDFS), 'LOCAL_VERIFIED_PDFS does not contain fake alias for 0510_w10_ms_42.pdf');
+assertContent(!('0510_s10_ms_13.pdf' in LOCAL_VERIFIED_PDFS), 'LOCAL_VERIFIED_PDFS does not contain fake alias for 0510_s10_ms_13.pdf');
+assertContent(!('0510_s10_ms_33.pdf' in LOCAL_VERIFIED_PDFS), 'LOCAL_VERIFIED_PDFS does not contain fake alias for 0510_s10_ms_33.pdf');
+
+// Verify non-administered papers are omitted from OFFICIAL_PAST_PAPER_PDFS
+const nonAdministeredS16 = OFFICIAL_PAST_PAPER_PDFS.find(p => p.paperCode === '0510/12' && p.year === 2016 && p.session === 'May/June');
+assertContent(nonAdministeredS16 === undefined, 'Non-administered paper 0510/12 May/June 2016 is omitted from past paper archive');
+
+const nonAdministeredW10 = OFFICIAL_PAST_PAPER_PDFS.find(p => p.paperCode === '0510/42' && p.year === 2010 && p.session === 'Oct/Nov');
+assertContent(nonAdministeredW10 === undefined, 'Non-administered paper 0510/42 Oct/Nov 2010 is omitted from past paper archive');
+
+// TEST SUITE 12: PAPER NUMBER FILTER ACCURACY & MULTI-COMPONENT ISOLATION
+console.log('\n--- 12. Paper Number Filter Accuracy & Multi-Component Isolation ---');
+
+// Simulate the exact PastPaperFinder filter logic
+function filterPapers(papers: typeof OFFICIAL_PAST_PAPER_PDFS, opts: {
+  subjectId?: string;
+  year?: number;
+  session?: string;
+  paperNumber?: string;
+  variant?: string;
+}) {
+  return papers.filter(pdf => {
+    if (opts.subjectId && opts.subjectId !== 'all') {
+      const matchesSub = pdf.subjectId === opts.subjectId || pdf.subjectCode.toLowerCase() === opts.subjectId.toLowerCase();
+      if (!matchesSub) return false;
+    }
+    if (opts.year && pdf.year !== opts.year) return false;
+    if (opts.session && !pdf.session.toLowerCase().includes(opts.session.toLowerCase())) return false;
+    if (opts.paperNumber && opts.paperNumber !== 'All') {
+      const cleanTarget = opts.paperNumber.replace(/^paper\s*/i, '').trim();
+      if (pdf.paperNumber !== undefined && pdf.paperNumber !== null) {
+        if (pdf.paperNumber.toString() !== cleanTarget) return false;
+      } else {
+        const matchCode = new RegExp('[/_]0?' + cleanTarget + '[0-9]?($|[^0-9])').test(pdf.paperCode);
+        const matchComponent = new RegExp('\\bpaper\\s*0?' + cleanTarget + '\\b', 'i').test(pdf.paperComponent || '');
+        if (!matchCode && !matchComponent) return false;
+      }
+    }
+    if (opts.variant && opts.variant !== 'All' && pdf.variant !== undefined) {
+      if (pdf.variant.toString() !== opts.variant) return false;
+    }
+    return true;
+  });
+}
+
+// 12a. CIE ESL Archive Paper Number filter: 2025 / May-June / Paper 2 / Variant 2
+const eslP2V2 = filterPapers(OFFICIAL_PAST_PAPER_PDFS, {
+  subjectId: 'cie-esl-0510',
+  year: 2025,
+  session: 'May/June',
+  paperNumber: '2',
+  variant: '2'
+});
+assertContent(eslP2V2.length > 0, 'ESL 2025 May/June Paper 2 Variant 2 returns matching papers', `Found ${eslP2V2.length}`);
+assertContent(eslP2V2.some(p => p.paperCode === '0510/22'), 'ESL filter results include 0510/22');
+assertContent(eslP2V2.every(p => p.paperCode !== '0510/12'), 'ESL filter results contain ZERO instances of 0510/12 Paper 1 (no variant bleed)');
+
+// 12b. Multi-component regression: Physics (0625) 2023 / May-June / Paper 2 / Variant 2
+const physicsP2V2 = filterPapers(OFFICIAL_PAST_PAPER_PDFS, {
+  subjectId: 'cie-physics-0625',
+  year: 2023,
+  session: 'May/June',
+  paperNumber: '2',
+  variant: '2'
+});
+assertContent(physicsP2V2.length > 0, 'Physics 2023 May/June Paper 2 Variant 2 returns matching papers', `Found ${physicsP2V2.length}`);
+assertContent(physicsP2V2.some(p => p.paperCode === '0625/22'), 'Physics filter results include 0625/22 Paper 2');
+assertContent(physicsP2V2.every(p => p.paperCode !== '0625/12' && p.paperCode !== '0625/42' && p.paperCode !== '0625/62'), 'Physics filter results contain ZERO instances of Paper 1, Paper 4, or Paper 6');
+
+// TEST SUITE 13: DIRECT RESOURCE AVAILABILITY & DISCLOSURE
+console.log('\n--- 13. Direct Resource Availability & Board Hub Disclosure ---');
+
+// 13a. ESL 2026 Specimen papers must expose direct Cambridge PDF links, not board hubs
+const sp26Paper1 = OFFICIAL_PAST_PAPER_PDFS.find(p => p.id === 'pdf-0510-sp26-1');
+assertTransport(!!sp26Paper1?.qpPdfUrl && !!sp26Paper1?.msPdfUrl, 'Specimen Paper 1 has defined QP & MS URLs');
+assertContent(sp26Paper1?.isPortal === false, 'Specimen Paper 1 is flagged as direct resource (isPortal: false)');
+assertContent(sp26Paper1?.qpPdfUrl.includes('637263-2024-specimen-paper-1.pdf') === true, 'Specimen Paper 1 QP points to direct Cambridge PDF');
+assertContent(sp26Paper1?.msPdfUrl.includes('637270-2024-specimen-paper-1-mark-scheme.pdf') === true, 'Specimen Paper 1 MS points to direct Cambridge PDF');
+
+const sp26Paper2 = OFFICIAL_PAST_PAPER_PDFS.find(p => p.id === 'pdf-0510-sp26-2');
+assertTransport(!!sp26Paper2?.qpPdfUrl && !!sp26Paper2?.msPdfUrl, 'Specimen Paper 2 has defined QP & MS URLs');
+assertContent(sp26Paper2?.isPortal === false, 'Specimen Paper 2 is flagged as direct resource (isPortal: false)');
+assertContent(sp26Paper2?.qpPdfUrl.includes('638100-2024-specimen-paper-2.pdf') === true, 'Specimen Paper 2 QP points to direct Cambridge PDF');
+assertContent(sp26Paper2?.msPdfUrl.includes('638098-2024-specimen-paper-2-markscheme.pdf') === true, 'Specimen Paper 2 MS points to direct Cambridge PDF');
+
+// 13b. Cross-board archive inventory audit: Edexcel & OxfordAQA must be flagged isPortal: true
+const edexcelRows = OFFICIAL_PAST_PAPER_PDFS.filter(p => p.board === 'Edexcel');
+const oxfordRows = OFFICIAL_PAST_PAPER_PDFS.filter(p => p.board === 'OxfordAQA');
+const cieRows = OFFICIAL_PAST_PAPER_PDFS.filter(p => p.board === 'CIE');
+
+assertContent(edexcelRows.length === 1666, 'Catalog inventory contains all 1,666 Edexcel rows', `Found ${edexcelRows.length}`);
+assertContent(oxfordRows.length === 231, 'Catalog inventory contains all 231 OxfordAQA rows', `Found ${oxfordRows.length}`);
+assertContent(cieRows.length === 7373, 'Catalog inventory contains all 7,373 administered CIE rows (excluding non-administered s16/w10 variants)', `Found ${cieRows.length}`);
+
+// Every Edexcel and OxfordAQA row must disclose isPortal: true so students are not served fake PDFs
+assertContent(edexcelRows.every(p => p.isPortal === true), 'All 1,666 Edexcel rows explicitly set isPortal: true');
+assertContent(oxfordRows.every(p => p.isPortal === true), 'All 231 OxfordAQA rows explicitly set isPortal: true');
+
+// CIE 2026 coverage check: verify regular CIE series are through 2025 and 2026 contains specimen placeholders only
+const cie2026Rows = cieRows.filter(p => p.year === 2026);
+assertContent(cie2026Rows.length === 5, 'CIE 2026 rows consist exclusively of the 5 authentic specimen placeholders (0580, 0510, 0500)', `Found ${cie2026Rows.length}`);
+assertContent(cie2026Rows.every(p => p.session.toLowerCase().includes('specimen')), 'All CIE 2026 rows are specimen sessions, avoiding unadministered regular series falsification');
+
+// TEST SUITE 14: NAVIGATION & PAPER COUNT RECONCILIATION
+console.log('\n--- 14. Navigation Label & Archive Count Reconciliation ---');
+assertContent(OFFICIAL_PAST_PAPER_PDFS.length >= 9200, 'Past paper archive count matches high catalog depth (>= 9,200)', `Found ${OFFICIAL_PAST_PAPER_PDFS.length}`);
+
+// TEST SUITE 15: AUTONOMOUS FOUNDER CONSOLE QA SWEEP
+console.log('\n--- 15. Autonomous Founder Console QA Sweep & Curriculum Guard ---');
 const autonomousSweep = await runFullAutonomousQaSweep();
-assert(autonomousSweep.failedCount === 0, 'Autonomous QA sweep reports 0 failed checks (100% health)', `Found ${autonomousSweep.failedCount} failures: ${autonomousSweep.checks.filter(c => c.status === 'failed').map(c => c.name).join(', ')}`);
+assertContent(autonomousSweep.failedCount === 0, 'Autonomous QA sweep reports 0 failed checks (100% health)', `Found ${autonomousSweep.failedCount} failures: ${autonomousSweep.checks.filter(c => c.status === 'failed').map(c => c.name).join(', ')}`);
 const eslGuard = autonomousSweep.checks.find(c => c.id === 'guard-esl-reform-mapping');
-assert(eslGuard?.status === 'passed', 'ESL 0510 Paper 1 vs Paper 2 Reform Guard is PASSED', eslGuard?.details);
+assertContent(eslGuard?.status === 'passed', 'ESL 0510 Paper 1 vs Paper 2 Reform Guard is PASSED', eslGuard?.details);
 
 console.log('✓ Verified AI Solver, AI Tutor, and Math Working Validator precision & subject isolation');
+console.log(`✓ Verified Audio Asset Non-Colliding Distinct Content & ID3 Metadata`);
+console.log(`✓ Verified ESL Paper Identity, Filter Boundaries, and Direct Specimen Endpoints`);
 console.log(`✓ Verified Autonomous QA Sweep: ${autonomousSweep.passedCount}/${autonomousSweep.totalChecks} Checks Passed (${autonomousSweep.healthPercent}% System Health)`);
 
 console.log('\n===========================================================');
-console.log(`  QA SUMMARY: ${passCount} PASSED, ${failCount} FAILED`);
+console.log('  QA ACCEPTANCE REPORT: TRANSPORT HEALTH VS CONTENT CORRECTNESS');
+console.log('===========================================================');
+console.log(`  [TRANSPORT HEALTH]    : ${transportPassCount} Passed, ${transportFailCount} Failed`);
+console.log(`  [CONTENT CORRECTNESS] : ${contentPassCount} Passed, ${contentFailCount} Failed`);
+console.log(`  [OVERALL TOTAL]       : ${passCount} Passed, ${failCount} Failed`);
+
 if (failCount === 0) {
-  console.log('  RESULT: ALL WEBSITE FUNCTIONALITY & CONTENT AUDITS PASSED!');
+  console.log('\n  RESULT: ALL WEBSITE FUNCTIONALITY, CONTENT & TRANSPORT AUDITS PASSED!');
 } else {
-  console.log(`  FAILURES:\n  ${failures.join('\n  ')}`);
+  console.log(`\n  FAILURES (${failCount}):\n  ${failures.join('\n  ')}`);
 }
 console.log('===========================================================');
 
 process.exit(failCount === 0 ? 0 : 1);
+
