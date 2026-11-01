@@ -309,9 +309,24 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
         return false;
       }
 
-      // Session / Series filter
+      // Session / Series filter (cross-board awareness: June/May/Summer/January)
       if (selectedSession !== 'All') {
-        if (!pdf.session.toLowerCase().includes(selectedSession.toLowerCase())) {
+        const selLower = selectedSession.toLowerCase();
+        const pdfSessLower = pdf.session.toLowerCase();
+
+        let matchesSession = pdfSessLower.includes(selLower);
+        if (!matchesSession) {
+          if (selLower === 'may/june' || selLower === 'june' || selLower === 'summer') {
+            matchesSession = pdfSessLower.includes('june') || pdfSessLower.includes('may') || pdfSessLower.includes('summer');
+          } else if (selLower === 'oct/nov' || selLower === 'november' || selLower === 'winter') {
+            matchesSession = pdfSessLower.includes('nov') || pdfSessLower.includes('oct') || pdfSessLower.includes('winter');
+          } else if (selLower === 'feb/march' || selLower === 'march' || selLower === 'spring') {
+            matchesSession = pdfSessLower.includes('march') || pdfSessLower.includes('feb') || pdfSessLower.includes('spring');
+          } else if (selLower === 'january' || selLower === 'jan') {
+            matchesSession = pdfSessLower.includes('jan');
+          }
+        }
+        if (!matchesSession) {
           return false;
         }
       }
@@ -1146,7 +1161,8 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
             >
               <option value="All">All Series</option>
-              <option value="May/June">May / June (Summer - s)</option>
+              <option value="May/June">May / June (Summer - s &amp; Edexcel June)</option>
+              <option value="June">June Series (Edexcel / Pearson)</option>
               <option value="Oct/Nov">Oct / Nov (Winter - w)</option>
               <option value="Feb/March">Feb / March (Spring - m)</option>
               <option value="January">January Series (Edexcel)</option>
@@ -1642,13 +1658,18 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                 Variant {pdf.variant}
                               </span>
                             )}
-                            {Boolean(pdf.isPortal || !pdf.qpPdfUrl?.endsWith('.pdf') || pdf.board === 'Edexcel' || pdf.board === 'OxfordAQA') && (
+                            {Boolean(pdf.isUnavailable) && (
+                              <span className="rounded-lg bg-rose-950/80 text-rose-300 px-2 py-0.5 text-[10px] font-semibold border border-rose-500/40 flex items-center gap-1">
+                                Unavailable / Not Administered
+                              </span>
+                            )}
+                            {Boolean(pdf.isPortal || !pdf.qpPdfUrl?.endsWith('.pdf') || pdf.board === 'Edexcel' || pdf.board === 'OxfordAQA') && !pdf.isUnavailable && (
                               <span className="rounded-lg bg-amber-950/80 text-amber-300 px-2 py-0.5 text-[10px] font-semibold border border-amber-500/40 flex items-center gap-1">
                                 <ExternalLink className="h-2.5 w-2.5 text-amber-400" />
                                 Official Board Hub
                               </span>
                             )}
-                            {isListeningPaper && (
+                            {isListeningPaper && !pdf.isUnavailable && (
                               <span className="rounded-lg bg-indigo-950/80 text-indigo-300 px-2 py-0.5 text-[10px] font-bold border border-indigo-500/40 flex items-center gap-1">
                                 <Headphones className="h-2.5 w-2.5 animate-pulse text-indigo-400" />
                                 Audio Track
@@ -1677,7 +1698,15 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                         <p className="text-xs text-slate-300 mt-1 leading-relaxed">
                           {pdf.paperComponent}
                         </p>
-                        {Boolean(pdf.isPortal) && (
+                        {Boolean(pdf.isUnavailable) && (
+                          <div className="mt-2.5 flex items-start gap-1.5 rounded-lg bg-rose-950/40 border border-rose-500/30 p-2 text-[11px] text-rose-200/90 leading-snug">
+                            <Info className="h-3.5 w-3.5 text-rose-400 shrink-0 mt-0.5" />
+                            <span>
+                              <strong>Official Examination Record:</strong> {pdf.unavailableReason || 'This variant was not administered or published by Cambridge for this examination series.'}
+                            </span>
+                          </div>
+                        )}
+                        {Boolean(pdf.isPortal) && !pdf.isUnavailable && (
                           <div className="mt-2.5 flex items-start gap-1.5 rounded-lg bg-amber-950/40 border border-amber-500/30 p-2 text-[11px] text-amber-200/90 leading-snug">
                             <Info className="h-3.5 w-3.5 text-amber-400 shrink-0 mt-0.5" />
                             <span>
@@ -1689,6 +1718,12 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
                       {/* Action Buttons: Audio, QP, MS, ER, GT */}
                       <div className="mt-5 pt-4 border-t border-slate-800/80 space-y-2">
+                        {pdf.isUnavailable ? (
+                          <div className="rounded-xl border border-dashed border-rose-500/30 bg-rose-950/20 p-3 text-center text-xs text-rose-300 font-medium">
+                            <span className="font-bold">Variant Not Administered:</span> Cambridge did not administer or publish this variant for this series.
+                          </div>
+                        ) : (
+                          <>
                         {/* Listening Audio Track Stream & Download Box */}
                         {isListeningPaper && audioUrls && (
                           <div className="bg-gradient-to-r from-sky-950/70 via-indigo-950/50 to-slate-950/80 rounded-xl p-3 border border-sky-500/30 space-y-2 mb-2">
@@ -1903,6 +1938,8 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                               </button>
                             )}
                           </div>
+                        )}
+                        </>
                         )}
                       </div>
                     </div>

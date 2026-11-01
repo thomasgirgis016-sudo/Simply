@@ -560,6 +560,18 @@ export default async function handler(req: any, res: any) {
       return res.end(html);
     }
 
+    const isKnownUnavailableVariant =
+      (examCode && (examCode.includes('0510_s16_qp_12') || examCode.includes('0510_w10_ms_42'))) ||
+      (rawUrl && (rawUrl.includes('0510_s16_qp_12') || rawUrl.includes('0510_w10_ms_42')));
+
+    if (isKnownUnavailableVariant) {
+      return res.status(404).json({
+        error: 'Variant not administered or published by Cambridge for this examination series',
+        isUnavailable: true,
+        requestedVariant: examCode || rawUrl
+      });
+    }
+
     return res.status(404).json({
       error: 'Resource not found on official mirror archives (blocked HTML redirects / 404s)',
       attemptedUrls: candidates,

@@ -362,6 +362,8 @@ export interface OfficialPaperPdf {
   backupMsUrl?: string;
   fileSizeBytes?: string; // e.g. "1.2 MB"
   isPortal?: boolean; // When true, links directly to official board qualification/materials portal
+  isUnavailable?: boolean; // When true, indicates variant was never administered or released
+  unavailableReason?: string;
 }
 
 // 3. Syllabus Interactive Specification Checklist Types

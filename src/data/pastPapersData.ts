@@ -1800,10 +1800,11 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
             // Historical Cambridge 0510 non-administered examination variants:
             // 1. In June 2010, Cambridge 0510 only administered Variants 1 and 2 (no Variant 3 existed)
             if (sub.code === '0510' && yr === 2010 && series.code === 's' && v === 3) continue;
-            // 2. In May/June 2016, Cambridge 0510 Paper 1 only ran Variants 1 and 3 (Variant 12 was never administered)
-            if (sub.code === '0510' && yr === 2016 && series.code === 's' && p.paperNumber === 1 && v === 2) continue;
-            // 3. In Oct/Nov 2010, Cambridge 0510 Paper 4 only ran Variant 1 (Variant 42 was never administered)
-            if (sub.code === '0510' && yr === 2010 && series.code === 'w' && p.paperNumber === 4 && v === 2) continue;
+
+            // 2. May/June 2016 0510/12 and Oct/Nov 2010 0510/42 were never administered by Cambridge
+            const isUnavailableVariant =
+              (sub.code === '0510' && yr === 2016 && series.code === 's' && p.paperNumber === 1 && v === 2) ||
+              (sub.code === '0510' && yr === 2010 && series.code === 'w' && p.paperNumber === 4 && v === 2);
 
             const compCode = `${p.paperNumber}${v}`;
             const paperCode = `${sub.code}/${compCode}`;
@@ -1812,17 +1813,17 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
             const erFilename = `${sub.code}_${series.code}${yy}_er.pdf`;
             const gtFilename = `${sub.code}_${series.code}${yy}_gt.pdf`;
 
-            const qpUrl = LOCAL_VERIFIED_PDFS[qpFilename] ||
-              `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${qpFilename}`;
-            const backupQp = `https://bestexamhelp.com/exam/cambridge-igcse/${sub.slug}/${yr}/${qpFilename}`;
+            const qpUrl = isUnavailableVariant ? '' : (LOCAL_VERIFIED_PDFS[qpFilename] ||
+              `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${qpFilename}`);
+            const backupQp = isUnavailableVariant ? '' : `https://bestexamhelp.com/exam/cambridge-igcse/${sub.slug}/${yr}/${qpFilename}`;
 
-            const msUrl = LOCAL_VERIFIED_PDFS[msFilename] ||
-              `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${msFilename}`;
-            const backupMs = `https://bestexamhelp.com/exam/cambridge-igcse/${sub.slug}/${yr}/${msFilename}`;
+            const msUrl = isUnavailableVariant ? '' : (LOCAL_VERIFIED_PDFS[msFilename] ||
+              `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${msFilename}`);
+            const backupMs = isUnavailableVariant ? '' : `https://bestexamhelp.com/exam/cambridge-igcse/${sub.slug}/${yr}/${msFilename}`;
 
-            const erUrl = LOCAL_VERIFIED_PDFS[erFilename] ||
-              `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${erFilename}`;
-            const gtUrl = `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${gtFilename}`;
+            const erUrl = isUnavailableVariant ? '' : (LOCAL_VERIFIED_PDFS[erFilename] ||
+              `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${erFilename}`);
+            const gtUrl = isUnavailableVariant ? '' : `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${gtFilename}`;
 
             // Syllabus-accurate paper component titles
             let paperTitle = p.title;
@@ -1854,13 +1855,15 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
               paperComponent: `${paperTitle} (Variant ${v})`,
               paperCode,
               tier: sub.code === '0510' && yr >= 2024 ? 'General' : p.tier,
+              isUnavailable: isUnavailableVariant,
+              unavailableReason: isUnavailableVariant ? 'This variant was not administered or published by Cambridge for this examination series.' : undefined,
               qpPdfUrl: qpUrl,
               backupQpUrl: backupQp,
               msPdfUrl: msUrl,
               backupMsUrl: backupMs,
               examinerReportUrl: erUrl,
               gradeThresholdsUrl: gtUrl,
-              fileSizeBytes: 'Official PDF'
+              fileSizeBytes: isUnavailableVariant ? 'Not Administered' : 'Official PDF'
             });
           }
         }

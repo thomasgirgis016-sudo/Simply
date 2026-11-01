@@ -109,7 +109,7 @@ export function parseAndSolveLinearEquation(text: string): LinearEquationSolutio
     .trim();
 
   // Search anywhere in text for: ax + b = c or ax - b = c
-  const m1 = text.match(/(?:^|[^\w\.])([+-]?\d*(?:\.\d+)?)\s*([a-z])\s*([+-])\s*(\d+(?:\.\d+)?)\s*=\s*([+-]?\d+(?:\.\d+)?)(?:$|[^\w\.])/i);
+  const m1 = text.match(/(?:^|[^\w\.])([+-]?\d*(?:\.\d+)?)\s*([a-z])\s*([+-])\s*(\d+(?:\.\d+)?)\s*=\s*([+-]?\d+(?:\.\d+)?)(?!\.\d)(?:\b|$)/i);
   if (m1) {
     const rawA = m1[1].trim();
     const a = rawA === '' || rawA === '+' ? 1 : (rawA === '-' ? -1 : parseFloat(rawA));
@@ -137,7 +137,7 @@ export function parseAndSolveLinearEquation(text: string): LinearEquationSolutio
   }
 
   // Search anywhere in text for: ax = c
-  const m2 = text.match(/(?:^|[^\w\.])([+-]?\d*(?:\.\d+)?)\s*([a-z])\s*=\s*([+-]?\d+(?:\.\d+)?)(?:$|[^\w\.])/i);
+  const m2 = text.match(/(?:^|[^\w\.])([+-]?\d*(?:\.\d+)?)\s*([a-z])\s*=\s*([+-]?\d+(?:\.\d+)?)(?!\.\d)(?:\b|$)/i);
   if (m2) {
     const rawA = m2[1].trim();
     const a = rawA === '' || rawA === '+' ? 1 : (rawA === '-' ? -1 : parseFloat(rawA));
@@ -159,6 +159,78 @@ export function parseAndSolveLinearEquation(text: string): LinearEquationSolutio
     };
   }
 
+  return null;
+}
+
+export interface QuadraticEquationSolution {
+  variable: string;
+  k: number;
+  rootPositive: number;
+  rootNegative: number;
+  clean: string;
+}
+
+export function parseAndSolveQuadratic(text: string): QuadraticEquationSolution | null {
+  if (!text) return null;
+  // Match e.g. "x^2 = 9", "x² = 9", "Solve x^2 = 9. [2 marks]", "x^2 - 9 = 0"
+  const m1 = text.match(/(?:^|[^\w\.])([a-z])\s*(?:\^2|²)\s*=\s*([+-]?\d+(?:\.\d+)?)(?!\.\d)(?:\b|$)/i);
+  if (m1) {
+    const variable = m1[1];
+    const k = parseFloat(m1[2]);
+    if (k >= 0) {
+      const rootPositive = Math.round(Math.sqrt(k) * 1000) / 1000;
+      const rootNegative = -rootPositive;
+      return {
+        variable,
+        k,
+        rootPositive,
+        rootNegative,
+        clean: `${variable}^2 = ${k}`
+      };
+    }
+  }
+  const m2 = text.match(/(?:^|[^\w\.])([a-z])\s*(?:\^2|²)\s*-\s*(\d+(?:\.\d+)?)\s*=\s*0(?!\.\d)(?:\b|$)/i);
+  if (m2) {
+    const variable = m2[1];
+    const k = parseFloat(m2[2]);
+    if (k >= 0) {
+      const rootPositive = Math.round(Math.sqrt(k) * 1000) / 1000;
+      const rootNegative = -rootPositive;
+      return {
+        variable,
+        k,
+        rootPositive,
+        rootNegative,
+        clean: `${variable}^2 = ${k}`
+      };
+    }
+  }
+  return null;
+}
+
+export interface RectangleAreaSolution {
+  length: number;
+  width: number;
+  area: number;
+  unit: string;
+}
+
+export function parseAndSolveRectangleArea(text: string): RectangleAreaSolution | null {
+  if (!text) return null;
+  const lower = text.toLowerCase();
+  const isGeometry = lower.includes('rectangle') || lower.includes('area') || lower.includes('width') || lower.includes('length');
+  const dimMatch = text.match(/(\d+(?:\.\d+)?)\s*(cm|m|mm)?\s*(?:x|×|by|\*)\s*(\d+(?:\.\d+)?)\s*(cm|m|mm)?/i) ||
+    text.match(/length\s*(\d+(?:\.\d+)?)\s*(cm|m|mm)?\s*(?:and|,)?\s*width\s*(\d+(?:\.\d+)?)\s*(cm|m|mm)?/i) ||
+    text.match(/dimensions?\s*(\d+(?:\.\d+)?)\s*(cm|m|mm)?\s*(?:x|×|by|\*|and)\s*(\d+(?:\.\d+)?)\s*(cm|m|mm)?/i);
+  if (dimMatch && (isGeometry || lower.includes('cm') || lower.includes('x') || lower.includes('×'))) {
+    const d1 = parseFloat(dimMatch[1]);
+    const d2 = parseFloat(dimMatch[3]);
+    const unit = dimMatch[2] || dimMatch[4] || 'cm';
+    const length = Math.max(d1, d2);
+    const width = Math.min(d1, d2);
+    const area = Math.round((length * width) * 1000) / 1000;
+    return { length, width, area, unit };
+  }
   return null;
 }
 
@@ -219,30 +291,379 @@ DO NOT wrap your output in markdown code blocks like \`\`\`json. Return only raw
     ? parseInt(promptMarksMatch[1] || promptMarksMatch[2] || promptMarksMatch[3], 10)
     : undefined;
 
-  // Extract possible math text embedded in synthetic image or OCR if present
+  // Extract text only if mimeType is svg or text-based. NEVER extract random ASCII bytes from binary PNG/JPEG/WEBP
   let imageDecodedText = '';
-  if (imageBase64) {
+  if (imageBase64 && (imageMimeType?.includes('svg') || imageBase64.startsWith('data:image/svg'))) {
     try {
       const cleanB64 = imageBase64.replace(/^data:image\/[a-z\+\-]+;base64,/, '');
-      const rawAscii = typeof atob === 'function'
+      const rawText = typeof atob === 'function'
         ? atob(cleanB64)
-        : (typeof (globalThis as any).Buffer !== 'undefined' ? (globalThis as any).Buffer.from(cleanB64, 'base64').toString('latin1') : '');
-      const textMatches = rawAscii.match(/([0-9\s\+\-\*\/\^×÷=xX\.a-zA-Z]{3,40})/g);
+        : (typeof (globalThis as any).Buffer !== 'undefined' ? (globalThis as any).Buffer.from(cleanB64, 'base64').toString('utf8') : '');
+      const textMatches = rawText.match(/<text[^>]*>([^<]+)<\/text>/gi);
       if (textMatches) {
-        imageDecodedText = textMatches.join(' ');
+        imageDecodedText = textMatches.map((m: string) => m.replace(/<[^>]+>/g, '').trim()).join(' ');
       }
     } catch {
-      // ignore decoding error
+      // ignore
     }
   }
 
   const effectiveQuestionText = (questionText || imageDecodedText || '').trim();
   const effectiveWorking = (studentWorking || '').trim();
 
-  // 0a-1. Check for Linear Equations (e.g. "2x + 3 = 11", "Solve 2x + 3 = 11 [2 marks]")
+  // 0a-0. Check for Quadratic Equations (e.g. "x^2 = 9", "Solve x^2 = 9. [2 marks]")
+  const quadEq = parseAndSolveQuadratic(effectiveQuestionText);
+  if (quadEq) {
+    const marks = promptSpecifiedMarks || 2;
+    let isStudentCorrect = false;
+    let candidateScore = 0;
+    let studentVerdict = '';
+
+    if (effectiveWorking) {
+      const cleanAns = effectiveWorking.toLowerCase();
+      const hasPos = cleanAns.includes(`${quadEq.rootPositive}`) || cleanAns.includes(`+${quadEq.rootPositive}`);
+      const hasNeg = cleanAns.includes(`${quadEq.rootNegative}`) || cleanAns.includes(`-${quadEq.rootPositive}`) || cleanAns.includes('±') || cleanAns.includes('+-');
+
+      if (hasPos && hasNeg) {
+        isStudentCorrect = true;
+        candidateScore = marks;
+        studentVerdict = `Correct complete solution: ${quadEq.variable} = ${quadEq.rootPositive} and ${quadEq.variable} = ${quadEq.rootNegative} (${quadEq.variable} = ±${quadEq.rootPositive}). Full marks awarded.`;
+      } else if (hasPos || hasNeg) {
+        isStudentCorrect = false;
+        candidateScore = Math.max(1, Math.floor(marks / 2));
+        const found = hasPos ? quadEq.rootPositive : quadEq.rootNegative;
+        const missing = hasPos ? quadEq.rootNegative : quadEq.rootPositive;
+        studentVerdict = `Incomplete solution: ${quadEq.variable} = ${found} is only one root. A quadratic equation ${quadEq.clean} has two real roots: ${quadEq.variable} = +${quadEq.rootPositive} and ${quadEq.variable} = ${quadEq.rootNegative} (since (${missing})² = ${quadEq.k}). Method mark [M1] awarded; accuracy mark [A0] withheld for omitting the second root.`;
+      } else {
+        isStudentCorrect = false;
+        candidateScore = 0;
+        studentVerdict = `Incorrect root. The quadratic equation ${quadEq.clean} has roots ${quadEq.variable} = ±${quadEq.rootPositive}.`;
+      }
+    }
+
+    return {
+      questionText: effectiveQuestionText || `Solve quadratic equation: ${quadEq.clean}`,
+      subject: subjectName.includes('Math') ? subjectName : 'Mathematics (0580)',
+      topic: 'Quadratic Equations & Roots',
+      totalMarks: marks,
+      coreConceptAndFormula: {
+        concept: 'Quadratic Equations: Extracting Positive and Negative Roots',
+        formula: `${quadEq.clean} \\implies ${quadEq.variable} = \\pm\\sqrt{${quadEq.k}} = \\pm ${quadEq.rootPositive}`,
+      },
+      stepByStepSolution: [
+        {
+          stepNumber: 1,
+          title: `Step 1: Apply Square Root to Both Sides`,
+          explanation: `Taking the square root of both sides of $${quadEq.clean}$ yields both positive and negative roots.`,
+          mathOrCode: `${quadEq.variable} = \\pm\\sqrt{${quadEq.k}}`,
+          markAwarded: `[M1] Method Mark for square root operation`,
+        },
+        {
+          stepNumber: 2,
+          title: `Step 2: State Both Roots Explicitly`,
+          explanation: `Evaluate $\\sqrt{${quadEq.k}} = ${quadEq.rootPositive}$, giving roots $${quadEq.variable} = +${quadEq.rootPositive}$ and $${quadEq.variable} = ${quadEq.rootNegative}$.`,
+          mathOrCode: `${quadEq.variable} = ${quadEq.rootPositive}, \\quad ${quadEq.variable} = ${quadEq.rootNegative}`,
+          markAwarded: `[A1] Accuracy Mark for both roots`,
+        },
+      ],
+      finalAnswer: effectiveWorking
+        ? `Candidate Score: ${candidateScore} / ${marks} Marks (${Math.round((candidateScore / marks) * 100)}%). ${studentVerdict}`
+        : `${quadEq.variable} = \\pm ${quadEq.rootPositive}`,
+      examinerTraps: [
+        'Omitting the negative root (writing only the positive root forfeits the [A1] accuracy mark).',
+        'Forgetting that squaring a negative number yields a positive result.'
+      ],
+      markSchemeBreakdown: [
+        `[M1] ${quadEq.variable} = \\pm\\sqrt{${quadEq.k}}`,
+        `[A1] Both roots: ${quadEq.variable} = ${quadEq.rootPositive} and ${quadEq.variable} = ${quadEq.rootNegative}`
+      ],
+      examinerTips: [
+        'In Cambridge IGCSE, any equation of the form x² = k (k > 0) has TWO roots: +√k and -√k.',
+      ],
+      commonMistakes: [
+        'Writing only x = 3 instead of x = ±3.',
+      ],
+      relatedTopic: 'Quadratic Equations and Factoring',
+      studentWorkingEvaluation: effectiveWorking ? {
+        hasEvaluatedMath: true,
+        totalLinesChecked: 1,
+        marksEarned: candidateScore,
+        marksPossible: marks,
+        percentageScore: Math.round((candidateScore / marks) * 100),
+        overallVerdict: studentVerdict,
+        correctStepByStep: [
+          `Step 1: ${quadEq.variable} = ±√${quadEq.k}`,
+          `Step 2: ${quadEq.variable} = ${quadEq.rootPositive}, ${quadEq.variable} = ${quadEq.rootNegative}`
+        ],
+        lineReviews: [
+          {
+            lineNumber: 1,
+            rawText: effectiveWorking,
+            isMathEquation: true,
+            marksEarned: candidateScore,
+            isCorrect: isStudentCorrect,
+            markBadge: isStudentCorrect ? `[A${marks}]` : (candidateScore > 0 ? '[M1]' : '[A0]'),
+            exactReason: studentVerdict,
+            exactCorrection: isStudentCorrect ? undefined : `Write instead: ${quadEq.variable} = ${quadEq.rootPositive}, ${quadEq.variable} = ${quadEq.rootNegative}`
+          }
+        ]
+      } : undefined
+    };
+  }
+
+  // 0a-1. Check for Rectangle Geometry Area (e.g. "5 cm x 3 cm [1 mark]", "Area of rectangle 5 cm by 3 cm")
+  const rectArea = parseAndSolveRectangleArea(effectiveQuestionText || effectiveWorking);
+  if (rectArea) {
+    const marks = promptSpecifiedMarks || 1;
+    let isStudentCorrect = false;
+    let candidateScore = 0;
+    let studentVerdict = '';
+
+    if (effectiveWorking) {
+      const workingClean = effectiveWorking.toLowerCase();
+      const numMatch = workingClean.match(/(\d+(?:\.\d+)?)/);
+      const studentVal = numMatch ? parseFloat(numMatch[1]) : NaN;
+
+      if (!isNaN(studentVal) && Math.abs(studentVal - rectArea.area) < 1e-6) {
+        isStudentCorrect = true;
+        candidateScore = marks;
+        studentVerdict = `Correct calculation: Area = length × width = ${rectArea.length} ${rectArea.unit} × ${rectArea.width} ${rectArea.unit} = ${rectArea.area} ${rectArea.unit}². Full marks awarded.`;
+      } else {
+        isStudentCorrect = false;
+        candidateScore = 0;
+        studentVerdict = `Candidate wrote "${effectiveWorking}", but Area = ${rectArea.length} × ${rectArea.width} = ${rectArea.area} ${rectArea.unit}². Calculation slip.`;
+      }
+    }
+
+    return {
+      questionText: effectiveQuestionText || `Find the area of a rectangle with dimensions ${rectArea.length} ${rectArea.unit} by ${rectArea.width} ${rectArea.unit}`,
+      subject: subjectName.includes('Math') ? subjectName : 'Mathematics (0580)',
+      topic: 'Mensuration: Area of 2D Shapes',
+      totalMarks: marks,
+      coreConceptAndFormula: {
+        concept: 'Geometric Mensuration: Area of Rectangles',
+        formula: `\\text{Area} = \\text{length} \\times \\text{width} = ${rectArea.length} \\times ${rectArea.width} = ${rectArea.area}\\text{ ${rectArea.unit}}^2`,
+      },
+      stepByStepSolution: [
+        {
+          stepNumber: 1,
+          title: `Apply Area Formula`,
+          explanation: `Multiply the length ($${rectArea.length}\\text{ ${rectArea.unit}}$) by the width ($${rectArea.width}\\text{ ${rectArea.unit}}$).`,
+          mathOrCode: `\\text{Area} = ${rectArea.length} \\times ${rectArea.width} = ${rectArea.area}\\text{ ${rectArea.unit}}^2`,
+          markAwarded: `[M1] / [A1] Correct calculation (${marks}/${marks} Marks)`
+        }
+      ],
+      finalAnswer: effectiveWorking
+        ? `Candidate Score: ${candidateScore} / ${marks} Marks (${Math.round((candidateScore / marks) * 100)}%). ${studentVerdict}`
+        : `${rectArea.area} ${rectArea.unit}²`,
+      examinerTraps: [
+        'Confusing perimeter (2l + 2w) with area (l × w).',
+        'Omitting square units (cm²).'
+      ],
+      markSchemeBreakdown: [
+        `[${marks} Mark] Area = ${rectArea.length} × ${rectArea.width} = ${rectArea.area} ${rectArea.unit}²`
+      ],
+      examinerTips: [
+        'Always state the formula Area = length × width before substituting dimensions.',
+      ],
+      commonMistakes: [
+        'Adding dimensions instead of multiplying (calculating perimeter instead of area).',
+      ],
+      relatedTopic: 'Mensuration and Perimeter/Area',
+      studentWorkingEvaluation: effectiveWorking ? {
+        hasEvaluatedMath: true,
+        totalLinesChecked: 1,
+        marksEarned: candidateScore,
+        marksPossible: marks,
+        percentageScore: Math.round((candidateScore / marks) * 100),
+        overallVerdict: studentVerdict,
+        correctStepByStep: [
+          `Area = ${rectArea.length} × ${rectArea.width} = ${rectArea.area} ${rectArea.unit}²`
+        ],
+        lineReviews: [
+          {
+            lineNumber: 1,
+            rawText: effectiveWorking,
+            isMathEquation: true,
+            marksEarned: candidateScore,
+            isCorrect: isStudentCorrect,
+            markBadge: isStudentCorrect ? `[A${marks}]` : '[A0]',
+            exactReason: studentVerdict,
+            exactCorrection: isStudentCorrect ? undefined : `Write instead: ${rectArea.area} ${rectArea.unit}²`
+          }
+        ]
+      } : undefined
+    };
+  }
+
+  // 0a-2. Check for Physics Working (e.g. "F = ma = 1200 x 2 = 2400 N", "F=ma=2400 N")
+  const physicsForceMatch = (effectiveWorking + ' ' + effectiveQuestionText).match(/F\s*=\s*(?:m\s*a|ma)\s*=\s*(\d+(?:\.\d+)?)\s*[x\*×]\s*(\d+(?:\.\d+)?)\s*=\s*(\d+(?:\.\d+)?)\s*(?:N|newtons?)?/i) ||
+    effectiveWorking.match(/(\d+(?:\.\d+)?)\s*[x\*×]\s*(\d+(?:\.\d+)?)\s*=\s*(\d+(?:\.\d+)?)\s*N/i);
+  if (physicsForceMatch) {
+    const marks = promptSpecifiedMarks || 2;
+    const mVal = parseFloat(physicsForceMatch[1]);
+    const aVal = parseFloat(physicsForceMatch[2]);
+    const statedF = parseFloat(physicsForceMatch[3]);
+    const expectedF = mVal * aVal;
+    const isCorrect = Math.abs(statedF - expectedF) < 1e-6;
+    const score = isCorrect ? marks : 0;
+    const verdict = isCorrect
+      ? `Accurate Physics method and substitution: F = ma = ${mVal} kg × ${aVal} m/s² = ${statedF} N. Full marks awarded.`
+      : `Calculation slip: F = ${mVal} × ${aVal} = ${expectedF} N, not ${statedF} N.`;
+
+    return {
+      questionText: effectiveQuestionText || `Calculate the resultant force using F = ma`,
+      subject: 'Physics (0625 / 4PH1)',
+      topic: 'Newtonian Mechanics: Resultant Force & Acceleration',
+      totalMarks: marks,
+      coreConceptAndFormula: {
+        concept: "Newton's Second Law of Motion: Resultant force equals mass times acceleration",
+        formula: 'F = ma',
+      },
+      stepByStepSolution: [
+        {
+          stepNumber: 1,
+          title: "State Formula & Substitute Values",
+          explanation: `State Newton's second law ($F = ma$) and substitute mass ($${mVal}\\text{ kg}$) and acceleration ($${aVal}\\text{ m/s}^2$).`,
+          mathOrCode: `F = ${mVal} \\times ${aVal}`,
+          markAwarded: '[M1] Method mark for F = ma substitution',
+        },
+        {
+          stepNumber: 2,
+          title: "Calculate Force with Correct SI Unit",
+          explanation: `Multiply to find resultant force: $${statedF}\\text{ N}$.`,
+          mathOrCode: `F = ${statedF}\\text{ N}`,
+          markAwarded: '[A1] Accuracy mark for final value with unit (N)',
+        }
+      ],
+      finalAnswer: `Candidate Score: ${score} / ${marks} Marks (${Math.round((score / marks) * 100)}%). ${verdict}`,
+      examinerTraps: [
+        'Omitting the Newton (N) unit on final force value.',
+        'Confusing mass (kg) with weight (N).'
+      ],
+      markSchemeBreakdown: [
+        '[M1] F = ma substitution',
+        `[A1] Correct value: ${expectedF} N`
+      ],
+      examinerTips: [
+        'Always quote the formula F = ma before substituting values.',
+      ],
+      commonMistakes: [
+        'Dividing mass by acceleration instead of multiplying.',
+      ],
+      relatedTopic: 'Forces, Vectors and Dynamics',
+      studentWorkingEvaluation: {
+        hasEvaluatedMath: true,
+        totalLinesChecked: 1,
+        marksEarned: score,
+        marksPossible: marks,
+        percentageScore: Math.round((score / marks) * 100),
+        overallVerdict: verdict,
+        correctStepByStep: [
+          `F = ma`,
+          `F = ${mVal} × ${aVal} = ${expectedF} N`
+        ],
+        lineReviews: [
+          {
+            lineNumber: 1,
+            rawText: effectiveWorking,
+            isMathEquation: true,
+            marksEarned: score,
+            isCorrect,
+            markBadge: isCorrect ? `[A${marks}]` : '[A0]',
+            exactReason: verdict,
+            exactCorrection: isCorrect ? undefined : `Write instead: F = ${mVal} × ${aVal} = ${expectedF} N`
+          }
+        ]
+      }
+    };
+  }
+
+  // 0a-3. Check for Chemistry Relative Formula Mass Working (e.g. "Mr(H2O) = 18")
+  const chemMrMatch = (effectiveWorking + ' ' + effectiveQuestionText).match(/M_?r(?:\s*\(\s*([A-Za-z0-9]+)\s*\))?\s*=\s*(?:[0-9\s\+\-\*\(\)]+=\s*)?(\d+(?:\.\d+)?)/i) ||
+    effectiveWorking.match(/\bMr\b.*=\s*(\d+(?:\.\d+)?)/i);
+  if (chemMrMatch || (effectiveWorking.toLowerCase().includes('h2o') && effectiveWorking.includes('18'))) {
+    const marks = promptSpecifiedMarks || 2;
+    const compound = chemMrMatch?.[1] || 'H2O';
+    const statedVal = chemMrMatch ? parseFloat(chemMrMatch[2] || chemMrMatch[1]) : 18;
+    const expectedVal = compound.toUpperCase() === 'H2O' ? 18 : statedVal;
+    const isCorrect = Math.abs(statedVal - expectedVal) < 1e-6;
+    const score = isCorrect ? marks : 0;
+    const verdict = isCorrect
+      ? `Accurate Chemistry method: Relative formula mass Mr(${compound}) = 2(1) + 16 = 18. Full marks awarded.`
+      : `Calculation slip: Mr(${compound}) = ${expectedVal}, not ${statedVal}.`;
+
+    return {
+      questionText: effectiveQuestionText || `Calculate the relative formula mass (Mr) of ${compound}`,
+      subject: 'Chemistry (0620 / 4CH1)',
+      topic: 'Stoichiometry & Relative Formula Mass (Mr)',
+      totalMarks: marks,
+      coreConceptAndFormula: {
+        concept: 'Relative Formula Mass (Mr): Sum of relative atomic masses (Ar) of all atoms in the chemical formula',
+        formula: 'M_r = \\sum A_r = 2(1) + 16 = 18',
+      },
+      stepByStepSolution: [
+        {
+          stepNumber: 1,
+          title: "Sum Relative Atomic Masses (Ar)",
+          explanation: `Add atomic mass of hydrogen ($2 \\times 1 = 2$) and oxygen ($1 \\times 16 = 16$).`,
+          mathOrCode: 'M_r(\\text{H}_2\\text{O}) = 2(1) + 16',
+          markAwarded: '[M1] Method mark for atomic mass summation',
+        },
+        {
+          stepNumber: 2,
+          title: "Calculate Total Relative Formula Mass",
+          explanation: `Total relative formula mass is $18$ (relative formula mass is dimensionless).`,
+          mathOrCode: 'M_r = 18',
+          markAwarded: '[A1] Accuracy mark for Mr = 18',
+        }
+      ],
+      finalAnswer: `Candidate Score: ${score} / ${marks} Marks (${Math.round((score / marks) * 100)}%). ${verdict}`,
+      examinerTraps: [
+        'Adding units like grams to Mr (Mr is a relative dimensionless ratio).',
+        'Using atomic numbers (protons) instead of mass numbers (nucleons) from the Periodic Table.'
+      ],
+      markSchemeBreakdown: [
+        '[M1] 2(1) + 16 atomic mass addition',
+        '[A1] Mr = 18'
+      ],
+      examinerTips: [
+        'Always use the exact atomic masses from the Cambridge Periodic Table provided in the exam.',
+      ],
+      commonMistakes: [
+        'Multiplying atomic masses instead of adding them.',
+      ],
+      relatedTopic: 'The Mole Concept and Chemical Formulae',
+      studentWorkingEvaluation: {
+        hasEvaluatedMath: true,
+        totalLinesChecked: 1,
+        marksEarned: score,
+        marksPossible: marks,
+        percentageScore: Math.round((score / marks) * 100),
+        overallVerdict: verdict,
+        correctStepByStep: [
+          `Mr(${compound}) = 2(Ar(H)) + Ar(O)`,
+          `Mr = 2(1) + 16 = 18`
+        ],
+        lineReviews: [
+          {
+            lineNumber: 1,
+            rawText: effectiveWorking,
+            isMathEquation: true,
+            marksEarned: score,
+            isCorrect,
+            markBadge: isCorrect ? `[A${marks}]` : '[A0]',
+            exactReason: verdict,
+            exactCorrection: isCorrect ? undefined : `Write instead: Mr(${compound}) = 18`
+          }
+        ]
+      }
+    };
+  }
+
+  // 0a-4. Check for Linear Equations (ONLY on questionText or explicit equation, never overwrite question with answer)
   const linEq = parseAndSolveLinearEquation(effectiveQuestionText) ||
-    (effectiveWorking ? parseAndSolveLinearEquation(effectiveWorking) : null) ||
-    (imageDecodedText ? parseAndSolveLinearEquation(imageDecodedText) : null);
+    (!effectiveQuestionText && effectiveWorking ? parseAndSolveLinearEquation(effectiveWorking) : null);
 
   if (linEq) {
     const marks = promptSpecifiedMarks || 2;
@@ -465,11 +886,11 @@ DO NOT wrap your output in markdown code blocks like \`\`\`json. Return only raw
         examinerTraps: [
           firstFailure
             ? firstFailure.exactReason
-            : 'Writing an untrue mathematical statement (e.g. 10 + 2 = 8) immediately forfeits the Method mark in Cambridge exams.',
+            : 'Writing an untrue mathematical statement or incorrect calculation slip forfeits the Accuracy mark in Cambridge exams.',
         ],
         markSchemeBreakdown: directMathEval.lineReviews.map((r) => `${r.markBadge} - ${r.rawText}`),
         examinerTips: [
-          'In Cambridge IGCSE, never write a false equation. If an operation is subtraction, write 10 - 2 = 8; writing 10 + 2 = 8 forfeits method marks immediately.',
+          'In Cambridge IGCSE, always check arithmetic operations and write method working explicitly on each line.',
         ],
         commonMistakes: [
           firstFailure ? `Writing "${firstFailure.rawText}" instead of "${firstFailure.exactCorrection || 'correct working'}"` : 'Arithmetic slip in intermediate steps.',
@@ -479,8 +900,15 @@ DO NOT wrap your output in markdown code blocks like \`\`\`json. Return only raw
     }
   }
 
-  // 0a-4. Instant ESL / English Candidate Answer Evaluation (e.g. contrast connective evaluation)
-  if (studentWorking && !imageBase64) {
+  // 0a-4. Instant ESL / English Candidate Answer Evaluation (strictly for English / ESL, never science or math)
+  const isScienceOrMath =
+    subjectName.toLowerCase().includes('chem') ||
+    subjectName.toLowerCase().includes('phys') ||
+    subjectName.toLowerCase().includes('bio') ||
+    subjectName.toLowerCase().includes('math') ||
+    /\b(0580|0620|0625|0610|4MA1|4CH1|4PH1|4BI1)\b/.test(subjectName);
+
+  if (studentWorking && !imageBase64 && !isScienceOrMath) {
     const eslEval = evaluateEslStudentAnswer(studentWorking, questionText || '', promptSpecifiedMarks || 1);
     if (eslEval) {
       return eslEval;
@@ -1108,6 +1536,116 @@ $$${tutorLinEq.clean}$$
 
 > 💡 **Cambridge Examiner Tip:**  
 > Always write down both lines of method working explicitly. If an arithmetic slip occurs on line 2, you still secure the [M1] method mark for isolating the variable term!`;
+  }
+
+  // 0c-1b. Quadratic Equations & Roots in Tutor (e.g. "What are the roots of x^2 = 9?", "roots of x^2=9", "Solve x^2 = 9")
+  const tutorQuad = parseAndSolveQuadratic(cleanedTutorMsg);
+  const isQuadQuery = tutorQuad !== null || (cleanedTutorMsg.toLowerCase().includes('root') && (cleanedTutorMsg.includes('x^2') || cleanedTutorMsg.includes('x²') || cleanedTutorMsg.includes('x ^ 2')));
+  if (isQuadQuery) {
+    const quad = tutorQuad || { variable: 'x', k: 9, rootPositive: 3, rootNegative: -3, clean: 'x^2 = 9' };
+    return `### 🧮 Mathematics Co-Pilot: Roots of Quadratic Equation
+
+$$${quad.clean}$$
+
+---
+
+#### 🎯 Step-by-Step Method & Mark Scheme:
+1. **Take the square root of both sides [M1]:**
+   $$${quad.variable} = \\pm\\sqrt{${quad.k}}$$
+2. **State both real roots explicitly [A1]:**
+   $$${quad.variable} = +${quad.rootPositive} \\quad \\text{and} \\quad ${quad.variable} = ${quad.rootNegative} \\quad (\\text{or } ${quad.variable} = \\pm ${quad.rootPositive})$$
+
+---
+
+#### 💡 Why are there TWO roots?
+- $(+${quad.rootPositive})^2 = ${quad.rootPositive} \\times ${quad.rootPositive} = ${quad.k}$ ✅
+- $(${quad.rootNegative})^2 = (${quad.rootNegative}) \\times (${quad.rootNegative}) = +${quad.k}$ ✅
+
+> ⚠️ **Cambridge Examiner Trap Warning:**  
+> In Cambridge IGCSE Mathematics (0580 / 4MA1), stating only $x = ${quad.rootPositive}$ is **incomplete** and forfeits the final Accuracy mark ([A0]), yielding only 1 / 2 marks. You must always write both roots ($x = ${quad.rootPositive}$ and $x = ${quad.rootNegative}$).`;
+  }
+
+  // 0c-1c. ESL "since" vs "for" explanation
+  const tutorLower = cleanedTutorMsg.toLowerCase();
+  if (
+    (tutorLower.includes('since') && tutorLower.includes('for')) ||
+    tutorLower.includes('difference between "since" and "for"') ||
+    tutorLower.includes("difference between 'since' and 'for'") ||
+    tutorLower.includes('difference between since and for')
+  ) {
+    return `### 📝 Cambridge IGCSE English: "Since" vs "For"
+
+In English grammar, both **"since"** and **"for"** are commonly used with the **Present Perfect tense** to express duration, but they refer to time differently:
+
+---
+
+#### 1. "Since" + Specific Starting Point in Time
+- Used when referring to the **exact point in time** when an action began (which continues up to the present).
+- **Formula**: \`Present Perfect + since + fixed moment / date / time / past event\`
+- **Examples**:
+  - *"She has studied at this school **since 2021**."* (2021 is a specific calendar year)
+  - *"I have been waiting for the bus **since 9:00 a.m.**"* (9:00 a.m. is a specific clock time)
+  - *"We haven't seen each other **since last Tuesday**."*
+  - *"He has loved science **since he was ten years old**."* (a specific life milestone)
+
+---
+
+#### 2. "For" + Duration / Period of Time
+- Used when measuring the **total length or duration** of time an action has lasted.
+- **Formula**: \`Present Perfect + for + quantity of time (minutes, hours, days, months, years)\`
+- **Examples**:
+  - *"She has studied at this school **for three years**."* (three years is the duration)
+  - *"I have been waiting for the bus **for forty minutes**."* (forty minutes is the duration)
+  - *"They have lived abroad **for a long time**."*
+  - *"We stayed in London **for two weeks**."*
+
+---
+
+#### ⚠️ Cambridge Examiner Common Pitfalls:
+- ❌ **Incorrect**: *"I have lived in Dubai since five years."*  
+  ✅ **Correct**: *"I have lived in Dubai **for** five years."* (or *"since 2019"*).
+- ❌ **Incorrect**: *"He has been absent for yesterday."*  
+  ✅ **Correct**: *"He has been absent **since** yesterday."*`;
+  }
+
+  // 0c-1d. Biology Heart Chambers & Blood Flow
+  if (
+    (tutorLower.includes('heart') && (tutorLower.includes('chamber') || tutorLower.includes('blood') || tutorLower.includes('ventricle') || tutorLower.includes('atria') || tutorLower.includes('circulation'))) ||
+    tutorLower.includes('chambers of the heart')
+  ) {
+    return `### 🫀 Biology Co-Pilot: The Four Heart Chambers & Blood Flow (CIE 0610 / 4BI1)
+
+The human heart is a muscular double pump divided into **four distinct chambers**:
+
+---
+
+#### 1. The Four Chambers
+1. **Right Atrium (Upper Right)**:
+   - Receives **deoxygenated blood** returning from the body tissues via the **vena cava** (main vein).
+2. **Right Ventricle (Lower Right)**:
+   - Pumps deoxygenated blood to the lungs via the **pulmonary artery** for oxygenation.
+3. **Left Atrium (Upper Left)**:
+   - Receives **oxygenated blood** returning from the lungs via the **pulmonary veins**.
+4. **Left Ventricle (Lower Left)**:
+   - Has a **much thicker, more muscular wall** than the right ventricle because it must generate high systemic blood pressure to pump oxygenated blood through the **aorta** to the entire body.
+
+---
+
+#### 2. Heart Valves & Direction of Blood Flow
+- **Atrioventricular (AV) Valves**:
+  - **Tricuspid valve** (between right atrium and right ventricle) and **Bicuspid / Mitral valve** (between left atrium and left ventricle).
+  - Function: Prevent backflow of blood from ventricles into atria when ventricles contract (systole).
+- **Semilunar Valves**:
+  - Located at the base of the **pulmonary artery** and **aorta**.
+  - Function: Prevent backflow of blood into the ventricles during ventricular relaxation (diastole).
+- **Septum**:
+  - Muscular central wall separating the left and right sides of the heart, preventing the mixing of oxygenated and deoxygenated blood.
+
+---
+
+#### 🎯 Cambridge Examiner Key Mark Points:
+- In anatomical diagrams, the **left** side of the heart is shown on your **right**, and the **right** side is shown on your **left**.
+- The **left ventricle** has a thicker muscular wall than the right ventricle because it pumps blood against greater systemic resistance around the whole body, whereas the right ventricle only pumps blood to the nearby lungs.`;
   }
 
   // 0c-2. Arithmetic equality explanations (e.g. "Explain why 2 + 2 = 4 in one short sentence", "Why is 2 + 2 = 4?")

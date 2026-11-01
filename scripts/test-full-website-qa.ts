@@ -93,9 +93,11 @@ console.log('\n--- 3. Official Past Paper PDF Archive Index ---');
 assert(OFFICIAL_PAST_PAPER_PDFS.length >= 7000, 'PDF Archive Catalog Scale', `Found ${OFFICIAL_PAST_PAPER_PDFS.length} PDFs`);
 let verifiedPdfUrls = 0;
 for (const pdf of OFFICIAL_PAST_PAPER_PDFS) {
-  assert(!!pdf.qpPdfUrl && !!pdf.msPdfUrl, `PDF ${pdf.id} URL existence`, 'Missing QP or MS URL');
+  if (!pdf.isUnavailable) {
+    assert(!!pdf.qpPdfUrl && !!pdf.msPdfUrl, `PDF ${pdf.id} URL existence`, 'Missing QP or MS URL');
+    verifiedPdfUrls += 2;
+  }
   assert(pdf.year >= 2010 && pdf.year <= 2026, `PDF ${pdf.id} year range`, `Invalid year ${pdf.year}`);
-  verifiedPdfUrls += 2;
 }
 console.log(`✓ Verified ${OFFICIAL_PAST_PAPER_PDFS.length} past paper exam sessions (${verifiedPdfUrls} QP & MS URLs)`);
 
@@ -351,8 +353,97 @@ assertContent(!examinerReport.isVerified, 'Examiner Agent rejects generic templa
 assertContent(examinerReport.accuracyScorePercent <= 50, 'Examiner Agent docks accuracy score for generic template mismatch', `Score was ${examinerReport.accuracyScorePercent}%`);
 assertContent(examinerReport.examinerSeal === 'NEEDS_EXAMINER_REVIEW', 'Examiner Agent marks template mismatch as NEEDS_EXAMINER_REVIEW', `Seal was ${examinerReport.examinerSeal}`);
 
-// TEST SUITE 10: ESL AUDIO ASSET MAPPING & DISTINCT IDENTITY
-console.log('\n--- 10. ESL Audio Asset Mapping & Distinct Identity ---');
+// 8p. AI Tutor Relevancy: ESL "since" vs "for"
+console.log('\n--- 8p-8x. AI Tutor & Solver Subject Relevancy & Mark Rigour ---');
+const tutorEslSinceFor = await askAiTutor([{ role: 'user', content: 'What is the difference between "since" and "for"?' }], 'English as a Second Language (0510)', 'Cambridge CIE');
+assertContent(tutorEslSinceFor.toLowerCase().includes('point in time') && tutorEslSinceFor.toLowerCase().includes('duration'), 'AI Tutor explains "since" (point in time) vs "for" (duration)', `Got: ${tutorEslSinceFor.slice(0, 100)}...`);
+assertContent(!tutorEslSinceFor.includes('m/s') && !tutorEslSinceFor.includes('SI units') && !tutorEslSinceFor.toLowerCase().includes('cause/effect rubric'), 'AI Tutor does NOT return science rubrics or SI units for ESL grammar');
+assertContent(!tutorEslSinceFor.includes('10 + 2 = 8'), 'AI Tutor does NOT contain false equation 10 + 2 = 8');
+
+// 8q. AI Tutor Relevancy: Maths roots of x^2 = 9
+const tutorMathRoots = await askAiTutor([{ role: 'user', content: 'What are the roots of x^2 = 9?' }], 'Mathematics (0580)', 'Cambridge CIE');
+assertContent(tutorMathRoots.includes('+3') && tutorMathRoots.includes('-3'), 'AI Tutor states both roots (+3 and -3 or ±3) for x^2 = 9', `Got: ${tutorMathRoots.slice(0, 100)}...`);
+assertContent(tutorMathRoots.toLowerCase().includes('trap') || tutorMathRoots.toLowerCase().includes('incomplete'), 'AI Tutor warns that stating only x = 3 is incomplete and forfeits accuracy mark');
+
+// 8r. AI Tutor Relevancy: Biology Heart Chambers & Blood Flow
+const tutorBioChambers = await askAiTutor([{ role: 'user', content: 'What are the chambers of the heart and how does blood flow through them?' }], 'Biology (0610)', 'Cambridge CIE');
+assertContent(tutorBioChambers.includes('Right Atrium') && tutorBioChambers.includes('Left Atrium') && tutorBioChambers.includes('Right Ventricle') && tutorBioChambers.includes('Left Ventricle'), 'AI Tutor names all 4 heart chambers', `Got: ${tutorBioChambers.slice(0, 120)}...`);
+assertContent(tutorBioChambers.includes('vena cava') && tutorBioChambers.includes('aorta'), 'AI Tutor names vena cava and aorta in blood flow path');
+assertContent(!tutorBioChambers.includes('m/s') && !tutorBioChambers.includes('y = mx + c'), 'AI Tutor does NOT leak physics/math formulas into biology response');
+
+// 8s. Solver Mark Scoring: Incomplete quadratic answer x = 3 on x^2 = 9 [2 marks] awards partial credit 1/2 marks
+const solverQuadIncomplete = await solveQuestionWithGemini({
+  questionText: 'Solve x^2 = 9. [2 marks]',
+  studentWorking: 'x = 3',
+  subjectName: 'Mathematics (0580)',
+  examBoard: 'Cambridge CIE',
+  gradeLevel: 'IGCSE'
+});
+assertContent(solverQuadIncomplete.totalMarks === 2, 'Quadratic solver resolves 2 total marks from prompt spec', `Got ${solverQuadIncomplete.totalMarks}`);
+assertContent(solverQuadIncomplete.studentWorkingEvaluation?.marksEarned === 1, 'Incomplete quadratic answer x = 3 receives partial credit 1 / 2 marks (M1 awarded, A0 withheld)', `Got ${solverQuadIncomplete.studentWorkingEvaluation?.marksEarned}`);
+assertContent(solverQuadIncomplete.studentWorkingEvaluation?.percentageScore === 50, 'Incomplete quadratic answer receives 50% score', `Got ${solverQuadIncomplete.studentWorkingEvaluation?.percentageScore}%`);
+assertContent(!JSON.stringify(solverQuadIncomplete).includes('1(3)=3') && !JSON.stringify(solverQuadIncomplete).includes('y = mx + c'), 'Quadratic solver does NOT invent false linear check 1(3)=3 or leak y=mx+c');
+
+// 8t. Solver Mark Scoring: Full quadratic answer x = 3, x = -3 on x^2 = 9 [2 marks] awards full credit 2/2 marks
+const solverQuadComplete = await solveQuestionWithGemini({
+  questionText: 'Solve x^2 = 9. [2 marks]',
+  studentWorking: 'x = 3, x = -3',
+  subjectName: 'Mathematics (0580)',
+  examBoard: 'Cambridge CIE',
+  gradeLevel: 'IGCSE'
+});
+assertContent(solverQuadComplete.studentWorkingEvaluation?.marksEarned === 2, 'Complete quadratic answer x = 3, x = -3 receives full credit 2 / 2 marks', `Got ${solverQuadComplete.studentWorkingEvaluation?.marksEarned}`);
+assertContent(solverQuadComplete.studentWorkingEvaluation?.percentageScore === 100, 'Complete quadratic answer receives 100% score');
+
+// 8u. Solver Mark Scoring: Correct Physics working F = ma = 1200 x 2 = 2400 N awards 2/2 marks
+const solverPhysicsForce = await solveQuestionWithGemini({
+  questionText: 'Calculate the resultant force acting on a 1200 kg vehicle accelerating at 2 m/s^2. [2 marks]',
+  studentWorking: 'F = ma = 1200 x 2 = 2400 N',
+  subjectName: 'Physics (0625)',
+  examBoard: 'Cambridge CIE',
+  gradeLevel: 'IGCSE'
+});
+assertContent(solverPhysicsForce.studentWorkingEvaluation?.marksEarned === 2, 'Physics F = ma calculation receives 2 / 2 marks', `Got ${solverPhysicsForce.studentWorkingEvaluation?.marksEarned}`);
+assertContent(solverPhysicsForce.studentWorkingEvaluation?.percentageScore === 100, 'Physics working receives 100%');
+assertContent(solverPhysicsForce.topic.toLowerCase().includes('mechanic') || solverPhysicsForce.topic.toLowerCase().includes('force'), 'Physics working correctly classified under Mechanics/Force', `Got ${solverPhysicsForce.topic}`);
+
+// 8v. Solver Mark Scoring: Correct Chemistry working Mr(H2O) = 18 awards 2/2 marks without ESL criteria
+const solverChemMr = await solveQuestionWithGemini({
+  questionText: 'Calculate the relative formula mass of H2O. [2 marks]',
+  studentWorking: 'Mr(H2O) = 18',
+  subjectName: 'Chemistry (0620)',
+  examBoard: 'Cambridge CIE',
+  gradeLevel: 'IGCSE'
+});
+assertContent(solverChemMr.studentWorkingEvaluation?.marksEarned === 2, 'Chemistry Mr(H2O) = 18 receives 2 / 2 marks', `Got ${solverChemMr.studentWorkingEvaluation?.marksEarned}`);
+assertContent(solverChemMr.studentWorkingEvaluation?.percentageScore === 100, 'Chemistry Mr calculation receives 100%');
+assertContent(solverChemMr.subject.toLowerCase().includes('chemistry'), 'Chemistry question remains categorized as Chemistry', `Got ${solverChemMr.subject}`);
+assertContent(!JSON.stringify(solverChemMr).includes('subordinating conjunction') && !JSON.stringify(solverChemMr).includes('cohesive devices'), 'Chemistry question does NOT leak ESL language criteria');
+
+// 8w. Photo / Image Solving: Rectangle 5 cm x 3 cm [1 mark] computes area 15 cm^2
+const solverRectImage = await solveQuestionWithGemini({
+  questionText: 'Find the area of a rectangle with length 5 cm and width 3 cm. [1 mark]',
+  studentWorking: '15 cm^2',
+  subjectName: 'Mathematics (0580)',
+  examBoard: 'Cambridge CIE',
+  gradeLevel: 'IGCSE'
+});
+assertContent(solverRectImage.totalMarks === 1, 'Rectangle question resolves 1 total mark', `Got ${solverRectImage.totalMarks}`);
+assertContent(solverRectImage.studentWorkingEvaluation?.marksEarned === 1, 'Rectangle answer 15 cm^2 receives 1 / 1 mark', `Got ${solverRectImage.studentWorkingEvaluation?.marksEarned}`);
+assertContent(solverRectImage.finalAnswer.includes('15') && solverRectImage.finalAnswer.includes('cm'), 'Rectangle solution final answer contains 15 cm²', `Got ${solverRectImage.finalAnswer}`);
+
+// 8x. Safe OCR / Binary Leak Elimination: Binary PNG image does NOT leak IHDR/IDAT or invent O=2
+const solverBinarySafe = await solveQuestionWithGemini({
+  imageBase64: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==',
+  questionText: 'Find the area of the rectangle. Dimensions 5 cm x 3 cm. [1 mark]',
+  studentWorking: '15',
+  subjectName: 'Mathematics (0580)',
+  examBoard: 'Cambridge CIE',
+  gradeLevel: 'IGCSE'
+});
+assertContent(!solverBinarySafe.questionText.includes('IHDR') && !solverBinarySafe.questionText.includes('IDAT'), 'Solver does NOT leak raw binary PNG chunks (IHDR/IDAT) into questionText');
+assertContent(!JSON.stringify(solverBinarySafe).includes('O=2') && !JSON.stringify(solverBinarySafe).includes('O = 2'), 'Solver does NOT invent false equation O=2 from binary noise');
+assertContent(solverBinarySafe.studentWorkingEvaluation?.marksEarned === 1, 'Binary image with 5 cm x 3 cm prompt correctly marks student answer 15 as 1/1');
 const audioSp26 = createValidMp3Buffer(120, '0510_sp26_audio_22');
 const audioS17 = createValidMp3Buffer(120, '0510_s17_audio_42');
 const audioW10 = createValidMp3Buffer(120, '0510_w10_audio_41');
@@ -383,12 +474,14 @@ assertContent(!('0510_w10_ms_42.pdf' in LOCAL_VERIFIED_PDFS), 'LOCAL_VERIFIED_PD
 assertContent(!('0510_s10_ms_13.pdf' in LOCAL_VERIFIED_PDFS), 'LOCAL_VERIFIED_PDFS does not contain fake alias for 0510_s10_ms_13.pdf');
 assertContent(!('0510_s10_ms_33.pdf' in LOCAL_VERIFIED_PDFS), 'LOCAL_VERIFIED_PDFS does not contain fake alias for 0510_s10_ms_33.pdf');
 
-// Verify non-administered papers are omitted from OFFICIAL_PAST_PAPER_PDFS
-const nonAdministeredS16 = OFFICIAL_PAST_PAPER_PDFS.find(p => p.paperCode === '0510/12' && p.year === 2016 && p.session === 'May/June');
-assertContent(nonAdministeredS16 === undefined, 'Non-administered paper 0510/12 May/June 2016 is omitted from past paper archive');
+// Verify non-administered papers are preserved in OFFICIAL_PAST_PAPER_PDFS with explicit isUnavailable flag
+const nonAdministeredS16 = OFFICIAL_PAST_PAPER_PDFS.find(p => p.paperCode === '0510/12' && p.year === 2016 && p.session.includes('May/June'));
+assertContent(nonAdministeredS16 !== undefined, 'Restored paper 0510/12 May/June 2016 exists in past paper archive');
+assertContent(nonAdministeredS16?.isUnavailable === true, '0510/12 May/June 2016 is designated with isUnavailable: true');
 
-const nonAdministeredW10 = OFFICIAL_PAST_PAPER_PDFS.find(p => p.paperCode === '0510/42' && p.year === 2010 && p.session === 'Oct/Nov');
-assertContent(nonAdministeredW10 === undefined, 'Non-administered paper 0510/42 Oct/Nov 2010 is omitted from past paper archive');
+const nonAdministeredW10 = OFFICIAL_PAST_PAPER_PDFS.find(p => p.paperCode === '0510/42' && p.year === 2010 && p.session.includes('Oct/Nov'));
+assertContent(nonAdministeredW10 !== undefined, 'Restored paper 0510/42 Oct/Nov 2010 exists in past paper archive');
+assertContent(nonAdministeredW10?.isUnavailable === true, '0510/42 Oct/Nov 2010 is designated with isUnavailable: true');
 
 // TEST SUITE 12: PAPER NUMBER FILTER ACCURACY & MULTI-COMPONENT ISOLATION
 console.log('\n--- 12. Paper Number Filter Accuracy & Multi-Component Isolation ---');
@@ -407,7 +500,17 @@ function filterPapers(papers: typeof OFFICIAL_PAST_PAPER_PDFS, opts: {
       if (!matchesSub) return false;
     }
     if (opts.year && pdf.year !== opts.year) return false;
-    if (opts.session && !pdf.session.toLowerCase().includes(opts.session.toLowerCase())) return false;
+    if (opts.session && opts.session !== 'All') {
+      const targetSess = opts.session.toLowerCase();
+      const pdfSess = pdf.session.toLowerCase();
+      const isMayJuneTarget = targetSess.includes('may') || targetSess.includes('june') || targetSess === 's';
+      const isMayJunePdf = pdfSess.includes('may') || pdfSess.includes('june') || pdfSess.includes('summer') || pdfSess.includes('s');
+      if (isMayJuneTarget && isMayJunePdf) {
+        // match cross-board May/June
+      } else if (!pdfSess.includes(targetSess)) {
+        return false;
+      }
+    }
     if (opts.paperNumber && opts.paperNumber !== 'All') {
       const cleanTarget = opts.paperNumber.replace(/^paper\s*/i, '').trim();
       if (pdf.paperNumber !== undefined && pdf.paperNumber !== null) {
@@ -449,6 +552,23 @@ assertContent(physicsP2V2.length > 0, 'Physics 2023 May/June Paper 2 Variant 2 r
 assertContent(physicsP2V2.some(p => p.paperCode === '0625/22'), 'Physics filter results include 0625/22 Paper 2');
 assertContent(physicsP2V2.every(p => p.paperCode !== '0625/12' && p.paperCode !== '0625/42' && p.paperCode !== '0625/62'), 'Physics filter results contain ZERO instances of Paper 1, Paper 4, or Paper 6');
 
+// 12c. Edexcel 2026 June Series Filter: 4ES1 and 4MA1
+const edexcel4es1June = filterPapers(OFFICIAL_PAST_PAPER_PDFS, {
+  subjectId: 'edx-esl-4es1',
+  year: 2026,
+  session: 'May/June'
+});
+assertContent(edexcel4es1June.length === 4, 'Edexcel 4ES1 2026 May/June filter returns all 4 June 2026 papers', `Found ${edexcel4es1June.length}`);
+assertContent(edexcel4es1June.every(p => p.session.toLowerCase().includes('june')), 'All returned 4ES1 papers belong to June series');
+
+const edexcel4ma1June = filterPapers(OFFICIAL_PAST_PAPER_PDFS, {
+  subjectId: 'edx-math-4ma1',
+  year: 2026,
+  session: 'May/June'
+});
+assertContent(edexcel4ma1June.length === 8, 'Edexcel 4MA1 2026 May/June filter returns all 8 June 2026 papers', `Found ${edexcel4ma1June.length}`);
+assertContent(edexcel4ma1June.every(p => p.session.toLowerCase().includes('june')), 'All returned 4MA1 papers belong to June series');
+
 // TEST SUITE 13: DIRECT RESOURCE AVAILABILITY & DISCLOSURE
 console.log('\n--- 13. Direct Resource Availability & Board Hub Disclosure ---');
 
@@ -472,7 +592,8 @@ const cieRows = OFFICIAL_PAST_PAPER_PDFS.filter(p => p.board === 'CIE');
 
 assertContent(edexcelRows.length === 1666, 'Catalog inventory contains all 1,666 Edexcel rows', `Found ${edexcelRows.length}`);
 assertContent(oxfordRows.length === 231, 'Catalog inventory contains all 231 OxfordAQA rows', `Found ${oxfordRows.length}`);
-assertContent(cieRows.length === 7373, 'Catalog inventory contains all 7,373 administered CIE rows (excluding non-administered s16/w10 variants)', `Found ${cieRows.length}`);
+assertContent(cieRows.length === 7375, 'Catalog inventory contains all 7,375 CIE rows (including restored unavailable s16/w10 variants)', `Found ${cieRows.length}`);
+assertContent(OFFICIAL_PAST_PAPER_PDFS.length === 9272, 'Catalog total inventory equals exactly 9,272 items', `Found ${OFFICIAL_PAST_PAPER_PDFS.length}`);
 
 // Every Edexcel and OxfordAQA row must disclose isPortal: true so students are not served fake PDFs
 assertContent(edexcelRows.every(p => p.isPortal === true), 'All 1,666 Edexcel rows explicitly set isPortal: true');
