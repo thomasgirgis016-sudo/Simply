@@ -133,14 +133,18 @@ for (const ch of allChapters) {
 }
 assert(zeroQuestionChapters === 0, `All ${allChapters.length} chapters have available classified questions (Missing: ${zeroQuestionChapters})`);
 
-// Validate question schema & mark scheme geometry
-for (const q of allQuestions.slice(0, 30)) {
-  assert(q.totalMarks > 0, `Question ${q.id} has positive mark count`);
+// Validate question schema, authentic past paper source & mark scheme geometry
+for (const q of allQuestions) {
+  assert(!q.id.includes('synth'), `Question ${q.id} is an authentic past paper question, not synthetic`);
+  assert(!q.prompt.includes('Given the parameters') && !q.prompt.includes('Define the principle of'), `Question ${q.id} has authentic exam prompt`);
+  assert(q.source.length >= 6 && /\d{4}/.test(q.source), `Question ${q.id} has authentic past paper source citation: ${q.source}`);
+  assert(q.totalMarks > 0, `Question ${q.id} has positive mark count: ${q.totalMarks}`);
   assert(q.subParts.length > 0, `Question ${q.id} has at least 1 subpart`);
   for (const sp of q.subParts) {
     assert(sp.marks > 0, `Subpart ${sp.part} of ${q.id} has marks > 0`);
     assert(sp.prompt.length > 0, `Subpart ${sp.part} has prompt`);
     assert(sp.markScheme.length > 0, `Subpart ${sp.part} has markScheme criteria`);
+    assert(sp.finalAnswer.length > 0 && sp.finalAnswer !== '42.5', `Subpart ${sp.part} has authentic final answer: ${sp.finalAnswer}`);
     for (const ms of sp.markScheme) {
       assert(typeof ms.markType === 'string' && ms.markType.startsWith('['), `Mark type '${ms.markType}' formatted in Cambridge square brackets`);
     }
