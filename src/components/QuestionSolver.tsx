@@ -18,7 +18,8 @@ import {
   Award,
   Edit3,
   Search,
-  ShieldCheck
+  ShieldCheck,
+  Calculator
 } from 'lucide-react';
 import { Subject, UserProfile, SolverResult, FlaggedQuestionIssue, HandwrittenReviewResult, PastPaperItem } from '../types';
 import { SAMPLE_SOLVER_QUESTIONS } from '../data/initialData';
@@ -251,138 +252,136 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
       return {
         label: mark,
         type: 'Method Mark',
-        badgeClass: 'bg-blue-500/15 text-blue-300 border-blue-500/30',
+        badgeClass: 'bg-amber-950/60 text-amber-300 border-amber-800/50',
       };
     }
     if (upper.includes('[A') || upper.includes('A1') || upper.includes('A2')) {
       return {
         label: mark,
         type: 'Accuracy Mark',
-        badgeClass: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+        badgeClass: 'bg-emerald-950/60 text-emerald-300 border-emerald-800/50',
       };
     }
     if (upper.includes('[B') || upper.includes('B1') || upper.includes('B2')) {
       return {
         label: mark,
         type: 'Independent Mark',
-        badgeClass: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+        badgeClass: 'bg-blue-950/60 text-blue-300 border-blue-800/50',
       };
     }
     return {
       label: mark,
       type: 'Mark Scheme',
-      badgeClass: 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30',
+      badgeClass: 'bg-slate-800 text-slate-300 border-slate-700',
     };
   };
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900/90 to-indigo-950/40 p-6 md:p-8 shadow-xl">
-        <div className="absolute right-0 top-0 -mr-16 -mt-16 h-64 w-64 rounded-full bg-indigo-500/10 blur-3xl" />
+      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-800/90 bg-slate-900/90 p-6 md:p-8 shadow-xl">
         <div className="relative z-10 max-w-3xl">
-          <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 px-3 py-1 text-xs font-semibold text-indigo-400 border border-indigo-500/20 mb-3">
-            <Sparkles className="h-3.5 w-3.5" />
-            <span>Multimodal Vision & Mark Scheme Engine</span>
+          <div className="inline-flex items-center gap-2 rounded-full bg-blue-950/80 px-3 py-1 text-xs font-semibold text-blue-300 border border-blue-800/50 mb-3">
+            <Calculator className="h-3.5 w-3.5" />
+            <span>Official Mark Scheme & Examiner Engine</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
-            IGCSE AI Question & Photo Solver
+            Mark Scheme Step-by-Step Solver
           </h1>
           <p className="mt-2 text-sm text-slate-300 leading-relaxed">
-            Snap a picture of any textbook problem, past paper question, or diagram. The AI gives you
-            a step-by-step breakdown using official Cambridge & Edexcel mark scheme criteria ([M], [A], [B] marks) and examiner report warnings.
+            Upload or type any Cambridge past paper question to view complete line-by-line mark scheme workings ([M], [A], [B] marks) and examiner report guidance.
           </p>
         </div>
 
-          {/* Quick Sample Selector */}
-          <div className="mt-6 border-t border-slate-800/80 pt-4">
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2.5 flex items-center gap-1.5">
-              <FileQuestion className="h-3.5 w-3.5 text-indigo-400" />
-              Try an IGCSE Past Paper Question:
+        {/* Quick Sample Selector */}
+        <div className="mt-6 border-t border-slate-800/80 pt-4">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2.5 flex items-center gap-1.5">
+            <FileQuestion className="h-3.5 w-3.5 text-blue-400" />
+            Try an IGCSE Past Paper Question:
+          </p>
+          <div className="flex flex-nowrap sm:flex-wrap gap-2 overflow-x-auto pb-1 no-scrollbar">
+            {filteredSampleQuestions.map((s, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => loadSampleQuestion(s)}
+                className="shrink-0 rounded-lg border border-slate-700/70 bg-slate-800/60 px-3 py-1.5 text-xs text-slate-200 hover:border-blue-500 hover:bg-slate-800 hover:text-white transition cursor-pointer"
+              >
+                {s.title}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Mode Switcher */}
+      <div className="flex flex-wrap rounded-2xl bg-slate-900/90 p-1.5 border border-slate-800 gap-1">
+        <button
+          type="button"
+          onClick={() => {
+            setSolverMode('solve');
+            setErrorMessage(null);
+          }}
+          className={`flex-1 min-w-[140px] flex items-center justify-center gap-2 rounded-xl py-2.5 px-3 text-xs font-bold transition cursor-pointer ${
+            solverMode === 'solve'
+              ? 'bg-blue-600 text-white shadow-sm'
+              : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          <Calculator className="h-4 w-4" />
+          <span>Solve Question / Photo</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setSolverMode('exam-lookup');
+            setErrorMessage(null);
+          }}
+          className={`flex-1 min-w-[170px] flex items-center justify-center gap-2 rounded-xl py-2.5 px-3 text-xs font-bold transition cursor-pointer ${
+            solverMode === 'exam-lookup'
+              ? 'bg-blue-600 text-white shadow-sm'
+              : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          <BookOpen className="h-4 w-4" />
+          <span>Search by Exam Code & Q#</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setSolverMode('handwritten');
+            setErrorMessage(null);
+          }}
+          className={`flex-1 min-w-[140px] flex items-center justify-center gap-2 rounded-xl py-2.5 px-3 text-xs font-bold transition cursor-pointer ${
+            solverMode === 'handwritten'
+              ? 'bg-blue-600 text-white shadow-sm'
+              : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          <PenTool className="h-4 w-4" />
+          <span>Grade Handwritten ($M1, A1$)</span>
+        </button>
+      </div>
+
+      {/* Academic Engine Rubric Card */}
+      <div className="rounded-2xl border border-slate-700/60 bg-slate-800/80 p-4 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="h-9 w-9 rounded-xl bg-blue-950/80 border border-blue-800/50 flex items-center justify-center shrink-0">
+            <ShieldCheck className="h-5 w-5 text-blue-300" />
+          </div>
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-bold text-white">Official Cambridge & Edexcel Mark Scheme Rubrics</span>
+              <span className="inline-block rounded-full bg-blue-950/80 px-2.5 py-0.5 text-[10px] font-semibold text-blue-300 border border-blue-800/50">
+                Cambridge 0580, 0620, 0625, 0610 & 0510 Guidance
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-400 mt-0.5">
+              Full step-by-step method [M], accuracy [A], and independent [B] mark evaluation for {subject.name} ({subject.code}).
             </p>
-            <div className="flex flex-nowrap sm:flex-wrap gap-2 overflow-x-auto pb-1 no-scrollbar">
-              {filteredSampleQuestions.map((s, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => loadSampleQuestion(s)}
-                  className="shrink-0 rounded-lg border border-slate-700/70 bg-slate-800/60 px-3 py-1.5 text-xs text-slate-200 hover:border-indigo-500 hover:bg-indigo-950/40 hover:text-white transition cursor-pointer"
-                >
-                  {s.title}
-                </button>
-              ))}
-            </div>
           </div>
         </div>
-
-        {/* Mode Switcher */}
-        <div className="flex flex-wrap rounded-2xl bg-slate-900/90 p-1.5 border border-slate-800 gap-1">
-          <button
-            type="button"
-            onClick={() => {
-              setSolverMode('solve');
-              setErrorMessage(null);
-            }}
-            className={`flex-1 min-w-[140px] flex items-center justify-center gap-2 rounded-xl py-2.5 px-3 text-xs font-bold transition cursor-pointer ${
-              solverMode === 'solve'
-                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <Sparkles className="h-4 w-4" />
-            <span>Solve Question / Photo</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setSolverMode('exam-lookup');
-              setErrorMessage(null);
-            }}
-            className={`flex-1 min-w-[170px] flex items-center justify-center gap-2 rounded-xl py-2.5 px-3 text-xs font-bold transition cursor-pointer ${
-              solverMode === 'exam-lookup'
-                ? 'bg-gradient-to-r from-sky-600 to-cyan-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <BookOpen className="h-4 w-4" />
-            <span>Search by Exam Code & Q#</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setSolverMode('handwritten');
-              setErrorMessage(null);
-            }}
-            className={`flex-1 min-w-[140px] flex items-center justify-center gap-2 rounded-xl py-2.5 px-3 text-xs font-bold transition cursor-pointer ${
-              solverMode === 'handwritten'
-                ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 shadow-md'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <PenTool className="h-4 w-4" />
-            <span>Grade Handwritten ($M1, A1$)</span>
-          </button>
-        </div>
-
-        {/* Free Student AI Pass Card */}
-        <div className="rounded-2xl border border-indigo-500/30 bg-gradient-to-r from-indigo-950/40 via-purple-950/20 to-slate-900/60 p-4 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center shrink-0">
-              <Sparkles className="h-5 w-5 text-emerald-400" />
-            </div>
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs font-bold text-white">Chief Examiner AI Engine Active</span>
-                <span className="inline-block rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-semibold text-emerald-400 border border-emerald-500/25">
-                  Cambridge & Edexcel Official Mark Scheme Rubrics
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-400 mt-0.5">
-                Full step-by-step method [M], accuracy [A], and syllabus keyword evaluation for {subject.name} ({subject.code}).
-              </p>
-            </div>
-          </div>
-        </div>
+      </div>
 
         {/* Input Section */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
@@ -824,7 +823,7 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
               <p className="text-[11px] sm:text-xs text-slate-400">
                 <span className="text-emerald-400 font-medium">
-                  ✦ Senior Cambridge Examiner System Active
+                  Senior Cambridge Examiner Rubrics Active
                 </span>
               </p>
 
@@ -833,7 +832,7 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
                   type="button"
                   onClick={handleSolve}
                   disabled={loading || (!questionText.trim() && !studentTypedWorking.trim() && !selectedImage)}
-                  className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 px-6 py-3 sm:py-2.5 text-xs sm:text-sm font-bold text-white shadow-lg shadow-indigo-500/25 hover:from-indigo-400 hover:to-pink-400 transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 text-xs sm:text-sm font-medium text-white shadow-sm hover:bg-blue-500 transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {loading ? (
                     <>
@@ -842,7 +841,7 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
                     </>
                   ) : (
                     <>
-                      <Sparkles className="h-4 w-4" />
+                      <Calculator className="h-4 w-4" />
                       <span>Solve & Reveal Mark Scheme</span>
                     </>
                   )}
@@ -852,12 +851,12 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
                   type="button"
                   onClick={handleGradeHandwritten}
                   disabled={loading || (!questionText.trim() && !studentTypedWorking.trim() && !selectedImage)}
-                  className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-3 sm:py-2.5 text-xs sm:text-sm font-bold text-slate-950 shadow-lg shadow-amber-500/25 hover:from-amber-400 hover:to-orange-400 transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 text-xs sm:text-sm font-medium text-white shadow-sm hover:bg-blue-500 transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {loading ? (
                     <>
                       <RefreshCw className="h-4 w-4 animate-spin" />
-                      <span>Grading Handwritten Method & Marks...</span>
+                      <span>Grading Method & Accuracy Marks...</span>
                     </>
                   ) : (
                     <>
@@ -1008,20 +1007,20 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
             </div>
           )}
 
-          {/* Senior Cambridge Examiner Autonomous AI Agent Verification Shield */}
+          {/* Senior Cambridge Examiner Verification Audit */}
           {result.examinerVerification && (
-            <div className="rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-emerald-950/40 via-slate-900 to-sky-950/30 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
+            <div className="rounded-2xl border border-slate-700/60 bg-slate-800/80 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shadow-inner">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-950/80 text-blue-300 border border-blue-800/50 shadow-inner">
                   <ShieldCheck className="h-5 w-5" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-300">
-                      Senior Cambridge Examiner AI Agent
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-200">
+                      Senior Cambridge Examiner Audit
                     </span>
-                    <span className="rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-[10px] font-extrabold text-emerald-300 border border-emerald-500/40">
-                      0-Mistake Audit Passed ✅
+                    <span className="rounded-full bg-emerald-950/80 px-2.5 py-0.5 text-[10px] font-extrabold text-emerald-300 border border-emerald-800/50">
+                      Mark Scheme Protocol Verified ✅
                     </span>
                   </div>
                   <p className="text-[11px] text-slate-300 mt-1 leading-relaxed">
@@ -1041,12 +1040,12 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
           )}
 
           {/* Section 1: Core Concept & Formula */}
-          <div className="rounded-2xl border border-sky-500/30 bg-gradient-to-r from-sky-950/25 via-slate-900 to-indigo-950/20 p-5 shadow-md">
+          <div className="rounded-2xl border border-slate-700/60 bg-slate-800/80 p-5 shadow-sm">
             <div className="flex items-center gap-2.5 mb-2.5">
-              <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-sky-500/20 text-xs font-black text-sky-400 border border-sky-500/30">
+              <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-blue-950/80 text-xs font-black text-blue-300 border border-blue-800/50">
                 1
               </span>
-              <h4 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-sky-300">
+              <h4 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-slate-200">
                 Section 1: Core Concept & Required Equation
               </h4>
             </div>
@@ -1056,7 +1055,7 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
                 {result.coreConceptAndFormula?.concept || result.topic}
               </p>
               {result.coreConceptAndFormula?.formula && (
-                <div className="mt-2 rounded-xl bg-slate-950/80 p-3 border border-sky-500/20 font-mono text-xs sm:text-sm text-sky-200 overflow-x-auto max-w-full">
+                <div className="mt-2 rounded-xl bg-slate-950/80 p-3 border border-slate-700 font-mono text-xs sm:text-sm text-sky-200 overflow-x-auto max-w-full">
                   <MathRenderer content={`$$${result.coreConceptAndFormula.formula}$$`} />
                 </div>
               )}
@@ -1067,17 +1066,17 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
           <div className="space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2.5">
-                <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-500/20 text-xs font-black text-indigo-400 border border-indigo-500/30">
+                <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-blue-950/80 text-xs font-black text-blue-300 border border-blue-800/50">
                   2
                 </span>
-                <h4 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-indigo-300">
+                <h4 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-slate-200">
                   Section 2: Step-by-Step Working & Method Mark Allocations
                 </h4>
               </div>
               <div className="flex items-center gap-2 text-[10px] font-semibold text-slate-400">
-                <span className="inline-block h-2 w-2 rounded-full bg-blue-400" /> Method ($M$)
+                <span className="inline-block h-2 w-2 rounded-full bg-amber-400" /> Method ($M$)
                 <span className="inline-block h-2 w-2 rounded-full bg-emerald-400 ml-1" /> Accuracy ($A$)
-                <span className="inline-block h-2 w-2 rounded-full bg-amber-400 ml-1" /> Independent ($B$)
+                <span className="inline-block h-2 w-2 rounded-full bg-blue-400 ml-1" /> Independent ($B$)
               </div>
             </div>
 
@@ -1212,22 +1211,22 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
             </button>
           </div>
 
-          {/* Quick AI Tutor follow-up */}
+          {/* Examiner Walkthrough Follow-up */}
           {onOpenChatWithQuestion && (
-            <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+            <div className="flex items-center justify-between rounded-xl border border-slate-700/60 bg-slate-800/80 p-4 shadow-sm">
               <div className="flex items-center gap-3">
-                <BookOpen className="h-5 w-5 text-indigo-400" />
+                <BookOpen className="h-5 w-5 text-blue-400" />
                 <div>
-                  <p className="text-xs font-bold text-white">Still confused about this problem?</p>
-                  <p className="text-[11px] text-slate-400">Ask the AI Examiner to give you a similar practice question or break down any step.</p>
+                  <p className="text-xs font-bold text-white">Need a detailed walkthrough on this problem?</p>
+                  <p className="text-[11px] text-slate-400">Consult the Examiner Walkthrough Co-Pilot for step derivations or similar past paper questions.</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => onOpenChatWithQuestion(result.questionText)}
-                className="flex items-center gap-1.5 rounded-xl bg-indigo-600/80 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-500 transition"
+                className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-xs font-medium text-white hover:bg-blue-500 transition shadow-sm cursor-pointer"
               >
-                <span>Ask AI Tutor</span>
+                <span>Consult Examiner Walkthrough</span>
                 <ArrowRight className="h-3.5 w-3.5" />
               </button>
             </div>

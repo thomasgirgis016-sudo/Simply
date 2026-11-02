@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   BookOpen,
-  Sparkles,
   AlertTriangle,
   BookmarkCheck,
   CheckCircle,
@@ -14,7 +13,9 @@ import {
   Compass,
   Award,
   CheckSquare,
-  FileQuestion
+  FileQuestion,
+  FileText,
+  RefreshCw
 } from 'lucide-react';
 import { Subject, RevisionTopic, UserProfile, BookmarkItem } from '../types';
 import { MathRenderer } from './MathRenderer';
@@ -143,37 +144,37 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
       <div className="no-print rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg backdrop-blur-sm">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <span className="inline-block rounded-md bg-cyan-500/20 px-2 py-0.5 text-xs font-semibold text-cyan-300 border border-cyan-500/30">
-              {subject.code} • Syllabus Revision Summaries
+            <span className="inline-block rounded-md bg-blue-950/80 px-2.5 py-0.5 text-xs font-semibold text-blue-300 border border-blue-800/50">
+              {subject.code} • High-Yield Syllabus Summaries
             </span>
-            <h2 className="text-xl font-bold text-white mt-1">High-Yield Revision & Cheat Sheets</h2>
+            <h2 className="text-xl font-bold text-white mt-1">High-Yield Syllabus Summaries</h2>
             <p className="text-xs text-slate-400">Guaranteed marks: Key definitions, formula sheets & examiner traps</p>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={() => window.print()}
-              className="flex items-center gap-1.5 rounded-xl border border-cyan-500/30 bg-cyan-950/40 px-3.5 py-2 text-xs font-bold text-cyan-300 hover:bg-cyan-900/40 hover:text-white transition cursor-pointer shadow-sm active:scale-95"
+              className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition cursor-pointer shadow-sm active:scale-95"
               title="1-Click export printable revision cheat sheet"
             >
-              <Printer className="h-4 w-4 text-cyan-400" />
+              <Printer className="h-4 w-4 text-blue-400" />
               <span>1-Click Summary Sheet Export (PDF)</span>
             </button>
 
             <button
               onClick={() => setIsAiModalOpen(true)}
-              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 px-4 py-2 text-xs font-bold text-white shadow-md hover:from-cyan-500 hover:to-blue-500 transition cursor-pointer active:scale-95"
+              className="flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 px-4 py-2 text-xs font-semibold text-white shadow-sm transition cursor-pointer active:scale-95"
             >
-              <Sparkles className="h-4 w-4" />
+              <BookOpen className="h-4 w-4" />
               <span>Custom Topic Sheet</span>
             </button>
           </div>
         </div>
 
-        {/* Biology & Chemistry Fast Chapter Notes Workflow */}
+        {/* Fast Chapter Notes Workflow */}
         <div className="mt-4 rounded-xl border border-slate-800 bg-slate-950/70 p-3.5 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="flex h-2 w-2 rounded-full bg-cyan-400 animate-pulse" />
+            <span className="flex h-2 w-2 rounded-full bg-blue-400 animate-pulse" />
             <span className="text-xs font-bold text-slate-300">Chapter Revision Generator:</span>
           </div>
 
@@ -181,7 +182,7 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
             <select
               value={selectedChapterToGenerate}
               onChange={(e) => setSelectedChapterToGenerate(e.target.value)}
-              className="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs text-slate-200 focus:border-cyan-500 focus:outline-none cursor-pointer"
+              className="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs text-slate-200 focus:border-blue-500 focus:outline-none cursor-pointer"
             >
               {subject.topics.map((t) => (
                 <option key={t} value={t}>
@@ -193,10 +194,10 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
             <button
               onClick={() => handleQuickGenerateChapter(selectedChapterToGenerate || subject.topics[0])}
               disabled={isGeneratingChapter}
-              className="shrink-0 flex items-center gap-1.5 rounded-xl bg-cyan-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-cyan-500 transition cursor-pointer disabled:opacity-50"
+              className="shrink-0 flex items-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm transition cursor-pointer disabled:opacity-50"
             >
-              <Sparkles className={`h-3.5 w-3.5 ${isGeneratingChapter ? 'animate-spin' : ''}`} />
-              <span>{isGeneratingChapter ? 'Generating...' : '⚡ Generate'}</span>
+              <FileText className={`h-3.5 w-3.5 ${isGeneratingChapter ? 'animate-spin' : ''}`} />
+              <span>{isGeneratingChapter ? 'Generating...' : 'Generate Notes'}</span>
             </button>
           </div>
         </div>
@@ -295,9 +296,9 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
 
             {/* Part 3: Core Equations / Chemical & Biological Pathways */}
             {activeTopic.coreEquationsOrPathways && activeTopic.coreEquationsOrPathways.length > 0 && (
-              <div className="mt-6 rounded-xl border border-indigo-500/25 bg-indigo-950/20 p-5 space-y-3">
-                <div className="flex items-center gap-2 text-indigo-300 font-bold text-xs uppercase tracking-wider">
-                  <Sparkles className="h-4 w-4 text-indigo-400" />
+              <div className="mt-6 rounded-xl border border-slate-700/60 bg-slate-800/80 p-5 space-y-3">
+                <div className="flex items-center gap-2 text-slate-200 font-bold text-xs uppercase tracking-wider">
+                  <BookOpen className="h-4 w-4 text-blue-400" />
                   <span>Part 3: Core Equations & Reaction / Biological Pathways</span>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
@@ -536,15 +537,15 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
           </p>
           <button
             onClick={() => setIsAiModalOpen(true)}
-            className="mt-4 inline-flex items-center gap-2 rounded-xl bg-cyan-600 px-4 py-2 text-xs font-bold text-white hover:bg-cyan-500 transition"
+            className="mt-4 inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 px-4 py-2 text-xs font-semibold text-white shadow-sm transition cursor-pointer"
           >
-            <Sparkles className="h-4 w-4" />
+            <BookOpen className="h-4 w-4" />
             Generate Revision Guide
           </button>
         </div>
       )}
 
-      {/* AI Generate Notes Modal */}
+      {/* Generate Notes Modal */}
       {isAiModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-fadeIn">
           <div className="relative w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-2xl">
@@ -556,10 +557,10 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
             </button>
 
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="rounded-xl bg-cyan-500/20 p-2 text-cyan-400 border border-cyan-500/30">
-                <Sparkles className="h-5 w-5" />
+              <div className="rounded-xl bg-blue-950/80 p-2 text-blue-300 border border-blue-800/50">
+                <BookOpen className="h-5 w-5" />
               </div>
-              <h3 className="text-lg font-bold text-white">Generate IGCSE Revision Guide</h3>
+              <h3 className="text-lg font-bold text-white">Generate Syllabus Revision Guide</h3>
             </div>
 
             <p className="text-xs text-slate-300 mb-4 leading-relaxed">
@@ -576,7 +577,7 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
                   value={aiTopicInput}
                   onChange={(e) => setAiTopicInput(e.target.value)}
                   placeholder="e.g. Thermal Physics, Photosynthesis, Quadratic graphs"
-                  className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-sm text-white placeholder-slate-500 focus:border-cyan-500 focus:outline-none"
+                  className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-sm text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none"
                 />
               </div>
 
@@ -586,7 +587,7 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
                     key={t}
                     type="button"
                     onClick={() => setAiTopicInput(t)}
-                    className="rounded-md border border-slate-800 bg-slate-800/60 px-2 py-1 text-[11px] text-slate-300 hover:border-cyan-500 hover:text-white"
+                    className="rounded-md border border-slate-800 bg-slate-800/60 px-2 py-1 text-[11px] text-slate-300 hover:border-blue-500 hover:text-white cursor-pointer"
                   >
                     + {t}
                   </button>
@@ -598,7 +599,7 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
               <button
                 type="button"
                 onClick={() => setIsAiModalOpen(false)}
-                className="rounded-xl px-4 py-2 text-xs font-medium text-slate-400 hover:bg-slate-800 hover:text-white"
+                className="rounded-xl px-4 py-2 text-xs font-medium text-slate-400 hover:bg-slate-800 hover:text-white cursor-pointer"
               >
                 Cancel
               </button>
@@ -606,16 +607,16 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
                 type="button"
                 onClick={handleGenerateAiNotes}
                 disabled={isGenerating || !aiTopicInput.trim()}
-                className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 px-5 py-2 text-xs font-bold text-white shadow-lg hover:from-cyan-500 hover:to-blue-500 disabled:opacity-50"
+                className="flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 px-5 py-2 text-xs font-semibold text-white shadow-sm disabled:opacity-50 cursor-pointer"
               >
                 {isGenerating ? (
                   <>
-                    <Sparkles className="h-4 w-4 animate-spin" />
-                    <span>Compiling Cheat Sheet...</span>
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    <span>Compiling Summary Sheet...</span>
                   </>
                 ) : (
                   <>
-                    <Sparkles className="h-4 w-4" />
+                    <FileText className="h-4 w-4" />
                     <span>Generate Notes</span>
                   </>
                 )}

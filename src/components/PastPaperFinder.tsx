@@ -32,7 +32,8 @@ import {
   Edit3,
   Headphones,
   Volume2,
-  Info
+  Info,
+  Calculator
 } from 'lucide-react';
 import { Subject, UserProfile, PastPaperItem, BookmarkItem, OfficialPaperPdf, PastPaperSubPart } from '../types';
 import {
@@ -787,7 +788,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
         {/* Quick Suggestion Pills */}
         <div className="mt-4 pt-3 border-t border-slate-800/50">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-1.5">
-            <Sparkles className="h-3 w-3 text-sky-400" />
+            <BookOpen className="h-3 w-3 text-sky-400" />
             Popular Exam Papers:
           </p>
           <div className="flex flex-wrap gap-1.5">
@@ -918,7 +919,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             {activeTab === 'questions' && (
               <div className="flex flex-wrap items-center gap-1.5 pt-0.5 text-xs">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1 shrink-0">
-                  <Sparkles className="h-3 w-3" />
+                  <FileText className="h-3 w-3" />
                   Sample Exam Codes:
                 </span>
                 {[
@@ -2020,10 +2021,10 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                 >
                   {/* Exact Code Match Banner */}
                   {paper.isExactCodeMatch && (
-                    <div className="bg-gradient-to-r from-emerald-950/80 via-sky-950/60 to-slate-900 border-b border-emerald-500/30 px-4 py-2.5 flex items-center justify-between flex-wrap gap-2">
+                    <div className="bg-slate-900/95 border-b border-emerald-500/40 px-4 py-2.5 flex items-center justify-between flex-wrap gap-2">
                       <div className="flex items-center gap-2 text-xs font-bold text-emerald-300">
-                        <Sparkles className="h-4 w-4 text-emerald-400 animate-pulse" />
-                        <span>🎯 Exact Exam Paper & Question Match: {paper.paperCode} {paper.session} - {paper.questionNumber}</span>
+                        <CheckCircle className="h-4 w-4 text-emerald-400" />
+                        <span>Exact Past Paper Question Match: {paper.paperCode} {paper.session} - {paper.questionNumber}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] font-mono text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
@@ -2128,14 +2129,14 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                         <span>Grade My Answer</span>
                       </button>
 
-                      {/* Solve in AI */}
+                      {/* Step-by-Step Solver */}
                       {onOpenSolverWithQuestion && (
                         <button
                           onClick={() => onOpenSolverWithQuestion(paper.questionPrompt)}
-                          className="rounded-xl bg-gradient-to-r from-pink-600 to-indigo-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:from-pink-500 hover:to-indigo-500 transition cursor-pointer flex items-center gap-1.5"
+                          className="rounded-xl bg-blue-600 hover:bg-blue-500 px-3.5 py-1.5 text-xs font-medium text-white shadow-sm transition cursor-pointer flex items-center gap-1.5"
                         >
-                          <Sparkles className="h-3.5 w-3.5" />
-                          <span>Solve in AI</span>
+                          <Calculator className="h-3.5 w-3.5" />
+                          <span>Step-by-Step Solver</span>
                         </button>
                       )}
 
@@ -2209,11 +2210,11 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                 navigator.clipboard.writeText(`[${paper.paperCode} ${paper.session} - ${paper.questionNumber}] ${paper.questionPrompt || ''}`);
                               }
                             }}
-                            className="inline-flex items-center gap-1 rounded-lg border border-purple-500/40 bg-purple-500/10 px-2.5 py-1 text-[11px] font-bold text-purple-300 hover:bg-purple-500/20 transition cursor-pointer"
-                            title="Open AI Multimodal Solver to breakdown steps and official criteria"
+                            className="inline-flex items-center gap-1 rounded-lg border border-blue-500/40 bg-blue-500/10 px-2.5 py-1 text-[11px] font-semibold text-blue-300 hover:bg-blue-500/20 transition cursor-pointer"
+                            title="Open Mark Scheme Solver to view step-by-step criteria"
                           >
-                            <Sparkles className="h-3 w-3 text-purple-400" />
-                            <span>AI Solver Breakdown</span>
+                            <Calculator className="h-3 w-3 text-blue-400" />
+                            <span>Mark Scheme Breakdown</span>
                           </button>
                           <span className="text-xs font-bold text-amber-400">
                             {typeof activeSubPartMap[paper.id] === 'number' && paper.subParts?.[activeSubPartMap[paper.id] as number]
@@ -2701,8 +2702,8 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                   {isBoardPortal ? (
                     <div className="relative flex-1 w-full bg-slate-950 overflow-y-auto flex items-center justify-center p-4 sm:p-8">
                       <div className="max-w-xl w-full bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl text-center space-y-6 animate-fadeIn">
-                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/30 text-sky-400 text-xs font-bold uppercase tracking-wider">
-                          <Sparkles className="h-4 w-4" />
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-950/80 border border-blue-800/50 text-blue-300 text-xs font-semibold uppercase tracking-wider">
+                          <BookOpen className="h-4 w-4" />
                           Official {boardName} Archive
                         </div>
 

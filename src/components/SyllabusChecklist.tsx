@@ -3,7 +3,6 @@ import {
   CheckCircle,
   AlertCircle,
   HelpCircle,
-  Sparkles,
   Search,
   Filter,
   TrendingUp,
@@ -11,7 +10,9 @@ import {
   Zap,
   BookOpen,
   ArrowRight,
-  Award
+  Award,
+  Target,
+  MessageSquare
 } from 'lucide-react';
 import { Subject, UserProfile, SyllabusChecklistItem } from '../types';
 import { INITIAL_SYLLABUS_SPECS } from '../data/syllabusSpecsData';
@@ -147,10 +148,10 @@ export const SyllabusChecklist: React.FC<SyllabusChecklistProps> = ({
 
             <button
               onClick={handleLaunchDiagnostic}
-              className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-2 text-xs font-bold text-slate-950 shadow-md shadow-amber-500/20 hover:from-amber-400 hover:to-orange-400 transition active:scale-95 cursor-pointer shrink-0"
+              className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 px-4 py-2 text-xs font-semibold text-white shadow-sm transition active:scale-95 cursor-pointer shrink-0"
             >
-              <Sparkles className="h-4 w-4" />
-              <span>Launch AI Diagnostic Drill on Weak Areas</span>
+              <Target className="h-4 w-4" />
+              <span>Launch Past Paper Error Analysis</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </div>
@@ -303,10 +304,10 @@ export const SyllabusChecklist: React.FC<SyllabusChecklistProps> = ({
                     {onOpenAiChatWithTopic && (
                       <button
                         onClick={() => onOpenAiChatWithTopic(item.statement)}
-                        className="p-1.5 rounded-xl border border-slate-700 bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition"
-                        title="Ask Examiner AI to explain this objective"
+                        className="p-1.5 rounded-xl border border-slate-700 bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition cursor-pointer"
+                        title="Consult Examiner Walkthrough on this objective"
                       >
-                        <Sparkles className="h-3.5 w-3.5 text-indigo-400" />
+                        <MessageSquare className="h-3.5 w-3.5 text-blue-400" />
                       </button>
                     )}
                   </div>

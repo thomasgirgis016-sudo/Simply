@@ -9,7 +9,6 @@ import {
   UserCheck,
   Calculator,
   ShieldCheck,
-  Sparkles,
   Atom,
   Download
 } from 'lucide-react';
@@ -63,16 +62,17 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       case 'mock': return 'Timed Mock Simulator';
       case 'predicted': return '2026 Predicted Papers';
       case 'worksheet': return 'Worksheet Builder';
-      case 'solver': return 'AI Solver & Grader';
-      case 'chat': return 'AI Examiner Tutor Chat';
+      case 'classifieds': return 'Topic Classifieds';
+      case 'solver': return 'Mark Scheme Step-by-Step Solver';
+      case 'chat': return 'Examiner Walkthrough Co-Pilot';
       case 'esl-speaking': return 'ESL Speaking Simulator';
       case 'atp': return 'Paper 6 ATP Lab Master';
       case 'pitfalls': return 'Examiner Pitfall Heatmap';
       case 'mistakes': return 'The Mistake Black Book';
       case 'traps': return 'Command Words Traps';
       case 'blitz': return '60s Unit Conversion Blitz';
-      case 'revision': return 'Syllabus Revision Notes';
-      case 'flashcards': return 'Spaced Repetition Flashcards';
+      case 'revision': return 'High-Yield Syllabus Summaries';
+      case 'flashcards': return 'Topic Active Recall Decks';
       case 'cheatsheets': return 'Night Before Cheat Sheets';
       case 'formulas': return 'Formulas Dictionary';
       case 'checklist': return 'Syllabus Tracker';

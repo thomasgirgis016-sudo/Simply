@@ -263,12 +263,12 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
       {/* Chat Header */}
       <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950/70 px-4 py-3 sm:px-6 sm:py-4">
         <div className="flex items-center gap-2.5 sm:gap-3">
-          <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-500/20">
+          <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm">
             <Bot className="h-5 w-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-bold text-white text-sm">IGCSE Chief Examiner AI</h3>
+              <h3 className="font-bold text-white text-sm">Examiner Walkthrough Co-Pilot</h3>
               <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
             </div>
             <p className="text-[11px] text-slate-400">
@@ -298,8 +298,8 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
               <div
                 className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-xs font-bold ${
                   isUser
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-purple-600/30 text-purple-300 border border-purple-500/30'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-blue-950/80 text-blue-300 border border-blue-800/50'
                 }`}
               >
                 {isUser ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
@@ -308,18 +308,18 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
               <div
                 className={`max-w-[85%] rounded-2xl p-4 shadow-sm ${
                   isUser
-                    ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white'
+                    ? 'bg-blue-600 text-white'
                     : 'border border-slate-800 bg-slate-950/70 text-slate-200'
                 }`}
               >
                 {!isUser && (
-                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-purple-400 mb-1.5">
-                    <Sparkles className="h-3 w-3" />
-                    <span>AI Examiner Guidance</span>
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-blue-400 mb-1.5">
+                    <BookOpen className="h-3 w-3" />
+                    <span>Examiner Guidance</span>
                   </div>
                 )}
                 <MathRenderer content={m.content} className="text-xs sm:text-sm leading-relaxed" />
-                <p className={`mt-2 text-[10px] text-right ${isUser ? 'text-indigo-200' : 'text-slate-500'}`}>
+                <p className={`mt-2 text-[10px] text-right ${isUser ? 'text-blue-100' : 'text-slate-500'}`}>
                   {m.timestamp}
                 </p>
               </div>
@@ -329,12 +329,12 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
 
         {loading && (
           <div className="flex items-start gap-3">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-purple-600/30 text-purple-300 border border-purple-500/30">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blue-950/80 text-blue-300 border border-blue-800/50">
               <Bot className="h-4 w-4" />
             </div>
             <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4 text-xs text-slate-400 flex items-center gap-2">
-              <RefreshCw className="h-3.5 w-3.5 animate-spin text-purple-400" />
-              Examiner AI is evaluating mark scheme criteria...
+              <RefreshCw className="h-3.5 w-3.5 animate-spin text-blue-400" />
+              Examiner Co-Pilot is evaluating mark scheme criteria...
             </div>
           </div>
         )}
@@ -375,13 +375,13 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
 
       {/* Quick Prompts Bar */}
       <div className="border-t border-slate-800/80 bg-slate-950/50 px-4 py-2 flex items-center gap-2 overflow-x-auto no-scrollbar">
-        <Sparkles className="h-3.5 w-3.5 text-purple-400 shrink-0" />
+        <HelpCircle className="h-3.5 w-3.5 text-blue-400 shrink-0" />
         {quickQuestions.map((q, idx) => (
           <button
             key={idx}
             type="button"
             onClick={() => handleSend(q)}
-            className="shrink-0 rounded-lg border border-slate-800 bg-slate-900/90 px-3 py-1 text-[11px] text-slate-300 hover:border-purple-500 hover:text-white transition"
+            className="shrink-0 rounded-lg border border-slate-800 bg-slate-900/90 px-3 py-1 text-[11px] text-slate-300 hover:border-blue-500 hover:text-white transition cursor-pointer"
           >
             {q}
           </button>
@@ -402,12 +402,12 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={`Ask a question or enter exam code & Q# (e.g. 0580/42 Q6 or "Grade my answer: ...")...`}
-            className="flex-1 rounded-xl sm:rounded-2xl border border-slate-700 bg-slate-900 px-3.5 sm:px-4 py-2.5 sm:py-3 text-base sm:text-sm text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none"
+            className="flex-1 rounded-xl sm:rounded-2xl border border-slate-700 bg-slate-900 px-3.5 sm:px-4 py-2.5 sm:py-3 text-base sm:text-sm text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none"
           />
           <button
             type="submit"
             disabled={!input.trim() || loading}
-            className="flex h-11 w-11 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/25 hover:from-purple-500 hover:to-indigo-500 transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="flex h-11 w-11 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-blue-600 hover:bg-blue-500 text-white shadow-sm transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             <Send className="h-4 w-4" />
           </button>

@@ -6,7 +6,6 @@ import {
   GraduationCap,
   Camera,
   FileText,
-  Sparkles,
   TrendingUp,
   BookmarkCheck,
   Layers,
@@ -108,20 +107,20 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
     {
       group: 'Past Papers & Exams',
       items: [
-        { id: 'finder', label: 'Past Paper Vault', icon: Search, color: 'text-amber-400' },
+        { id: 'finder', label: 'Past Paper Vault', icon: Search, color: 'text-blue-400' },
         { id: 'classifieds', label: 'Topic Classifieds', icon: FileText, color: 'text-emerald-400' },
         { id: 'split', label: 'Split-Screen Papers', icon: Columns, color: 'text-sky-400' },
         { id: 'mock', label: 'Timed Mock Simulator', icon: Clock, color: 'text-amber-400' },
-        { id: 'predicted', label: '2026 Predicted Papers', icon: Sparkles, color: 'text-purple-400' },
-        { id: 'worksheet', label: 'Worksheet Builder', icon: Printer, color: 'text-indigo-400' },
+        { id: 'predicted', label: '2026 Predicted Papers', icon: FileText, color: 'text-blue-400' },
+        { id: 'worksheet', label: 'Worksheet Builder', icon: Printer, color: 'text-slate-300' },
       ]
     },
     {
-      group: 'AI Examiner & Vision',
+      group: 'Examiner Guidance & Step Solvers',
       items: [
-        { id: 'solver', label: 'AI Solver & Grader', icon: Camera, color: 'text-pink-400' },
-        { id: 'chat', label: 'AI Examiner Tutor Chat', icon: MessageSquare, color: 'text-purple-400' },
-        { id: 'esl-speaking', label: 'ESL Speaking Oral', icon: Mic, color: 'text-violet-400' },
+        { id: 'solver', label: 'Mark Scheme Step-by-Step Solver', icon: Calculator, color: 'text-blue-400' },
+        { id: 'chat', label: 'Examiner Walkthrough Co-Pilot', icon: MessageSquare, color: 'text-sky-400' },
+        { id: 'esl-speaking', label: 'ESL Speaking Oral', icon: Mic, color: 'text-teal-400' },
       ]
     },
     {
@@ -134,11 +133,11 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
       ]
     },
     {
-      group: 'Speed Drills & Summaries',
+      group: 'Revision & Syllabus Summaries',
       items: [
         { id: 'blitz', label: '60s Unit Blitz', icon: Zap, color: 'text-amber-400' },
-        { id: 'revision', label: 'Syllabus Revision Notes', icon: BookOpen, color: 'text-cyan-400' },
-        { id: 'flashcards', label: 'Spaced Flashcards (SM-2)', icon: Layers, color: 'text-indigo-400' },
+        { id: 'revision', label: 'High-Yield Syllabus Summaries', icon: BookOpen, color: 'text-sky-400' },
+        { id: 'flashcards', label: 'Topic Active Recall Decks', icon: Layers, color: 'text-blue-400' },
         { id: 'cheatsheets', label: 'Night Before Cheat Sheets', icon: FileText, color: 'text-amber-400' },
         { id: 'formulas', label: 'Formulas & Definitions', icon: BookmarkCheck, color: 'text-amber-400' },
         { id: 'checklist', label: 'Syllabus Tracker', icon: ListChecks, color: 'text-emerald-400' },

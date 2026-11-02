@@ -220,7 +220,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               {currentUser ? `Welcome back, ${currentUser.name}` : `Welcome to Simply IGCSE`}
             </h1>
             <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
-              Official past paper vault, line-by-line AI examiner grading, and personal mistake tracking engineered for Grade 9 candidates.
+              Official past paper vault, line-by-line mark scheme solver, and personal mistake tracking engineered for Grade 9 candidates.
             </p>
           </div>
 
@@ -427,29 +427,29 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
           </div>
 
-          {/* 2. AI Solver & Vision OCR */}
+          {/* 2. Step-by-Step Solver */}
           <div
             onClick={() => onNavigateTab('solver')}
-            className="group flex flex-col justify-between rounded-xl sm:rounded-2xl border border-slate-800/90 bg-slate-900/60 p-3 sm:p-5 shadow-lg hover:border-pink-500/50 hover:bg-slate-900/90 transition active:scale-95 cursor-pointer"
+            className="group flex flex-col justify-between rounded-xl sm:rounded-2xl border border-slate-800/90 bg-slate-900/60 p-3 sm:p-5 shadow-lg hover:border-blue-500/50 hover:bg-slate-900/90 transition active:scale-95 cursor-pointer"
           >
             <div>
               <div className="flex items-center justify-between mb-2 sm:mb-3">
-                <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl bg-pink-500/15 text-pink-400 border border-pink-500/25 group-hover:scale-105 transition">
-                  <Camera className="h-4 w-4 sm:h-5 sm:w-5" />
+                <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl bg-blue-500/15 text-blue-400 border border-blue-500/25 group-hover:scale-105 transition">
+                  <Calculator className="h-4 w-4 sm:h-5 sm:w-5" />
                 </div>
-                <span className="rounded bg-pink-500/15 px-1.5 py-0.5 text-[9px] sm:text-[10px] font-bold text-pink-300 font-mono">
-                  Vision OCR
+                <span className="rounded bg-blue-500/15 px-1.5 py-0.5 text-[9px] sm:text-[10px] font-bold text-blue-300 font-mono">
+                  Step-by-Step
                 </span>
               </div>
-              <h3 className="text-xs sm:text-base font-bold text-white group-hover:text-pink-300 transition line-clamp-1">
-                AI Solver
+              <h3 className="text-xs sm:text-base font-bold text-white group-hover:text-blue-300 transition line-clamp-1">
+                Step-by-Step Solver
               </h3>
               <p className="hidden sm:block text-xs text-slate-400 mt-1 leading-relaxed line-clamp-2">
-                Snap handwriting for line-by-line mark scheme checks ([M1], [A1], [B1]).
+                Official Cambridge & Edexcel mark scheme criteria ([M1], [A1], [B1]) for typed questions or past paper photos.
               </p>
             </div>
-            <div className="mt-2.5 sm:mt-4 flex items-center gap-1 text-[11px] sm:text-xs font-bold text-pink-400 group-hover:translate-x-1 transition">
-              <span>Grade</span>
+            <div className="mt-2.5 sm:mt-4 flex items-center gap-1 text-[11px] sm:text-xs font-bold text-blue-400 group-hover:translate-x-1 transition">
+              <span>Solve</span>
               <ArrowRight className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
             </div>
           </div>
@@ -549,7 +549,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             />
             <button
               type="submit"
-              className="rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-3.5 sm:px-4 py-2 text-xs font-black text-slate-950 shadow-md hover:brightness-110 shrink-0 transition cursor-pointer"
+              className="rounded-xl bg-blue-600 hover:bg-blue-500 text-white px-3.5 sm:px-4 py-2 text-xs font-bold shadow-sm shrink-0 transition cursor-pointer"
             >
               Check
             </button>
@@ -582,19 +582,19 @@ export const HomeView: React.FC<HomeViewProps> = ({
           {/* Hub Filters */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
             {[
-              { id: 'featured', label: '🌟 Top 6' },
-              { id: 'papers', label: '📝 Papers & Mocks' },
-              { id: 'ai', label: '🤖 AI & Grading' },
-              { id: 'mastery', label: '🎯 Cambridge Mastery' },
-              { id: 'drills', label: '⚡ Drills & Notes' },
-              { id: 'all', label: '📚 All 20+' }
+              { id: 'featured', label: 'Top Workspaces' },
+              { id: 'papers', label: 'Papers & Mocks' },
+              { id: 'ai', label: 'Examiner & Step Solvers' },
+              { id: 'mastery', label: 'Cambridge Mastery' },
+              { id: 'drills', label: 'Revision & Active Recall' },
+              { id: 'all', label: 'All Tools' }
             ].map((hub) => (
               <button
                 key={hub.id}
                 onClick={() => setActiveHub(hub.id as CategoryHub)}
                 className={`rounded-xl px-3 py-1.5 font-bold transition cursor-pointer shrink-0 ${
                   activeHub === hub.id
-                    ? 'bg-indigo-600 text-white shadow-md'
+                    ? 'bg-blue-600 text-white shadow-sm'
                     : 'bg-slate-900/80 text-slate-400 border border-slate-800 hover:text-slate-200 hover:bg-slate-800'
                 }`}
               >
@@ -726,25 +726,25 @@ export const HomeView: React.FC<HomeViewProps> = ({
           {(activeHub === 'papers' || activeHub === 'all') && (
             <div
               onClick={() => onNavigateTab('predicted')}
-              className="group flex flex-col justify-between rounded-2xl border border-slate-800/90 bg-slate-900/60 p-4 sm:p-5 shadow-lg hover:border-purple-500/50 hover:bg-slate-900/90 transition cursor-pointer"
+              className="group flex flex-col justify-between rounded-2xl border border-slate-800/90 bg-slate-900/60 p-4 sm:p-5 shadow-lg hover:border-blue-500/50 hover:bg-slate-900/90 transition cursor-pointer"
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-500/15 text-purple-400 border border-purple-500/25">
-                    <Sparkles className="h-4.5 w-4.5" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/15 text-blue-400 border border-blue-500/25">
+                    <FileText className="h-4.5 w-4.5" />
                   </div>
-                  <span className="rounded bg-purple-500/10 px-1.5 py-0.5 text-[10px] font-bold text-purple-300 font-mono">
+                  <span className="rounded bg-blue-500/10 px-1.5 py-0.5 text-[10px] font-bold text-blue-300 font-mono">
                     Predictions
                   </span>
                 </div>
-                <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-purple-300 transition">
+                <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-blue-300 transition">
                   2026 Predicted Papers
                 </h3>
                 <p className="text-xs text-slate-400 mt-1 leading-relaxed">
                   Exam predictions calculated from Cambridge topic recurrence cycles for upcoming series.
                 </p>
               </div>
-              <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-purple-400 group-hover:translate-x-1 transition">
+              <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-blue-400 group-hover:translate-x-1 transition">
                 <span>View Predictions</span>
                 <ArrowRight className="h-3 w-3" />
               </div>
@@ -784,55 +784,55 @@ export const HomeView: React.FC<HomeViewProps> = ({
           {(activeHub === 'drills' || activeHub === 'all') && (
             <div
               onClick={() => onNavigateTab('flashcards')}
-              className="group flex flex-col justify-between rounded-2xl border border-slate-800/90 bg-slate-900/60 p-4 sm:p-5 shadow-lg hover:border-indigo-500/50 hover:bg-slate-900/90 transition cursor-pointer"
+              className="group flex flex-col justify-between rounded-2xl border border-slate-800/90 bg-slate-900/60 p-4 sm:p-5 shadow-lg hover:border-blue-500/50 hover:bg-slate-900/90 transition cursor-pointer"
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-500/15 text-indigo-400 border border-indigo-500/25">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/15 text-blue-400 border border-blue-500/25">
                     <Layers className="h-4.5 w-4.5" />
                   </div>
-                  <span className="rounded bg-indigo-500/10 px-1.5 py-0.5 text-[10px] font-bold text-indigo-300 font-mono">
-                    SM-2
+                  <span className="rounded bg-blue-500/10 px-1.5 py-0.5 text-[10px] font-bold text-blue-300 font-mono">
+                    Recall
                   </span>
                 </div>
-                <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-indigo-300 transition">
-                  Spaced Repetition Flashcards
+                <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-blue-300 transition">
+                  Topic Active Recall Decks
                 </h3>
                 <p className="text-xs text-slate-400 mt-1 leading-relaxed">
                   Scientifically scheduled recall cards for formulas, definitions, and chemical tests.
                 </p>
               </div>
-              <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-indigo-400 group-hover:translate-x-1 transition">
+              <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-blue-400 group-hover:translate-x-1 transition">
                 <span>Practice Cards</span>
                 <ArrowRight className="h-3 w-3" />
               </div>
             </div>
           )}
 
-          {/* AI Examiner Chat */}
+          {/* Examiner Walkthrough Co-Pilot */}
           {(activeHub === 'ai' || activeHub === 'all') && (
             <div
               onClick={() => onNavigateTab('chat')}
-              className="group flex flex-col justify-between rounded-2xl border border-slate-800/90 bg-slate-900/60 p-4 sm:p-5 shadow-lg hover:border-purple-500/50 hover:bg-slate-900/90 transition cursor-pointer"
+              className="group flex flex-col justify-between rounded-2xl border border-slate-800/90 bg-slate-900/60 p-4 sm:p-5 shadow-lg hover:border-blue-500/50 hover:bg-slate-900/90 transition cursor-pointer"
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-500/15 text-purple-400 border border-purple-500/25">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/15 text-blue-400 border border-blue-500/25">
                     <MessageSquare className="h-4.5 w-4.5" />
                   </div>
-                  <span className="rounded bg-purple-500/10 px-1.5 py-0.5 text-[10px] font-bold text-purple-300 font-mono">
-                    Tutor
+                  <span className="rounded bg-blue-500/10 px-1.5 py-0.5 text-[10px] font-bold text-blue-300 font-mono">
+                    Co-Pilot
                   </span>
                 </div>
-                <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-purple-300 transition">
-                  AI Examiner Tutor Chat
+                <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-blue-300 transition">
+                  Examiner Walkthrough Co-Pilot
                 </h3>
                 <p className="text-xs text-slate-400 mt-1 leading-relaxed">
                   Ask any syllabus question and receive strict mark-scheme breakdown instructions.
                 </p>
               </div>
-              <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-purple-400 group-hover:translate-x-1 transition">
-                <span>Start Chat</span>
+              <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-blue-400 group-hover:translate-x-1 transition">
+                <span>Start Co-Pilot</span>
                 <ArrowRight className="h-3 w-3" />
               </div>
             </div>
@@ -963,9 +963,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     </button>
                     <button
                       onClick={() => { onSelectSubject(sub); onNavigateTab('solver'); }}
-                      className="rounded-lg border border-slate-800 bg-slate-950/70 py-1 px-1 text-[11px] font-semibold text-pink-300 hover:bg-pink-500/20 transition cursor-pointer"
+                      className="rounded-lg border border-slate-800 bg-slate-950/70 py-1 px-1 text-[11px] font-semibold text-blue-300 hover:bg-blue-500/20 transition cursor-pointer"
                     >
-                      AI Solver
+                      Solver
                     </button>
                   </div>
                 </div>

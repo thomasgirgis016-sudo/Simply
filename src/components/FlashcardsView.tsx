@@ -229,10 +229,10 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
       <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg backdrop-blur-sm">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <span className="inline-block rounded-md bg-indigo-500/20 px-2 py-0.5 text-xs font-semibold text-indigo-300 border border-indigo-500/30">
+            <span className="inline-block rounded-md bg-blue-950/80 px-2.5 py-0.5 text-xs font-semibold text-blue-300 border border-blue-800/50">
               {subject.code} • {subject.name}
             </span>
-            <h2 className="text-xl font-bold text-white mt-1">Smart Spaced Repetition Flashcards</h2>
+            <h2 className="text-xl font-bold text-white mt-1">Topic Active Recall Decks</h2>
             <p className="text-xs text-slate-400">Master definitions, formulas and mark scheme keywords</p>
           </div>
 
@@ -275,11 +275,11 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
             <button
               onClick={handleGenerateNext10Cards}
               disabled={isGeneratingTen}
-              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-emerald-500/20 hover:from-emerald-500 hover:to-teal-500 transition cursor-pointer active:scale-95 disabled:opacity-50"
-              title="Generate the next 10 high-yield exam flashcards for this chapter via AI"
+              className="flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 px-4 py-2 text-xs font-semibold text-white shadow-sm transition cursor-pointer active:scale-95 disabled:opacity-50"
+              title="Generate the next 10 high-yield exam flashcards for this chapter"
             >
-              <Sparkles className={`h-4 w-4 ${isGeneratingTen ? 'animate-spin' : ''}`} />
-              <span>{isGeneratingTen ? 'Generating 10 Cards...' : '⚡ AI Generate Next 10 Cards'}</span>
+              <Layers className={`h-4 w-4 ${isGeneratingTen ? 'animate-spin' : ''}`} />
+              <span>{isGeneratingTen ? 'Generating 10 Cards...' : 'Generate Next 10 Cards'}</span>
             </button>
 
             <button
@@ -424,10 +424,10 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
           </p>
           <button
             onClick={() => setIsAiModalOpen(true)}
-            className="mt-4 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white hover:bg-indigo-500 transition"
+            className="mt-4 inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 px-4 py-2 text-xs font-semibold text-white shadow-sm transition cursor-pointer"
           >
-            <Sparkles className="h-4 w-4" />
-            Generate with Gemini
+            <Layers className="h-4 w-4" />
+            Generate Topic Cards
           </button>
         </div>
       ) : (
@@ -621,14 +621,14 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
             </button>
 
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="rounded-xl bg-indigo-500/20 p-2 text-indigo-400 border border-indigo-500/30">
-                <Sparkles className="h-5 w-5" />
+              <div className="rounded-xl bg-blue-950/80 p-2 text-blue-300 border border-blue-800/50">
+                <Layers className="h-5 w-5" />
               </div>
-              <h3 className="text-lg font-bold text-white">Generate IGCSE Flashcards</h3>
+              <h3 className="text-lg font-bold text-white">Generate Topic Flashcards</h3>
             </div>
 
             <p className="text-xs text-slate-300 mb-4 leading-relaxed">
-              Enter any topic from the {subject.name} syllabus (e.g. "Kinematics & v-t graphs", "Electrolysis of brine", "Circle Theorems") and Gemini will generate exam-aligned cards.
+              Enter any topic from the {subject.name} syllabus (e.g. "Kinematics & v-t graphs", "Electrolysis of brine", "Circle Theorems") to generate exam-aligned cards.
             </p>
 
             <div className="space-y-3">
@@ -641,7 +641,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                   value={aiTopicInput}
                   onChange={(e) => setAiTopicInput(e.target.value)}
                   placeholder="e.g. Organic Chemistry Alkanes & Alkenes"
-                  className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
+                  className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-sm text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none"
                 />
               </div>
 
@@ -652,7 +652,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                     key={t}
                     type="button"
                     onClick={() => setAiTopicInput(t)}
-                    className="rounded-md border border-slate-800 bg-slate-800/60 px-2 py-1 text-[11px] text-slate-300 hover:border-indigo-500 hover:text-white"
+                    className="rounded-md border border-slate-800 bg-slate-800/60 px-2 py-1 text-[11px] text-slate-300 hover:border-blue-500 hover:text-white cursor-pointer"
                   >
                     + {t}
                   </button>
@@ -664,7 +664,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
               <button
                 type="button"
                 onClick={() => setIsAiModalOpen(false)}
-                className="rounded-xl px-4 py-2 text-xs font-medium text-slate-400 hover:bg-slate-800 hover:text-white"
+                className="rounded-xl px-4 py-2 text-xs font-medium text-slate-400 hover:bg-slate-800 hover:text-white cursor-pointer"
               >
                 Cancel
               </button>
@@ -672,7 +672,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                 type="button"
                 onClick={handleGenerateAiDeck}
                 disabled={isGenerating || !aiTopicInput.trim()}
-                className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 px-5 py-2 text-xs font-bold text-white shadow-lg hover:from-indigo-400 hover:to-purple-500 disabled:opacity-50"
+                className="flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 px-5 py-2 text-xs font-semibold text-white shadow-sm disabled:opacity-50 cursor-pointer"
               >
                 {isGenerating ? (
                   <>
@@ -681,7 +681,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                   </>
                 ) : (
                   <>
-                    <Sparkles className="h-4 w-4" />
+                    <Layers className="h-4 w-4" />
                     <span>Generate Cards</span>
                   </>
                 )}

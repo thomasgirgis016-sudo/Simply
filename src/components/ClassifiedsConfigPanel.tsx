@@ -10,7 +10,6 @@ import {
   ChevronRight,
   ChevronLeft,
   Settings2,
-  Sparkles,
   ArrowUpDown,
   MoveUp,
   MoveDown,

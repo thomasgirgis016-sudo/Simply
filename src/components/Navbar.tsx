@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
-  Sparkles,
   Camera,
   Layers,
   GraduationCap,
@@ -171,27 +170,28 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const baseTabs = [
     { id: 'home', label: 'Home', icon: Home, color: 'text-indigo-400' },
-    { id: 'finder', label: 'Past Papers', icon: Search, color: 'text-amber-400' },
+    { id: 'finder', label: 'Past Papers', icon: Search, color: 'text-blue-400' },
+    { id: 'classifieds', label: 'Topic Classifieds', icon: FileText, color: 'text-emerald-400' },
     { id: 'atp', label: 'Paper 6 ATP', icon: FlaskConical, color: 'text-amber-400' },
-    { id: 'roadmap', label: 'Exam Roadmap', icon: Calendar, color: 'text-indigo-400' },
+    { id: 'roadmap', label: 'Exam Roadmap', icon: Calendar, color: 'text-sky-400' },
     { id: 'traps', label: 'Command Words', icon: ShieldAlert, color: 'text-rose-400' },
     { id: 'pitfalls', label: 'Examiner Pitfalls', icon: TrendingDown, color: 'text-rose-400' },
     { id: 'blitz', label: '60s Unit Blitz', icon: Zap, color: 'text-amber-400' },
     { id: 'mistakes', label: 'Mistake Black Book', icon: BookMarked, color: 'text-rose-400' },
     { id: 'cheatsheets', label: 'Night Before Sheets', icon: FileText, color: 'text-amber-400' },
     { id: 'mock', label: 'Timed Mock Simulator', icon: Clock, color: 'text-amber-400' },
-    { id: 'worksheet', label: 'Worksheet Builder', icon: Printer, color: 'text-indigo-400' },
+    { id: 'worksheet', label: 'Worksheet Builder', icon: Printer, color: 'text-slate-300' },
     { id: 'radar', label: 'Grade 9 Radar', icon: Activity, color: 'text-emerald-400' },
-    { id: 'predicted', label: '2025 Predictions', icon: Sparkles, color: 'text-purple-400' },
-    { id: 'revision', label: 'Revision Notes', icon: BookOpen, color: 'text-cyan-400' },
+    { id: 'predicted', label: '2026 Predictions', icon: FileText, color: 'text-blue-400' },
+    { id: 'revision', label: 'High-Yield Syllabus Summaries', icon: BookOpen, color: 'text-sky-400' },
     { id: 'quiz', label: 'Past Paper Quizzes', icon: GraduationCap, color: 'text-emerald-400' },
-    { id: 'solver', label: 'AI Solver & Grading', icon: Camera, color: 'text-pink-400' },
+    { id: 'solver', label: 'Mark Scheme Step-by-Step Solver', icon: Calculator, color: 'text-blue-400' },
     { id: 'checklist', label: 'Syllabus Tracker', icon: ListChecks, color: 'text-emerald-400' },
-    { id: 'esl-speaking', label: 'ESL Speaking Oral', icon: Mic, color: 'text-violet-400' },
-    { id: 'flashcards', label: 'Flashcards', icon: Layers, color: 'text-indigo-400' },
+    { id: 'esl-speaking', label: 'ESL Speaking Oral', icon: Mic, color: 'text-teal-400' },
+    { id: 'flashcards', label: 'Topic Active Recall Decks', icon: Layers, color: 'text-blue-400' },
     { id: 'formulas', label: 'Formulas & Commands', icon: BookmarkCheck, color: 'text-amber-400' },
-    { id: 'chat', label: 'AI Examiner Chat', icon: MessageSquare, color: 'text-purple-400' },
-    { id: 'analytics', label: 'Teacher Classroom', icon: Users, color: 'text-violet-400' },
+    { id: 'chat', label: 'Examiner Walkthrough Co-Pilot', icon: MessageSquare, color: 'text-sky-400' },
+    { id: 'analytics', label: 'Teacher Classroom', icon: Users, color: 'text-blue-400' },
     { id: 'boundaries', label: 'Grade Boundaries', icon: TrendingUp, color: 'text-teal-400' },
     { id: 'split', label: 'Split-Screen Papers', icon: Columns, color: 'text-sky-400' },
   ];
@@ -345,7 +345,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
                 <button
                   onClick={() => onOpenAuth('signup')}
-                  className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-md shadow-indigo-500/20 hover:from-indigo-400 hover:to-purple-500 transition cursor-pointer"
+                  className="flex items-center gap-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm transition cursor-pointer"
                 >
                   <User className="h-3.5 w-3.5" />
                   <span>Sign Up</span>

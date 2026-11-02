@@ -6,7 +6,6 @@ import {
   BookOpen,
   CheckCircle,
   Clock,
-  Sparkles,
   Award,
   Layers,
   ChevronDown,
