@@ -563,21 +563,21 @@ export function App() {
   const getTabFeatureName = (tab: ActiveTab): string => {
     switch (tab) {
       case 'atp': return 'the Science Paper 6 Alternative to Practical (ATP) Master';
-      case 'roadmap': return 'the AI Exam Countdown & Daily Study Roadmap';
+      case 'roadmap': return 'the Exam Countdown & Daily Study Roadmap';
       case 'traps': return 'the Cambridge Command Words Trap Detector';
       case 'pitfalls': return 'the Examiner Pitfalls Heatmap';
       case 'blitz': return 'the 60-Second Unit Conversion Blitz';
-      case 'solver': return 'the AI Question Solver & Grading Engine';
+      case 'solver': return 'the Mark Scheme Step-by-Step Solver';
       case 'finder': return 'the Past Papers & Mark Schemes Hub';
       case 'mock': return 'the Timed Mock Exam Simulator & Grade Boundaries';
       case 'worksheet': return 'the Worksheet & Test Builder';
       case 'radar': return 'the Weak-Spot Radar & Grade 9 Diagnostic';
       case 'predicted': return 'the 2025/2026 Predicted Papers Engine';
-      case 'revision': return 'the Revision Notes & Examiner Summaries';
+      case 'revision': return 'the High-Yield Syllabus Summaries';
       case 'quiz': return 'Past Paper Mock Quizzes & Tests';
-      case 'flashcards': return 'Flashcards & Spaced Repetition';
+      case 'flashcards': return 'the Topic Active Recall Decks';
       case 'formulas': return 'Formulas & Command Words';
-      case 'chat': return 'the AI Chief Examiner Chat';
+      case 'chat': return 'the Examiner Walkthrough Co-Pilot';
       case 'checklist': return 'the Interactive Syllabus Checklist';
       case 'esl-speaking': return 'the ESL Speaking Oral Exam Simulator';
       case 'boundaries': return 'the Grade Boundaries Calculator';
@@ -926,7 +926,7 @@ export function App() {
         {[
           { id: 'home', label: 'Home', icon: Home, color: 'text-indigo-400' },
           { id: 'finder', label: 'Papers', icon: FileText, color: 'text-amber-400' },
-          { id: 'solver', label: 'AI Solver', icon: Camera, color: 'text-pink-400' },
+          { id: 'solver', label: 'Solver', icon: Calculator, color: 'text-blue-400' },
           { id: 'mistakes', label: 'Mistakes', icon: BookMarked, color: 'text-rose-400' },
           { id: 'menu', label: 'All Tools', icon: Menu, color: 'text-indigo-400' },
         ].map((tab) => {
@@ -949,7 +949,7 @@ export function App() {
               <div className="relative">
                 <Icon className={`h-5 w-5 ${isActive ? tab.color : 'text-slate-400'}`} />
                 {isActive && (
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-1 w-3 rounded-full bg-indigo-500 shadow-sm shadow-indigo-500" />
+                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-1 w-3 rounded-full bg-blue-500 shadow-sm shadow-blue-500" />
                 )}
               </div>
               <span className={`text-[10px] mt-1 tracking-tight font-sans ${isActive ? 'text-white font-bold' : 'text-slate-400 font-medium'}`}>
@@ -965,7 +965,7 @@ export function App() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
             <SimplyLogo size="sm" showText={false} />
-            <span className="font-bold text-slate-200">Simply IGCSE AI Co-Pilot</span>
+            <span className="font-bold text-slate-200">Simply IGCSE Platform</span>
             <span className="text-slate-600">|</span>
             <span>Cambridge (CIE) & Pearson Edexcel Curriculum</span>
           </div>
