@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   X,
-  Sparkles,
+  GraduationCap,
   BookOpen,
   CheckCircle2,
   FileText,
@@ -64,15 +64,24 @@ export const AboutSimplyModal: React.FC<AboutSimplyModalProps> = ({
         {/* Executive Summary */}
         <div className="rounded-2xl border border-indigo-500/30 bg-gradient-to-br from-indigo-950/50 via-slate-900 to-purple-950/30 p-5 sm:p-6 mb-6">
           <h3 className="text-sm font-black uppercase tracking-wider text-indigo-300 mb-2 flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-indigo-400" />
+            <GraduationCap className="h-4 w-4 text-indigo-400" />
             Executive Summary
           </h3>
           <p className="text-sm sm:text-base text-slate-200 leading-relaxed font-sans">
-            <strong className="text-white font-bold">Simply IGCSE</strong> is the definitive academic operating system engineered specifically for Cambridge Assessment International Education (<strong className="text-indigo-300">CAIE</strong>) and Pearson <strong className="text-indigo-300">Edexcel</strong> IGCSE candidates, tutors, and schools worldwide.
+            <strong className="text-white font-bold">Simply IGCSE</strong> is the definitive IGCSE Examination & Revision Workspace engineered specifically for Cambridge Assessment International Education (<strong className="text-indigo-300">CAIE</strong>) and Pearson <strong className="text-indigo-300">Edexcel</strong> IGCSE candidates, tutors, and schools worldwide.
           </p>
           <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mt-2.5">
             Founded by <span className="text-amber-400 font-semibold">Thomas</span>, the platform bridges the gap between chaotic PDF past paper folders and generic AI tools by enforcing strict, line-by-line mark scheme verification, official examiner report feedback, and automated diagnostics designed to guarantee top-tier examination results.
           </p>
+          <div className="mt-3.5 pt-3 border-t border-slate-800/80 flex flex-col gap-1 text-xs">
+            <p className="text-indigo-200 font-medium flex items-center gap-1.5">
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+              <span>Curated by experienced IGCSE educators, head of departments, and past examiners across Cairo, Alexandria, and the UK.</span>
+            </p>
+            <p className="text-slate-400 text-[11px]">
+              Strictly aligned with Cambridge Assessment International Education (CAIE) 2024–2026 specifications.
+            </p>
+          </div>
         </div>
 
         {/* 3 Core Pillars: What Simply IGCSE Does */}
@@ -143,9 +152,9 @@ export const AboutSimplyModal: React.FC<AboutSimplyModalProps> = ({
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-500/15 text-purple-400 border border-purple-500/20 mb-3">
                   <Award className="h-4.5 w-4.5" />
                 </div>
-                <h4 className="text-sm font-bold text-white mb-1.5">SM-2 Spaced Repetition & Unit Blitz</h4>
+                <h4 className="text-sm font-bold text-white mb-1.5">SM-2 Spaced Repetition & Topic Drills</h4>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Scientific SuperMemo (SM-2) algorithm calculates daily due review cards for definitions and formulas. Accompanied by a 60-second rapid-fire metric unit blitz to eliminate careless unit conversion errors.
+                  Scientific SuperMemo (SM-2) algorithm calculates daily due review cards for definitions and formulas. Accompanied by rapid-fire topic classified drills to eliminate careless calculation errors.
                 </p>
               </div>
             </div>
@@ -171,9 +180,9 @@ export const AboutSimplyModal: React.FC<AboutSimplyModalProps> = ({
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-500/15 text-rose-400 border border-rose-500/20 mb-3">
                   <Flame className="h-4.5 w-4.5" />
                 </div>
-                <h4 className="text-sm font-bold text-white mb-1.5">The Mistake Black Book & Rematch Engine</h4>
+                <h4 className="text-sm font-bold text-white mb-1.5">Personal Error & Mistake Log</h4>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Personal error log where candidates save every question they lost marks on, diagnose the root cause (arithmetic slip, misread command, formula trap), and run active recall Rematch Quizzes until 100% mastered.
+                  Dedicated revision notebook where candidates save every question they lost marks on, diagnose the root cause (arithmetic slip, misread command, formula trap), and run active recall Rematch Quizzes until 100% mastered.
                 </p>
               </div>
             </div>

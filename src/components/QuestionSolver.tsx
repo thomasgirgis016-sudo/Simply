@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   Camera,
   Upload,
-  Sparkles,
   CheckCircle,
   AlertTriangle,
   Lightbulb,
@@ -44,6 +43,12 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
   profile,
   onOpenChatWithQuestion,
 }) => {
+  const isLanguageOrHumanities =
+    subject.category === 'Languages' ||
+    subject.category === 'Humanities' ||
+    subject.code === '0510' ||
+    subject.code === '0470';
+
   const [solverMode, setSolverMode] = useState<'solve' | 'exam-lookup' | 'handwritten'>('solve');
   const [questionText, setQuestionText] = useState('');
   const [studentTypedWorking, setStudentTypedWorking] = useState('');
@@ -626,7 +631,11 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
                         rows={3}
                         value={studentExamAnswer}
                         onChange={(e) => setStudentExamAnswer(e.target.value)}
-                        placeholder="Type your answer, numerical value, or working steps here (e.g. 'Distance = 39.0 km' or show your calculations)..."
+                        placeholder={
+                          isLanguageOrHumanities
+                            ? "Write your summary points or essay response here (e.g., The advantages of renewable energy include...)"
+                            : "Enter your working steps or final answer (e.g., x = 4.5 or 125 cm³)..."
+                        }
                         className="w-full rounded-xl border border-sky-500/40 bg-slate-950 p-3 text-sm text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none"
                       />
                       <div className="flex items-center justify-end gap-2">
@@ -746,7 +755,11 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
                     rows={3}
                     value={questionText}
                     onChange={(e) => setQuestionText(e.target.value)}
-                    placeholder="Type or paste the question text here (e.g. 'Solve 10 - x = 2' or '10 - 2 = 8' or upload a photo above)..."
+                    placeholder={
+                      isLanguageOrHumanities
+                        ? "Write your summary points or essay response here (e.g., The advantages of renewable energy include...)"
+                        : "Enter your working steps or final answer (e.g., x = 4.5 or 125 cm³)..."
+                    }
                     className="w-full rounded-xl border border-slate-700/80 bg-slate-950/70 p-3.5 sm:p-4 text-base sm:text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                   />
                 </div>
@@ -758,14 +771,20 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
                       2. Test Your Working Line / Calculation (Optional):
                     </span>
                     <span className="text-[10px] text-slate-400 font-normal">
-                      e.g. write "10 - 2 = 8" or "10 + 2 = 8" to see marks awarded or exact error reasons
+                      {isLanguageOrHumanities
+                        ? 'e.g. write a paragraph or summary sentence to evaluate'
+                        : 'e.g. write "10 - 2 = 8" or "10 + 2 = 8" to see marks awarded or exact error reasons'}
                     </span>
                   </label>
                   <input
                     type="text"
                     value={studentTypedWorking}
                     onChange={(e) => setStudentTypedWorking(e.target.value)}
-                    placeholder="Type your working step here (e.g. '10 - 2 = 8' or '10 + 2 = 8')..."
+                    placeholder={
+                      isLanguageOrHumanities
+                        ? "Write your summary points or essay response here (e.g., The advantages of renewable energy include...)"
+                        : "Enter your working steps or final answer (e.g., x = 4.5 or 125 cm³)..."
+                    }
                     className="w-full rounded-xl border border-indigo-500/30 bg-slate-950/80 px-3.5 py-2.5 text-xs sm:text-sm font-mono text-indigo-200 placeholder-slate-500 focus:border-indigo-400 focus:outline-none"
                   />
                 </div>

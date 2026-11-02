@@ -5,7 +5,6 @@ import {
   Filter,
   CheckCircle,
   HelpCircle,
-  Sparkles,
   Award,
   Layers,
   ArrowRight,

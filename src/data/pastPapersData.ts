@@ -618,7 +618,7 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
     difficultyTier: 'Standard Extended',
     snippetQuery: 'summary 120 words sea turtles nesting threats conservation linkers own words',
     questionPrompt: 'Read the article about sea turtle conservation. Write a summary explaining:\n1. The natural and human threats facing nesting sea turtles\n2. The conservation measures communities are taking to protect them.\nWrite between 100 and 120 words. Use your own words where possible.',
-    diagramOrMath: '100 - 120 \\text{ words} \\implies 10 \\text{ Content} + 6 \\text{ Language}',
+    diagramOrMath: '100–120 words → 10 Content marks + 6 Language marks',
     marks: 16,
     markScheme: [
       { markType: '[Content 1-10]', requirement: 'Award up to 10 marks for distinct bullet points identified: coastal development, artificial beach lighting, plastic ingestion, poaching, predator predation; protected hatcheries, community patrols, turtle-friendly fishing gear.' },
@@ -641,7 +641,7 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
     difficultyTier: 'Grade 9 Challenge',
     snippetQuery: 'formal article school magazine youth volunteering community benefits register idioms',
     questionPrompt: 'Your school principal wants to encourage more students to take part in community volunteering projects.\nWrite an article for your school magazine about the benefits of volunteering for young people.\nIn your article, discuss:\n- The practical skills and confidence students gain\n- The positive impact on local residents and charities\n- Ways students can get involved during term time.\nWrite about 150 to 200 words in an appropriate formal yet engaging tone.',
-    diagramOrMath: '150 - 200 \\text{ words} \\implies 8 \\text{ Content} + 8 \\text{ Language}',
+    diagramOrMath: '150–200 words → 8 Content marks + 8 Language marks',
     marks: 16,
     markScheme: [
       { markType: '[Content 1-8]', requirement: 'Fully addresses all 3 prompt bullets with convincing details, persuasive arguments, and realistic recommendations.' },
@@ -685,7 +685,7 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
     ],
     snippetQuery: 'note taking heading subheadings bullet points concise phrases facts evtol',
     questionPrompt: 'Read the article about urban air mobility and the development of electric vertical takeoff aircraft.\nYou are preparing notes for a classroom presentation.\nComplete the notes below, writing one factual point on each line.\n\nHeading 1: Benefits of urban air mobility aircraft [5 marks]\nHeading 2: Challenges facing widespread implementation [4 marks]',
-    diagramOrMath: '5 + 4 = 9 \\text{ marks}',
+    diagramOrMath: '5 marks (Heading 1) + 4 marks (Heading 2) = 9 marks',
     marks: 9,
     markScheme: [
       { markType: '[1-5]', requirement: 'Award 1 mark per valid point for Benefits: zero emissions, reduced travel times, lower noise, operates from vertiports, cheaper maintenance.' },

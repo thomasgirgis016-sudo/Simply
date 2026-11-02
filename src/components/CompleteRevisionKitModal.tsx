@@ -105,7 +105,7 @@ export const CompleteRevisionKitModal: React.FC<CompleteRevisionKitModalProps> =
             </div>
             <div>
               <h2 className="text-sm sm:text-base font-black text-white flex items-center gap-2">
-                1-Click Complete Exam Survival Kit (PDF)
+                Official Formula & Data Booklet (PDF)
               </h2>
               <p className="text-[11px] text-slate-400">
                 Combines 1-Page Cheat Sheet + Unmastered Errors + Top Examiner Traps + Formulas
@@ -238,7 +238,7 @@ export const CompleteRevisionKitModal: React.FC<CompleteRevisionKitModalProps> =
                   Simply IGCSE • Personal Diagnostic Error Log • Section 2
                 </div>
                 <h2 className="text-xl sm:text-2xl font-black text-white print:text-black tracking-tight mt-1">
-                  The Mistake Black Book — Unmastered Questions ({unmasteredMistakes.length})
+                  Personal Error & Mistake Log — Unmastered Questions ({unmasteredMistakes.length})
                 </h2>
                 <p className="text-xs text-slate-400 print:text-slate-600">
                   Targeted review of past paper slips before entering the exam room.

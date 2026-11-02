@@ -2,8 +2,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   MessageSquare,
   Send,
-  Sparkles,
-  Bot,
+  GraduationCap,
   User,
   Trash2,
   RefreshCw,
@@ -264,7 +263,7 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
       <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950/70 px-4 py-3 sm:px-6 sm:py-4">
         <div className="flex items-center gap-2.5 sm:gap-3">
           <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm">
-            <Bot className="h-5 w-5" />
+            <GraduationCap className="h-5 w-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
@@ -302,7 +301,7 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
                     : 'bg-blue-950/80 text-blue-300 border border-blue-800/50'
                 }`}
               >
-                {isUser ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
+                {isUser ? <User className="h-4 w-4" /> : <GraduationCap className="h-4 w-4" />}
               </div>
 
               <div
@@ -330,7 +329,7 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
         {loading && (
           <div className="flex items-start gap-3">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blue-950/80 text-blue-300 border border-blue-800/50">
-              <Bot className="h-4 w-4" />
+              <GraduationCap className="h-4 w-4" />
             </div>
             <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4 text-xs text-slate-400 flex items-center gap-2">
               <RefreshCw className="h-3.5 w-3.5 animate-spin text-blue-400" />

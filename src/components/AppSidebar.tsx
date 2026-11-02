@@ -128,14 +128,14 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
       items: [
         { id: 'atp', label: 'Paper 6 ATP Lab Master', icon: FlaskConical, color: 'text-amber-400' },
         { id: 'pitfalls', label: 'Examiner Pitfall Heatmap', icon: TrendingDown, color: 'text-rose-400' },
-        { id: 'mistakes', label: 'The Mistake Black Book', icon: BookMarked, color: 'text-rose-400' },
+        { id: 'mistakes', label: 'Personal Error & Mistake Log', icon: BookMarked, color: 'text-rose-400' },
         { id: 'traps', label: 'Command Words Traps', icon: ShieldAlert, color: 'text-rose-400' },
       ]
     },
     {
       group: 'Revision & Syllabus Summaries',
       items: [
-        { id: 'blitz', label: '60s Unit Blitz', icon: Zap, color: 'text-amber-400' },
+        { id: 'blitz', label: 'Topic Classified Drills', icon: Zap, color: 'text-amber-400' },
         { id: 'revision', label: 'High-Yield Syllabus Summaries', icon: BookOpen, color: 'text-sky-400' },
         { id: 'flashcards', label: 'Topic Active Recall Decks', icon: Layers, color: 'text-blue-400' },
         { id: 'cheatsheets', label: 'Night Before Cheat Sheets', icon: FileText, color: 'text-amber-400' },

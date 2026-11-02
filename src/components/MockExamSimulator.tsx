@@ -15,7 +15,6 @@ import {
   BookmarkCheck,
   Maximize2,
   Minimize2,
-  Sparkles,
   BookOpen,
   ArrowRight,
   Eye,
@@ -58,6 +57,12 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showFormulaSheet, setShowFormulaSheet] = useState(false);
+
+  const isLanguageOrHumanities =
+    subject.category === 'Languages' ||
+    subject.category === 'Humanities' ||
+    subject.code === '0510' ||
+    subject.code === '0470';
 
   // Filter available papers for active subject
   const subjectPapers = useMemo(() => {
@@ -470,27 +475,43 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
             <div className="space-y-4 pt-2">
               <div>
                 <label className="text-xs font-bold text-slate-300 block mb-1 flex items-center justify-between">
-                  <span>Show Step-by-Step Working [Method Marks M1/M2]:</span>
-                  <span className="text-[10px] text-slate-500">LaTeX math supported (e.g. \frac, \sqrt)</span>
+                  <span>
+                    {isLanguageOrHumanities
+                      ? 'Student Response & Summary Points [Content & Language Marks]:'
+                      : 'Show Step-by-Step Working [Method Marks M1/M2]:'}
+                  </span>
+                  {!isLanguageOrHumanities && (
+                    <span className="text-[10px] text-slate-500">LaTeX math supported (e.g. \frac, \sqrt)</span>
+                  )}
                 </label>
                 <textarea
                   rows={4}
                   value={currentAns?.studentWorking || ''}
                   onChange={(e) => handleUpdateWorking(e.target.value)}
-                  placeholder="Show all formulas used, algebraic substitutions, and steps leading to your answer..."
+                  placeholder={
+                    isLanguageOrHumanities
+                      ? 'Write your summary points or essay response here (e.g., The advantages of renewable energy include...)'
+                      : 'Enter your working steps or final answer (e.g., x = 4.5 or 125 cm³)...'
+                  }
                   className="w-full rounded-2xl border border-slate-700 bg-slate-950 p-3.5 font-mono text-xs sm:text-sm text-slate-100 placeholder-slate-600 focus:border-amber-500 focus:outline-none"
                 />
               </div>
 
               <div>
                 <label className="text-xs font-bold text-slate-300 block mb-1">
-                  Final Numerical or Stated Answer [Accuracy Mark A1]:
+                  {isLanguageOrHumanities
+                    ? 'Final Conclusion or Word Count Statement:'
+                    : 'Final Numerical or Stated Answer [Accuracy Mark A1]:'}
                 </label>
                 <input
                   type="text"
                   value={currentAns?.studentAnswer || ''}
                   onChange={(e) => handleUpdateAnswer(e.target.value)}
-                  placeholder="e.g. 24.5 cm² or x = 4, x = -2..."
+                  placeholder={
+                    isLanguageOrHumanities
+                      ? 'Write your summary points or essay response here (e.g., The advantages of renewable energy include...)'
+                      : 'Enter your working steps or final answer (e.g., x = 4.5 or 125 cm³)...'
+                  }
                   className="w-full rounded-2xl border border-slate-700 bg-slate-950 p-3 text-sm font-mono text-amber-300 font-bold placeholder-slate-600 focus:border-amber-500 focus:outline-none"
                 />
               </div>

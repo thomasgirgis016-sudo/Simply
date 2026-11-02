@@ -5,7 +5,6 @@ import {
   GraduationCap,
   Camera,
   FileText,
-  Sparkles,
   ArrowRight,
   TrendingUp,
   Bookmark,
@@ -208,7 +207,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-500/15 px-2.5 py-0.5 text-xs font-bold text-indigo-300 border border-indigo-500/30">
                 <ShieldCheck className="h-3.5 w-3.5 text-indigo-400" />
-                Cambridge & Edexcel OS
+                IGCSE Examination & Revision Workspace
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-xs font-bold text-emerald-300 border border-emerald-500/30">
                 <Award className="h-3.5 w-3.5 text-emerald-400" />
@@ -361,10 +360,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <button
               onClick={onOpenRevisionKit}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs font-bold transition active:scale-95 cursor-pointer shadow-sm"
-              title="Generate 1-Click Cambridge Revision Survival Kit PDF"
+              title="Generate Official Cambridge Formula & Data Booklet PDF"
             >
               <Download className="h-3.5 w-3.5 text-rose-400" />
-              <span>1-Click Survival Kit (PDF)</span>
+              <span>Formula & Data Booklet (PDF)</span>
             </button>
           )}
 
@@ -454,7 +453,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
           </div>
 
-          {/* 3. The Mistake Black Book */}
+          {/* 3. Personal Error & Mistake Log */}
           <div
             onClick={() => onNavigateTab('mistakes')}
             className="group flex flex-col justify-between rounded-xl sm:rounded-2xl border border-slate-800/90 bg-slate-900/60 p-3 sm:p-5 shadow-lg hover:border-rose-500/50 hover:bg-slate-900/90 transition active:scale-95 cursor-pointer"
@@ -469,7 +468,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 </span>
               </div>
               <h3 className="text-xs sm:text-base font-bold text-white group-hover:text-rose-300 transition line-clamp-1">
-                Black Book
+                Personal Error Log
               </h3>
               <p className="hidden sm:block text-xs text-slate-400 mt-1 leading-relaxed line-clamp-2">
                 Personal error notebook with reason tags & active Rematch Quiz Engine.
@@ -751,7 +750,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
           )}
 
-          {/* 60s Unit Conversion Blitz */}
+          {/* Topic Classified Drills */}
           {(activeHub === 'drills' || activeHub === 'all') && (
             <div
               onClick={() => onNavigateTab('blitz')}
@@ -767,14 +766,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   </span>
                 </div>
                 <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-amber-300 transition">
-                  Unit Conversion Blitz
+                  Topic Classified Drills
                 </h3>
                 <p className="text-xs text-slate-400 mt-1 leading-relaxed">
                   Rapid-fire conversions (cm³ ↔ dm³, kJ ↔ J, kPa ↔ Pa) to eliminate careless errors.
                 </p>
               </div>
               <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-amber-400 group-hover:translate-x-1 transition">
-                <span>Start Blitz</span>
+                <span>Start Drills</span>
                 <ArrowRight className="h-3 w-3" />
               </div>
             </div>

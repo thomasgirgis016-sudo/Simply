@@ -10,7 +10,6 @@ import {
   Search,
   Filter,
   Trash2,
-  Sparkles,
   ExternalLink,
   ChevronRight,
   Printer,
@@ -187,7 +186,7 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
             <div className="flex items-center gap-2 flex-wrap">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-500/20 px-3 py-1 text-xs font-black text-rose-300 border border-rose-500/40">
                 <BookMarked className="h-4 w-4 text-rose-400" />
-                <span>The Mistake Black Book</span>
+                <span>Personal Error & Mistake Log</span>
               </span>
               <span className="rounded-md bg-amber-500/15 px-2.5 py-0.5 text-xs font-bold text-amber-300 border border-amber-500/30 font-mono">
                 Grade 9 Recovery System
@@ -580,7 +579,7 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
                 <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-500/20 text-rose-400 border border-rose-500/30">
                   <Plus className="h-4 w-4" />
                 </span>
-                <h3 className="text-base font-bold text-white">Log a Question to Black Book</h3>
+                <h3 className="text-base font-bold text-white">Log a Question to Error Log</h3>
               </div>
 
               <button
@@ -734,7 +733,7 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
                   type="submit"
                   className="rounded-xl bg-gradient-to-r from-rose-500 to-amber-600 px-5 py-2 text-xs font-bold text-white shadow-md hover:brightness-110 transition cursor-pointer"
                 >
-                  Save to Black Book
+                  Save to Error Log
                 </button>
               </div>
             </form>

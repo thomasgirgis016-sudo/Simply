@@ -183,7 +183,7 @@ export const ExamCountdownWidget: React.FC<ExamCountdownWidgetProps> = ({
                 <Circle className="h-4 w-4 text-slate-500 shrink-0" />
               )}
               <span className="text-xs font-semibold">
-                Clear {recommendedDailyMistakeClears} Black Book Errors
+                Clear {recommendedDailyMistakeClears} Logged Errors
               </span>
             </div>
             <span className="text-[10px] font-mono font-bold text-rose-400">+25 XP</span>

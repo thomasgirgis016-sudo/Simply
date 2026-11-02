@@ -68,9 +68,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       case 'esl-speaking': return 'ESL Speaking Simulator';
       case 'atp': return 'Paper 6 ATP Lab Master';
       case 'pitfalls': return 'Examiner Pitfall Heatmap';
-      case 'mistakes': return 'The Mistake Black Book';
+      case 'mistakes': return 'Personal Error & Mistake Log';
       case 'traps': return 'Command Words Traps';
-      case 'blitz': return '60s Unit Conversion Blitz';
+      case 'blitz': return 'Topic Classified Drills';
       case 'revision': return 'High-Yield Syllabus Summaries';
       case 'flashcards': return 'Topic Active Recall Decks';
       case 'cheatsheets': return 'Night Before Cheat Sheets';
@@ -149,10 +149,10 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           <button
             onClick={onOpenRevisionKit}
             className="hidden md:flex h-9 items-center justify-center gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 px-2.5 text-xs font-semibold text-amber-300 transition cursor-pointer"
-            title="Export 1-Click Complete Revision Kit (PDF)"
+            title="Export Official Formula & Data Booklet (PDF)"
           >
             <Download className="h-4 w-4 text-amber-400" />
-            <span className="hidden xl:inline text-[11px]">Survival Kit</span>
+            <span className="hidden xl:inline text-[11px]">Formula & Data Booklet</span>
           </button>
         )}
 

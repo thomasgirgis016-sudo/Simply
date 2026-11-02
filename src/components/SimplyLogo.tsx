@@ -118,7 +118,7 @@ export const SimplyLogo: React.FC<SimplyLogoProps> = ({
             </span>
           </div>
           <span className={`font-semibold tracking-wide text-slate-400 mt-1 ${currentSize.sub}`}>
-            AI Examination Suite
+            Cambridge & Edexcel Exam Suite
           </span>
         </div>
       )}

@@ -6,7 +6,6 @@ import {
   CheckCircle2,
   XCircle,
   RotateCcw,
-  Sparkles,
   ArrowRight,
   TrendingUp,
   Flame,
@@ -193,13 +192,13 @@ export const UnitConversionBlitz: React.FC = () => {
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold tracking-wide uppercase">
               <Zap className="w-3.5 h-3.5 text-amber-400" />
-              60-Second Cambridge Speed Blitz
+              Topic Classified Drills
             </div>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Unit Conversion & Formula Traps Blitz
+              Topic Classified Drills & Unit Traps
             </h1>
             <p className="text-slate-300 text-xs sm:text-sm max-w-xl leading-relaxed">
-              Don't let metric conversion slips cost you an A*! Train under 60-second pressure on the exact unit conversions that appear on Cambridge Science & Math papers.
+              Don't let metric conversion slips cost you an A*! Train under timed pressure on the exact unit conversions that appear on Cambridge Science & Math papers.
             </p>
           </div>
 
@@ -228,7 +227,7 @@ export const UnitConversionBlitz: React.FC = () => {
             </div>
             <div className="space-y-2">
               <h2 className="text-2xl font-black text-white">
-                Ready for the 60-Second Cambridge Blitz?
+                Ready for Topic Classified Drills?
               </h2>
               <p className="text-xs text-slate-400 max-w-md mx-auto">
                 Rapidly convert cm³ to dm³, kJ to J, and hours to seconds. Build your combo streak and eliminate careless unit errors forever.
@@ -239,7 +238,7 @@ export const UnitConversionBlitz: React.FC = () => {
               onClick={handleStart}
               className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm shadow-xl shadow-amber-500/25 transition-all transform active:scale-95"
             >
-              Start 60-Second Blitz
+              Start Topic Drills
             </button>
           </div>
         )}
@@ -324,7 +323,7 @@ export const UnitConversionBlitz: React.FC = () => {
             </div>
 
             <div className="space-y-1">
-              <h3 className="text-2xl font-black text-white">Blitz Complete!</h3>
+              <h3 className="text-2xl font-black text-white">Drills Complete!</h3>
               <p className="text-xs text-slate-400">
                 You scored <strong className="text-amber-400 font-mono">{score} points</strong> under 60-second Cambridge exam pressure.
               </p>

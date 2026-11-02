@@ -566,7 +566,7 @@ export function App() {
       case 'roadmap': return 'the Exam Countdown & Daily Study Roadmap';
       case 'traps': return 'the Cambridge Command Words Trap Detector';
       case 'pitfalls': return 'the Examiner Pitfalls Heatmap';
-      case 'blitz': return 'the 60-Second Unit Conversion Blitz';
+      case 'blitz': return 'the Topic Classified Drills';
       case 'solver': return 'the Mark Scheme Step-by-Step Solver';
       case 'finder': return 'the Past Papers & Mark Schemes Hub';
       case 'mock': return 'the Timed Mock Exam Simulator & Grade Boundaries';
@@ -963,11 +963,19 @@ export function App() {
       {/* Footer (with bottom padding so it never hides behind mobile nav) */}
       <footer className="mt-auto border-t border-slate-800/80 bg-slate-950/90 py-8 px-4 text-xs text-slate-400 mb-16 md:mb-0">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2.5">
-            <SimplyLogo size="sm" showText={false} />
-            <span className="font-bold text-slate-200">Simply IGCSE Platform</span>
-            <span className="text-slate-600">|</span>
-            <span>Cambridge (CIE) & Pearson Edexcel Curriculum</span>
+          <div className="flex flex-col gap-1 text-center md:text-left">
+            <div className="flex items-center justify-center md:justify-start gap-2.5">
+              <SimplyLogo size="sm" showText={false} />
+              <span className="font-bold text-slate-200">Simply IGCSE Platform</span>
+              <span className="text-slate-600">|</span>
+              <span>Cambridge (CIE) & Pearson Edexcel Curriculum</span>
+            </div>
+            <p className="text-[11px] text-slate-400">
+              Curated by experienced IGCSE educators, head of departments, and past examiners across Cairo, Alexandria, and the UK.
+            </p>
+            <p className="text-[10px] text-slate-500">
+              Strictly aligned with Cambridge Assessment International Education (CAIE) 2024–2026 specifications.
+            </p>
           </div>
 
           <div className="flex items-center gap-4 text-slate-400">
