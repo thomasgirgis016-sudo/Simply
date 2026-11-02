@@ -10,6 +10,7 @@
     "test:papers": "node scripts/test-past-papers.mjs",
     "test:qa": "npx tsx scripts/test-full-website-qa.ts",
     "test:routes": "npx tsx scripts/test-all-routes-viewport.ts",
+    "test:classifieds": "npx tsx scripts/test-classifieds-generator.ts",
     "preview": "vite preview"
   },
   "dependencies": {

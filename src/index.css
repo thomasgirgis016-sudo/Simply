@@ -489,4 +489,86 @@ html.executive .shadow-xl {
   color: #ffffff;
 }
 
+/* ==========================================================================
+   CAMBRIDGE IGCSE TOPIC CLASSIFIEDS PRINT ENGINE (@media print Rules)
+   ========================================================================== */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 15mm 15mm 15mm 15mm;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 10.5pt;
+  }
+
+  /* Hide all non-printable website chrome */
+  nav, header, footer, .sidebar, .config-panel, .floating-calc, .no-print {
+    display: none !important;
+  }
+
+  /* Show print container */
+  .classified-print-container {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  /* Force clean page breaks */
+  .cover-page {
+    page-break-after: always;
+    break-after: page;
+    height: 100%;
+  }
+
+  .mark-scheme-section {
+    page-break-before: always;
+    break-before: page;
+  }
+
+  /* Prevent question splitting across page boundaries */
+  .question-block {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin-bottom: 24pt;
+  }
+
+  /* Ensure diagrams and tables stay with their question */
+  .question-diagram, .question-table {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    max-width: 90%;
+    margin: 8pt auto;
+  }
+
+  /* Running Header & Running Footer on every printed page */
+  .print-running-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    font-size: 8pt;
+    color: #64748b;
+    border-bottom: 0.5pt solid #cbd5e1;
+    padding-bottom: 4pt;
+  }
+
+  .print-running-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    font-size: 8pt;
+    color: #64748b;
+    border-top: 0.5pt solid #cbd5e1;
+    padding-top: 4pt;
+  }
+}
+
+
 

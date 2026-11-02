@@ -72,6 +72,7 @@ export type ActiveTab =
   | 'chat'
   | 'boundaries'
   | 'split'
+  | 'classifieds'
   | 'analytics'
   | 'admin';
 

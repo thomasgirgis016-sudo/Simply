@@ -33,6 +33,7 @@ import { AccountGate } from './components/AccountGate';
 import { TeacherAnalyticsDashboard } from './components/TeacherAnalyticsDashboard';
 import { MockExamSimulator } from './components/MockExamSimulator';
 import { WorksheetBuilder } from './components/WorksheetBuilder';
+import { PrintableClassifiedsGenerator } from './components/PrintableClassifiedsGenerator';
 import { WeakSpotRadar } from './components/WeakSpotRadar';
 import { PredictedPaperView } from './components/PredictedPaperView';
 import { ScienceAtpMaster } from './components/ScienceAtpMaster';
@@ -401,6 +402,7 @@ export function App() {
         'cheatsheets',
         'mock',
         'worksheet',
+        'classifieds',
         'radar',
         'predicted'
       ];
@@ -791,6 +793,13 @@ export function App() {
 
             {activeTab === 'worksheet' && (
               <WorksheetBuilder
+                subject={activeSubject}
+                profile={profile}
+              />
+            )}
+
+            {activeTab === 'classifieds' && (
+              <PrintableClassifiedsGenerator
                 subject={activeSubject}
                 profile={profile}
               />
