@@ -280,6 +280,33 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
     '0510/12 May/June 2023'
   ];
 
+  // Cross-board session matching helper
+  const matchesSessionFilter = (sessionStr: string, filterSession: string): boolean => {
+    if (!filterSession || filterSession === 'All') return true;
+    const selLower = filterSession.toLowerCase();
+    const sessLower = (sessionStr || '').toLowerCase();
+    if (sessLower.includes(selLower)) return true;
+    if (selLower === 'may/june' || selLower === 'summer') {
+      return sessLower.includes('june') || sessLower.includes('may') || sessLower.includes('summer') || sessLower === 's';
+    }
+    if (selLower === 'june') {
+      return sessLower.includes('june');
+    }
+    if (selLower === 'oct/nov' || selLower === 'november' || selLower === 'winter') {
+      return sessLower.includes('nov') || sessLower.includes('oct') || sessLower.includes('winter') || sessLower === 'w';
+    }
+    if (selLower === 'feb/march' || selLower === 'march' || selLower === 'spring') {
+      return sessLower.includes('march') || sessLower.includes('feb') || sessLower.includes('spring') || sessLower === 'm';
+    }
+    if (selLower === 'january' || selLower === 'jan') {
+      return sessLower.includes('jan');
+    }
+    if (selLower === 'specimen') {
+      return sessLower.includes('specimen') || sessLower.includes('sp');
+    }
+    return false;
+  };
+
   // ==========================================
   // 1. FILTERING FOR OFFICIAL FULL PAPER PDFS
   // ==========================================
@@ -311,22 +338,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
       // Session / Series filter (cross-board awareness: June/May/Summer/January)
       if (selectedSession !== 'All') {
-        const selLower = selectedSession.toLowerCase();
-        const pdfSessLower = pdf.session.toLowerCase();
-
-        let matchesSession = pdfSessLower.includes(selLower);
-        if (!matchesSession) {
-          if (selLower === 'may/june' || selLower === 'june' || selLower === 'summer') {
-            matchesSession = pdfSessLower.includes('june') || pdfSessLower.includes('may') || pdfSessLower.includes('summer');
-          } else if (selLower === 'oct/nov' || selLower === 'november' || selLower === 'winter') {
-            matchesSession = pdfSessLower.includes('nov') || pdfSessLower.includes('oct') || pdfSessLower.includes('winter');
-          } else if (selLower === 'feb/march' || selLower === 'march' || selLower === 'spring') {
-            matchesSession = pdfSessLower.includes('march') || pdfSessLower.includes('feb') || pdfSessLower.includes('spring');
-          } else if (selLower === 'january' || selLower === 'jan') {
-            matchesSession = pdfSessLower.includes('jan');
-          }
-        }
-        if (!matchesSession) {
+        if (!matchesSessionFilter(pdf.session, selectedSession)) {
           return false;
         }
       }
@@ -504,9 +516,9 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
         return false;
       }
 
-      // Session filter
+      // Session filter (with cross-board awareness)
       if (selectedSession !== 'All') {
-        if (!paper.session.toLowerCase().includes(selectedSession.toLowerCase())) {
+        if (!matchesSessionFilter(paper.session, selectedSession)) {
           return false;
         }
       }
@@ -607,7 +619,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
         if (selectedBoard !== 'All' && p.board !== selectedBoard) return false;
         if (selectedSubjectId !== 'all' && p.subjectId !== selectedSubjectId && p.subjectCode.toLowerCase() !== selectedSubjectId.toLowerCase()) return false;
         if (selectedYear !== 'All' && p.year.toString() !== selectedYear) return false;
-        if (selectedSession !== 'All' && !p.session.toLowerCase().includes(selectedSession.toLowerCase())) return false;
+        if (selectedSession !== 'All' && !matchesSessionFilter(p.session, selectedSession)) return false;
         if (selectedPaperNumber !== 'All' && p.paperNumber?.toString() !== selectedPaperNumber) return false;
         if (selectedVariant !== 'All' && p.variant?.toString() !== selectedVariant) return false;
         return true;
@@ -1025,9 +1037,12 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                     className="w-full rounded-xl border border-slate-700 bg-slate-900 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
                   >
                     <option value="All">All Series</option>
-                    <option value="May/June">May / June (M/J)</option>
+                    <option value="May/June">May / June (M/J &amp; Edexcel June)</option>
+                    <option value="June">June Series (Edexcel / Pearson)</option>
                     <option value="Oct/Nov">Oct / Nov (O/N)</option>
                     <option value="Feb/March">Feb / March (F/M)</option>
+                    <option value="January">January Series (Edexcel)</option>
+                    <option value="Specimen">Specimen Series</option>
                   </select>
                 </div>
               </div>

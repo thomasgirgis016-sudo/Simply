@@ -605,6 +605,20 @@ const edexcel4es1June = filterPapers(OFFICIAL_PAST_PAPER_PDFS, {
 assertContent(edexcel4es1June.length === 4, 'Edexcel 4ES1 2026 May/June filter returns all 4 June 2026 papers', `Found ${edexcel4es1June.length}`);
 assertContent(edexcel4es1June.every(p => p.session.toLowerCase().includes('june')), 'All returned 4ES1 papers belong to June series');
 
+const edexcel4es1StrictJune = filterPapers(OFFICIAL_PAST_PAPER_PDFS, {
+  subjectId: 'edx-esl-4es1',
+  year: 2026,
+  session: 'June'
+});
+assertContent(edexcel4es1StrictJune.length === 4, 'Edexcel 4ES1 2026 June filter returns all 4 June 2026 papers', `Found ${edexcel4es1StrictJune.length}`);
+
+const edexcel4es1All = filterPapers(OFFICIAL_PAST_PAPER_PDFS, {
+  subjectId: 'edx-esl-4es1',
+  year: 2026,
+  session: 'All'
+});
+assertContent(edexcel4es1All.length === 8, 'Edexcel 4ES1 2026 All filter returns all 8 papers (4 June + 4 Jan)', `Found ${edexcel4es1All.length}`);
+
 const edexcel4ma1June = filterPapers(OFFICIAL_PAST_PAPER_PDFS, {
   subjectId: 'edx-math-4ma1',
   year: 2026,
@@ -612,6 +626,13 @@ const edexcel4ma1June = filterPapers(OFFICIAL_PAST_PAPER_PDFS, {
 });
 assertContent(edexcel4ma1June.length === 8, 'Edexcel 4MA1 2026 May/June filter returns all 8 June 2026 papers', `Found ${edexcel4ma1June.length}`);
 assertContent(edexcel4ma1June.every(p => p.session.toLowerCase().includes('june')), 'All returned 4MA1 papers belong to June series');
+
+const edexcel4ma1StrictJune = filterPapers(OFFICIAL_PAST_PAPER_PDFS, {
+  subjectId: 'edx-math-4ma1',
+  year: 2026,
+  session: 'June'
+});
+assertContent(edexcel4ma1StrictJune.length === 8, 'Edexcel 4MA1 2026 June filter returns all 8 June 2026 papers', `Found ${edexcel4ma1StrictJune.length}`);
 
 // TEST SUITE 13: DIRECT RESOURCE AVAILABILITY & DISCLOSURE
 console.log('\n--- 13. Direct Resource Availability & Board Hub Disclosure ---');
