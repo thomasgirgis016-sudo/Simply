@@ -94,8 +94,16 @@ assert(OFFICIAL_PAST_PAPER_PDFS.length >= 7000, 'PDF Archive Catalog Scale', `Fo
 let verifiedPdfUrls = 0;
 for (const pdf of OFFICIAL_PAST_PAPER_PDFS) {
   if (!pdf.isUnavailable) {
-    assert(!!pdf.qpPdfUrl && !!pdf.msPdfUrl, `PDF ${pdf.id} URL existence`, 'Missing QP or MS URL');
-    verifiedPdfUrls += 2;
+    if (pdf.qpUnavailableReason) {
+      assert(!!pdf.msPdfUrl, `PDF ${pdf.id} URL existence (QP not published, MS must exist)`, 'Missing MS URL');
+      verifiedPdfUrls += 1;
+    } else if (pdf.msUnavailableReason) {
+      assert(!!pdf.qpPdfUrl, `PDF ${pdf.id} URL existence (MS not published, QP must exist)`, 'Missing QP URL');
+      verifiedPdfUrls += 1;
+    } else {
+      assert(!!pdf.qpPdfUrl && !!pdf.msPdfUrl, `PDF ${pdf.id} URL existence`, 'Missing QP or MS URL');
+      verifiedPdfUrls += 2;
+    }
   }
   assert(pdf.year >= 2010 && pdf.year <= 2026, `PDF ${pdf.id} year range`, `Invalid year ${pdf.year}`);
 }
@@ -365,6 +373,10 @@ const tutorMathRoots = await askAiTutor([{ role: 'user', content: 'What are the 
 assertContent(tutorMathRoots.includes('+3') && tutorMathRoots.includes('-3'), 'AI Tutor states both roots (+3 and -3 or ±3) for x^2 = 9', `Got: ${tutorMathRoots.slice(0, 100)}...`);
 assertContent(tutorMathRoots.toLowerCase().includes('trap') || tutorMathRoots.toLowerCase().includes('incomplete'), 'AI Tutor warns that stating only x = 3 is incomplete and forfeits accuracy mark');
 
+const tutorMathRootsExplain = await askAiTutor([{ role: 'user', content: 'Solve x^2 = 9 and explain its two roots' }], 'Mathematics (0580)', 'Cambridge CIE');
+assertContent(tutorMathRootsExplain.includes('+3') && tutorMathRootsExplain.includes('-3'), 'AI Tutor provides both roots (+3 and -3) when asked to solve and explain', `Got: ${tutorMathRootsExplain.slice(0, 100)}...`);
+assertContent(!tutorMathRootsExplain.includes('SI units') && !tutorMathRootsExplain.includes('y = mx + c'), 'AI Tutor does NOT return generic SI units or y=mx+c for quadratic explanation');
+
 // 8r. AI Tutor Relevancy: Biology Heart Chambers & Blood Flow
 const tutorBioChambers = await askAiTutor([{ role: 'user', content: 'What are the chambers of the heart and how does blood flow through them?' }], 'Biology (0610)', 'Cambridge CIE');
 assertContent(tutorBioChambers.includes('Right Atrium') && tutorBioChambers.includes('Left Atrium') && tutorBioChambers.includes('Right Ventricle') && tutorBioChambers.includes('Left Ventricle'), 'AI Tutor names all 4 heart chambers', `Got: ${tutorBioChambers.slice(0, 120)}...`);
@@ -444,6 +456,32 @@ const solverBinarySafe = await solveQuestionWithGemini({
 assertContent(!solverBinarySafe.questionText.includes('IHDR') && !solverBinarySafe.questionText.includes('IDAT'), 'Solver does NOT leak raw binary PNG chunks (IHDR/IDAT) into questionText');
 assertContent(!JSON.stringify(solverBinarySafe).includes('O=2') && !JSON.stringify(solverBinarySafe).includes('O = 2'), 'Solver does NOT invent false equation O=2 from binary noise');
 assertContent(solverBinarySafe.studentWorkingEvaluation?.marksEarned === 1, 'Binary image with 5 cm x 3 cm prompt correctly marks student answer 15 as 1/1');
+
+// 8y. Image Solver: Unparsed image guard returns 0 marks with clear failure notice
+const solverUnparsedImage = await solveQuestionWithGemini({
+  imageBase64: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+  studentWorking: 'x = 3',
+  subjectName: 'Mathematics (0580)',
+  examBoard: 'Cambridge CIE',
+  gradeLevel: 'IGCSE'
+});
+assertContent(solverUnparsedImage.totalMarks === 0, 'Unparsed image without readable question awards 0 total marks', `Got ${solverUnparsedImage.totalMarks}`);
+assertContent(solverUnparsedImage.studentWorkingEvaluation?.marksEarned === 0, 'Unparsed image awards 0 marks earned', `Got ${solverUnparsedImage.studentWorkingEvaluation?.marksEarned}`);
+assertContent(solverUnparsedImage.questionText.toLowerCase().includes('parsing incomplete') || (solverUnparsedImage.fullStepByStepSolution?.toLowerCase() || '').includes('clearer photo'), 'Unparsed image alerts student to provide clearer photo or type question manually');
+
+// 8z. Image Solver: SVG rectangle image without typed prompt resolves 15 cm^2
+const svgRectangle = 'data:image/svg+xml;base64,' + Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"><text>Rectangle 5 cm by 3 cm. Calculate area. [1 mark]</text></svg>').toString('base64');
+const solverSvgRect = await solveQuestionWithGemini({
+  imageBase64: svgRectangle,
+  studentWorking: '15 cm^2',
+  subjectName: 'Mathematics (0580)',
+  examBoard: 'Cambridge CIE',
+  gradeLevel: 'IGCSE'
+});
+assertContent(solverSvgRect.totalMarks === 1, 'SVG rectangle question resolves 1 total mark from image text', `Got ${solverSvgRect.totalMarks}`);
+assertContent(solverSvgRect.studentWorkingEvaluation?.marksEarned === 1, 'SVG rectangle image awards 1 mark for 15 cm^2', `Got ${solverSvgRect.studentWorkingEvaluation?.marksEarned}`);
+assertContent(solverSvgRect.finalAnswer.includes('15') && solverSvgRect.finalAnswer.includes('cm'), 'SVG rectangle image final answer contains 15 cm²', `Got ${solverSvgRect.finalAnswer}`);
+
 const audioSp26 = createValidMp3Buffer(120, '0510_sp26_audio_22');
 const audioS17 = createValidMp3Buffer(120, '0510_s17_audio_42');
 const audioW10 = createValidMp3Buffer(120, '0510_w10_audio_41');
@@ -474,14 +512,20 @@ assertContent(!('0510_w10_ms_42.pdf' in LOCAL_VERIFIED_PDFS), 'LOCAL_VERIFIED_PD
 assertContent(!('0510_s10_ms_13.pdf' in LOCAL_VERIFIED_PDFS), 'LOCAL_VERIFIED_PDFS does not contain fake alias for 0510_s10_ms_13.pdf');
 assertContent(!('0510_s10_ms_33.pdf' in LOCAL_VERIFIED_PDFS), 'LOCAL_VERIFIED_PDFS does not contain fake alias for 0510_s10_ms_33.pdf');
 
-// Verify non-administered papers are preserved in OFFICIAL_PAST_PAPER_PDFS with explicit isUnavailable flag
+// Verify authentic partially published papers are accurately catalogued with genuine PDFs and non-published notices
 const nonAdministeredS16 = OFFICIAL_PAST_PAPER_PDFS.find(p => p.paperCode === '0510/12' && p.year === 2016 && p.session.includes('May/June'));
 assertContent(nonAdministeredS16 !== undefined, 'Restored paper 0510/12 May/June 2016 exists in past paper archive');
-assertContent(nonAdministeredS16?.isUnavailable === true, '0510/12 May/June 2016 is designated with isUnavailable: true');
+assertContent(nonAdministeredS16?.isUnavailable === false, '0510/12 May/June 2016 is not marked totally unavailable since MS exists');
+assertContent(nonAdministeredS16?.msPdfUrl?.includes('0510_s16_ms_12.pdf') === true, '0510/12 May/June 2016 points to authentic Mark Scheme 12');
+assertContent(nonAdministeredS16?.qpPdfUrl === '', '0510/12 May/June 2016 does not link unadministered QP');
+assertContent(nonAdministeredS16?.qpUnavailableReason?.includes('not published') === true, '0510/12 May/June 2016 specifies QP was not published');
 
 const nonAdministeredW10 = OFFICIAL_PAST_PAPER_PDFS.find(p => p.paperCode === '0510/42' && p.year === 2010 && p.session.includes('Oct/Nov'));
 assertContent(nonAdministeredW10 !== undefined, 'Restored paper 0510/42 Oct/Nov 2010 exists in past paper archive');
-assertContent(nonAdministeredW10?.isUnavailable === true, '0510/42 Oct/Nov 2010 is designated with isUnavailable: true');
+assertContent(nonAdministeredW10?.isUnavailable === false, '0510/42 Oct/Nov 2010 is not marked totally unavailable since QP exists');
+assertContent(nonAdministeredW10?.qpPdfUrl?.includes('0510_w10_qp_42.pdf') === true, '0510/42 Oct/Nov 2010 points to authentic Question Paper 42');
+assertContent(nonAdministeredW10?.msPdfUrl === '', '0510/42 Oct/Nov 2010 does not link unadministered MS');
+assertContent(nonAdministeredW10?.msUnavailableReason?.includes('not published') === true, '0510/42 Oct/Nov 2010 specifies MS was not published');
 
 // TEST SUITE 12: PAPER NUMBER FILTER ACCURACY & MULTI-COMPONENT ISOLATION
 console.log('\n--- 12. Paper Number Filter Accuracy & Multi-Component Isolation ---');

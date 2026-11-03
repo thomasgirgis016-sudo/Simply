@@ -1439,13 +1439,13 @@ export const AUTHENTIC_PAST_PAPER_CLASSIFIED_QUESTIONS: ClassifiedQuestion[] = [
     subParts: [
       {
         part: '(a)',
-        prompt: 'State two features visible on all amphibians that distinguish them from reptiles.',
+        prompt: 'State two distinctive biological characteristics of amphibians that distinguish them from reptiles.',
         marks: 2,
         markScheme: [
-          { markType: '[B1]', requirement: 'Moist skin without scales' },
-          { markType: '[B1]', requirement: 'Lay soft jelly-covered eggs in water (amphibians) vs dry scaly skin and leathery eggs on land (reptiles)' }
+          { markType: '[B1]', requirement: 'Moist permeable skin without scales (accept: absence of claws on digits / webbed feet)' },
+          { markType: '[B1]', requirement: 'Lay soft jelly-covered eggs in water / aquatic larval stage with gills (vs shelled leathery eggs on land in reptiles)' }
         ],
-        finalAnswer: 'Moist scale-less skin; jelly-covered eggs laid in water.'
+        finalAnswer: 'Moist permeable skin without scales; soft jelly-covered eggs laid in water (or lack of claws on digits).'
       },
       {
         part: '(b)',
@@ -2336,15 +2336,22 @@ export const AUTHENTIC_PAST_PAPER_CLASSIFIED_QUESTIONS: ClassifiedQuestion[] = [
     chapterId: '0510-01',
     subjectCode: '0510',
     subjectName: 'English as a Second Language',
-    source: '0510/22/M/J/23 Q1',
+    source: '0510/22/M/J/23 Q1 (Pre-2024 Component 22: Reading & Writing Extended)',
     year: 2023,
     season: 'May/June',
-    paperComponent: 'Paper 2 (Reading & Writing)',
+    paperComponent: 'Paper 2 (Pre-2024 Syllabus: Reading & Writing Extended)',
     tier: 'Both',
     topic: 'Exercise 1 — Short-Answer Information Transfer',
     subtopic: 'Factual Comprehension & Extraction',
     questionNumber: '1',
-    prompt: 'Read the article about a marine conservation station in the Azores archipelago.',
+    prompt: `Read the following article about a marine conservation station in the Azores archipelago, and then answer the questions that follow:
+
+**Guardians of the Deep: The Azores Marine Observation Station**
+Perched on the rugged volcanic cliffs of São Miguel Island in the Portuguese archipelago of the Azores, the Ponta Delgada Marine Observation Post first opened its doors to international researchers and conservationists in 2008. Situated along a major North Atlantic migratory corridor, the post provides an unparalleled vantage point for monitoring marine biodiversity.
+
+During the seasonal migrations, over twenty distinct cetacean species traverse these nutrient-rich oceanic trenches. While blue whales and fin whales pass through in early spring, marine biologists record that the sperm whale (*Physeter macrocephalus*) is spotted most frequently in early summer, feeding on giant squid in the abyssal depths just six miles off the coast.
+
+Each summer, a cohort of international student volunteers is recruited to maintain a round-the-clock visual watch from the cliff-top watchtower. To facilitate accurate and standardized scientific record-keeping under harsh Atlantic weather conditions, all volunteer observers are provided with waterproof binoculars and digital GPS logging tablets upon arrival at the research facility.`,
     subParts: [
       {
         part: '(a)',

@@ -232,6 +232,7 @@ export interface SolverResult {
   examinerTips?: string[];
   commonMistakes?: string[];
   relatedTopic?: string;
+  fullStepByStepSolution?: string;
   studentWorkingEvaluation?: {
     hasEvaluatedMath: boolean;
     totalLinesChecked: number;
@@ -364,6 +365,8 @@ export interface OfficialPaperPdf {
   isPortal?: boolean; // When true, links directly to official board qualification/materials portal
   isUnavailable?: boolean; // When true, indicates variant was never administered or released
   unavailableReason?: string;
+  qpUnavailableReason?: string;
+  msUnavailableReason?: string;
 }
 
 // 3. Syllabus Interactive Specification Checklist Types

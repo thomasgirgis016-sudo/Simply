@@ -1706,6 +1706,14 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                             </span>
                           </div>
                         )}
+                        {(pdf.qpUnavailableReason || pdf.msUnavailableReason) && !pdf.isUnavailable && (
+                          <div className="mt-2.5 flex items-start gap-1.5 rounded-lg bg-amber-950/40 border border-amber-500/30 p-2 text-[11px] text-amber-200/90 leading-snug">
+                            <Info className="h-3.5 w-3.5 text-amber-400 shrink-0 mt-0.5" />
+                            <span>
+                              <strong>Examination Series Record:</strong> {pdf.qpUnavailableReason ? `${pdf.qpUnavailableReason}. ` : ''}{pdf.msUnavailableReason ? `${pdf.msUnavailableReason}.` : ''}
+                            </span>
+                          </div>
+                        )}
                         {Boolean(pdf.isPortal) && !pdf.isUnavailable && (
                           <div className="mt-2.5 flex items-start gap-1.5 rounded-lg bg-amber-950/40 border border-amber-500/30 p-2 text-[11px] text-amber-200/90 leading-snug">
                             <Info className="h-3.5 w-3.5 text-amber-400 shrink-0 mt-0.5" />
@@ -1769,76 +1777,82 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                             <FileText className="h-4 w-4 text-sky-400 shrink-0" />
                             <span>Question Paper (QP)</span>
                           </div>
-                          <div className="flex items-center gap-1.5">
-                            {Boolean(pdf.isPortal) ? (
-                              <span className="text-[11px] text-amber-300/80 font-medium px-1">External Board Resource</span>
-                            ) : (
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleOpenPdf(
-                                    pdf.qpPdfUrl,
-                                    `${pdf.paperCode} Question Paper`,
-                                    `${pdf.subjectName} • ${pdf.session}`,
-                                    pdf.backupQpUrl,
-                                    'qp',
-                                    pdf.board,
-                                    pdf.paperCode,
-                                    isListeningPaper && audioUrls ? {
-                                      hasAudio: true,
-                                      audioStreamUrl: audioUrls.streamUrl,
-                                      audioDownloadUrl: audioUrls.downloadUrl
-                                    } : undefined
-                                  )
-                                }
-                                className="inline-flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-800 px-2 py-1 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition cursor-pointer"
-                                title="Preview in-app viewer"
-                              >
-                                <Eye className="h-3.5 w-3.5 text-sky-400" />
-                                <span className="hidden sm:inline">View</span>
-                              </button>
-                            )}
-                            {(() => {
-                              const isPortalPaper = Boolean(pdf.isPortal) ||
-                                (!pdf.qpPdfUrl.endsWith('.pdf') && !pdf.qpPdfUrl.includes('.pdf?')) ||
-                                pdf.qpPdfUrl.includes('qualifications.pearson.com') ||
-                                pdf.qpPdfUrl.includes('oxfordaqa.com');
-                              const portalHubLabel = pdf.board === 'Edexcel' ? 'Pearson Hub' : pdf.board === 'OxfordAQA' ? 'Oxford Hub' : 'Board Hub';
-                              return (
-                                <>
-                                  <a
-                                    href={isPortalPaper ? pdf.qpPdfUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.qpPdfUrl)}${pdf.backupQpUrl ? `&fallback=${encodeURIComponent(pdf.backupQpUrl)}` : ''}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1 rounded-lg border border-sky-500/40 bg-sky-500/10 px-2 py-1 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition"
-                                    title={isPortalPaper ? `Open official ${pdf.board} qualification materials hub` : "Open PDF directly in verified viewer"}
-                                  >
-                                    <ExternalLink className="h-3.5 w-3.5" />
-                                    <span className="hidden sm:inline">{isPortalPaper ? portalHubLabel : 'Open'}</span>
-                                  </a>
-                                  <a
-                                    href={isPortalPaper && pdf.backupQpUrl ? pdf.backupQpUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.qpPdfUrl)}${pdf.backupQpUrl ? `&fallback=${encodeURIComponent(pdf.backupQpUrl)}` : ''}&download=true`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1 rounded-lg bg-sky-600 px-2.5 py-1 text-xs font-bold text-white hover:bg-sky-500 transition shadow-sm"
-                                    title={isPortalPaper ? `Search verified archive pack for ${pdf.paperCode}` : "Download official Question Paper PDF"}
-                                  >
-                                    <Download className="h-3.5 w-3.5" />
-                                    <span>{isPortalPaper ? 'Search Archive' : 'Download'}</span>
-                                  </a>
-                                </>
-                              );
-                            })()}
-                          </div>
+                          {pdf.qpPdfUrl ? (
+                            <div className="flex items-center gap-1.5">
+                              {Boolean(pdf.isPortal) ? (
+                                <span className="text-[11px] text-amber-300/80 font-medium px-1">External Board Resource</span>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    handleOpenPdf(
+                                      pdf.qpPdfUrl,
+                                      `${pdf.paperCode} Question Paper`,
+                                      `${pdf.subjectName} • ${pdf.session}`,
+                                      pdf.backupQpUrl,
+                                      'qp',
+                                      pdf.board,
+                                      pdf.paperCode,
+                                      isListeningPaper && audioUrls ? {
+                                        hasAudio: true,
+                                        audioStreamUrl: audioUrls.streamUrl,
+                                        audioDownloadUrl: audioUrls.downloadUrl
+                                      } : undefined
+                                    )
+                                  }
+                                  className="inline-flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-800 px-2 py-1 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition cursor-pointer"
+                                  title="Preview in-app viewer"
+                                >
+                                  <Eye className="h-3.5 w-3.5 text-sky-400" />
+                                  <span className="hidden sm:inline">View</span>
+                                </button>
+                              )}
+                              {(() => {
+                                const isPortalPaper = Boolean(pdf.isPortal) ||
+                                  (!pdf.qpPdfUrl.endsWith('.pdf') && !pdf.qpPdfUrl.includes('.pdf?')) ||
+                                  pdf.qpPdfUrl.includes('qualifications.pearson.com') ||
+                                  pdf.qpPdfUrl.includes('oxfordaqa.com');
+                                const portalHubLabel = pdf.board === 'Edexcel' ? 'Pearson Hub' : pdf.board === 'OxfordAQA' ? 'Oxford Hub' : 'Board Hub';
+                                return (
+                                  <>
+                                    <a
+                                      href={isPortalPaper ? pdf.qpPdfUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.qpPdfUrl)}${pdf.backupQpUrl ? `&fallback=${encodeURIComponent(pdf.backupQpUrl)}` : ''}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-1 rounded-lg border border-sky-500/40 bg-sky-500/10 px-2 py-1 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition"
+                                      title={isPortalPaper ? `Open official ${pdf.board} qualification materials hub` : "Open PDF directly in verified viewer"}
+                                    >
+                                      <ExternalLink className="h-3.5 w-3.5" />
+                                      <span className="hidden sm:inline">{isPortalPaper ? portalHubLabel : 'Open'}</span>
+                                    </a>
+                                    <a
+                                      href={isPortalPaper && pdf.backupQpUrl ? pdf.backupQpUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.qpPdfUrl)}${pdf.backupQpUrl ? `&fallback=${encodeURIComponent(pdf.backupQpUrl)}` : ''}&download=true`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-1 rounded-lg bg-sky-600 px-2.5 py-1 text-xs font-bold text-white hover:bg-sky-500 transition shadow-sm"
+                                      title={isPortalPaper ? `Search verified archive pack for ${pdf.paperCode}` : "Download official Question Paper PDF"}
+                                    >
+                                      <Download className="h-3.5 w-3.5" />
+                                      <span>{isPortalPaper ? 'Search Archive' : 'Download'}</span>
+                                    </a>
+                                  </>
+                                );
+                              })()}
+                            </div>
+                          ) : (
+                            <span className="text-[11px] text-amber-300/90 font-medium px-2 py-0.5 rounded bg-amber-950/40 border border-amber-500/30">
+                              {pdf.qpUnavailableReason || 'QP Not Published'}
+                            </span>
+                          )}
                         </div>
 
                         {/* Mark Scheme Row */}
-                        {pdf.msPdfUrl && (
-                          <div className="flex items-center justify-between gap-2 bg-emerald-950/20 rounded-xl p-2.5 border border-emerald-500/20">
-                            <div className="flex items-center gap-2 text-xs font-bold text-emerald-300">
-                              <CheckCircle className="h-4 w-4 text-emerald-400 shrink-0" />
-                              <span>Mark Scheme (MS)</span>
-                            </div>
+                        <div className={`flex items-center justify-between gap-2 rounded-xl p-2.5 border ${pdf.msPdfUrl ? 'bg-emerald-950/20 border-emerald-500/20' : 'bg-slate-950/60 border-slate-800'}`}>
+                          <div className={`flex items-center gap-2 text-xs font-bold ${pdf.msPdfUrl ? 'text-emerald-300' : 'text-slate-400'}`}>
+                            <CheckCircle className={`h-4 w-4 shrink-0 ${pdf.msPdfUrl ? 'text-emerald-400' : 'text-slate-500'}`} />
+                            <span>Mark Scheme (MS)</span>
+                          </div>
+                          {pdf.msPdfUrl ? (
                             <div className="flex items-center gap-1.5">
                               {Boolean(pdf.isPortal) ? (
                                 <span className="text-[11px] text-amber-300/80 font-medium px-1">External Board Resource</span>
@@ -1895,8 +1909,12 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                 );
                               })()}
                             </div>
-                          </div>
-                        )}
+                          ) : (
+                            <span className="text-[11px] text-amber-300/90 font-medium px-2 py-0.5 rounded bg-amber-950/40 border border-amber-500/30">
+                              {pdf.msUnavailableReason || 'MS Not Published'}
+                            </span>
+                          )}
+                        </div>
 
                         {/* Extra Session Materials: Examiner Report & Grade Thresholds */}
                         {(pdf.examinerReportUrl || pdf.gradeThresholdsUrl) && (

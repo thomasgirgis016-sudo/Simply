@@ -1801,10 +1801,11 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
             // 1. In June 2010, Cambridge 0510 only administered Variants 1 and 2 (no Variant 3 existed)
             if (sub.code === '0510' && yr === 2010 && series.code === 's' && v === 3) continue;
 
-            // 2. May/June 2016 0510/12 and Oct/Nov 2010 0510/42 were never administered by Cambridge
-            const isUnavailableVariant =
-              (sub.code === '0510' && yr === 2016 && series.code === 's' && p.paperNumber === 1 && v === 2) ||
-              (sub.code === '0510' && yr === 2010 && series.code === 'w' && p.paperNumber === 4 && v === 2);
+            // Historical examination variant availability:
+            // - May/June 2016 0510/12: Question paper was not published; authentic Mark Scheme 0510_s16_ms_12.pdf exists.
+            // - Oct/Nov 2010 0510/42: Authentic Question paper 0510_w10_qp_42.pdf exists; Mark Scheme was not published.
+            const isS16P12 = sub.code === '0510' && yr === 2016 && series.code === 's' && p.paperNumber === 1 && v === 2;
+            const isW10P42 = sub.code === '0510' && yr === 2010 && series.code === 'w' && p.paperNumber === 4 && v === 2;
 
             const compCode = `${p.paperNumber}${v}`;
             const paperCode = `${sub.code}/${compCode}`;
@@ -1813,17 +1814,30 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
             const erFilename = `${sub.code}_${series.code}${yy}_er.pdf`;
             const gtFilename = `${sub.code}_${series.code}${yy}_gt.pdf`;
 
-            const qpUrl = isUnavailableVariant ? '' : (LOCAL_VERIFIED_PDFS[qpFilename] ||
-              `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${qpFilename}`);
-            const backupQp = isUnavailableVariant ? '' : `https://bestexamhelp.com/exam/cambridge-igcse/${sub.slug}/${yr}/${qpFilename}`;
+            let qpUrl = LOCAL_VERIFIED_PDFS[qpFilename] ||
+              `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${qpFilename}`;
+            let backupQp = `https://bestexamhelp.com/exam/cambridge-igcse/${sub.slug}/${yr}/${qpFilename}`;
 
-            const msUrl = isUnavailableVariant ? '' : (LOCAL_VERIFIED_PDFS[msFilename] ||
-              `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${msFilename}`);
-            const backupMs = isUnavailableVariant ? '' : `https://bestexamhelp.com/exam/cambridge-igcse/${sub.slug}/${yr}/${msFilename}`;
+            let msUrl = LOCAL_VERIFIED_PDFS[msFilename] ||
+              `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${msFilename}`;
+            let backupMs = `https://bestexamhelp.com/exam/cambridge-igcse/${sub.slug}/${yr}/${msFilename}`;
 
-            const erUrl = isUnavailableVariant ? '' : (LOCAL_VERIFIED_PDFS[erFilename] ||
-              `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${erFilename}`);
-            const gtUrl = isUnavailableVariant ? '' : `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${gtFilename}`;
+            let qpUnavailableReason: string | undefined;
+            let msUnavailableReason: string | undefined;
+
+            if (isS16P12) {
+              qpUrl = '';
+              backupQp = '';
+              qpUnavailableReason = 'Question paper 12 was not published for this series; official Mark Scheme is available.';
+            } else if (isW10P42) {
+              msUrl = '';
+              backupMs = '';
+              msUnavailableReason = 'Mark scheme 42 was not published for this series; official Question Paper is available.';
+            }
+
+            const erUrl = LOCAL_VERIFIED_PDFS[erFilename] ||
+              `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${erFilename}`;
+            const gtUrl = `https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/${gtFilename}`;
 
             // Syllabus-accurate paper component titles
             let paperTitle = p.title;
@@ -1855,15 +1869,16 @@ function generateOfficialPastPapers(): OfficialPaperPdf[] {
               paperComponent: `${paperTitle} (Variant ${v})`,
               paperCode,
               tier: sub.code === '0510' && yr >= 2024 ? 'General' : p.tier,
-              isUnavailable: isUnavailableVariant,
-              unavailableReason: isUnavailableVariant ? 'This variant was not administered or published by Cambridge for this examination series.' : undefined,
+              isUnavailable: false,
+              qpUnavailableReason,
+              msUnavailableReason,
               qpPdfUrl: qpUrl,
               backupQpUrl: backupQp,
               msPdfUrl: msUrl,
               backupMsUrl: backupMs,
               examinerReportUrl: erUrl,
               gradeThresholdsUrl: gtUrl,
-              fileSizeBytes: isUnavailableVariant ? 'Not Administered' : 'Official PDF'
+              fileSizeBytes: 'Official PDF'
             });
           }
         }

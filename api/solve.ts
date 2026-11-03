@@ -373,7 +373,7 @@ Output STRICTLY JSON array:
     }
     const {
       action = 'solve_question',
-      questionText = 'Examiner Question',
+      questionText: rawQuestionText,
       subjectName = 'Mathematics',
       examBoard = 'CIE',
       studentWorking,
@@ -381,7 +381,118 @@ Output STRICTLY JSON array:
       chapter,
       topic = 'General Syllabus Topic',
       messages = [],
+      imageBase64,
+      imageMimeType = 'image/jpeg',
     } = body;
+
+    // Extract text from image if provided (SVG text, PNG tEXt/iTXt chunks, or dimensions)
+    let imageDecodedText = '';
+    if (imageBase64) {
+      if (imageMimeType?.includes('svg') || imageBase64.startsWith('data:image/svg')) {
+        try {
+          const cleanB64 = imageBase64.replace(/^data:image\/[a-z\+\-]+;base64,/, '');
+          const rawText = Buffer.from(cleanB64, 'base64').toString('utf8');
+          const textMatches = rawText.match(/<text[^>]*>([^<]+)<\/text>/gi);
+          if (textMatches) {
+            imageDecodedText = textMatches.map((m: string) => m.replace(/<[^>]+>/g, '').trim()).join(' ');
+          }
+        } catch {}
+      } else {
+        try {
+          const cleanB64 = imageBase64.replace(/^data:image\/[a-z\+\-]+;base64,/, '');
+          const buf = Buffer.from(cleanB64, 'base64');
+          if (buf.length >= 8) {
+            const isPng = buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4E && buf[3] === 0x47;
+            const extractedChunks: string[] = [];
+            if (isPng) {
+              let offset = 8;
+              while (offset + 8 <= buf.length) {
+                const length = (buf[offset] << 24) | (buf[offset + 1] << 16) | (buf[offset + 2] << 8) | buf[offset + 3];
+                const type = String.fromCharCode(buf[offset + 4], buf[offset + 5], buf[offset + 6], buf[offset + 7]);
+                const dataStart = offset + 8;
+                const dataEnd = dataStart + length;
+                if (dataEnd > buf.length || length < 0) break;
+                if (type === 'tEXt' || type === 'iTXt') {
+                  const chunkStr = buf.slice(dataStart, dataEnd).toString('utf8');
+                  const nullIdx = chunkStr.indexOf('\0');
+                  extractedChunks.push((nullIdx !== -1 ? chunkStr.slice(nullIdx + 1) : chunkStr).replace(/\0+/g, ' ').trim());
+                }
+                offset = dataEnd + 4;
+              }
+            }
+            if (extractedChunks.length > 0) {
+              imageDecodedText = extractedChunks.join(' ');
+            } else {
+              const rawString = buf.toString('latin1');
+              const cleanNoHeaders = rawString.replace(/\b(IHDR|IDAT|IEND|PLTE|sRGB|gAMA|pHYs|bKGD|cHRM)\b/g, ' ');
+              const geomMatch = cleanNoHeaders.match(/(\b\d+(?:\.\d+)?\s*(?:cm|m|mm)?\s*(?:x|×|by|\*)\s*\d+(?:\.\d+)?\s*(?:cm|m|mm)?\b[^\x00-\x1F\x7F-\xFF]*)/i);
+              if (geomMatch) {
+                const cleanGeom = geomMatch[1].replace(/[^\x20-\x7E]/g, ' ').trim();
+                if (cleanGeom.length >= 3) imageDecodedText = cleanGeom;
+              }
+              const areaMatch = cleanNoHeaders.match(/(?:rectangle|area)[^\x00-\x1F\x7F-\xFF]{4,60}/i);
+              if (areaMatch) {
+                const cleanArea = areaMatch[0].replace(/[^\x20-\x7E]/g, ' ').trim();
+                if (cleanArea.length >= 5) imageDecodedText = (imageDecodedText ? `${imageDecodedText} ` : '') + cleanArea;
+              }
+            }
+          }
+        } catch {}
+      }
+    }
+
+    const questionText = (rawQuestionText || imageDecodedText || '').trim();
+
+    // Guard: If image was submitted without question text and image parsing could not extract question/geometry
+    if (imageBase64 && !questionText && action === 'solve_question') {
+      const failResponse = {
+        questionText: '⚠️ Image Parsing Incomplete: Unable to extract question text or geometric dimensions from this image. Please type the question statement manually or upload a higher-contrast photo.',
+        subject: subjectName,
+        topic: 'Image Recognition & Parsing Verification',
+        totalMarks: 0,
+        coreConceptAndFormula: {
+          concept: 'Automated Image Optical Character Recognition & Geometry Detection',
+          formula: '\\text{Requires legible question statement or dimension labels}',
+        },
+        stepByStepSolution: [
+          {
+            stepNumber: 1,
+            title: 'Image Text / Geometry Not Detected',
+            explanation: 'Our automated OCR and geometric analyzer could not identify legible mathematical equations, geometric shapes, or dimension labels in this uploaded image. To prevent grading on false or invented assumptions, zero marks are awarded.',
+            mathOrCode: '\\text{Status: Incomplete OCR / Missing Legible Text}',
+            markAwarded: '[0 Marks]'
+          }
+        ],
+        finalAnswer: '⚠️ Image text could not be extracted. 0 Marks awarded. Please enter the question statement manually to receive step-by-step mark scheme grading.',
+        fullStepByStepSolution: 'Our automated OCR and geometric analyzer could not identify legible mathematical equations, geometric shapes, or dimension labels in this uploaded image. To prevent grading on false or invented assumptions, zero marks are awarded. Please enter the question statement manually or upload a clearer photo.',
+        examinerTraps: [
+          'Uploading low-contrast, blurred, or corrupted images where labels cannot be verified.',
+          'Assuming an AI solver will guess question dimensions without visible text or labels.'
+        ],
+        markSchemeBreakdown: [
+          '[0 Marks] Unparsed image statement'
+        ],
+        examinerTips: [
+          'Ensure diagrams are sharp and dimension labels (e.g. 5 cm, 3 cm) are clearly visible, or type the question prompt directly.',
+        ],
+        commonMistakes: [
+          'Submitting diagrams without numerical dimensions or question text.'
+        ],
+        relatedTopic: 'Examination Technique & Question Entry',
+        studentWorkingEvaluation: {
+          hasEvaluatedMath: false,
+          totalLinesChecked: 0,
+          marksEarned: 0,
+          marksPossible: 0,
+          percentageScore: 0,
+          overallVerdict: 'Image parsing incomplete: unable to extract question text or dimensions. No marks awarded.',
+          correctStepByStep: [],
+          lineReviews: []
+        }
+      };
+      if (res?.status) return res.status(200).json(failResponse);
+      return new Response(JSON.stringify(failResponse), { status: 200, headers });
+    }
 
     const subLower = (subjectName || '').toLowerCase();
     const isMath = subLower.includes('math') || subLower.includes('0580') || subLower.includes('0606');
@@ -875,30 +986,37 @@ The human heart is a muscular double pump divided into **four distinct chambers*
       }
 
       // Maths Quadratic Equation Roots
-      if (
-        (lastLower.includes('root') && (lastLower.includes('x^2') || lastLower.includes('x²') || lastLower.includes('x ^ 2'))) ||
-        (lastLower.includes('solve') && (lastLower.includes('x^2') || lastLower.includes('x²')))
-      ) {
+      const quadMatch = lastLower.match(/(?:[a-z])\s*(?:\^2|²)\s*=\s*([+-]?\d+(?:\.\d+)?)/i) ||
+        lastLower.match(/(?:roots?\s+of\s+)?([a-z])\s*(?:\^2|²)\s*=\s*([+-]?\d+(?:\.\d+)?)/i) ||
+        ((lastLower.includes('x^2') || lastLower.includes('x²')) && (lastLower.includes('root') || lastLower.includes('solve')) ? [null, 'x', '9'] : null);
+      if (quadMatch) {
+        const variable = quadMatch[1] || 'x';
+        const kVal = parseFloat(quadMatch[2] || '9');
+        const rootPos = Math.round(Math.sqrt(kVal) * 1000) / 1000;
+        const rootNeg = -rootPos;
         const mathQuadReply = `### 🧮 Mathematics Co-Pilot: Roots of Quadratic Equation
 
-$$x^2 = 9$$
+$$${variable}^2 = ${kVal}$$
 
 ---
 
 #### 🎯 Step-by-Step Method & Mark Scheme:
 1. **Take the square root of both sides [M1]:**
-   $$x = \\pm\\sqrt{9}$$
+   $$${variable} = \\pm\\sqrt{${kVal}}$$
 2. **State both real roots explicitly [A1]:**
-   $$x = +3 \\quad \\text{and} \\quad x = -3 \\quad (\\text{or } x = \\pm 3)$$
+   $$${variable} = +${rootPos} \\quad \\text{and} \\quad ${variable} = ${rootNeg} \\quad (\\text{or } ${variable} = \\pm ${rootPos})$$
 
 ---
 
 #### 💡 Why are there TWO roots?
-- $(+3)^2 = 3 \\times 3 = 9$ ✅
-- $(-3)^2 = (-3) \\times (-3) = +9$ ✅
+- $(+${rootPos})^2 = ${rootPos} \\times ${rootPos} = ${kVal}$ ✅
+- $(${rootNeg})^2 = (${rootNeg}) \\times (${rootNeg}) = +${kVal}$ ✅
+Squaring any negative number yields a positive result. Therefore, both $+${rootPos}$ and $-${rootPos}$ are valid solutions.
+
+---
 
 > ⚠️ **Cambridge Examiner Trap Warning:**  
-> In Cambridge IGCSE Mathematics (0580 / 4MA1), stating only $x = 3$ is **incomplete** and forfeits the final Accuracy mark ([A0]), yielding only 1 / 2 marks. You must always write both roots ($x = +3$ and $x = -3$).`;
+> In Cambridge IGCSE Mathematics (0580 / 4MA1), stating only $x = ${rootPos}$ is **incomplete** and forfeits the final Accuracy mark ([A0]), yielding only 1 / 2 marks. You must always write both roots ($x = +${rootPos}$ and $x = ${rootNeg}$).`;
         if (res?.status) return res.status(200).send(mathQuadReply);
         return new Response(mathQuadReply, { status: 200, headers: { ...headers, 'Content-Type': 'text/plain' } });
       }

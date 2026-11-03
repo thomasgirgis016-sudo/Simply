@@ -55,6 +55,32 @@ export const SUBJECT_PAPER_SPECIFICATIONS: Record<string, SubjectCurriculumStruc
         description: '40 marks • ~50 mins • 4 recorded audio exercises testing short dialogues, interviews, note completion, and speaker attitudes. Full official audio tracks included.'
       },
       {
+        paperNumber: 3,
+        codeSuffix: '03',
+        name: 'Listening Core',
+        title: 'Paper 3: Listening Core (Pre-2024 Series)',
+        marks: 30,
+        duration: '~40 minutes',
+        tier: 'Core',
+        weightPercent: 30,
+        isListening: true,
+        hasAudio: true,
+        description: 'Listening examination for Core tier candidates in pre-2024 Cambridge series.'
+      },
+      {
+        paperNumber: 4,
+        codeSuffix: '04',
+        name: 'Listening Extended',
+        title: 'Paper 4: Listening Extended (Pre-2024 Series)',
+        marks: 40,
+        duration: '~50 minutes',
+        tier: 'Extended',
+        weightPercent: 30,
+        isListening: true,
+        hasAudio: true,
+        description: 'Listening examination for Extended tier candidates in pre-2024 Cambridge series.'
+      },
+      {
         paperNumber: 'Component 3',
         codeSuffix: '03',
         name: 'Speaking Endorsement',
