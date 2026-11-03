@@ -986,7 +986,7 @@ The human heart is a muscular double pump divided into **four distinct chambers*
       }
 
       // Maths Quadratic Equation Roots
-      const quadMatch = lastLower.match(/(?:[a-z])\s*(?:\^2|²)\s*=\s*([+-]?\d+(?:\.\d+)?)/i) ||
+      const quadMatch = lastLower.match(/(?:^|[^\w\.])([a-z])\s*(?:\^2|²)\s*=\s*([+-]?\d+(?:\.\d+)?)/i) ||
         lastLower.match(/(?:roots?\s+of\s+)?([a-z])\s*(?:\^2|²)\s*=\s*([+-]?\d+(?:\.\d+)?)/i) ||
         ((lastLower.includes('x^2') || lastLower.includes('x²')) && (lastLower.includes('root') || lastLower.includes('solve')) ? [null, 'x', '9'] : null);
       if (quadMatch) {
