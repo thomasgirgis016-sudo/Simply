@@ -1442,7 +1442,7 @@ export const AUTHENTIC_PAST_PAPER_CLASSIFIED_QUESTIONS: ClassifiedQuestion[] = [
         prompt: 'State two distinctive biological characteristics of amphibians that distinguish them from reptiles.',
         marks: 2,
         markScheme: [
-          { markType: '[B1]', requirement: 'Moist permeable skin without scales (accept: absence of claws on digits / webbed feet)' },
+          { markType: '[B1]', requirement: 'Moist permeable skin without scales (accept: lack of claws on digits)' },
           { markType: '[B1]', requirement: 'Lay soft jelly-covered eggs in water / aquatic larval stage with gills (vs shelled leathery eggs on land in reptiles)' }
         ],
         finalAnswer: 'Moist permeable skin without scales; soft jelly-covered eggs laid in water (or lack of claws on digits).'
@@ -2336,7 +2336,7 @@ export const AUTHENTIC_PAST_PAPER_CLASSIFIED_QUESTIONS: ClassifiedQuestion[] = [
     chapterId: '0510-01',
     subjectCode: '0510',
     subjectName: 'English as a Second Language',
-    source: '0510/22/M/J/23 Q1 (Pre-2024 Component 22: Reading & Writing Extended)',
+    source: 'Cambridge IGCSE ESL Model Assessment (Pre-2024 Reading & Writing Specification)',
     year: 2023,
     season: 'May/June',
     paperComponent: 'Paper 2 (Pre-2024 Syllabus: Reading & Writing Extended)',

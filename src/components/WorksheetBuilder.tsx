@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import {
   FileText,
   Printer,
@@ -33,6 +33,10 @@ export const WorksheetBuilder: React.FC<WorksheetBuilderProps> = ({
   const [targetMarks, setTargetMarks] = useState<number>(25);
   const [activeView, setActiveView] = useState<'student-qp' | 'teacher-ms'>('student-qp');
 
+  useEffect(() => {
+    setWorksheetTitle(`${subject.name} Unit Revision & Mastery Test`);
+  }, [subject.id, subject.name]);
+
   const subjectPapers = useMemo(() => {
     const all = getAllPastPapers();
     return all.filter(p => p.subjectId === subject.id || p.subjectId.includes(subject.code));
@@ -60,25 +64,26 @@ export const WorksheetBuilder: React.FC<WorksheetBuilderProps> = ({
 
     if (pool.length === 0) pool = subjectPapers;
 
-    // Available question candidates (allows multiple questions when building large worksheets like 60 or 80 marks)
+    // Unique question candidates (strictly distinct to avoid printing identical duplicate questions)
+    const seenPrompt = new Set<string>();
     const availablePool: PastPaperItem[] = [];
-    const repeatCount = targetMarks > 40 ? 6 : targetMarks > 25 ? 4 : 2;
-    for (let r = 0; r < repeatCount; r++) {
-      for (const q of pool) {
-        availablePool.push({
-          ...q,
-          id: r === 0 ? q.id : `${q.id}-r${r}`
-        });
+
+    // Prioritize selected topics/difficulty pool
+    for (const q of pool) {
+      const cleanKey = q.questionPrompt.trim().substring(0, 80);
+      if (!seenPrompt.has(cleanKey)) {
+        seenPrompt.add(cleanKey);
+        availablePool.push(q);
       }
-      // Also bring in other subject papers if pool is small
-      if (pool.length < 5 && subjectPapers.length > pool.length) {
-        for (const extra of subjectPapers) {
-          if (!pool.some(p => p.id === extra.id)) {
-            availablePool.push({
-              ...extra,
-              id: `${extra.id}-suppl-r${r}`
-            });
-          }
+    }
+
+    // If pool is small and doesn't reach target marks, supplement with other distinct questions from subjectPapers
+    if (subjectPapers.length > availablePool.length) {
+      for (const extra of subjectPapers) {
+        const cleanKey = extra.questionPrompt.trim().substring(0, 80);
+        if (!seenPrompt.has(cleanKey)) {
+          seenPrompt.add(cleanKey);
+          availablePool.push(extra);
         }
       }
     }
@@ -301,7 +306,7 @@ export const WorksheetBuilder: React.FC<WorksheetBuilderProps> = ({
                 {worksheetTitle}
               </h2>
               <div className="text-xs font-bold text-slate-400 print:text-black mt-0.5">
-                {subject.name} ({subject.code}) • {activeView === 'student-qp' ? 'Question Paper' : 'Official Mark Scheme'}
+                {subject.name} ({subject.code}) • {activeView === 'student-qp' ? 'Question Paper' : 'Practice Solution & Mark Scheme'}
               </div>
             </div>
 

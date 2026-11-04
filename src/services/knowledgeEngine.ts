@@ -154,7 +154,14 @@ $$N_2(g) + 3H_2(g) \\rightleftharpoons 2NH_3(g) \\quad (\\Delta H = -92\\text{ k
   }
 
   // 4. Rates of Reaction & Collision Theory
-  if (q.includes('rate') || q.includes('collision theory') || q.includes('catalyst') || q.includes('surface area') || q.includes('activation energy')) {
+  if (
+    !isBioSubject &&
+    !q.includes('alveol') &&
+    !q.includes('lung') &&
+    !q.includes('gas exchange') &&
+    !q.includes('respiratory') &&
+    (q.includes('collision theory') || q.includes('activation energy') || (q.includes('rate') && (q.includes('reaction') || q.includes('reactant') || q.includes('temperature') || isChemSubject)))
+  ) {
     return `### ⏱️ Rates of Reaction & Collision Theory (${examBoard})
 
 The **Rate of Reaction** is the change in concentration of a reactant or product per unit time:
@@ -458,6 +465,41 @@ When a parachutist jumps out of an aircraft:
 - **Plant Cell in Pure Water**: Water enters by osmosis $\\rightarrow$ vacuole swells $\\rightarrow$ cytoplasm pushes against rigid cellulose cell wall $\\rightarrow$ cell becomes **turgid** (wall prevents bursting).
 - **Plant Cell in Concentrated Salt Solution**: Water leaves by osmosis $\\rightarrow$ cytoplasm shrinks away from cell wall $\\rightarrow$ **plasmolysed** (cell is **flaccid**).
 - **Animal Cell (RBC) in Pure Water**: Water enters by osmosis $\\rightarrow$ cell swells and **bursts (lysis)** because it has no cell wall!`;
+    }
+
+    if (q.includes('alveol') || q.includes('gas exchange') || q.includes('lungs') || (q.includes('diffusion') && (q.includes('lung') || q.includes('human') || q.includes('respiratory')))) {
+      return `### 🫁 Gas Exchange in Humans & Alveoli Adaptations (CIE 0610 / 4BI1)
+
+The **alveoli** are tiny, elastic air sacs located at the terminus of bronchioles where gas exchange ($O_2$ into blood, $CO_2$ out of blood) takes place by **diffusion**.
+
+---
+
+#### 1. Key Adaptations of Alveoli for Maximum Rate of Diffusion
+
+| Adaptation | How It Maximizes Rate of Gas Diffusion | Examiner Mark Point |
+| :--- | :--- | :--- |
+| **Vast Surface Area** | Millions of microscopic alveoli collectively create a massive surface-area-to-volume ratio ($>70\\text{ m}^2$). | **[B1]** Greatly increases total area available for simultaneous diffusion. |
+| **Extremely Thin Diffusion Pathway** | The alveolar wall is only **one cell thick** (simple squamous epithelium), and capillary walls are also **one cell thick**. | **[B1]** Minimizes the diffusion distance to $<1\\;\\mu\\text{m}$, allowing rapid diffusion. |
+| **Dense Capillary Network (Rich Blood Supply)** | Every alveolus is enveloped by an extensive mesh of blood capillaries. | **[B1]** Constant blood flow carries oxygen away and brings carbon dioxide, maintaining a **steep concentration gradient**. |
+| **Moist Internal Lining** | A thin film of moisture covers the interior surface of each alveolus. | **[B1]** Allows oxygen to dissolve before diffusing across cell membranes into blood plasma. |
+| **Efficient Lung Ventilation (Breathing)** | Continuous inspiration of oxygen-rich air and expiration of carbon-dioxide-rich air. | **[B1]** Keeps alveolar $O_2$ concentration higher than in capillary blood, maintaining a **steep concentration gradient**. |
+
+---
+
+#### 2. Fick's Law of Diffusion Applied to Gas Exchange
+$$\\text{Rate of Diffusion} \\propto \\frac{\\text{Surface Area} \\times \\text{Concentration Gradient}}{\\text{Diffusion Distance}}$$
+- **High Surface Area** $\\uparrow$
+- **Steep Concentration Gradient** $\\uparrow$
+- **Short Diffusion Distance** $\\downarrow$
+$\\implies$ Maximizes the overall rate of $O_2$ and $CO_2$ transfer.
+
+---
+
+#### 🎯 Cambridge Examiner Trap Alert:
+- ❌ **Do NOT say**: *"Alveolar walls are thin, only one cell thick, like cell membranes."*
+- ✅ **Must say**: *"Alveolar walls are **one cell thick**"* (a cell is much thicker than a membrane; confusing a cell with a cell membrane forfeits accuracy marks).
+- ❌ **Do NOT say**: *"There is more blood."*
+- ✅ **Must say**: *"Dense capillary network maintains a **steep concentration gradient** for oxygen and carbon dioxide."*`;
     }
   }
 

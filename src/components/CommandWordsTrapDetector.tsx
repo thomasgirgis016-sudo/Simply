@@ -112,19 +112,19 @@ const TRAP_QUIZ: TrapQuizQuestion[] = [
     studentAnswer: 'Student wrote: "As temperature goes from 20°C to 50°C, the dye spreads across the agar gel much faster."',
     options: [
       {
-        text: 'Award 2 / 2 Marks: The student clearly shows that rate increases with temperature.',
-        isCorrect: false,
-        explanation: 'Incorrect! The student only DESCRIBED what happens ("spreads faster"). "Explain" requires the scientific mechanism: higher kinetic energy and faster particle movement.'
-      },
-      {
-        text: 'Award 0 / 2 Marks: The student described the trend instead of explaining the kinetic mechanism.',
+        text: 'Award 0 / 2 Marks: The student only described what happens ("spreads faster") rather than explaining the kinetic mechanism.',
         isCorrect: true,
-        explanation: 'Correct! Cambridge examiners award 0 marks here because the question asked to EXPLAIN. Describing the observation earns no marks without mentioning kinetic energy or particle movement.'
+        explanation: 'Correct! Under official Cambridge marking rubrics, an "Explain" question requires the scientific mechanism (particles gain kinetic energy and move faster). Describing the visible result earns 0 / 2 marks.'
       },
       {
-        text: 'Award 1 / 2 Marks: For mentioning temperature numbers.',
+        text: 'Award 1 / 2 Marks: 1 mark for describing the observation and 0 marks for the missing mechanism.',
         isCorrect: false,
-        explanation: 'Incorrect. Cambridge mark schemes do not award marks for restating prompt numbers without scientific reasoning.'
+        explanation: 'Incorrect. Cambridge science mark schemes do not award partial credit for describing the observation when the command word is "Explain". Full zero is awarded if the kinetic mechanism is absent.'
+      },
+      {
+        text: 'Award 2 / 2 Marks: Full marks because the student demonstrated that higher temperature speeds up diffusion.',
+        isCorrect: false,
+        explanation: 'Incorrect! This conflates "Describe" with "Explain". Simply restating that diffusion speeds up fails to explain WHY (particles possess more kinetic energy).'
       }
     ]
   },

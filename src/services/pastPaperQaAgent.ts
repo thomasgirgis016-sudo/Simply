@@ -181,8 +181,8 @@ export function runPastPaperQaAgent(
 
   // 2. Iterate through official PDFs
   for (const pdf of pdfs) {
-    // Validate Question Paper URL
-    if (!pdf.qpPdfUrl || !pdf.qpPdfUrl.startsWith('http')) {
+    // Validate Question Paper URL (ignore if explicitly flagged as unadministered/unavailable)
+    if (!pdf.isUnavailable && !pdf.qpUnavailableReason && (!pdf.qpPdfUrl || !pdf.qpPdfUrl.startsWith('http'))) {
       issues.push({
         paperId: pdf.id,
         paperCode: pdf.paperCode,
@@ -195,7 +195,7 @@ export function runPastPaperQaAgent(
     }
 
     // Validate Mark Scheme URL if present
-    if (pdf.msPdfUrl && !pdf.msPdfUrl.startsWith('http')) {
+    if (!pdf.isUnavailable && !pdf.msUnavailableReason && pdf.msPdfUrl && !pdf.msPdfUrl.startsWith('http')) {
       issues.push({
         paperId: pdf.id,
         paperCode: pdf.paperCode,

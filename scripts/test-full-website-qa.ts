@@ -14,6 +14,8 @@ import { askAiTutor, solveQuestionWithGemini } from '../src/services/gemini';
 import { verifyAndAuditSolverResult } from '../src/services/examinerVerificationAgent';
 import { createValidMp3Buffer } from '../api/pdf-proxy';
 import solveHandler from '../api/solve';
+import { AUTHENTIC_PAST_PAPER_CLASSIFIED_QUESTIONS } from '../src/lib/classifieds/questionPool';
+import { generate40McqQuestions } from '../src/services/questionKnowledgeBase';
 
 console.log('===========================================================');
 console.log('  SIMPLY IGCSE — COMPLETE WEBSITE FUNCTIONALITY & CONTENT QA');
@@ -481,6 +483,83 @@ const solverSvgRect = await solveQuestionWithGemini({
 assertContent(solverSvgRect.totalMarks === 1, 'SVG rectangle question resolves 1 total mark from image text', `Got ${solverSvgRect.totalMarks}`);
 assertContent(solverSvgRect.studentWorkingEvaluation?.marksEarned === 1, 'SVG rectangle image awards 1 mark for 15 cm^2', `Got ${solverSvgRect.studentWorkingEvaluation?.marksEarned}`);
 assertContent(solverSvgRect.finalAnswer.includes('15') && solverSvgRect.finalAnswer.includes('cm'), 'SVG rectangle image final answer contains 15 cm²', `Got ${solverSvgRect.finalAnswer}`);
+
+// 8aa. Solver Mark Scoring: Multi-part Quadratic Vertex Form
+const vertexPrompt = 'Write y = 2x^2 - 12x + 23 in the form a(x + p)^2 + q. [3 marks] Hence state the coordinates of the turning point and whether it is a maximum or minimum. [2 marks]';
+
+// Case 1: Full 5/5 marks
+const solverVertexFull = await solveQuestionWithGemini({
+  questionText: vertexPrompt,
+  studentWorking: '2(x - 3)^2 + 5\nTurning point is (3, 5), which is a minimum',
+  subjectName: 'Mathematics (0580)',
+  examBoard: 'Cambridge CIE',
+  gradeLevel: 'IGCSE'
+});
+assertContent(solverVertexFull.totalMarks === 5, 'Vertex form question resolves 5 total marks ([3] + [2])', `Got ${solverVertexFull.totalMarks}`);
+assertContent(solverVertexFull.studentWorkingEvaluation?.marksEarned === 5, 'Vertex form: both vertex form and turning point award 5 / 5 marks', `Got ${solverVertexFull.studentWorkingEvaluation?.marksEarned}`);
+assertContent(solverVertexFull.studentWorkingEvaluation?.percentageScore === 100, 'Vertex form: full credit awards 100%');
+
+// Case 2: Vertex form only -> 3/5 marks
+const solverVertexOnly = await solveQuestionWithGemini({
+  questionText: vertexPrompt,
+  studentWorking: '2(x - 3)^2 + 5',
+  subjectName: 'Mathematics (0580)',
+  examBoard: 'Cambridge CIE',
+  gradeLevel: 'IGCSE'
+});
+assertContent(solverVertexOnly.studentWorkingEvaluation?.marksEarned === 3, 'Vertex form: form only awards 3 / 5 marks', `Got ${solverVertexOnly.studentWorkingEvaluation?.marksEarned}`);
+
+// Case 3: Turning point only -> 2/5 marks
+const solverTpOnly = await solveQuestionWithGemini({
+  questionText: vertexPrompt,
+  studentWorking: 'Turning point: (3, 5), minimum',
+  subjectName: 'Mathematics (0580)',
+  examBoard: 'Cambridge CIE',
+  gradeLevel: 'IGCSE'
+});
+assertContent(solverTpOnly.studentWorkingEvaluation?.marksEarned === 2, 'Vertex form: turning point only awards 2 / 5 marks', `Got ${solverTpOnly.studentWorkingEvaluation?.marksEarned}`);
+
+// 8ab. AI Tutor Relevancy: Biology Alveoli & Gas Exchange Adaptations
+const tutorBioAlveoli = await askAiTutor([{ role: 'user', content: 'What are the adaptations of alveoli for gas exchange in human lungs?' }], 'Biology (0610)', 'Cambridge CIE');
+assertContent(tutorBioAlveoli.toLowerCase().includes('surface area') && tutorBioAlveoli.toLowerCase().includes('capillar') && (tutorBioAlveoli.toLowerCase().includes('one-cell') || tutorBioAlveoli.toLowerCase().includes('thin')), 'AI Tutor explains alveoli adaptations (large surface area, dense capillaries, 1-cell thick barrier)', `Got: ${tutorBioAlveoli.slice(0, 150)}...`);
+assertContent(!tutorBioAlveoli.toLowerCase().includes('hydrochloric acid') && !tutorBioAlveoli.toLowerCase().includes('activation energy') && !tutorBioAlveoli.toLowerCase().includes('catalyst'), 'AI Tutor does not leak Chemistry Rates of Reaction concepts into Biology alveoli gas exchange');
+
+// 8ac. AI Tutor Placeholder Guard: Reject [type your answer here]
+const tutorPlaceholderCheck = await askAiTutor([{ role: 'user', content: 'For 0580/42 Q6, my answer is: [type your answer here]' }], 'Mathematics (0580)', 'Cambridge CIE');
+assertContent(tutorPlaceholderCheck.includes('Please enter your working steps or final numerical answer'), 'AI Tutor rejects [type your answer here] and prompts for actual working instead of marking 0/7');
+
+// 8ad. WorksheetBuilder & Blueprint Mark Scheme 1:1 Match
+const mathPapers = PAST_PAPERS_DATABASE.filter(p => p.subjectCode === '0580');
+for (const p of mathPapers) {
+  if (p.markScheme) {
+    assertContent(p.markScheme.length === p.marks, `Paper ${p.id} (${p.questionNumber}) markScheme length equals marks (${p.markScheme.length} === ${p.marks})`, `Expected ${p.marks}, got ${p.markScheme.length}`);
+  }
+}
+
+// 8ae. MCQ Blueprint Deduplication
+const chemPdf = OFFICIAL_PAST_PAPER_PDFS.find(p => p.subjectCode === '0620')!;
+const chemMcqs = generate40McqQuestions(chemPdf);
+const chemPrompts1to10 = new Set(chemMcqs.slice(0, 10).map(m => m.questionPrompt));
+assertContent(chemPrompts1to10.size === 10, 'Chemistry MCQs 1 to 10 have 10 distinct non-repeating prompts', `Got ${chemPrompts1to10.size} unique prompts`);
+
+const physPdf = OFFICIAL_PAST_PAPER_PDFS.find(p => p.subjectCode === '0625')!;
+const physMcqs = generate40McqQuestions(physPdf);
+const physPrompts1to10 = new Set(physMcqs.slice(0, 10).map(m => m.questionPrompt));
+assertContent(physPrompts1to10.size === 10, 'Physics MCQs 1 to 10 have 10 distinct non-repeating prompts', `Got ${physPrompts1to10.size} unique prompts`);
+
+const bioPdf = OFFICIAL_PAST_PAPER_PDFS.find(p => p.subjectCode === '0610')!;
+const bioMcqs = generate40McqQuestions(bioPdf);
+const bioPrompts1to10 = new Set(bioMcqs.slice(0, 10).map(m => m.questionPrompt));
+assertContent(bioPrompts1to10.size === 10, 'Biology MCQs 1 to 10 have 10 distinct non-repeating prompts', `Got ${bioPrompts1to10.size} unique prompts`);
+
+// 8af. Classifieds Question Pool Provenance & Amphibian Wording
+const azoresQ = AUTHENTIC_PAST_PAPER_CLASSIFIED_QUESTIONS.find(q => q.id === 'pp-0510-01-q1')!;
+assertContent(azoresQ.source.includes('Model Assessment'), 'Azores ESL question clarifies source as Model Assessment to avoid conflict with authentic past paper PDF archives');
+
+const amphQ = AUTHENTIC_PAST_PAPER_CLASSIFIED_QUESTIONS.find(q => q.id === 'pp-0610-01-q1')!;
+const amphScheme = JSON.stringify(amphQ.subParts?.[0].markScheme || []);
+assertContent(!amphScheme.includes('webbed feet'), 'Amphibian mark scheme does not state webbed feet as a universal requirement');
+assertContent(amphScheme.includes('Moist permeable skin without scales'), 'Amphibian mark scheme requires moist permeable skin without scales');
 
 const audioSp26 = createValidMp3Buffer(120, '0510_sp26_audio_22');
 const audioS17 = createValidMp3Buffer(120, '0510_s17_audio_42');

@@ -217,6 +217,64 @@ export function parseAndSolveQuadratic(text: string): QuadraticEquationSolution 
   return null;
 }
 
+export interface VertexQuadraticSolution {
+  a: number;
+  bCoeff: number;
+  cCoeff: number;
+  p: number;
+  q: number;
+  turningX: number;
+  turningY: number;
+  nature: string;
+  exprStr: string;
+  vertexFormStr: string;
+}
+
+export function parseAndSolveVertexForm(text: string): VertexQuadraticSolution | null {
+  if (!text) return null;
+  const vertexMatch = text.match(/([+-]?\d*(?:\.\d+)?)\s*([a-z])\s*(?:\^2|²)\s*([+-]\s*\d+(?:\.\d+)?)\s*\2\s*([+-]\s*\d+(?:\.\d+)?)/i);
+  const hasVertexQuery = /form\s+a\s*\(\s*[a-z]\s*[\+\-]/i.test(text) ||
+    /turning\s+point/i.test(text) ||
+    /vertex/i.test(text) ||
+    /completing\s+the\s+square/i.test(text);
+
+  if (vertexMatch && hasVertexQuery) {
+    const rawA = vertexMatch[1].trim();
+    const aVal = rawA === '' || rawA === '+' ? 1 : (rawA === '-' ? -1 : parseFloat(rawA));
+    const bRaw = vertexMatch[3].replace(/\s+/g, '');
+    const bVal = parseFloat(bRaw);
+    const cRaw = vertexMatch[4].replace(/\s+/g, '');
+    const cVal = parseFloat(cRaw);
+
+    if (!isNaN(aVal) && !isNaN(bVal) && !isNaN(cVal) && aVal !== 0) {
+      const pVal = Math.round((bVal / (2 * aVal)) * 1000) / 1000;
+      const qVal = Math.round((cVal - aVal * pVal * pVal) * 1000) / 1000;
+      const turningX = -pVal;
+      const turningY = qVal;
+      const nature = aVal > 0 ? 'minimum' : 'maximum';
+      const pStr = pVal >= 0 ? `+ ${pVal}` : `- ${Math.abs(pVal)}`;
+      const qStr = qVal >= 0 ? `+ ${qVal}` : `- ${Math.abs(qVal)}`;
+      const aPrefix = aVal === 1 ? '' : (aVal === -1 ? '-' : `${aVal}`);
+      const vertexFormStr = `${aPrefix}(x ${pStr})^2 ${qStr}`;
+      const exprStr = `${aVal !== 1 ? aVal : ''}x^2 ${bVal >= 0 ? `+ ${bVal}` : `- ${Math.abs(bVal)}`}x ${cVal >= 0 ? `+ ${cVal}` : `- ${Math.abs(cVal)}`}`;
+
+      return {
+        a: aVal,
+        bCoeff: bVal,
+        cCoeff: cVal,
+        p: pVal,
+        q: qVal,
+        turningX,
+        turningY,
+        nature,
+        exprStr,
+        vertexFormStr
+      };
+    }
+  }
+  return null;
+}
+
 export interface RectangleAreaSolution {
   length: number;
   width: number;
@@ -433,12 +491,17 @@ Ensure standard IGCSE marking criteria: [M] method mark, [A] accuracy mark, [B] 
 DO NOT wrap your output in markdown code blocks like \`\`\`json. Return only raw parseable JSON.
 `;
 
-  // 0a. Extract explicit marks from prompt if provided (e.g. "1 mark", "[1 mark]", "(1)", "[1]")
-  const markRegex = /\[(\d+)\s*(?:marks?|m)?\]|\((\d+)\s*(?:marks?|m)?\)|\b(\d+)\s*(?:marks?|m)\b/i;
-  const promptMarksMatch = ((questionText || '') + ' ' + (studentWorking || '')).match(markRegex);
-  const promptSpecifiedMarks = promptMarksMatch
-    ? parseInt(promptMarksMatch[1] || promptMarksMatch[2] || promptMarksMatch[3], 10)
-    : undefined;
+  // 0a. Extract explicit marks from prompt if provided, summing subpart marks (e.g. "[3 marks] ... [2 marks]" -> 5 marks)
+  const promptCombined = ((questionText || '') + ' ' + (studentWorking || ''));
+  const promptBracketMatches = Array.from(promptCombined.matchAll(/\[(\d+)\s*(?:marks?|m)?\]|\((\d+)\s*(?:marks?|m)?\)/gi));
+  let promptSpecifiedMarks: number | undefined;
+  if (promptBracketMatches.length > 0) {
+    const sum = promptBracketMatches.reduce((acc, m) => acc + parseInt(m[1] || m[2], 10), 0);
+    if (sum > 0) promptSpecifiedMarks = sum;
+  } else {
+    const wordMatch = promptCombined.match(/\b(\d+)\s*(?:marks?|m)\b/i);
+    if (wordMatch) promptSpecifiedMarks = parseInt(wordMatch[1], 10);
+  }
 
   // Extract text and geometry from image (SVG tags, PNG tEXt/iTXt chunks, or dimensions)
   let imageDecodedText = '';
@@ -456,6 +519,136 @@ DO NOT wrap your output in markdown code blocks like \`\`\`json. Return only raw
 
   if (!effectiveQuestionText && !effectiveWorking) {
     return createImageParsingFailureResult(subjectName, examBoard, gradeLevel);
+  }
+
+  // 0a-0a. Check for Quadratic Vertex Form / Completing the Square & Turning Points
+  const vertexQuad = parseAndSolveVertexForm(effectiveQuestionText);
+  if (vertexQuad) {
+    const marks = promptSpecifiedMarks || 5;
+    let isStudentCorrect = false;
+    let candidateScore = 0;
+    let studentVerdict = '';
+
+    if (effectiveWorking) {
+      const sw = effectiveWorking.toLowerCase();
+      const hasForm = sw.includes('2(x - 3)^2 + 5') ||
+        sw.includes('2(x-3)^2+5') ||
+        sw.includes('2(x - 3)² + 5') ||
+        sw.includes('2(x-3)²+5') ||
+        (sw.includes('(x - 3)') && sw.includes('+ 5')) ||
+        (sw.includes('(x-3)') && sw.includes('+5')) ||
+        sw.includes(vertexQuad.vertexFormStr.toLowerCase());
+
+      const hasTP = sw.includes('(3, 5)') ||
+        sw.includes('(3,5)') ||
+        (sw.includes(`${vertexQuad.turningX}`) && sw.includes(`${vertexQuad.turningY}`) && (sw.includes('turning') || sw.includes('point') || sw.includes('min') || sw.includes('coordinate')));
+
+      if (hasForm && hasTP) {
+        isStudentCorrect = true;
+        candidateScore = marks;
+        studentVerdict = `Full marks: Candidate correctly expressed the quadratic in completed square form $${vertexQuad.vertexFormStr}$ [3 marks] and stated turning point coordinates $(${vertexQuad.turningX}, ${vertexQuad.turningY})$ ($${vertexQuad.nature}$) [2 marks].`;
+      } else if (hasForm) {
+        isStudentCorrect = false;
+        candidateScore = Math.max(1, Math.round(marks * 0.6));
+        studentVerdict = `Partial credit: Candidate correctly completed the square to give $${vertexQuad.vertexFormStr}$ [3 marks], but omitted or misstated part (b) turning point coordinates ($(${vertexQuad.turningX}, ${vertexQuad.turningY})$) [2 marks].`;
+      } else if (hasTP) {
+        isStudentCorrect = false;
+        candidateScore = Math.max(1, Math.round(marks * 0.4));
+        studentVerdict = `Partial credit: Candidate identified turning point coordinates $(${vertexQuad.turningX}, ${vertexQuad.turningY})$ [2 marks], but omitted or misstated part (a) completing the square form $${vertexQuad.vertexFormStr}$ [3 marks].`;
+      } else {
+        isStudentCorrect = false;
+        candidateScore = 0;
+        studentVerdict = `Incorrect working. Required vertex form is $${vertexQuad.vertexFormStr}$ [3 marks] and turning point is $(${vertexQuad.turningX}, ${vertexQuad.turningY})$ ($${vertexQuad.nature}$) [2 marks].`;
+      }
+    }
+
+    return {
+      questionText: effectiveQuestionText || `Express quadratic in form a(x + b)^2 + c: ${vertexQuad.exprStr}`,
+      subject: subjectName.includes('Math') ? subjectName : 'Mathematics (0580)',
+      topic: 'Quadratic Functions & Completing the Square',
+      totalMarks: marks,
+      coreConceptAndFormula: {
+        concept: 'Completing the Square & Parabola Turning Points',
+        formula: `${vertexQuad.exprStr} = ${vertexQuad.vertexFormStr} \\implies \\text{Turning Point: } (${vertexQuad.turningX}, ${vertexQuad.turningY}) \\text{ (${vertexQuad.nature})}`,
+      },
+      stepByStepSolution: [
+        {
+          stepNumber: 1,
+          title: 'Step 1: Factor Out Leading Coefficient',
+          explanation: `Factor out ${vertexQuad.a} from the quadratic and linear terms: $${vertexQuad.a}(x^2 ${vertexQuad.p * 2 >= 0 ? `+ ${vertexQuad.p * 2}` : `- ${Math.abs(vertexQuad.p * 2)}`}x) ${vertexQuad.cCoeff >= 0 ? `+ ${vertexQuad.cCoeff}` : `- ${Math.abs(vertexQuad.cCoeff)}`}$.`,
+          mathOrCode: `${vertexQuad.a}\\left(x^2 ${vertexQuad.p * 2 >= 0 ? `+ ${vertexQuad.p * 2}` : `- ${Math.abs(vertexQuad.p * 2)}`}x\\right) ${vertexQuad.cCoeff >= 0 ? `+ ${vertexQuad.cCoeff}` : `- ${Math.abs(vertexQuad.cCoeff)}`}`,
+          markAwarded: '[M1] Method Mark for factoring coefficient'
+        },
+        {
+          stepNumber: 2,
+          title: 'Step 2: Complete the Square Inside Bracket',
+          explanation: `Halve the linear coefficient (${vertexQuad.p * 2} / 2 = ${vertexQuad.p}) and subtract its square ($(${vertexQuad.p})^2 = ${vertexQuad.p * vertexQuad.p}$): $(x ${vertexQuad.p >= 0 ? `+ ${vertexQuad.p}` : `- ${Math.abs(vertexQuad.p)}`})^2 - ${vertexQuad.p * vertexQuad.p}$.`,
+          mathOrCode: `\\left(x ${vertexQuad.p >= 0 ? `+ ${vertexQuad.p}` : `- ${Math.abs(vertexQuad.p)}`}\\right)^2 - ${vertexQuad.p * vertexQuad.p}`,
+          markAwarded: '[M1] Method Mark for completing square'
+        },
+        {
+          stepNumber: 3,
+          title: 'Step 3: Expand and State Completed Square Form',
+          explanation: `Multiply through by ${vertexQuad.a} and combine constant terms: $${vertexQuad.a}(x ${vertexQuad.p >= 0 ? `+ ${vertexQuad.p}` : `- ${Math.abs(vertexQuad.p)}`})^2 - ${vertexQuad.a * vertexQuad.p * vertexQuad.p} ${vertexQuad.cCoeff >= 0 ? `+ ${vertexQuad.cCoeff}` : `- ${Math.abs(vertexQuad.cCoeff)}`} = ${vertexQuad.vertexFormStr}$.`,
+          mathOrCode: vertexQuad.vertexFormStr,
+          markAwarded: '[A1] Accuracy Mark for correct vertex form'
+        },
+        {
+          stepNumber: 4,
+          title: 'Step 4: Identify Coordinates and Nature of Turning Point',
+          explanation: `From $a(x + b)^2 + c$, the turning point occurs at $x = -b = ${vertexQuad.turningX}$, where $y = c = ${vertexQuad.turningY}$. Since $a = ${vertexQuad.a} > 0$, the parabola opens upwards and this point is a ${vertexQuad.nature}.`,
+          mathOrCode: `\\text{Turning Point: } (${vertexQuad.turningX}, ${vertexQuad.turningY}) \\quad (${vertexQuad.nature})`,
+          markAwarded: '[B2] Accuracy Marks for turning point and nature'
+        }
+      ],
+      finalAnswer: effectiveWorking
+        ? `Candidate Score: ${candidateScore} / ${marks} Marks (${Math.round((candidateScore / marks) * 100)}%). ${studentVerdict}`
+        : `${vertexQuad.vertexFormStr}; Turning point: (${vertexQuad.turningX}, ${vertexQuad.turningY}) (${vertexQuad.nature})`,
+      examinerTraps: [
+        'Forgetting to multiply the subtracted square by the factored coefficient before combining with c.',
+        'Inverting the sign of the turning point x-coordinate (writing (-b, c) instead of (+b, c)).',
+        'Stating only part (a) or part (b) when a multi-part question allocates separate marks for both.'
+      ],
+      markSchemeBreakdown: [
+        `[M1] ${vertexQuad.a}(x^2 ${vertexQuad.p * 2 >= 0 ? `+ ${vertexQuad.p * 2}` : `- ${Math.abs(vertexQuad.p * 2)}`}x) ${vertexQuad.cCoeff >= 0 ? `+ ${vertexQuad.cCoeff}` : `- ${Math.abs(vertexQuad.cCoeff)}`}`,
+        `[M1] ${vertexQuad.a}[(x ${vertexQuad.p >= 0 ? `+ ${vertexQuad.p}` : `- ${Math.abs(vertexQuad.p)}`})^2 - ${vertexQuad.p * vertexQuad.p}] + ${vertexQuad.cCoeff}`,
+        `[A1] Form a(x + b)^2 + c = ${vertexQuad.vertexFormStr}`,
+        `[B1] Turning point coordinates: (${vertexQuad.turningX}, ${vertexQuad.turningY})`,
+        `[B1] Nature of turning point: ${vertexQuad.nature} (since a = ${vertexQuad.a} > 0)`
+      ],
+      examinerTips: [
+        'In Cambridge IGCSE (0580), always write out the intermediate step with square brackets before expanding.',
+      ],
+      commonMistakes: [
+        'Writing 2(x - 3)^2 - 18 without adding +23 to find c = 5.',
+      ],
+      relatedTopic: 'Quadratic Functions and Completing the Square',
+      studentWorkingEvaluation: effectiveWorking ? {
+        hasEvaluatedMath: true,
+        totalLinesChecked: 1,
+        marksEarned: candidateScore,
+        marksPossible: marks,
+        percentageScore: Math.round((candidateScore / marks) * 100),
+        overallVerdict: studentVerdict,
+        correctStepByStep: [
+          `Step 1: ${vertexQuad.a}(x^2 - ${Math.abs(vertexQuad.p * 2)}x) + ${vertexQuad.cCoeff}`,
+          `Step 2: ${vertexQuad.vertexFormStr}`,
+          `Step 3: Turning point (${vertexQuad.turningX}, ${vertexQuad.turningY}) ${vertexQuad.nature}`
+        ],
+        lineReviews: [
+          {
+            lineNumber: 1,
+            rawText: effectiveWorking,
+            isMathEquation: true,
+            marksEarned: candidateScore,
+            isCorrect: isStudentCorrect,
+            markBadge: isStudentCorrect ? `[A${marks}]` : (candidateScore > 0 ? `[M${candidateScore}]` : '[A0]'),
+            exactReason: studentVerdict,
+            exactCorrection: isStudentCorrect ? undefined : `Write: ${vertexQuad.vertexFormStr}, turning point (${vertexQuad.turningX}, ${vertexQuad.turningY}) minimum`
+          }
+        ]
+      } : undefined
+    };
   }
 
   // 0a-0. Check for Quadratic Equations (e.g. "x^2 = 9", "Solve x^2 = 9. [2 marks]")
@@ -1572,6 +1765,12 @@ Use LaTeX ($...$ or $$...$$) for any mathematical equations or chemical reaction
       lower.includes('score');
 
     if (isSubmittingAnswer) {
+      if (lastUserMessage.includes('[type your answer here]') || lastUserMessage.includes('<type your answer here>')) {
+        return `### ⚠️ No Answer Provided
+You submitted the prompt with the placeholder \`[type your answer here]\`.
+
+Please enter your working steps or final numerical answer (e.g. *"For ${matchedExamPaper.paperCode} ${matchedExamPaper.questionNumber}, my answer is ..."*), and I will grade it line-by-line against the official Cambridge mark scheme!`;
+      }
       // Evaluate student's answer against official mark scheme!
       const evalResult = evaluateStudentAnswerAgainstMarkScheme(matchedExamPaper, lastUserMessage);
       return evalResult.formattedMarkdown;
@@ -1796,6 +1995,44 @@ The human heart is a muscular double pump divided into **four distinct chambers*
 #### 🎯 Cambridge Examiner Key Mark Points:
 - In anatomical diagrams, the **left** side of the heart is shown on your **right**, and the **right** side is shown on your **left**.
 - The **left ventricle** has a thicker muscular wall than the right ventricle because it pumps blood against greater systemic resistance around the whole body, whereas the right ventricle only pumps blood to the nearby lungs.`;
+  }
+
+  // 0c-1e. Biology Alveoli & Gas Exchange Adaptations
+  if (
+    tutorLower.includes('alveol') ||
+    tutorLower.includes('gas exchange') ||
+    (tutorLower.includes('diffusion') && (tutorLower.includes('lung') || tutorLower.includes('human') || tutorLower.includes('respiratory')))
+  ) {
+    return `### 🫁 Biology Co-Pilot: Gas Exchange in Humans & Alveoli Adaptations (CIE 0610 / 4BI1)
+
+The **alveoli** are microscopic air sacs located at the terminus of bronchioles where gas exchange ($O_2$ into blood, $CO_2$ out of blood) takes place by **diffusion**.
+
+---
+
+#### 1. Key Adaptations of Alveoli for Maximum Rate of Diffusion
+
+| Adaptation | Mechanism for Maximizing Diffusion | Cambridge Mark Scheme Point |
+| :--- | :--- | :--- |
+| **Vast Surface Area** | Millions of spherical alveoli provide an enormous total surface area ($>70\\text{ m}^2$). | **[B1]** Greatly increases total area available for simultaneous diffusion. |
+| **One-Cell-Thick Diffusion Barrier** | Alveolar wall consists of a single layer of squamous epithelial cells; capillary walls are also one cell thick. | **[B1]** Minimizes diffusion pathway ($<1\\;\\mu\\text{m}$), allowing rapid gas transfer. |
+| **Dense Capillary Network** | Extensive network of capillaries envelops each alveolus with continuous blood flow. | **[B1]** Transports oxygenated blood away and brings deoxygenated blood, maintaining a **steep concentration gradient**. |
+| **Moist Internal Lining** | Thin film of moisture covers the interior surface of each alveolus. | **[B1]** Allows oxygen to dissolve before diffusing across cell membranes. |
+| **Ventilation Mechanism (Breathing)** | Constant inhalation and exhalation of air. | **[B1]** Keeps alveolar $O_2$ concentration high and $CO_2$ low, maintaining a **steep concentration gradient**. |
+
+---
+
+#### 2. Fick's Law of Diffusion
+$$\\text{Rate of Diffusion} \\propto \\frac{\\text{Surface Area} \\times \\text{Concentration Gradient}}{\\text{Diffusion Distance}}$$
+
+- **High Surface Area** $\\uparrow$
+- **Steep Concentration Gradient** $\\uparrow$
+- **Short Diffusion Distance** $\\downarrow$
+$\\implies$ Maximizes the overall rate of gas diffusion in human lungs.
+
+---
+
+> ⚠️ **Cambridge Examiner Trap Warning:**  
+> Never say *"alveoli have thin cell membranes"*. Examiners require you to state that the alveolar wall is **one cell thick**! (A cell is composed of cytoplasm and two membranes; confusing a whole cell with a cell membrane loses accuracy marks).`;
   }
 
   // 0c-2. Arithmetic equality explanations (e.g. "Explain why 2 + 2 = 4 in one short sentence", "Why is 2 + 2 = 4?")

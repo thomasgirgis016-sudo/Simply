@@ -750,6 +750,7 @@ export function App() {
               <MistakeNotebookView
                 subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
                 profile={profile}
+                activeSubject={activeSubject}
               />
             )}
 

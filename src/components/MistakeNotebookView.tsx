@@ -33,11 +33,13 @@ import { MathRenderer } from './MathRenderer';
 interface MistakeNotebookViewProps {
   subjects: Subject[];
   profile: UserProfile;
+  activeSubject?: Subject;
 }
 
 export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
   subjects,
   profile,
+  activeSubject,
 }) => {
   const [mistakes, setMistakes] = useState<MistakeItem[]>(() => getMistakeNotebook());
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>('all');
@@ -52,8 +54,22 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
   const [rematchShowAnswer, setRematchShowAnswer] = useState(false);
   const [rematchStudentInput, setRematchStudentInput] = useState('');
 
-  // Form State for Adding New Mistake
-  const [newSubjectCode, setNewSubjectCode] = useState(subjects[0]?.code || '0580');
+  // Form State for Adding New Mistake - initialized with active subject
+  const [newSubjectCode, setNewSubjectCode] = useState(activeSubject?.code || subjects[0]?.code || '0580');
+
+  // Synchronize newSubjectCode if activeSubject changes
+  useEffect(() => {
+    if (activeSubject?.code) {
+      setNewSubjectCode(activeSubject.code);
+    }
+  }, [activeSubject?.code]);
+
+  const handleOpenAddModal = () => {
+    if (activeSubject?.code) {
+      setNewSubjectCode(activeSubject.code);
+    }
+    setIsAddModalOpen(true);
+  };
   const [newTopic, setNewTopic] = useState('');
   const [newPaperCode, setNewPaperCode] = useState('');
   const [newQuestionNum, setNewQuestionNum] = useState('');
@@ -217,7 +233,7 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
             </button>
 
             <button
-              onClick={() => setIsAddModalOpen(true)}
+              onClick={handleOpenAddModal}
               className="rounded-2xl border border-slate-700 bg-slate-800/90 hover:bg-slate-700 px-4 py-3 text-xs sm:text-sm font-bold text-white transition flex items-center gap-2 cursor-pointer"
             >
               <Plus className="h-4 w-4 text-rose-400" />
@@ -347,7 +363,7 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
             </p>
           </div>
           <button
-            onClick={() => setIsAddModalOpen(true)}
+            onClick={handleOpenAddModal}
             className="inline-flex items-center gap-2 rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white shadow-md hover:bg-rose-500 transition cursor-pointer"
           >
             <Plus className="h-4 w-4" />

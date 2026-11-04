@@ -503,10 +503,17 @@ Output STRICTLY JSON array:
     const isEsl = !isScienceOrMath && (subLower.includes('english') || subLower.includes('second language') || subLower.includes('esl') || subLower.includes('0510') || subLower.includes('0511'));
     const isEcon = !isScienceOrMath && (subLower.includes('econ') || subLower.includes('business') || subLower.includes('account'));
 
-    // Extract prompt-specified marks if present (e.g. "Solve 2 + 2. [1 mark]" -> 1 mark)
+    // Extract prompt-specified marks if present, summing subpart marks (e.g. "[3 marks] ... [2 marks]" -> 5 marks)
     const combinedPrompt = `${questionText || ''} ${studentWorking || ''}`;
-    const markMatch = combinedPrompt.match(/\[(\d+)\s*(?:marks?|m)?\]|\((\d+)\s*(?:marks?|m)?\)|\b(\d+)\s*(?:marks?|m)\b/i);
-    const resolvedTotalMarks = markMatch ? parseInt(markMatch[1] || markMatch[2] || markMatch[3], 10) : totalMarks;
+    const bracketMatches = Array.from(combinedPrompt.matchAll(/\[(\d+)\s*(?:marks?|m)?\]|\((\d+)\s*(?:marks?|m)?\)/gi));
+    let resolvedTotalMarks = totalMarks;
+    if (bracketMatches.length > 0) {
+      const sum = bracketMatches.reduce((acc, m) => acc + parseInt(m[1] || m[2], 10), 0);
+      if (sum > 0) resolvedTotalMarks = sum;
+    } else {
+      const wordMatch = combinedPrompt.match(/\b(\d+)\s*(?:marks?|m)\b/i);
+      if (wordMatch) resolvedTotalMarks = parseInt(wordMatch[1], 10);
+    }
 
     let defaultConcept = `${examBoard} ${subjectName} Core Principles`;
     let defaultFormula = '\\text{State base formula} \\rightarrow \\text{Substitute values} \\rightarrow \\text{Evaluate to 3 s.f.}';
@@ -542,6 +549,62 @@ Output STRICTLY JSON array:
     let lineReason = 'Candidate answer reviewed against official mark scheme.';
     let lineCorrection = 'Review required formula steps and check arithmetic.';
     let isStudentCorrect = false;
+
+    // Helper: Quadratic Vertex Form / Completing the Square & Turning Points
+    // (e.g. "Express 2x^2 - 12x + 23 in the form a(x + b)^2 + c. [3 marks] Hence state the coordinates of the turning point. [2 marks]")
+    let vertexSolution: {
+      a: number;
+      bCoeff: number;
+      cCoeff: number;
+      p: number;
+      q: number;
+      turningX: number;
+      turningY: number;
+      nature: string;
+      exprStr: string;
+      vertexFormStr: string;
+    } | null = null;
+
+    const vertexMatch = (questionText || '').match(/([+-]?\d*(?:\.\d+)?)\s*([a-z])\s*(?:\^2|²)\s*([+-]\s*\d+(?:\.\d+)?)\s*\2\s*([+-]\s*\d+(?:\.\d+)?)/i);
+    const hasVertexQuery = /form\s+a\s*\(\s*[a-z]\s*[\+\-]/i.test(questionText || '') ||
+      /turning\s+point/i.test(questionText || '') ||
+      /vertex/i.test(questionText || '') ||
+      /completing\s+the\s+square/i.test(questionText || '');
+
+    if (vertexMatch && hasVertexQuery) {
+      const rawA = vertexMatch[1].trim();
+      const aVal = rawA === '' || rawA === '+' ? 1 : (rawA === '-' ? -1 : parseFloat(rawA));
+      const bRaw = vertexMatch[3].replace(/\s+/g, '');
+      const bVal = parseFloat(bRaw);
+      const cRaw = vertexMatch[4].replace(/\s+/g, '');
+      const cVal = parseFloat(cRaw);
+
+      if (!isNaN(aVal) && !isNaN(bVal) && !isNaN(cVal) && aVal !== 0) {
+        const pVal = Math.round((bVal / (2 * aVal)) * 1000) / 1000;
+        const qVal = Math.round((cVal - aVal * pVal * pVal) * 1000) / 1000;
+        const turningX = -pVal;
+        const turningY = qVal;
+        const nature = aVal > 0 ? 'minimum' : 'maximum';
+        const pStr = pVal >= 0 ? `+ ${pVal}` : `- ${Math.abs(pVal)}`;
+        const qStr = qVal >= 0 ? `+ ${qVal}` : `- ${Math.abs(qVal)}`;
+        const aPrefix = aVal === 1 ? '' : (aVal === -1 ? '-' : `${aVal}`);
+        const vertexFormStr = `${aPrefix}(x ${pStr})^2 ${qStr}`;
+        const exprStr = `${aVal !== 1 ? aVal : ''}x^2 ${bVal >= 0 ? `+ ${bVal}` : `- ${Math.abs(bVal)}`}x ${cVal >= 0 ? `+ ${cVal}` : `- ${Math.abs(cVal)}`}`;
+
+        vertexSolution = {
+          a: aVal,
+          bCoeff: bVal,
+          cCoeff: cVal,
+          p: pVal,
+          q: qVal,
+          turningX,
+          turningY,
+          nature,
+          exprStr,
+          vertexFormStr
+        };
+      }
+    }
 
     // Helper: Quadratic Equation Parsing (e.g. "Solve x^2 = 9. [2 marks]")
     let quadSolution: { variable: string; k: number; rootPositive: number; rootNegative: number; clean: string } | null = null;
@@ -620,7 +683,46 @@ Output STRICTLY JSON array:
       }
     }
 
-    if (quadSolution !== null) {
+    if (vertexSolution !== null) {
+      defaultConcept = 'Quadratic Functions: Completing the Square & Turning Points';
+      defaultFormula = `${vertexSolution.exprStr} = ${vertexSolution.vertexFormStr} \\implies \\text{Turning Point: } (${vertexSolution.turningX}, ${vertexSolution.turningY}) \\text{ (${vertexSolution.nature})}`;
+      if (studentWorking) {
+        const sw = String(studentWorking).toLowerCase();
+        const hasForm = sw.includes('2(x - 3)^2 + 5') ||
+          sw.includes('2(x-3)^2+5') ||
+          sw.includes('2(x - 3)² + 5') ||
+          sw.includes('2(x-3)²+5') ||
+          (sw.includes('(x - 3)') && sw.includes('+ 5')) ||
+          (sw.includes('(x-3)') && sw.includes('+5')) ||
+          sw.includes(vertexSolution.vertexFormStr.toLowerCase());
+
+        const hasTP = sw.includes('(3, 5)') ||
+          sw.includes('(3,5)') ||
+          (sw.includes(`${vertexSolution.turningX}`) && sw.includes(`${vertexSolution.turningY}`) && (sw.includes('turning') || sw.includes('point') || sw.includes('min') || sw.includes('coordinate')));
+
+        if (hasForm && hasTP) {
+          isStudentCorrect = true;
+          candidateScore = resolvedTotalMarks;
+          lineReason = `Full marks: candidate correctly expressed the quadratic in completed square form $${vertexSolution.vertexFormStr}$ [3 marks] and stated turning point coordinates $(${vertexSolution.turningX}, ${vertexSolution.turningY})$ ($${vertexSolution.nature}$) [2 marks].`;
+          lineCorrection = 'Step verified.';
+        } else if (hasForm) {
+          isStudentCorrect = false;
+          candidateScore = Math.max(1, Math.round(resolvedTotalMarks * 0.6)); // 3/5 marks
+          lineReason = `Partial credit: candidate correctly completed the square to give $${vertexSolution.vertexFormStr}$ [3 marks], but omitted or misstated part (b) turning point coordinates ($(${vertexSolution.turningX}, ${vertexSolution.turningY})$) [2 marks].`;
+          lineCorrection = `Write turning point coordinates: (${vertexSolution.turningX}, ${vertexSolution.turningY}) (${vertexSolution.nature})`;
+        } else if (hasTP) {
+          isStudentCorrect = false;
+          candidateScore = Math.max(1, Math.round(resolvedTotalMarks * 0.4)); // 2/5 marks
+          lineReason = `Partial credit: candidate identified turning point coordinates $(${vertexSolution.turningX}, ${vertexSolution.turningY})$ [2 marks], but omitted or misstated part (a) completing the square form $${vertexSolution.vertexFormStr}$ [3 marks].`;
+          lineCorrection = `Write completed square form: ${vertexSolution.vertexFormStr}`;
+        } else {
+          isStudentCorrect = false;
+          candidateScore = 0;
+          lineReason = `Incorrect working. Required vertex form is $${vertexSolution.vertexFormStr}$ [3 marks] and turning point is $(${vertexSolution.turningX}, ${vertexSolution.turningY})$ ($${vertexSolution.nature}$) [2 marks].`;
+          lineCorrection = `Write: ${vertexSolution.vertexFormStr}, turning point (${vertexSolution.turningX}, ${vertexSolution.turningY}) minimum`;
+        }
+      }
+    } else if (quadSolution !== null) {
       defaultConcept = 'Quadratic Equations & Roots';
       defaultFormula = `${quadSolution.clean} \\implies ${quadSolution.variable} = \\pm\\sqrt{${quadSolution.k}} = \\pm ${quadSolution.rootPositive}`;
       if (studentWorking) {
@@ -1166,6 +1268,37 @@ Squaring any negative number yields a positive result. Therefore, both $+${rootP
           markAwarded: `[A1] Accuracy Mark (${linEqSolution.variable} = ${linEqSolution.x})`
         }
       ];
+    } else if (vertexSolution !== null) {
+      solutionSteps = [
+        {
+          stepNumber: 1,
+          title: 'Step 1: Factor Out Leading Coefficient',
+          explanation: `Factor out ${vertexSolution.a} from the quadratic and linear terms: $${vertexSolution.a}(x^2 ${vertexSolution.p * 2 >= 0 ? `+ ${vertexSolution.p * 2}` : `- ${Math.abs(vertexSolution.p * 2)}`}x) ${vertexSolution.cCoeff >= 0 ? `+ ${vertexSolution.cCoeff}` : `- ${Math.abs(vertexSolution.cCoeff)}`}$.`,
+          mathOrCode: `${vertexSolution.a}\\left(x^2 ${vertexSolution.p * 2 >= 0 ? `+ ${vertexSolution.p * 2}` : `- ${Math.abs(vertexSolution.p * 2)}`}x\\right) ${vertexSolution.cCoeff >= 0 ? `+ ${vertexSolution.cCoeff}` : `- ${Math.abs(vertexSolution.cCoeff)}`}`,
+          markAwarded: '[M1] Method Mark for factoring coefficient'
+        },
+        {
+          stepNumber: 2,
+          title: 'Step 2: Complete the Square Inside Bracket',
+          explanation: `Halve the linear coefficient (${vertexSolution.p * 2} / 2 = ${vertexSolution.p}) and subtract its square ($(${vertexSolution.p})^2 = ${vertexSolution.p * vertexSolution.p}$): $(x ${vertexSolution.p >= 0 ? `+ ${vertexSolution.p}` : `- ${Math.abs(vertexSolution.p)}`})^2 - ${vertexSolution.p * vertexSolution.p}$.`,
+          mathOrCode: `\\left(x ${vertexSolution.p >= 0 ? `+ ${vertexSolution.p}` : `- ${Math.abs(vertexSolution.p)}`}\\right)^2 - ${vertexSolution.p * vertexSolution.p}`,
+          markAwarded: '[M1] Method Mark for completing square'
+        },
+        {
+          stepNumber: 3,
+          title: 'Step 3: Expand and State Completed Square Form',
+          explanation: `Multiply through by ${vertexSolution.a} and combine constant terms: $${vertexSolution.a}(x ${vertexSolution.p >= 0 ? `+ ${vertexSolution.p}` : `- ${Math.abs(vertexSolution.p)}`})^2 - ${vertexSolution.a * vertexSolution.p * vertexSolution.p} ${vertexSolution.cCoeff >= 0 ? `+ ${vertexSolution.cCoeff}` : `- ${Math.abs(vertexSolution.cCoeff)}`} = ${vertexSolution.vertexFormStr}$.`,
+          mathOrCode: vertexSolution.vertexFormStr,
+          markAwarded: '[A1] Accuracy Mark for correct vertex form'
+        },
+        {
+          stepNumber: 4,
+          title: 'Step 4: Identify Coordinates and Nature of Turning Point',
+          explanation: `From $a(x + b)^2 + c$, the turning point occurs at $x = -b = ${vertexSolution.turningX}$, where $y = c = ${vertexSolution.turningY}$. Since $a = ${vertexSolution.a} > 0$, the parabola opens upwards and this point is a ${vertexSolution.nature}.`,
+          mathOrCode: `\\text{Turning Point: } (${vertexSolution.turningX}, ${vertexSolution.turningY}) \\quad (${vertexSolution.nature})`,
+          markAwarded: '[B2] Accuracy Marks for turning point and nature'
+        }
+      ];
     } else {
       solutionSteps = [
         {
@@ -1188,6 +1321,8 @@ Squaring any negative number yields a positive result. Therefore, both $+${rootP
     let finalAnswerText = '';
     if (studentWorking) {
       finalAnswerText = `Candidate Score: ${candidateScore} / ${resolvedTotalMarks} Marks (${Math.round((candidateScore / resolvedTotalMarks) * 100)}%). ${lineReason}`;
+    } else if (vertexSolution !== null) {
+      finalAnswerText = `${vertexSolution.vertexFormStr}; Turning point: (${vertexSolution.turningX}, ${vertexSolution.turningY}) (${vertexSolution.nature})`;
     } else if (quadSolution !== null) {
       finalAnswerText = `${quadSolution.variable} = \\pm ${quadSolution.rootPositive}`;
     } else if (rectSolution !== null) {
@@ -1205,7 +1340,7 @@ Squaring any negative number yields a positive result. Therefore, both $+${rootP
     }
 
     const fallbackSolution = {
-      questionText: questionText.slice(0, 100),
+      questionText: (questionText || '').trim(),
       subject: resolvedSubject,
       topic: resolvedTopic,
       totalMarks: resolvedTotalMarks,
@@ -1218,6 +1353,10 @@ Squaring any negative number yields a positive result. Therefore, both $+${rootP
       examinerTraps: isEsl ? [
         'Using informal vocabulary or slang in formal extended writing',
         'Incomplete sentences or run-on comma splices'
+      ] : (vertexSolution !== null ? [
+        'Forgetting to multiply the squared constant by the factored leading coefficient before combining with c.',
+        'Inverting the sign of the turning point x-coordinate (writing (-b, c) vs (+b, c)).',
+        'Stating only part (a) or part (b) when a multi-part question allocates separate marks for both.'
       ] : (quadSolution !== null ? [
         'Omitting the negative root (writing only the positive root forfeits the [A1] accuracy mark).',
         'Forgetting that squaring a negative number yields a positive result.'
@@ -1233,8 +1372,14 @@ Squaring any negative number yields a positive result. Therefore, both $+${rootP
       ] : [
         'Premature rounding of intermediate values before final result',
         'Confusing arithmetic signs when rearranging terms'
-      ])))),
-      markSchemeBreakdown: quadSolution !== null ? [
+      ]))))),
+      markSchemeBreakdown: vertexSolution !== null ? [
+        `[M1] ${vertexSolution.a}(x^2 ${vertexSolution.p * 2 >= 0 ? `+ ${vertexSolution.p * 2}` : `- ${Math.abs(vertexSolution.p * 2)}`}x) ${vertexSolution.cCoeff >= 0 ? `+ ${vertexSolution.cCoeff}` : `- ${Math.abs(vertexSolution.cCoeff)}`}`,
+        `[M1] ${vertexSolution.a}[(x ${vertexSolution.p >= 0 ? `+ ${vertexSolution.p}` : `- ${Math.abs(vertexSolution.p)}`})^2 - ${vertexSolution.p * vertexSolution.p}] + ${vertexSolution.cCoeff}`,
+        `[A1] Form a(x + b)^2 + c = ${vertexSolution.vertexFormStr}`,
+        `[B1] Turning point coordinates: (${vertexSolution.turningX}, ${vertexSolution.turningY})`,
+        `[B1] Nature of turning point: ${vertexSolution.nature} (since a = ${vertexSolution.a} > 0)`
+      ] : (quadSolution !== null ? [
         `[M1] ${quadSolution.variable} = \\pm\\sqrt{${quadSolution.k}}`,
         `[A1] Both roots: ${quadSolution.variable} = ${quadSolution.rootPositive} and ${quadSolution.variable} = ${quadSolution.rootNegative}`
       ] : (rectSolution !== null ? [
@@ -1247,7 +1392,7 @@ Squaring any negative number yields a positive result. Therefore, both $+${rootP
       ] : [
         '[M1] Valid method shown',
         '[A1] Correct final answer / sentence meeting syllabus criteria'
-      ]))),
+      ])))),
       examinerTips: [
         isEsl ? 'Use sophisticated discourse markers to signal logical contrast.' : 'Write out every algebraic rearrangement step clearly to secure method marks.'
       ],

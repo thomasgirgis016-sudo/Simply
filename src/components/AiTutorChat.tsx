@@ -68,6 +68,11 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
     const text = textToSend || input;
     if (!text.trim() || loading) return;
 
+    if (text.includes('[type your answer here]')) {
+      setInput(`For ${examQuestionsForSubject[0]?.paperCode || ''} ${examQuestionsForSubject[0]?.questionNumber || ''}, my answer is: `);
+      return;
+    }
+
     const userMsg: Message = {
       id: `msg-${Date.now()}-user`,
       role: 'user',
@@ -363,8 +368,11 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
           ))}
           <button
             type="button"
-            onClick={() => handleSend(`For ${examQuestionsForSubject[0].paperCode} ${examQuestionsForSubject[0].questionNumber}, here is my answer: [type your answer here]. Grade my answer and tell me my marks.`)}
+            onClick={() => {
+              setInput(`For ${examQuestionsForSubject[0].paperCode} ${examQuestionsForSubject[0].questionNumber}, my answer is: `);
+            }}
             className="shrink-0 rounded-lg border border-emerald-500/30 bg-emerald-950/40 px-2.5 py-1 text-[11px] text-emerald-300 hover:bg-emerald-900/50 transition cursor-pointer flex items-center gap-1"
+            title="Type your answer to receive line-by-line mark scheme grading"
           >
             <CheckCircle className="h-3 w-3" />
             <span>Test & Grade My Answer</span>

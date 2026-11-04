@@ -28,7 +28,8 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
         marks: 2,
         prompt: 'A marker buoy M is anchored such that the bearing of M from town P is 040°. State the three-figure bearing of town P from buoy M.',
         markScheme: [
-          { markType: '[B2]', requirement: 'Back-bearing = 040° + 180° = 220° (allow [B1] for 220 without leading zero)' }
+          { markType: '[M1]', requirement: 'Back-bearing calculation: $040° + 180°$' },
+          { markType: '[A1]', requirement: 'Back-bearing = $220°$' }
         ],
         finalAnswer: '220°',
         examinerTip: 'Add 180° to forward bearings less than 180° to find the back-bearing.'
@@ -54,6 +55,8 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
     diagramOrMath: 'c^2 = a^2 + b^2 - 2ab\\cos(C)',
     marks: 7,
     markScheme: [
+      { markType: '[M1]', requirement: 'Back-bearing method: $040° + 180°$' },
+      { markType: '[A1]', requirement: 'Back-bearing = $220°$' },
       { markType: '[B1]', requirement: 'Distance for A = 18 × 1.5 = 27 km; Distance for B = 24 × 1.5 = 36 km' },
       { markType: '[B1]', requirement: 'Angle between courses = 115° - 040° = 75°' },
       { markType: '[M1]', requirement: 'Correct application of cosine rule: $d^2 = 27^2 + 36^2 - 2(27)(36)\\cos(75°)$' },
@@ -82,7 +85,8 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
         marks: 2,
         prompt: 'The first four terms of a linear sequence are $3, 7, 11, 15$. Find an expression for the $n$th term.',
         markScheme: [
-          { markType: '[B2]', requirement: 'Common difference = 4 $\\implies 4n - 1$' }
+          { markType: '[M1]', requirement: 'Common difference = 4, identifying $4n$' },
+          { markType: '[A1]', requirement: 'Final $n$th term = $4n - 1$' }
         ],
         finalAnswer: '$4n - 1$'
       },
@@ -105,6 +109,8 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
     diagramOrMath: 'an^2 + bn + c',
     marks: 6,
     markScheme: [
+      { markType: '[M1]', requirement: 'Common difference = 4, identifying $4n$' },
+      { markType: '[A1]', requirement: 'Linear $n$th term = $4n - 1$' },
       { markType: '[M1]', requirement: 'Finding first differences (7, 11, 15, 19) and constant second difference = 4' },
       { markType: '[M1]', requirement: '$2a = 4 \\implies a = 2$, identifying $2n^2$ component' },
       { markType: '[M1]', requirement: 'Subtracting $2n^2$ from terms (4 - 2 = 2, 11 - 8 = 3, 22 - 18 = 4) gives linear sequence $n + 1$' },
@@ -132,37 +138,38 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
         marks: 2,
         prompt: 'Express $\\vec{AB}$ in terms of $\\mathbf{a}$ and $\\mathbf{b}$.',
         markScheme: [
-          { markType: '[B1]', requirement: '$\\vec{AB} = \\mathbf{b} - \\mathbf{a}$' }
+          { markType: '[M1]', requirement: '$\\vec{AB} = \\vec{OB} - \\vec{OA} = 6\\mathbf{b} - 3\\mathbf{a}$' },
+          { markType: '[A1]', requirement: '$\\vec{AB} = 6\\mathbf{b} - 3\\mathbf{a} \\text{ (or } 3(2\\mathbf{b} - \\mathbf{a})\\text{)}$' }
         ],
-        finalAnswer: '$\\mathbf{b} - \\mathbf{a}$'
+        finalAnswer: '$6\\mathbf{b} - 3\\mathbf{a}$'
       },
       {
         part: '(b)',
-        marks: 6,
-        prompt: 'In triangle $OAB$, $\\vec{OA} = \\mathbf{a}$ and $\\vec{OB} = \\mathbf{b}$. Point $M$ lies on $AB$ such that $AM : MB = 1 : 2$.\nPoint $N$ lies on $OB$ such that $ON = \\frac{1}{3}\\mathbf{b}$.\nShow that $\\vec{OM} = \\frac{2}{3}\\mathbf{a} + \\frac{1}{3}\\mathbf{b}$ and prove that $M, N$ and the point $P(2\\mathbf{a})$ lie on a straight line.',
-        diagramOrMath: '\\vec{OM} = \\mathbf{a} + \\frac{1}{3}(\\mathbf{b} - \\mathbf{a})',
+        marks: 4,
+        prompt: 'In triangle $OAB$, $\\vec{OA} = 3\\mathbf{a}$ and $\\vec{OB} = 6\\mathbf{b}$. Point $M$ lies on $AB$ such that $AM : MB = 1 : 2$.\nPoint $P$ has position vector $\\vec{OP} = 3\\mathbf{a} + 3\\mathbf{b}$.\nShow that $\\vec{OM} = 2\\mathbf{a} + 2\\mathbf{b}$ and prove that $O, M$ and $P$ lie on a straight line.',
+        diagramOrMath: '\\vec{OM} = \\vec{OA} + \\frac{1}{3}\\vec{AB} = 3\\mathbf{a} + \\frac{1}{3}(6\\mathbf{b} - 3\\mathbf{a})',
         markScheme: [
-          { markType: '[B1]', requirement: '$\\vec{AB} = \\mathbf{b} - \\mathbf{a}$' },
-          { markType: '[M1]', requirement: '$\\vec{OM} = \\vec{OA} + \\frac{1}{3}\\vec{AB} = \\mathbf{a} + \\frac{1}{3}(\\mathbf{b} - \\mathbf{a}) = \\frac{2}{3}\\mathbf{a} + \\frac{1}{3}\\mathbf{b}$' },
-          { markType: '[M1]', requirement: 'Find vector $\\vec{NM} = \\vec{OM} - \\vec{ON} = \\frac{2}{3}\\mathbf{a} + \\frac{1}{3}\\mathbf{b} - \\frac{1}{3}\\mathbf{b} = \\frac{2}{3}\\mathbf{a}$' },
-          { markType: '[M1]', requirement: 'Find vector $\\vec{NP} = \\vec{OP} - \\vec{ON} = 2\\mathbf{a} - \\frac{1}{3}\\mathbf{b}$ or vector $\\vec{MP}$' },
-          { markType: '[A1]', requirement: 'Demonstrating collinearity via parallel scalar multiple and common point' }
+          { markType: '[M1]', requirement: '$\\vec{OM} = \\vec{OA} + \\frac{1}{3}\\vec{AB} = 3\\mathbf{a} + \\frac{1}{3}(6\\mathbf{b} - 3\\mathbf{a})$' },
+          { markType: '[A1]', requirement: '$\\vec{OM} = 2\\mathbf{a} + 2\\mathbf{b} = 2(\\mathbf{a} + \\mathbf{b})$' },
+          { markType: '[M1]', requirement: '$\\vec{OP} = 3\\mathbf{a} + 3\\mathbf{b} = 3(\\mathbf{a} + \\mathbf{b}) = \\frac{3}{2}\\vec{OM}$' },
+          { markType: '[A1]', requirement: 'Conclude: $\\vec{OP} = \\frac{3}{2}\\vec{OM}$ (parallel scalar multiple) and sharing common origin $O \\implies O, M, P$ lie on a straight line' }
         ],
-        finalAnswer: 'Proof shown: $\\vec{NM}$ is a scalar multiple of $\\vec{a}$ and points share common origin'
+        finalAnswer: 'Proof shown: $\\vec{OP} = \\frac{3}{2}\\vec{OM}$ and points share common origin $O$'
       }
     ],
     snippetQuery: 'vector proof parallel straight line collinear scalar multiple vector OA OB',
-    questionPrompt: 'In triangle $OAB$, $\\vec{OA} = \\mathbf{a}$ and $\\vec{OB} = \\mathbf{b}$. Point $M$ lies on $AB$ such that $AM : MB = 1 : 2$.\nPoint $N$ lies on $OB$ such that $ON = \\frac{1}{3}\\mathbf{b}$.\nShow that $\\vec{OM} = \\frac{2}{3}\\mathbf{a} + \\frac{1}{3}\\mathbf{b}$ and prove that $M, N$ and the point $P(2\\mathbf{a})$ lie on a straight line.',
-    diagramOrMath: '\\vec{OM} = \\mathbf{a} + \\frac{1}{3}(\\mathbf{b} - \\mathbf{a})',
-    marks: 8,
+    questionPrompt: 'In triangle $OAB$, $\\vec{OA} = 3\\mathbf{a}$ and $\\vec{OB} = 6\\mathbf{b}$. Point $M$ lies on $AB$ such that $AM : MB = 1 : 2$.\nPoint $P$ has position vector $\\vec{OP} = 3\\mathbf{a} + 3\\mathbf{b}$.\nShow that $\\vec{OM} = 2\\mathbf{a} + 2\\mathbf{b}$ and prove that points $O, M$ and $P$ lie on a straight line.',
+    diagramOrMath: '\\vec{OM} = 3\\mathbf{a} + \\frac{1}{3}(6\\mathbf{b} - 3\\mathbf{a}) = 2\\mathbf{a} + 2\\mathbf{b}',
+    marks: 6,
     markScheme: [
-      { markType: '[B1]', requirement: '$\\vec{AB} = \\mathbf{b} - \\mathbf{a}$' },
-      { markType: '[M1]', requirement: '$\\vec{OM} = \\vec{OA} + \\frac{1}{3}\\vec{AB} = \\mathbf{a} + \\frac{1}{3}(\\mathbf{b} - \\mathbf{a}) = \\frac{2}{3}\\mathbf{a} + \\frac{1}{3}\\mathbf{b}$' },
-      { markType: '[M1]', requirement: 'Find vector $\\vec{NM} = \\vec{OM} - \\vec{ON} = \\frac{2}{3}\\mathbf{a} + \\frac{1}{3}\\mathbf{b} - \\frac{1}{3}\\mathbf{b} = \\frac{2}{3}\\mathbf{a}$' },
-      { markType: '[M1]', requirement: 'Find vector $\\vec{NP} = \\vec{OP} - \\vec{ON} = 2\\mathbf{a} - \\frac{1}{3}\\mathbf{b}$ or vector $\\vec{MP}$' },
-      { markType: '[A1]', requirement: 'Demonstrating collinearity via parallel scalar multiple and common point' }
+      { markType: '[M1]', requirement: '$\\vec{AB} = \\vec{OB} - \\vec{OA} = 6\\mathbf{b} - 3\\mathbf{a}$' },
+      { markType: '[A1]', requirement: '$\\vec{AB} = 6\\mathbf{b} - 3\\mathbf{a}$' },
+      { markType: '[M1]', requirement: '$\\vec{OM} = \\vec{OA} + \\frac{1}{3}\\vec{AB} = 3\\mathbf{a} + \\frac{1}{3}(6\\mathbf{b} - 3\\mathbf{a})$' },
+      { markType: '[A1]', requirement: '$\\vec{OM} = 2\\mathbf{a} + 2\\mathbf{b} = 2(\\mathbf{a} + \\mathbf{b})$' },
+      { markType: '[M1]', requirement: '$\\vec{OP} = 3\\mathbf{a} + 3\\mathbf{b} = 3(\\mathbf{a} + \\mathbf{b}) = \\frac{3}{2}\\vec{OM}$' },
+      { markType: '[A1]', requirement: 'Collinearity: $\\vec{OP}$ is a scalar multiple of $\\vec{OM}$ and points share common origin $O$' }
     ],
-    finalAnswer: 'Proof shown: $\\vec{NM}$ is a scalar multiple of $\\vec{a}$ and points share common origin',
+    finalAnswer: 'Proof shown: $\\vec{OP} = \\frac{3}{2}\\vec{OM}$ and points share common origin $O$',
     examinerReportSnippet: 'Vector proofs are regularly among the lowest-scoring questions on Paper 4. Candidates fail to explicitly state that the vectors share a common point.'
   },
   {
@@ -216,13 +223,16 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
     diagramOrMath: 'V_{\\text{frustum}} = \\frac{1}{3}\\pi R^2 H - \\frac{1}{3}\\pi r^2 h',
     marks: 8,
     markScheme: [
-      { markType: '[B1]', requirement: 'Using similar triangles: $\\frac{r}{12} = \\frac{10}{30} \\implies r = 4\\text{ cm}$' },
+      { markType: '[M1]', requirement: 'Using similar triangles ratio: $\\frac{r}{12} = \\frac{10}{30}$' },
+      { markType: '[A1]', requirement: '$r = 12 \\times \\frac{1}{3} = 4\\text{ cm}$' },
       { markType: '[M1]', requirement: 'Volume of large cone = $\\frac{1}{3}\\pi (12)^2 (30) = 1440\\pi$' },
       { markType: '[M1]', requirement: 'Volume of small cone = $\\frac{1}{3}\\pi (4)^2 (10) = \\frac{160}{3}\\pi$' },
-      { markType: '[M1]', requirement: 'Subtracting volumes: $1440\\pi - \\frac{160}{3}\\pi = \\frac{4160}{3}\\pi$' },
-      { markType: '[A1]', requirement: '$V = \\frac{4160}{3}\\pi\\text{ cm}^3$ or $1386.7\\pi\\text{ cm}^3$ (or approx $4356\\text{ cm}^3$)' }
+      { markType: '[A1]', requirement: 'Frustum volume = $1440\\pi - \\frac{160}{3}\\pi = \\frac{4160}{3}\\pi\\text{ cm}^3$' },
+      { markType: '[M1]', requirement: 'Recasting equation: $\\frac{4}{3}\\pi R^3 = \\frac{4160}{3}\\pi$' },
+      { markType: '[M1]', requirement: '$R^3 = 1040 \\implies R = \\sqrt[3]{1040}$' },
+      { markType: '[A1]', requirement: 'Radius of sphere $R = 10.1\\text{ cm}$ (to 3 s.f.)' }
     ],
-    finalAnswer: '$\\frac{4160}{3}\\pi\\text{ cm}^3$ (approx $4356\\text{ cm}^3$)',
+    finalAnswer: '$\\frac{4160}{3}\\pi\\text{ cm}^3$ (approx $4356\\text{ cm}^3$); $R = 10.1\\text{ cm}$',
     examinerReportSnippet: 'Candidates often cubed linear scale factor $k = 1/3$ correctly ($k^3 = 1/27$), but multiplied it by the whole cone without subtracting from the original.'
   },
   {
@@ -242,36 +252,36 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
       {
         part: '(i)',
         marks: 2,
-        prompt: 'State angle $ADB$ and give a geometrical reason.',
+        prompt: 'Calculate angle $BOD$ (subtended at center $O$) and state the circle theorem used.',
         markScheme: [
-          { markType: '[B1]', requirement: '$\\angle ADB = 62°$' },
-          { markType: '[B1]', requirement: 'Reason: Alternate segment theorem' }
+          { markType: '[M1]', requirement: 'Angle subtended at center is twice angle at circumference: $2 \\times 62°$' },
+          { markType: '[A1]', requirement: '$\\angle BOD = 124°$ (Angle at center is twice angle at circumference)' }
         ],
-        finalAnswer: '$62°$ (Alternate segment theorem)'
+        finalAnswer: '$124°$ (Angle at center is twice angle at circumference)'
       },
       {
         part: '(ii)',
         marks: 2,
-        prompt: 'Find angle $BCD$.',
+        prompt: 'Calculate angle $BCD$ and state the circle theorem used.',
         markScheme: [
-          { markType: '[M1]', requirement: 'In cyclic quadrilateral $ABCD$, opposite angles sum to $180°$' },
-          { markType: '[A1]', requirement: '$\\angle BCD = 180° - 62° = 118°$' }
+          { markType: '[M1]', requirement: 'Opposite angles in a cyclic quadrilateral sum to $180°$: $180° - 62°$' },
+          { markType: '[A1]', requirement: '$\\angle BCD = 180° - 62° = 118°$ (Opposite angles of cyclic quad sum to $180°$)' }
         ],
-        finalAnswer: '$118°$'
+        finalAnswer: '$118°$ (Opposite angles of cyclic quad sum to $180°$)'
       }
     ],
-    snippetQuery: 'circle theorem tangent radius cyclic quadrilateral alternate segment theorem',
-    questionPrompt: '$A, B, C$ and $D$ lie on the circumference of a circle, center $O$. Line $TAT\\prime$ is a tangent to the circle at $A$.\nAngle $TAB = 62°$ and angle $CBD = 34°$.\n(i) State angle $ADB$ and give a geometrical reason.\n(ii) Find angle $BCD$.',
-    diagramOrMath: '\\angle ADB = \\angle TAB = 62° \\quad (\\text{Alternate Segment Theorem})',
+    snippetQuery: 'circle theorem center angle circumference cyclic quadrilateral opposite angles 180',
+    questionPrompt: '$A, B, C$ and $D$ lie in order on the circumference of a circle, center $O$. Angle $BAD = 62°$.\n(i) Calculate angle $BOD$ and state the circle theorem used.\n(ii) Calculate angle $BCD$ and state the circle theorem used.',
+    diagramOrMath: '\\angle BOD = 2 \\times 62° = 124° \\quad \\text{and} \\quad \\angle BCD = 180° - 62° = 118°',
     marks: 4,
     markScheme: [
-      { markType: '[B1]', requirement: '$\\angle ADB = 62°$' },
-      { markType: '[B1]', requirement: 'Reason: Alternate segment theorem' },
-      { markType: '[M1]', requirement: 'In cyclic quadrilateral $ABCD$, opposite angles sum to $180°$' },
-      { markType: '[A1]', requirement: '$\\angle BCD = 180° - 62° = 118°$' }
+      { markType: '[M1]', requirement: 'Angle subtended at center is twice angle at circumference: $2 \\times 62°$' },
+      { markType: '[A1]', requirement: '$\\angle BOD = 124°$' },
+      { markType: '[M1]', requirement: 'Opposite angles in cyclic quadrilateral $ABCD$ sum to $180°$: $180° - 62°$' },
+      { markType: '[A1]', requirement: '$\\angle BCD = 118°$' }
     ],
-    finalAnswer: '(i) $62°$ (Alternate segment theorem); (ii) $118°$ (Opposite angles of cyclic quad sum to $180°$)',
-    examinerReportSnippet: 'The alternate segment theorem remains the least recognized circle theorem on Paper 2. Candidates frequently guessed "tangent meets radius at 90°".'
+    finalAnswer: '(i) $124°$ (Angle at center is twice angle at circumference); (ii) $118°$ (Opposite angles of cyclic quad sum to $180°$)',
+    examinerReportSnippet: 'Candidates often confuse the cyclic quadrilateral rule with alternate angles, erroneously assuming opposite angles are equal rather than supplementary.'
   },
 
   // ─────────────────────────────────────────────────────────────
@@ -354,7 +364,8 @@ export const PAST_PAPERS_DATABASE: PastPaperItem[] = [
       { markType: '[M1]', requirement: 'Balanced reduction equation: $Fe_2O_3 + 3CO \\rightarrow 2Fe + 3CO_2$' },
       { markType: '[B1]', requirement: 'Thermal decomposition of limestone: $CaCO_3 \\rightarrow CaO + CO_2$' },
       { markType: '[B1]', requirement: 'Acid-base neutralization with sand/silica ($SiO_2$): $CaO + SiO_2 \\rightarrow CaSiO_3$' },
-      { markType: '[A1]', requirement: 'Identify product $CaSiO_3$ as molten slag, which floats on molten iron and is tapped off' }
+      { markType: '[B1]', requirement: 'Product $CaSiO_3$ (calcium silicate) forms molten slag' },
+      { markType: '[A1]', requirement: 'Slag is less dense than iron, floats on top, and is tapped off separately' }
     ],
     finalAnswer: '$Fe_2O_3 + 3CO \\rightarrow 2Fe + 3CO_2$; $CaO + SiO_2 \\rightarrow CaSiO_3$ (molten slag)',
     examinerReportSnippet: 'Many candidates wrote that carbon itself directly reduces hematite in modern blast furnaces, missing the main reducing agent which is carbon monoxide ($CO$).'

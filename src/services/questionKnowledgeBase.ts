@@ -2581,7 +2581,7 @@ export function generate40McqQuestions(pdf: OfficialPaperPdf): PastPaperItem[] {
     let explanation = 'Standard Cambridge MCQ mark scheme answer.';
 
     if (isPhysics) {
-      if (q <= 5) {
+      if (q === 1) {
         topic = 'Measurement & Kinematics';
         prompt = `A student measures the diameter of a thin copper wire using a micrometer screw gauge. The main scale reading is $2.5\\text{ mm}$ and the circular thimble reading is $38$.\nWhat is the diameter of the wire?`;
         optionA = '$2.38\\text{ mm}$';
@@ -2590,7 +2590,43 @@ export function generate40McqQuestions(pdf: OfficialPaperPdf): PastPaperItem[] {
         optionD = '$6.30\\text{ mm}$';
         correct = 'B';
         explanation = 'Main scale = 2.5 mm, thimble = 0.38 mm; total = 2.5 + 0.38 = 2.88 mm.';
-      } else if (q <= 10) {
+      } else if (q === 2) {
+        topic = 'Measurement & Kinematics';
+        prompt = `A steel sphere is measured with vernier calipers. The main scale reads $3.4\\text{ cm}$ and the 6th vernier division coincides with a main scale mark.\nWhat is the diameter of the sphere?`;
+        optionA = '$3.40\\text{ cm}$';
+        optionB = '$3.46\\text{ cm}$';
+        optionC = '$3.64\\text{ cm}$';
+        optionD = '$4.00\\text{ cm}$';
+        correct = 'B';
+        explanation = 'Main scale = 3.4 cm, vernier = 0.06 cm; total = 3.46 cm.';
+      } else if (q === 3) {
+        topic = 'Speed, Velocity & Acceleration';
+        prompt = `What does the area enclosed under a speed-time graph represent?`;
+        optionA = 'Acceleration';
+        optionB = 'Total distance travelled';
+        optionC = 'Average speed';
+        optionD = 'Resultant force';
+        correct = 'B';
+        explanation = 'The area under a speed-time graph represents distance travelled (distance = speed * time).';
+      } else if (q === 4) {
+        topic = 'Speed, Velocity & Acceleration';
+        prompt = `A car accelerates uniformly from rest to a speed of $24\\text{ m/s}$ in $8.0\\text{ s}$.\nWhat is the acceleration of the car?`;
+        optionA = '$0.33\\text{ m/s}^2$';
+        optionB = '$3.0\\text{ m/s}^2$';
+        optionC = '$16\\text{ m/s}^2$';
+        optionD = '$192\\text{ m/s}^2$';
+        correct = 'B';
+        explanation = 'a = (v - u) / t = (24 - 0) / 8.0 = 3.0 m/s^2.';
+      } else if (q === 5) {
+        topic = 'Scalars and Vectors';
+        prompt = `Which row contains two vector quantities?`;
+        optionA = 'Mass and velocity';
+        optionB = 'Acceleration and force';
+        optionC = 'Distance and speed';
+        optionD = 'Time and momentum';
+        correct = 'B';
+        explanation = 'Both acceleration and force possess both magnitude and direction, making them vectors.';
+      } else if (q === 6) {
         topic = 'Forces, Mass & Weight';
         prompt = `An object of mass $5.0\\text{ kg}$ is pulled along a frictionless horizontal surface by a force of $20\\text{ N}$. A resistive friction force of $5\\text{ N}$ acts in the opposite direction.\nWhat is the acceleration of the object?`;
         optionA = '$1.0\\text{ m/s}^2$';
@@ -2599,6 +2635,42 @@ export function generate40McqQuestions(pdf: OfficialPaperPdf): PastPaperItem[] {
         optionD = '$5.0\\text{ m/s}^2$';
         correct = 'B';
         explanation = 'Resultant force F = 20 - 5 = 15 N. a = F / m = 15 / 5.0 = 3.0 m/s^2.';
+      } else if (q === 7) {
+        topic = 'Forces, Mass & Weight';
+        prompt = `A block of rock is transported from Earth to the Moon. The gravitational field strength on the Moon is $1.6\\text{ N/kg}$.\nHow do the mass and weight of the rock on the Moon compare with its values on Earth?`;
+        optionA = 'Mass is less; weight is the same';
+        optionB = 'Mass is the same; weight is less';
+        optionC = 'Both mass and weight are less';
+        optionD = 'Both mass and weight are the same';
+        correct = 'B';
+        explanation = 'Mass is the quantity of matter and remains constant. Weight depends on gravity (W = mg) and is less on the Moon.';
+      } else if (q === 8) {
+        topic = 'Terminal Velocity';
+        prompt = `A skydiver falls towards the Earth and reaches terminal velocity before opening the parachute.\nWhich statement describes the forces acting on the skydiver at terminal velocity?`;
+        optionA = 'Air resistance is greater than weight, so acceleration is upward';
+        optionB = 'Air resistance equals weight, so the resultant force is zero';
+        optionC = 'Weight is greater than air resistance, so the skydiver speeds up';
+        optionD = 'There is no air resistance acting at terminal velocity';
+        correct = 'B';
+        explanation = 'At terminal velocity, downward weight equals upward air resistance; resultant force is zero so acceleration is zero.';
+      } else if (q === 9) {
+        topic = 'Hooke\'s Law & Springs';
+        prompt = `A spring has an unstretched length of $10.0\\text{ cm}$. A load of $4.0\\text{ N}$ extends it to $12.5\\text{ cm}$.\nAssuming the limit of proportionality is not exceeded, what is the spring constant $k$?`;
+        optionA = '$0.625\\text{ N/cm}$';
+        optionB = '$1.6\\text{ N/cm}$';
+        optionC = '$2.5\\text{ N/cm}$';
+        optionD = '$10.0\\text{ N/cm}$';
+        correct = 'B';
+        explanation = 'Extension x = 12.5 - 10.0 = 2.5 cm. k = F / x = 4.0 / 2.5 = 1.6 N/cm.';
+      } else if (q === 10) {
+        topic = 'Density & Pressure';
+        prompt = `A rectangular block of metal has dimensions $2.0\\text{ cm} \\times 3.0\\text{ cm} \\times 5.0\\text{ cm}$ and a mass of $240\\text{ g}$.\nWhat is the density of the metal?`;
+        optionA = '$0.125\\text{ g/cm}^3$';
+        optionB = '$8.0\\text{ g/cm}^3$';
+        optionC = '$24\\text{ g/cm}^3$';
+        optionD = '$7200\\text{ g/cm}^3$';
+        correct = 'B';
+        explanation = 'Volume = 2 * 3 * 5 = 30 cm^3. Density = mass / volume = 240 / 30 = 8.0 g/cm^3.';
       } else if (q <= 15) {
         topic = 'Work, Power & Energy';
         prompt = `A crane lifts a load of weight $4000\\text{ N}$ through a vertical height of $15\\text{ m}$ in a time of $30\\text{ s}$.\nWhat is the useful power developed by the crane?`;
@@ -2655,8 +2727,8 @@ export function generate40McqQuestions(pdf: OfficialPaperPdf): PastPaperItem[] {
         explanation = 'Alpha emission reduces mass number by 4 (238 - 4 = 234) and proton number by 2 (92 - 2 = 90).';
       }
     } else if (isChem) {
-      if (q <= 5) {
-        topic = 'States & Purity';
+      if (q === 1) {
+        topic = 'States of Matter';
         prompt = `Which substance has particles that are closely packed in an irregular arrangement and able to slide over one another?`;
         optionA = 'Ice at $-5^\\circ\\text{C}$';
         optionB = 'Liquid water at $20^\\circ\\text{C}$';
@@ -2664,8 +2736,44 @@ export function generate40McqQuestions(pdf: OfficialPaperPdf): PastPaperItem[] {
         optionD = 'Sodium chloride crystal at $25^\\circ\\text{C}$';
         correct = 'B';
         explanation = 'Liquids have particles closely packed with no regular arrangement and free to slide.';
-      } else if (q <= 10) {
-        topic = 'Atomic Structure & Bonding';
+      } else if (q === 2) {
+        topic = 'Diffusion of Gases';
+        prompt = `A glass tube has cotton wool soaked in concentrated aqueous ammonia ($NH_3$, $M_r = 17$) placed at one end and concentrated hydrochloric acid ($HCl$, $M_r = 36.5$) at the other.\nWhere does the white ring of ammonium chloride ($NH_4Cl$) form?`;
+        optionA = 'Exactly halfway along the tube';
+        optionB = 'Closer to the hydrochloric acid end because ammonia diffuses faster';
+        optionC = 'Closer to the ammonia end because hydrochloric acid diffuses faster';
+        optionD = 'At both ends simultaneously';
+        correct = 'B';
+        explanation = 'Ammonia has a lower molecular mass (Mr = 17) than hydrogen chloride (Mr = 36.5), so NH3 molecules diffuse faster, meeting closer to the HCl end.';
+      } else if (q === 3) {
+        topic = 'Chromatography & Separation';
+        prompt = `A chromatogram of a dye shows a spot that travelled $4.8\\text{ cm}$ while the solvent front travelled $6.0\\text{ cm}$.\nWhat is the $R_f$ value of the substance in the spot?`;
+        optionA = '$0.48$';
+        optionB = '$0.80$';
+        optionC = '$1.25$';
+        optionD = '$2.88$';
+        correct = 'B';
+        explanation = 'Rf = distance travelled by substance / distance travelled by solvent front = 4.8 / 6.0 = 0.80.';
+      } else if (q === 4) {
+        topic = 'Separation Techniques';
+        prompt = `Which separation technique is most suitable for obtaining pure water from aqueous copper(II) sulfate?`;
+        optionA = 'Crystallisation';
+        optionB = 'Simple distillation';
+        optionC = 'Fractional distillation';
+        optionD = 'Filtration';
+        correct = 'B';
+        explanation = 'Simple distillation separates a solvent (water) from a non-volatile dissolved solute (copper(II) sulfate).';
+      } else if (q === 5) {
+        topic = 'Purity & Melting Points';
+        prompt = `A sample of an organic compound melts sharply at $122^\\circ\\text{C}$. When an impurity is added, what happens to the melting point?`;
+        optionA = 'It melts over a range of temperatures below $122^\\circ\\text{C}$';
+        optionB = 'It melts sharply at $125^\\circ\\text{C}$';
+        optionC = 'It melts sharply at $120^\\circ\\text{C}$';
+        optionD = 'The melting point is unchanged';
+        correct = 'A';
+        explanation = 'Impurities lower the melting point and cause the substance to melt over a range of temperatures below that of the pure substance.';
+      } else if (q === 6) {
+        topic = 'Atomic Structure & Isotopes';
         prompt = `How many electrons, protons, and neutrons are in an ion of $^{35}_{17}\\text{Cl}^-$?`;
         optionA = '17 electrons, 17 protons, 18 neutrons';
         optionB = '18 electrons, 17 protons, 18 neutrons';
@@ -2673,6 +2781,42 @@ export function generate40McqQuestions(pdf: OfficialPaperPdf): PastPaperItem[] {
         optionD = '16 electrons, 17 protons, 18 neutrons';
         correct = 'B';
         explanation = 'Protons = 17, neutrons = 35 - 17 = 18, electrons = 17 + 1 = 18 for Cl- ion.';
+      } else if (q === 7) {
+        topic = 'Atomic Structure & Isotopes';
+        prompt = `Which statement correctly defines isotopes of the same element?`;
+        optionA = 'Atoms with the same number of neutrons but different numbers of protons';
+        optionB = 'Atoms with the same number of protons but different numbers of neutrons';
+        optionC = 'Atoms with different physical states and different chemical properties';
+        optionD = 'Molecules having identical molecular formula but different structural arrangements';
+        correct = 'B';
+        explanation = 'Isotopes are atoms of the same element with the same proton number (atomic number) but different nucleon numbers (different numbers of neutrons).';
+      } else if (q === 8) {
+        topic = 'Structure & Bonding';
+        prompt = `Why does graphite conduct electricity whereas diamond does not?`;
+        optionA = 'Graphite contains ions that are free to move throughout the structure';
+        optionB = 'Graphite has delocalised electrons between its hexagonal layers';
+        optionC = 'Diamond has weak intermolecular forces between layers';
+        optionD = 'Graphite has stronger covalent bonds than diamond';
+        correct = 'B';
+        explanation = 'In graphite, each carbon atom forms 3 covalent bonds leaving one delocalised electron per atom that can move freely between layers.';
+      } else if (q === 9) {
+        topic = 'Ionic Bonding';
+        prompt = `Magnesium reacts with oxygen to form magnesium oxide ($MgO$).\nHow are the ions formed in this reaction?`;
+        optionA = 'Magnesium atoms gain two electrons; oxygen atoms lose two electrons';
+        optionB = 'Magnesium atoms lose two electrons; oxygen atoms gain two electrons';
+        optionC = 'Magnesium and oxygen atoms share two pairs of electrons';
+        optionD = 'Magnesium atoms lose one electron; oxygen atoms gain one electron';
+        correct = 'B';
+        explanation = 'Mg loses 2 valence electrons to form Mg2+; O gains 2 electrons to form O2-.';
+      } else if (q === 10) {
+        topic = 'Covalent Bonding';
+        prompt = `How many pairs of electrons are shared between the two nitrogen atoms in a nitrogen molecule ($N_2$)?`;
+        optionA = '1 pair (single bond)';
+        optionB = '2 pairs (double bond)';
+        optionC = '3 pairs (triple bond)';
+        optionD = '4 pairs (quadruple bond)';
+        correct = 'C';
+        explanation = 'Each nitrogen atom has 5 valence electrons and needs 3 more to achieve an octet, sharing 3 pairs of electrons to form a triple covalent bond.';
       } else if (q <= 15) {
         topic = 'Stoichiometry & Moles';
         prompt = `What is the mass of $0.25\\text{ mol}$ of calcium carbonate ($CaCO_3$)? [$M_r: CaCO_3 = 100$].`;
@@ -2729,15 +2873,96 @@ export function generate40McqQuestions(pdf: OfficialPaperPdf): PastPaperItem[] {
         explanation = '2-methylpropane has formula C4H10 with a branched structure, making it an isomer of butane.';
       }
     } else if (isBio) {
-      if (q <= 10) {
-        topic = 'Cell Structure & Movement';
+      if (q === 1) {
+        topic = 'Characteristics of Living Organisms';
+        prompt = `Which characteristic of living organisms is defined as the removal of toxic materials and substances in excess of requirements from the body?`;
+        optionA = 'Nutrition';
+        optionB = 'Excretion';
+        optionC = 'Egestion';
+        optionD = 'Respiration';
+        correct = 'B';
+        explanation = 'Excretion is the removal of toxic materials and metabolic waste; egestion is the passing out of undigested food.';
+      } else if (q === 2) {
+        topic = 'Classification & Binomial System';
+        prompt = `According to the binomial system of naming species, what do the two words in the scientific name Panthera leo represent?`;
+        optionA = 'Family and genus';
+        optionB = 'Genus and species';
+        optionC = 'Kingdom and phylum';
+        optionD = 'Order and family';
+        correct = 'B';
+        explanation = 'The first word is the genus (capitalised) and the second is the species (lowercase).';
+      } else if (q === 3) {
+        topic = 'Cell Structure & Organisation';
+        prompt = `Which cellular structure is present in plant cells but absent from animal cells?`;
+        optionA = 'Cell membrane';
+        optionB = 'Cellulose cell wall';
+        optionC = 'Mitochondrion';
+        optionD = 'Ribosome';
+        correct = 'B';
+        explanation = 'Cellulose cell walls and permanent large central vacuoles are unique to plant cells among typical eukaryotic cells.';
+      } else if (q === 4) {
+        topic = 'Magnification & Size';
+        prompt = `An image of a plant cell measures $48\\text{ mm}$ across. The magnification of the image is $\\times 800$.\nWhat is the actual size of the cell?`;
+        optionA = '$0.06\\text{ mm}$ ($60\\;\\mu\\text{m}$)';
+        optionB = '$0.60\\text{ mm}$ ($600\\;\\mu\\text{m}$)';
+        optionC = '$16.6\\text{ mm}$';
+        optionD = '$38.4\\;\\mu\\text{m}$';
+        correct = 'A';
+        explanation = 'Actual size = Image size / Magnification = 48 mm / 800 = 0.06 mm = 60 micrometres.';
+      } else if (q === 5) {
+        topic = 'Movement In and Out of Cells';
         prompt = `Which process describes the net movement of water molecules from a region of higher water potential to lower water potential through a partially permeable membrane?`;
         optionA = 'Active transport';
         optionB = 'Osmosis';
         optionC = 'Diffusion';
         optionD = 'Transpiration';
         correct = 'B';
-        explanation = 'Osmosis is specifically the movement of water down water potential gradient across partially permeable membrane.';
+        explanation = 'Osmosis is specifically the movement of water down a water potential gradient across a partially permeable membrane.';
+      } else if (q === 6) {
+        topic = 'Active Transport';
+        prompt = `Which feature is essential for active transport to take place across a cell membrane?`;
+        optionA = 'Movement down a concentration gradient and light energy';
+        optionB = 'Carrier proteins and energy released from cellular respiration (ATP)';
+        optionC = 'Freely permeable membrane and kinetic energy only';
+        optionD = 'Water potential gradient and channel proteins only';
+        correct = 'B';
+        explanation = 'Active transport moves particles against concentration gradient using protein carriers and energy from ATP.';
+      } else if (q === 7) {
+        topic = 'Biological Molecules';
+        prompt = `A student tests a clear liquid with Benedict\'s reagent and heats the mixture in a water bath at $80^\\circ\\text{C}$. The mixture turns brick-red.\nWhat does the liquid contain?`;
+        optionA = 'Lipid';
+        optionB = 'Reducing sugar';
+        optionC = 'Protein';
+        optionD = 'Starch';
+        correct = 'B';
+        explanation = 'Benedict\'s test turns from blue to brick-red in the presence of reducing sugars like glucose.';
+      } else if (q === 8) {
+        topic = 'Enzymes & Catalysis';
+        prompt = `Why does the rate of an enzyme-catalysed reaction decrease rapidly when the temperature rises above $60^\\circ\\text{C}$?`;
+        optionA = 'Substrate molecules lose all their kinetic energy';
+        optionB = 'The active site changes shape permanently because the enzyme is denatured';
+        optionC = 'The activation energy of the reaction increases';
+        optionD = 'The enzyme molecules are hydrolysed into individual amino acids';
+        correct = 'B';
+        explanation = 'High temperatures break hydrogen and ionic bonds maintaining the tertiary structure, denaturing the active site.';
+      } else if (q === 9) {
+        topic = 'Plant Nutrition & Photosynthesis';
+        prompt = `What are the products of photosynthesis in green plants?`;
+        optionA = 'Carbon dioxide and water';
+        optionB = 'Glucose and oxygen';
+        optionC = 'Lactic acid and energy';
+        optionD = 'Ethanol and carbon dioxide';
+        correct = 'B';
+        explanation = 'Photosynthesis uses carbon dioxide + water with light energy absorbed by chlorophyll to produce glucose + oxygen.';
+      } else if (q === 10) {
+        topic = 'Leaf Structure';
+        prompt = `In which tissue of a dicotyledonous leaf does the highest rate of photosynthesis occur?`;
+        optionA = 'Upper epidermis';
+        optionB = 'Palisade mesophyll';
+        optionC = 'Spongy mesophyll';
+        optionD = 'Lower epidermis';
+        correct = 'B';
+        explanation = 'Palisade mesophyll cells are vertically packed near the upper surface and contain the highest density of chloroplasts.';
       } else if (q <= 20) {
         topic = 'Plant & Human Nutrition';
         prompt = `Which blood vessel carries blood with the highest concentration of glucose shortly after a carbohydrate-rich meal?`;
