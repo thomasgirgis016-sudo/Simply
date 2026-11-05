@@ -42,7 +42,9 @@ import {
   Info,
   BookMarked,
   FileText,
-  Headphones
+  Headphones,
+  Building2,
+  BrainCircuit
 } from 'lucide-react';
 import { UserProfile, Subject, UserAccount } from '../types';
 import { SimplyLogo } from './SimplyLogo';
@@ -74,6 +76,8 @@ export type ActiveTab =
   | 'boundaries'
   | 'split'
   | 'classifieds'
+  | 'tanzim'
+  | 'formula-quiz'
   | 'analytics'
   | 'admin';
 
@@ -193,6 +197,8 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'listening', label: 'Listening Practice', icon: Headphones, color: 'text-indigo-400' },
     { id: 'flashcards', label: 'Topic Active Recall Decks', icon: Layers, color: 'text-blue-400' },
     { id: 'formulas', label: 'Formulas & Commands', icon: BookmarkCheck, color: 'text-amber-400' },
+    { id: 'formula-quiz', label: 'Formula Recall Quizzer', icon: BrainCircuit, color: 'text-amber-400' },
+    { id: 'tanzim', label: 'Tanzim Equivalence Calculator', icon: Building2, color: 'text-indigo-400' },
     { id: 'chat', label: 'Examiner Walkthrough Co-Pilot', icon: MessageSquare, color: 'text-sky-400' },
     { id: 'analytics', label: 'Teacher Classroom', icon: Users, color: 'text-blue-400' },
     { id: 'boundaries', label: 'Grade Boundaries', icon: TrendingUp, color: 'text-teal-400' },

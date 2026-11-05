@@ -76,6 +76,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       case 'flashcards': return 'Topic Active Recall Decks';
       case 'cheatsheets': return 'Night Before Cheat Sheets';
       case 'formulas': return 'Formulas Dictionary';
+      case 'formula-quiz': return 'Formula Recall Memory Quizzer';
+      case 'tanzim': return 'Egyptian University Tanzim Calculator';
       case 'checklist': return 'Syllabus Tracker';
       case 'boundaries': return 'Grade Boundaries';
       case 'admin': return currentUser?.role === 'founder' ? 'Founder Console' : 'Admin Console';

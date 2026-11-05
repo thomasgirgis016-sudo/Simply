@@ -45,7 +45,9 @@ import {
   Atom,
   Download,
   Smartphone,
-  Headphones
+  Headphones,
+  Building2,
+  BrainCircuit
 } from 'lucide-react';
 import { Subject, UserProfile, UserAccount } from '../types';
 import { ActiveTab } from './Navbar';
@@ -142,8 +144,15 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
         { id: 'flashcards', label: 'Topic Active Recall Decks', icon: Layers, color: 'text-blue-400' },
         { id: 'cheatsheets', label: 'Night Before Cheat Sheets', icon: FileText, color: 'text-amber-400' },
         { id: 'formulas', label: 'Formulas & Definitions', icon: BookmarkCheck, color: 'text-amber-400' },
+        { id: 'formula-quiz', label: 'Formula Recall Quizzer', icon: BrainCircuit, color: 'text-amber-400' },
         { id: 'checklist', label: 'Syllabus Tracker', icon: ListChecks, color: 'text-emerald-400' },
         { id: 'boundaries', label: 'Grade Boundaries', icon: TrendingUp, color: 'text-teal-400' },
+      ]
+    },
+    {
+      group: 'University Admissions & Equivalence',
+      items: [
+        { id: 'tanzim', label: 'Egyptian Tanzim Calculator', icon: Building2, color: 'text-indigo-400' },
       ]
     }
   ];

@@ -28,6 +28,8 @@ import { PastPaperFinder } from './components/PastPaperFinder';
 import { SyllabusChecklist } from './components/SyllabusChecklist';
 import { EslSpeakingSimulator } from './components/EslSpeakingSimulator';
 import { ListeningSimulator } from './components/ListeningSimulator';
+import { TanzimCalculator } from './components/TanzimCalculator';
+import { FormulaMemoryQuizzer } from './components/FormulaMemoryQuizzer';
 import { HomeView } from './components/HomeView';
 import { AdminDashboard } from './components/AdminDashboard';
 import { AccountGate } from './components/AccountGate';
@@ -405,6 +407,8 @@ export function App() {
         'mock',
         'worksheet',
         'classifieds',
+        'tanzim',
+        'formula-quiz',
         'radar',
         'predicted'
       ];
@@ -583,6 +587,8 @@ export function App() {
       case 'checklist': return 'the Interactive Syllabus Checklist';
       case 'esl-speaking': return 'the ESL Speaking Oral Exam Simulator';
       case 'listening': return 'the Multi-Board English Listening Simulator';
+      case 'tanzim': return 'the Egyptian University Tanzim Equivalence Calculator';
+      case 'formula-quiz': return 'the Interactive Formula Memory Quizzer';
       case 'boundaries': return 'the Grade Boundaries Calculator';
       case 'split': return 'the Split-Screen Exam Viewer';
       case 'analytics': return 'the School & Teacher Analytics Diagnostics';
@@ -888,6 +894,19 @@ export function App() {
               <FormulaDictionary
                 subject={activeSubject}
                 formulas={formulas}
+              />
+            )}
+
+            {activeTab === 'formula-quiz' && (
+              <FormulaMemoryQuizzer
+                subject={activeSubject}
+                profile={profile}
+              />
+            )}
+
+            {activeTab === 'tanzim' && (
+              <TanzimCalculator
+                profile={profile}
               />
             )}
 
