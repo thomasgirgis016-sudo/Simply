@@ -60,7 +60,7 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
     subject,
     selectedChapterId: chapters[0]?.id || '0580-01',
     selectedSubtopics: [],
-    selectedYears: [2021, 2022, 2023, 2024, 2025],
+    selectedYears: [2021, 2022, 2023, 2024, 2025, 2026],
     selectedSeasons: ['May/June', 'Oct/Nov'],
     tier: 'Extended',
     paperComponents: ['Paper 2 (Extended / MCQ)', 'Paper 4 (Extended Theory)'],

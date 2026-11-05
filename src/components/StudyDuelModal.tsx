@@ -8,7 +8,6 @@ import {
   Play,
   Clock,
   Award,
-  Sparkles,
   ArrowRight,
   ShieldCheck,
   Flame,

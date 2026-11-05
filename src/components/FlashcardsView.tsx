@@ -350,7 +350,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                 const count = subjectCards.filter((c) => c.topic === t).length;
                 return (
                   <option key={t} value={t}>
-                    {t} {count > 0 ? `(${count} cards)` : '(0 cards - click AI Generate)'}
+                    {t} {count > 0 ? `(${count} cards)` : '(0 cards - click Generate Deck)'}
                   </option>
                 );
               })}
@@ -429,7 +429,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
           <Layers className="mx-auto h-12 w-12 text-slate-600 mb-3" />
           <h3 className="text-base font-bold text-slate-300">No flashcards found for this topic</h3>
           <p className="mt-1 text-xs text-slate-500">
-            Click "Generate AI Deck" above to generate cards for this syllabus unit!
+            Click "Generate Topic Cards" above to compile cards for this syllabus unit!
           </p>
           <button
             onClick={() => setIsAiModalOpen(true)}

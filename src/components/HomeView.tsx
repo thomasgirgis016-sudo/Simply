@@ -876,7 +876,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               Curriculum & Subject Directory
             </h2>
             <p className="text-xs text-slate-400">
-              Select a subject to instantly access its past papers, notes, or AI solver
+              Select a subject to instantly access its past papers, revision notes, or step-by-step solver
             </p>
           </div>
 

@@ -3,7 +3,6 @@ import {
   X,
   Camera,
   Upload,
-  Sparkles,
   CheckCircle2,
   XCircle,
   AlertTriangle,
@@ -162,7 +161,7 @@ export const HandwritingScannerModal: React.FC<HandwritingScannerModalProps> = (
             </div>
             <div>
               <div className="text-sm font-bold text-white flex items-center gap-2">
-                Handwritten Working Scanner & Mark Scheme AI
+                Handwritten Script Scanner & Mark Scheme Evaluation
               </div>
               <div className="text-[11px] text-slate-400">
                 Snap your handwritten past paper solution for line-by-line Cambridge marking
@@ -237,7 +236,7 @@ export const HandwritingScannerModal: React.FC<HandwritingScannerModalProps> = (
                   onClick={handleUseSample}
                   className="text-xs text-slate-400 hover:text-indigo-300 font-medium flex items-center gap-1.5 transition-colors"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+                  <FileText className="w-3.5 h-3.5 text-indigo-400" />
                   Or click here to test with a verified Cambridge handwritten sample
                 </button>
               </div>

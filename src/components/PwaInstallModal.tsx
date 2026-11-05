@@ -6,7 +6,6 @@ import {
   CheckCircle,
   X,
   Smartphone,
-  Sparkles,
   WifiOff
 } from 'lucide-react';
 import {
@@ -88,7 +87,7 @@ export const PwaInstallModal: React.FC<PwaInstallModalProps> = ({
             <span>Offline access to Formula Sheets & Night Before Cheat Sheets</span>
           </div>
           <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-indigo-400 shrink-0" />
+            <Smartphone className="h-4 w-4 text-indigo-400 shrink-0" />
             <span>Full-screen view with zero browser URL bar distractions</span>
           </div>
         </div>

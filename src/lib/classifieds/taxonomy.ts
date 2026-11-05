@@ -1318,6 +1318,8 @@ export const ESL_0510_TAXONOMY: ChapterTaxonomy[] = [
   }
 ];
 
+import { IGCSE_SUBJECTS } from '../../data/subjects';
+
 export const ALL_TAXONOMIES: Record<string, ChapterTaxonomy[]> = {
   '0580': MATHEMATICS_0580_TAXONOMY,
   'cie-math-0580': MATHEMATICS_0580_TAXONOMY,
@@ -1332,38 +1334,117 @@ export const ALL_TAXONOMIES: Record<string, ChapterTaxonomy[]> = {
   'cie-esl-0510': ESL_0510_TAXONOMY,
 };
 
+const dynamicSubjectTaxonomies = new Map<string, ChapterTaxonomy[]>();
+
 /**
- * Retrieve the chapter taxonomy for any subject code or ID
+ * Retrieve the chapter taxonomy for any subject code or ID (all 39 subjects supported)
  */
 export function getTaxonomyForSubject(subjectCodeOrId: string): ChapterTaxonomy[] {
   if (!subjectCodeOrId) return MATHEMATICS_0580_TAXONOMY;
-  const normalized = subjectCodeOrId.toLowerCase().trim();
-  
-  if (normalized.includes('0580') || normalized.includes('math')) {
+  const raw = subjectCodeOrId.trim();
+  const normalized = raw.toLowerCase();
+
+  // 1. Direct core subject matches
+  if (normalized === '0580' || normalized === 'cie-math-0580' || normalized === 'cie 0580') {
     return MATHEMATICS_0580_TAXONOMY;
   }
-  if (normalized.includes('0620') || normalized.includes('chem')) {
+  if (normalized === '0620' || normalized === 'cie-chem-0620' || normalized === 'cie 0620') {
     return CHEMISTRY_0620_TAXONOMY;
   }
-  if (normalized.includes('0625') || normalized.includes('phys')) {
+  if (normalized === '0625' || normalized === 'cie-physics-0625' || normalized === 'cie 0625') {
     return PHYSICS_0625_TAXONOMY;
   }
-  if (normalized.includes('0610') || normalized.includes('bio')) {
+  if (normalized === '0610' || normalized === 'cie-bio-0610' || normalized === 'cie 0610') {
     return BIOLOGY_0610_TAXONOMY;
   }
-  if (normalized.includes('0510') || normalized.includes('0511') || normalized.includes('esl') || normalized.includes('eng')) {
+  if (normalized === '0510' || normalized === '0511' || normalized === 'cie-esl-0510' || normalized === 'cie 0510' || normalized === 'cie 0511') {
     return ESL_0510_TAXONOMY;
   }
 
-  return ALL_TAXONOMIES[subjectCodeOrId] || MATHEMATICS_0580_TAXONOMY;
+  // 2. Exact match in pre-registered ALL_TAXONOMIES
+  if (ALL_TAXONOMIES[raw] || ALL_TAXONOMIES[normalized]) {
+    return ALL_TAXONOMIES[raw] || ALL_TAXONOMIES[normalized];
+  }
+
+  // 3. Dynamic subject cache check
+  if (dynamicSubjectTaxonomies.has(normalized)) {
+    return dynamicSubjectTaxonomies.get(normalized)!;
+  }
+
+  // 4. Resolve against official IGCSE_SUBJECTS database
+  const foundSubject = IGCSE_SUBJECTS.find(s =>
+    s.id.toLowerCase() === normalized ||
+    s.code.toLowerCase() === normalized ||
+    s.code.toLowerCase().replace(/[^a-z0-9]/g, '') === normalized.replace(/[^a-z0-9]/g, '') ||
+    s.code.toLowerCase().includes(normalized) ||
+    s.id.toLowerCase().includes(normalized) ||
+    s.name.toLowerCase() === normalized ||
+    s.name.toLowerCase().includes(normalized) ||
+    normalized.includes(s.id.toLowerCase())
+  );
+
+  if (foundSubject && foundSubject.topics && foundSubject.topics.length > 0) {
+    const codeMatch = foundSubject.code.match(/([0-9]{4}|[0-9][A-Z0-9]{3})/i);
+    const cleanCode = codeMatch ? codeMatch[1].toUpperCase() : foundSubject.code.replace(/[^a-zA-Z0-9]/g, '');
+    const isLang = foundSubject.category === 'Languages';
+    const isMath = foundSubject.category === 'Mathematics';
+    const chapters: ChapterTaxonomy[] = foundSubject.topics.map((t, idx) => {
+      const cleanTitle = t.replace(/^Paper\s*\d+\s*(Part\s*\d+)?:\s*/i, '').replace(/^Exercise\s*\d+:\s*/i, '').trim();
+      return {
+        id: `${cleanCode}-${String(idx + 1).padStart(2, '0')}`,
+        chapterNumber: idx + 1,
+        title: cleanTitle,
+        subjectCode: foundSubject.code,
+        subjectName: foundSubject.name,
+        subtopics: [t, cleanTitle],
+        learningObjectives: [
+          `Master fundamental syllabus criteria for ${cleanTitle}`,
+          `Apply command words and exam mark scheme conventions to ${cleanTitle}`,
+          `Solve structured examination questions and avoid typical candidate pitfalls in ${cleanTitle}`
+        ],
+        calculatorAllowed: !isLang && (!isMath || idx > 0),
+        formulaNotes: [],
+        tier: 'Both',
+        recommendedTimePerMarkMinutes: 1.25
+      };
+    });
+
+    dynamicSubjectTaxonomies.set(normalized, chapters);
+    dynamicSubjectTaxonomies.set(foundSubject.id.toLowerCase(), chapters);
+    dynamicSubjectTaxonomies.set(foundSubject.code.toLowerCase(), chapters);
+    return chapters;
+  }
+
+  // 5. Fallback heuristics for partial matches
+  if (normalized.includes('0580') || (normalized.includes('math') && !normalized.includes('4ma1') && !normalized.includes('4mb1') && !normalized.includes('0606'))) {
+    return MATHEMATICS_0580_TAXONOMY;
+  }
+  if (normalized.includes('0620') || (normalized.includes('chem') && !normalized.includes('4ch1'))) {
+    return CHEMISTRY_0620_TAXONOMY;
+  }
+  if (normalized.includes('0625') || (normalized.includes('phys') && !normalized.includes('4ph1'))) {
+    return PHYSICS_0625_TAXONOMY;
+  }
+  if (normalized.includes('0610') || (normalized.includes('bio') && !normalized.includes('4bi1'))) {
+    return BIOLOGY_0610_TAXONOMY;
+  }
+  if (normalized.includes('0510') || normalized.includes('0511') || (normalized.includes('esl') && !normalized.includes('4es1') && !normalized.includes('9280'))) {
+    return ESL_0510_TAXONOMY;
+  }
+
+  return MATHEMATICS_0580_TAXONOMY;
 }
 
 /**
- * Retrieve a specific chapter by its unique taxonomy ID (e.g. "0580-01", "0620-04")
+ * Retrieve a specific chapter by its unique taxonomy ID (e.g. "0580-01", "0620-04", "4MA1-02")
  */
 export function getChapterById(chapterId: string): ChapterTaxonomy | undefined {
   if (!chapterId) return undefined;
   for (const list of Object.values(ALL_TAXONOMIES)) {
+    const found = list.find(c => c.id === chapterId);
+    if (found) return found;
+  }
+  for (const list of dynamicSubjectTaxonomies.values()) {
     const found = list.find(c => c.id === chapterId);
     if (found) return found;
   }

@@ -175,7 +175,7 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
       setErrorMessage(
         err?.message?.includes('network') || err?.message?.includes('fetch')
           ? 'Network connectivity interruption. Please verify your connection and tap Retry.'
-          : err?.message || 'AI service busy or rate limit reached. Tap "Retry Solution" to re-attempt.'
+          : err?.message || 'Examiner evaluation service is momentarily busy. Tap "Retry Solution" to re-attempt.'
       );
     } finally {
       setLoading(false);
@@ -1217,8 +1217,8 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
             <div className="flex items-center gap-3">
               <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0" />
               <p className="text-xs text-slate-400 leading-relaxed">
-                <span className="font-semibold text-slate-300">Accuracy Notice: </span>
-                AI models can make mistakes. Always cross-check final working with your teacher and official published mark schemes.
+                <span className="font-semibold text-slate-300">Examiner Advisory: </span>
+                Always cross-check final working with your teacher and official published Cambridge & Edexcel mark schemes.
               </p>
             </div>
             <button

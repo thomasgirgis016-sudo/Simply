@@ -4,7 +4,6 @@ import {
   GraduationCap,
   TrendingDown,
   AlertTriangle,
-  Sparkles,
   BookOpen,
   Copy,
   Check,
@@ -256,7 +255,7 @@ export const TeacherAnalyticsDashboard: React.FC<TeacherAnalyticsDashboardProps>
           onClick={handleTriggerRemedialDrill}
           className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#FF5E62] to-[#FFA63A] px-5 py-3 text-xs font-black text-slate-950 shadow-xl shadow-amber-500/20 hover:opacity-95 active:scale-95 transition cursor-pointer shrink-0"
         >
-          <Sparkles className="h-4 w-4" />
+          <GraduationCap className="h-4 w-4" />
           <span>Generate Class Remedial Drill</span>
         </button>
       </div>

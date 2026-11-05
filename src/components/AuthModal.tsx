@@ -9,7 +9,7 @@ import {
   CheckCircle2,
   AlertCircle,
   ArrowRight,
-  Sparkles,
+  Info,
   ShieldCheck,
   Crown,
   Eye,
@@ -250,7 +250,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           {infoMsg && (
             <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-cyan-500/40 bg-cyan-950/20 p-3 text-xs text-cyan-300"
                  style={{ boxShadow: 'inset 2px 2px 5px #06090e' }}>
-              <Sparkles className="h-4 w-4 shrink-0 text-cyan-400 mt-0.5" />
+              <Info className="h-4 w-4 shrink-0 text-cyan-400 mt-0.5" />
               <span>{infoMsg}</span>
             </div>
           )}
@@ -450,8 +450,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   boxShadow: 'inset 3px 3px 6px #06090e, inset -3px -3px 6px #0d1f18'
                 }}
               >
-                <Sparkles className="h-4 w-4 text-emerald-400 shrink-0" />
-                <span><strong className="text-emerald-300 font-semibold">Instant Student Activation:</strong> Access past papers, AI solvers, flashcards, and quizzes immediately!</span>
+                <GraduationCap className="h-4 w-4 text-emerald-400 shrink-0" />
+                <span><strong className="text-emerald-300 font-semibold">Instant Student Activation:</strong> Access past papers, step-by-step mark scheme solvers, flashcards, and classified exam questions immediately!</span>
               </div>
 
               <div>

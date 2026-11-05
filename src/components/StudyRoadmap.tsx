@@ -4,7 +4,6 @@ import {
   Clock,
   CheckCircle2,
   Circle,
-  Sparkles,
   TrendingUp,
   AlertCircle,
   Plus,
@@ -219,14 +218,14 @@ export const StudyRoadmap: React.FC<StudyRoadmapProps> = ({
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-semibold tracking-wide uppercase">
-              <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-              Cambridge Exam Countdown & Adaptive Revision Engine
+              <Calendar className="w-3.5 h-3.5 text-indigo-400" />
+              Cambridge Exam Countdown & Structured Revision Planner
             </div>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
               Personalized Cambridge Study Roadmap
             </h1>
             <p className="text-slate-300 text-sm sm:text-base max-w-2xl leading-relaxed">
-              Never fall behind. Set your official Cambridge examination dates and follow an AI-calculated daily milestone checklist tailored to your target grades.
+              Never fall behind. Set your official Cambridge examination dates and follow a structured daily milestone checklist tailored to your target grades.
             </p>
           </div>
 

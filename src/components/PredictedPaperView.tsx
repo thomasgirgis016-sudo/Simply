@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import {
-  Sparkles,
   TrendingUp,
   FileText,
   Printer,
@@ -131,14 +130,14 @@ export const PredictedPaperView: React.FC<PredictedPaperViewProps> = ({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 px-3 py-1 text-xs font-black text-amber-300 border border-amber-500/30">
-              <Sparkles className="h-3.5 w-3.5" />
-              <span>Exam Rotation Predictive Intelligence</span>
+              <TrendingUp className="h-3.5 w-3.5" />
+              <span>Exam Series Topic Forecasting</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-white">
               Cambridge {selectedSeries} Predicted Paper
             </h1>
             <p className="text-xs sm:text-sm text-slate-300 max-w-2xl">
-              Algorithmic exam prediction based on historical topic appearances across 2016–2025 Cambridge series for <strong className="text-white">{subject.name} ({subject.code})</strong>.
+              Examiner-modeled paper forecast based on historical syllabus topic rotation cycles across 2016–2025 series for <strong className="text-white">{subject.name} ({subject.code})</strong>.
             </p>
           </div>
 

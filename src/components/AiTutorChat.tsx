@@ -124,7 +124,7 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
       const errorMsg: Message = {
         id: `msg-${Date.now()}-err`,
         role: 'assistant',
-        content: `⚠️ **Connection Notice**: The Examiner AI encountered a temporary network delay. Please retry your question or check your connection.`,
+        content: `⚠️ **Connection Notice**: The Senior Examiner evaluation service encountered a temporary network delay. Please retry your question or check your connection.`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, errorMsg]);
@@ -372,7 +372,7 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
               type="button"
               onClick={() => handleSend(`Show me ${p.paperCode} ${p.session} ${p.questionNumber} question and mark scheme`)}
               className="shrink-0 rounded-lg border border-sky-500/30 bg-sky-950/50 px-2.5 py-1 text-[11px] text-sky-200 hover:border-sky-400 hover:bg-sky-900/60 transition cursor-pointer flex items-center gap-1"
-              title={`Ask AI for ${p.paperCode} ${p.questionNumber}: ${p.topic}`}
+              title={`Ask Examiner Co-Pilot for ${p.paperCode} ${p.questionNumber}: ${p.topic}`}
             >
               <span className="font-mono text-[10px] text-sky-300">{p.paperCode}</span>
               <span className="font-bold">{p.questionNumber}</span>

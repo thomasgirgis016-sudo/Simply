@@ -8,7 +8,7 @@ import {
   RefreshCw,
   LogOut,
   CheckCircle,
-  Sparkles,
+  GraduationCap,
   Layers,
   BookOpen,
   Zap,
@@ -357,7 +357,7 @@ export const AccountGate: React.FC<AccountGateProps> = ({
         </h2>
 
         <p className="mt-3 text-sm text-slate-300 leading-relaxed max-w-md mx-auto">
-          To access {featureName}, past paper mark schemes, worked exam examples, and AI grading, please create an account or sign in with your active subscription.
+          To access {featureName}, past paper mark schemes, worked exam examples, and verified examiner grading, please create an account or sign in with your active subscription.
         </p>
 
         {/* Value pills */}
@@ -367,8 +367,8 @@ export const AccountGate: React.FC<AccountGateProps> = ({
             <span className="text-slate-300 text-[11px] font-medium">Cambridge & Edexcel Notes</span>
           </div>
           <div className="flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900/60 p-2.5">
-            <Sparkles className="h-4 w-4 text-[#FFA63A] shrink-0" />
-            <span className="text-slate-300 text-[11px] font-medium">AI Step-by-Step Marking</span>
+            <GraduationCap className="h-4 w-4 text-[#FFA63A] shrink-0" />
+            <span className="text-slate-300 text-[11px] font-medium">Step-by-Step Examiner Marking</span>
           </div>
           <div className="flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900/60 p-2.5">
             <Layers className="h-4 w-4 text-emerald-400 shrink-0" />

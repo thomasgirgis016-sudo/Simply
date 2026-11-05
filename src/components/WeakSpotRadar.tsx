@@ -3,7 +3,6 @@ import {
   TrendingUp,
   AlertTriangle,
   Award,
-  Sparkles,
   CheckCircle,
   Target,
   ArrowRight,

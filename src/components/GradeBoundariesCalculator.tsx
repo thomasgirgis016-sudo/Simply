@@ -5,7 +5,6 @@ import {
   TrendingUp,
   AlertCircle,
   HelpCircle,
-  Sparkles,
   ChevronRight,
   RotateCcw
 } from 'lucide-react';

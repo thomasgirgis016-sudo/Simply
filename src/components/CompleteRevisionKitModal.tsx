@@ -3,7 +3,6 @@ import {
   Printer,
   X,
   FileText,
-  Sparkles,
   BookMarked,
   TrendingDown,
   AlertTriangle,
@@ -181,7 +180,7 @@ export const CompleteRevisionKitModal: React.FC<CompleteRevisionKitModalProps> =
             {/* Golden Exam Directives */}
             <div className="rounded-2xl border border-amber-500/30 print:border-amber-400 bg-amber-950/20 print:bg-amber-50 p-4 space-y-2">
               <div className="text-xs font-black uppercase tracking-wider text-amber-300 print:text-amber-900 flex items-center gap-1.5">
-                <Sparkles className="h-4 w-4 text-amber-400 print:text-amber-700" />
+                <GraduationCap className="h-4 w-4 text-amber-400 print:text-amber-700" />
                 <span>Golden Cambridge Exam Directives</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-200 print:text-slate-800">
@@ -298,7 +297,7 @@ export const CompleteRevisionKitModal: React.FC<CompleteRevisionKitModalProps> =
 
                     {mistake.examinerTip && (
                       <div className="text-[11px] text-amber-300/90 print:text-amber-800 flex items-start gap-1">
-                        <Sparkles className="h-3 w-3 shrink-0 mt-0.5 text-amber-400 print:text-amber-700" />
+                        <GraduationCap className="h-3 w-3 shrink-0 mt-0.5 text-amber-400 print:text-amber-700" />
                         <span>{mistake.examinerTip}</span>
                       </div>
                     )}

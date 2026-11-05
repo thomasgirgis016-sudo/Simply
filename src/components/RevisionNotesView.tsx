@@ -533,7 +533,7 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
           <BookOpen className="mx-auto h-12 w-12 text-slate-600 mb-3" />
           <h3 className="text-base font-bold text-slate-300">No revision notes added yet for {subject.name}</h3>
           <p className="mt-1 text-xs text-slate-500">
-            Generate an instant high-yield cheat sheet with AI!
+            Compile an instant high-yield syllabus revision guide!
           </p>
           <button
             onClick={() => setIsAiModalOpen(true)}

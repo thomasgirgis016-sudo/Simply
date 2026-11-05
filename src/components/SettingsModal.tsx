@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Key, X, ExternalLink, CheckCircle2, AlertCircle, Sparkles, ShieldCheck, Sun, Moon, Type } from 'lucide-react';
+import { Key, X, ExternalLink, CheckCircle2, AlertCircle, GraduationCap, ShieldCheck, Sun, Moon, Type } from 'lucide-react';
 import { UserProfile } from '../types';
 
 interface SettingsModalProps {
@@ -78,7 +78,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         const data = await res.json().catch(() => ({}));
         if (data.hasServerKey) {
           setTestStatus('success');
-          setSuccessMessage('Connected to server-side Gemini AI engine (Zero-Key student access active).');
+          setSuccessMessage('Connected to server-side examination engine (Zero-Key student access active).');
           return;
         }
       }
@@ -87,7 +87,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       setErrorMessage('No Gemini API key is configured. Please enter your free Google Gemini API key above (get one in 30 seconds at aistudio.google.com/app/apikey), or set GEMINI_API_KEY in Vercel environment variables.');
     } catch {
       setTestStatus('error');
-      setErrorMessage('No Gemini API key configured. Enter your free Google Gemini API key above to enable live AI responses.');
+      setErrorMessage('No Gemini API key configured. Enter your free Google Gemini API key above to enable live examiner responses.');
     }
   };
 
@@ -103,11 +103,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
         <div className="flex items-center gap-3 mb-5">
           <div className="rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 p-2.5 text-white shadow-lg shadow-indigo-500/30">
-            <Sparkles className="h-5 w-5" />
+            <GraduationCap className="h-5 w-5" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white">AI Engine & API Settings</h2>
-            <p className="text-xs text-slate-400">Configure your Google Gemini AI integration</p>
+            <h2 className="text-xl font-bold text-white">Examiner Engine & API Settings</h2>
+            <p className="text-xs text-slate-400">Configure your syllabus evaluation and mark scheme engine</p>
           </div>
         </div>
 
@@ -209,7 +209,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-              AI Model
+              Evaluation Engine Model
             </label>
             <select
               value={model}

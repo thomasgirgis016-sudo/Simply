@@ -3,7 +3,6 @@ import {
   FlaskConical,
   Flame,
   Search,
-  Sparkles,
   CheckCircle,
   AlertTriangle,
   ArrowRight,

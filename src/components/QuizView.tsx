@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import confetti from 'canvas-confetti';
 import {
   GraduationCap,
-  Sparkles,
   CheckCircle2,
   XCircle,
   HelpCircle,
@@ -355,13 +354,13 @@ export const QuizView: React.FC<QuizViewProps> = ({
               <span>🎲 Mixed Paper Drill</span>
             </button>
 
-            {/* AI Generate Questions */}
+            {/* Generate Custom Practice Questions */}
             <button
               onClick={() => setIsAiModalOpen(true)}
               className="flex-1 sm:flex-none flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-3.5 py-2 text-xs font-bold text-white shadow-md hover:from-emerald-500 hover:to-teal-500 transition cursor-pointer active:scale-95"
             >
-              <Sparkles className="h-4 w-4" />
-              <span>AI More</span>
+              <FileText className="h-4 w-4" />
+              <span>Add Questions</span>
             </button>
           </div>
         </div>
@@ -760,10 +759,10 @@ export const QuizView: React.FC<QuizViewProps> = ({
             </button>
             <button
               onClick={() => setIsAiModalOpen(true)}
-              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-2.5 text-xs font-bold text-white shadow-lg shadow-emerald-500/25 hover:from-emerald-500 hover:to-teal-500 transition cursor-pointer"
+              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-2.5 text-xs font-bold text-white shadow-lg shadow-emerald-500/25 hover:from-emerald-400 hover:to-teal-500 transition cursor-pointer"
             >
-              <Sparkles className="h-4 w-4" />
-              <span>Generate New AI Questions</span>
+              <FileText className="h-4 w-4" />
+              <span>Generate Custom Question Set</span>
             </button>
           </div>
         </div>
@@ -778,8 +777,8 @@ export const QuizView: React.FC<QuizViewProps> = ({
             onClick={() => setIsAiModalOpen(true)}
             className="mt-4 inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-500 transition cursor-pointer"
           >
-            <Sparkles className="h-4 w-4" />
-            Generate with IGCSE AI
+            <FileText className="h-4 w-4" />
+            Generate Practice Set
           </button>
         </div>
       ) : (
@@ -971,14 +970,14 @@ export const QuizView: React.FC<QuizViewProps> = ({
         </div>
       )}
 
-      {/* AI Quiz Generator Modal */}
+      {/* Practice Set Generator Modal */}
       {isAiModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-3xl border border-slate-700 bg-slate-900 p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div className="flex items-center gap-2 text-white font-bold text-base">
-                <Sparkles className="h-5 w-5 text-emerald-400" />
-                <span>AI Mock Quiz Generator</span>
+                <GraduationCap className="h-5 w-5 text-emerald-400" />
+                <span>Classified Practice Set Builder</span>
               </div>
               <button
                 onClick={() => setIsAiModalOpen(false)}
@@ -1017,13 +1016,13 @@ export const QuizView: React.FC<QuizViewProps> = ({
               >
                 {isGenerating ? (
                   <>
-                    <Sparkles className="h-4 w-4 animate-spin" />
-                    <span>Generating...</span>
+                    <div className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                    <span>Compiling Cambridge Questions...</span>
                   </>
                 ) : (
                   <>
-                    <Sparkles className="h-4 w-4" />
-                    <span>Generate Quiz</span>
+                    <FileText className="h-4 w-4" />
+                    <span>Generate Practice Set</span>
                   </>
                 )}
               </button>

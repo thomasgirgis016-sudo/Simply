@@ -8,7 +8,6 @@ import {
   AlertTriangle,
   ArrowRight,
   BookMarked,
-  Sparkles,
   FileText
 } from 'lucide-react';
 import { getNextScheduledPaper, CountdownState } from '../services/examCountdownService';
@@ -136,11 +135,11 @@ export const ExamCountdownWidget: React.FC<ExamCountdownWidgetProps> = ({
       <div className="mt-4 pt-4 border-t border-slate-800/80">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2.5">
           <div className="flex items-center gap-1.5 text-xs font-bold text-slate-200">
-            <Sparkles className="h-3.5 w-3.5 text-indigo-400" />
+            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
             <span>Today's Grade 9 Daily Revision Quota:</span>
           </div>
           <span className="text-[11px] text-slate-400">
-            Check off daily to guarantee syllabus readiness
+            Check off daily to build comprehensive syllabus readiness
           </span>
         </div>
 

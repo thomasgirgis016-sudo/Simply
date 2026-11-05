@@ -358,7 +358,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 onClick={onOpenHandwritingScanner}
                 className="flex items-center gap-1.5 rounded-xl border border-sky-500/30 bg-sky-500/10 px-2.5 py-1.5 text-xs font-semibold text-sky-300 hover:bg-sky-500/20 hover:border-sky-500/50 transition cursor-pointer"
-                title="Snap a photo of your handwritten past paper solution for line-by-line AI grading"
+                title="Snap a photo of your handwritten past paper solution for line-by-line mark scheme grading"
               >
                 <Camera className="h-3.5 w-3.5 text-sky-400" />
                 <span className="hidden xl:inline">Scan Paper</span>
@@ -425,7 +425,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               onClick={onOpenSettings}
               className="rounded-xl border border-slate-800/80 bg-slate-900/60 p-2 text-slate-400 hover:bg-slate-800 hover:text-white transition cursor-pointer"
-              title="AI Model & Accessibility Settings"
+              title="Evaluation Engine & Accessibility Settings"
             >
               <Settings className="h-4 w-4" />
             </button>
@@ -757,7 +757,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 className="w-full flex items-center justify-center gap-2 rounded-xl border border-slate-800 bg-slate-900/60 py-2 text-xs font-semibold text-slate-400 hover:text-white transition cursor-pointer"
               >
                 <Settings className="h-3.5 w-3.5" />
-                <span>AI Model & Font Settings</span>
+                <span>Engine & Font Settings</span>
               </button>
 
               <div className="flex items-center justify-between pt-3 px-1 text-[11px] text-slate-500 border-t border-slate-800/40">

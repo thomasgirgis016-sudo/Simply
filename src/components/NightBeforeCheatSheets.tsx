@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import {
   FileText,
   Printer,
-  Sparkles,
   Search,
   CheckCircle,
   AlertTriangle,

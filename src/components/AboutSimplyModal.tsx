@@ -71,7 +71,7 @@ export const AboutSimplyModal: React.FC<AboutSimplyModalProps> = ({
             <strong className="text-white font-bold">Simply IGCSE</strong> is the definitive IGCSE Examination & Revision Workspace engineered specifically for Cambridge Assessment International Education (<strong className="text-indigo-300">CAIE</strong>) and Pearson <strong className="text-indigo-300">Edexcel</strong> IGCSE candidates, tutors, and schools worldwide.
           </p>
           <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mt-2.5">
-            Founded by <span className="text-amber-400 font-semibold">Thomas</span>, the platform bridges the gap between chaotic PDF past paper folders and generic AI tools by enforcing strict, line-by-line mark scheme verification, official examiner report feedback, and automated diagnostics designed to guarantee top-tier examination results.
+            Founded by <span className="text-amber-400 font-semibold">Thomas</span>, the platform bridges the gap between chaotic PDF past paper folders and generic chatbots by enforcing strict, line-by-line mark scheme verification, official examiner report feedback, and structured diagnostics designed to maximize student examination performance.
           </p>
           <div className="mt-3.5 pt-3 border-t border-slate-800/80 flex flex-col gap-1 text-xs">
             <p className="text-indigo-200 font-medium flex items-center gap-1.5">
@@ -111,9 +111,9 @@ export const AboutSimplyModal: React.FC<AboutSimplyModalProps> = ({
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-500/15 text-indigo-400 border border-indigo-500/20 mb-3">
                   <Camera className="h-4.5 w-4.5" />
                 </div>
-                <h4 className="text-sm font-bold text-white mb-1.5">AI Chief Examiner & Photo OCR</h4>
+                <h4 className="text-sm font-bold text-white mb-1.5">Senior Examiner Marking & Script Scanner</h4>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Snap a smartphone photo of handwritten student workings. Our vision AI maps your handwriting line-by-line against CAIE criteria, awarding [M1], [A1], or [A0] with red-ink annotations and immediate mark recovery guidance.
+                  Snap a smartphone photo of handwritten student workings. Our optical script parser evaluates student handwriting line-by-line against CAIE criteria, awarding [M1], [A1], or [A0] with red-ink annotations and immediate mark recovery guidance.
                 </p>
               </div>
             </div>
@@ -234,7 +234,7 @@ export const AboutSimplyModal: React.FC<AboutSimplyModalProps> = ({
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-800 pt-5">
           <div className="flex items-center gap-2 text-xs text-slate-400">
             <ShieldCheck className="h-4 w-4 text-emerald-400" />
-            <span>Strict Mark Scheme Compliance • Zero AI Speculation • Free Core Access & Optional AI Pro</span>
+            <span>Strict Mark Scheme Compliance • Zero Speculation • Free Core Access & Optional Pro</span>
           </div>
 
           <div className="flex items-center gap-2.5 w-full sm:w-auto">

@@ -36,7 +36,6 @@ import {
   Smartphone,
   Info,
   ChevronDown,
-  Sparkles,
   GraduationCap,
   RotateCcw,
   DollarSign,
@@ -1424,7 +1423,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <span className="text-[10px] font-bold bg-amber-500/20 px-1.5 py-0.5 rounded border border-amber-500/30">250 EGP/mo</span>
               </div>
               <div className="text-2xl font-black text-amber-300 mt-1 font-mono">{financialMetrics.proCount}</div>
-              <span className="text-[10px] text-slate-400">Full AI & solver access</span>
+              <span className="text-[10px] text-slate-400">Full solver & examiner access</span>
             </div>
 
             <div className="rounded-2xl border border-emerald-500/30 bg-emerald-950/20 p-4 shadow-md">
@@ -1630,7 +1629,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           </span>
                         ) : u.plan === 'plus' ? (
                           <span className="rounded-full px-2 py-0.5 text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 flex items-center gap-1 shadow-sm">
-                            <Sparkles className="h-3 w-3 text-indigo-400" />
+                            <Award className="h-3 w-3 text-indigo-400" />
                             <span>PLUS ({u.billingCycle === 'annual' ? 'Annual' : 'Monthly'})</span>
                           </span>
                         ) : (

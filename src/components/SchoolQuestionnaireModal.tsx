@@ -7,7 +7,6 @@ import {
   CheckCircle,
   ArrowRight,
   ArrowLeft,
-  Sparkles,
   ShieldCheck,
   Check,
   Smartphone,
@@ -447,7 +446,7 @@ export const SchoolQuestionnaireModal: React.FC<SchoolQuestionnaireModalProps> =
               <div className="rounded-2xl border border-amber-500/40 bg-gradient-to-br from-amber-950/30 via-slate-900 to-slate-900 p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-amber-400" />
+                    <GraduationCap className="h-4 w-4 text-amber-400" />
                     <span className="text-xs font-bold uppercase tracking-wider text-amber-300">
                       Recommended Plan for {schoolName || 'Your School'}
                     </span>

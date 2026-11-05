@@ -110,7 +110,7 @@ export const SyllabusChecklist: React.FC<SyllabusChecklistProps> = ({
               Interactive Syllabus Mastery Tracker
             </h1>
             <p className="mt-2 text-sm text-slate-300 leading-relaxed">
-              Track official learning objectives for <span className="font-bold text-white">{activeSubject.name} ({activeSubject.code})</span>. Rate your confidence (Red, Amber, Green) to spot syllabus blindspots and trigger AI diagnostic drills.
+              Track official learning objectives for <span className="font-bold text-white">{activeSubject.name} ({activeSubject.code})</span>. Rate your confidence (Red, Amber, Green) to spot syllabus blindspots and trigger targeted past paper drills.
             </p>
           </div>
 

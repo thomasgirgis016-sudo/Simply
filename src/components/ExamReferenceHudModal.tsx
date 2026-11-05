@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import {
   X,
   Search,
-  Sparkles,
+  GraduationCap,
   Printer,
   ChevronRight,
   FlaskConical,
@@ -296,8 +296,8 @@ export const ExamReferenceHudModal: React.FC<ExamReferenceHudModalProps> = ({
                   {selectedElement.igcseExamNotes && (
                     <div className="rounded-xl border border-amber-500/30 bg-amber-950/20 p-3 space-y-1">
                       <div className="flex items-center gap-1.5 text-[11px] font-bold text-amber-300">
-                        <Sparkles className="h-3.5 w-3.5 text-amber-400" />
-                        <span>Cambridge Chief Examiner Notes</span>
+                        <GraduationCap className="h-3.5 w-3.5 text-amber-400" />
+                        <span>Cambridge Examiner Practical Notes</span>
                       </div>
                       <p className="text-xs text-slate-300 leading-relaxed font-sans">
                         {selectedElement.igcseExamNotes}
@@ -366,7 +366,7 @@ export const ExamReferenceHudModal: React.FC<ExamReferenceHudModalProps> = ({
                       </div>
 
                       <div className="pt-2 border-t border-slate-800/80 text-[11px] text-amber-300/90 flex items-start gap-1.5">
-                        <Sparkles className="h-3 w-3 text-amber-400 shrink-0 mt-0.5" />
+                        <GraduationCap className="h-3 w-3 text-amber-400 shrink-0 mt-0.5" />
                         <span>{item.examTip}</span>
                       </div>
                     </div>

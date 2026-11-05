@@ -5,7 +5,6 @@ import {
   Volume2,
   VolumeX,
   RotateCcw,
-  Sparkles,
   Award,
   CheckCircle,
   AlertCircle,
@@ -584,7 +583,7 @@ export const EslSpeakingSimulator: React.FC<EslSpeakingSimulatorProps> = ({
                     onClick={handleEvaluate}
                     className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-6 py-2.5 text-xs font-bold text-white shadow-lg shadow-emerald-500/25 hover:from-emerald-400 hover:to-teal-500 transition cursor-pointer"
                   >
-                    <Sparkles className="h-4 w-4" />
+                    <CheckCheck className="h-4 w-4" />
                     <span>{isEvaluating ? 'Evaluating Cambridge Rubrics...' : 'Assess Full 30-Mark Exam'}</span>
                   </button>
                 </div>
@@ -715,7 +714,7 @@ export const EslSpeakingSimulator: React.FC<EslSpeakingSimulatorProps> = ({
           {(evaluation.vocabulary?.band9Upgrades || evaluation.suggestedUpgradedPhrases) && (
             <div className="rounded-2xl border border-indigo-500/30 bg-indigo-950/20 p-5 space-y-3">
               <span className="text-xs font-bold uppercase tracking-wider text-indigo-300 flex items-center gap-1.5">
-                <Sparkles className="h-4 w-4" />
+                <Award className="h-4 w-4" />
                 Band 9 Vocabulary Upgrades:
               </span>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">

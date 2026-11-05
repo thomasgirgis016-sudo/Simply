@@ -84,7 +84,7 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
   }, [chapters, config.selectedChapterId]);
 
   // Step 2 Available Years
-  const ALL_YEARS = [2019, 2020, 2021, 2022, 2023, 2024, 2025];
+  const ALL_YEARS = [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026];
   const ALL_SEASONS: ('May/June' | 'Oct/Nov' | 'Feb/March')[] = ['May/June', 'Oct/Nov', 'Feb/March'];
   const ALL_COMPONENTS = ['Paper 1 (Core)', 'Paper 2 (Extended / MCQ)', 'Paper 4 (Extended Theory)', 'Paper 6 (ATP / Practical)'];
 
@@ -228,7 +228,7 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                     }}
                     className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-white focus:outline-none focus:border-indigo-500"
                   >
-                    {IGCSE_SUBJECTS.filter(s => ['0580', '0620', '0625', '0610', '0510', '0511'].some(c => s.code.includes(c))).map(s => (
+                    {IGCSE_SUBJECTS.map(s => (
                       <option key={s.id} value={s.id}>
                         {s.code} • {s.name} ({s.board})
                       </option>
@@ -311,7 +311,7 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
               <div className="space-y-6">
                 <div>
                   <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2">
-                    1. Examination Year Range (2019 – 2025)
+                    1. Examination Year Range (2016 – 2026)
                   </label>
                   <div className="flex flex-wrap gap-2">
                     {ALL_YEARS.map(yr => {

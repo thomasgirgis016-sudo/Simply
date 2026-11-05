@@ -6,7 +6,6 @@ import {
   CheckCircle,
   AlertTriangle,
   ShieldCheck,
-  Sparkles,
   Smartphone,
   Copy,
   Check,
@@ -381,7 +380,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
-                <Sparkles className="h-3.5 w-3.5" />
+                <GraduationCap className="h-3.5 w-3.5" />
                 <span>Individual</span>
               </button>
               <button
@@ -524,7 +523,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                     <div>
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1">
-                          <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+                          <GraduationCap className="h-3.5 w-3.5 text-amber-400" />
                           Pro Tier (All Features)
                         </span>
                         <div className="flex items-baseline gap-1.5">
@@ -538,7 +537,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                           </span>
                         </div>
                       </div>
-                      <p className="text-[11px] text-slate-400 mt-1">Full AI power, line-by-line mark grading & speaking</p>
+                      <p className="text-[11px] text-slate-400 mt-1">Full syllabus access, line-by-line mark grading & speaking simulator</p>
 
                       <ul className="mt-3 space-y-1.5 text-[11px] text-slate-300">
                         <li className="flex items-center gap-1.5">
@@ -547,7 +546,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                         </li>
                         <li className="flex items-center gap-1.5">
                           <Check className="h-3.5 w-3.5 text-amber-400 shrink-0" />
-                          <span>AI Multimodal Step-by-Step Solver</span>
+                          <span>Step-by-Step Mark Scheme Solver & Script Scanner</span>
                         </li>
                         <li className="flex items-center gap-1.5">
                           <Check className="h-3.5 w-3.5 text-amber-400 shrink-0" />
@@ -861,7 +860,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                 {/* Step 2: Upload Receipt or Enter Transaction Reference */}
                 <div className="space-y-4">
                   <div className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                    Step 2: Submit Proof for AI Bank Matching
+                    Step 2: Submit Proof for Instant Bank Verification
                   </div>
 
                   {/* Drag & Drop Screenshot Upload */}
