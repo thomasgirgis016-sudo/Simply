@@ -349,14 +349,18 @@ export const WorksheetBuilder: React.FC<WorksheetBuilderProps> = ({
                   </div>
                 )}
 
-                {/* Blank Working Lines for Students to Write On */}
+                {/* Blank Response Lines for Students to Write On */}
                 <div className="space-y-2 pt-2">
                   <div className="border-b border-dashed border-slate-700/60 print:border-black/30 h-6" />
                   <div className="border-b border-dashed border-slate-700/60 print:border-black/30 h-6" />
                   <div className="border-b border-dashed border-slate-700/60 print:border-black/30 h-6" />
-                  <div className="flex justify-end pt-2 text-xs font-mono font-bold text-slate-400 print:text-black">
-                    Answer: <span className="inline-block border-b border-dashed border-slate-600/80 w-36 sm:w-64 align-bottom ml-2"></span>
-                  </div>
+                  {subject.category !== 'Languages' && !['0510', '0511', '0500', '4ES1'].includes(subject.code) && !subject.name.toLowerCase().includes('english') ? (
+                    <div className="flex justify-end pt-2 text-xs font-mono font-bold text-slate-400 print:text-black">
+                      Answer: <span className="inline-block border-b border-dashed border-slate-600/80 w-36 sm:w-64 align-bottom ml-2"></span>
+                    </div>
+                  ) : (
+                    <div className="border-b border-dashed border-slate-700/60 print:border-black/30 h-6" />
+                  )}
                 </div>
               </div>
             ))}

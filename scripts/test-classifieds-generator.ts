@@ -176,6 +176,92 @@ const limitedQuestions = getClassifiedQuestions({
 });
 assert(limitedQuestions.length <= 2, 'Classified query respects limit parameter');
 
+// ─────────────────────────────────────────────────────────────────────────────
+// 4. SUBJECT-AWARE WORKING BOX & MATH SYMBOL PURITY
+// ─────────────────────────────────────────────────────────────────────────────
+console.log('\n--- 4. Subject-Aware Working Box & Math Symbol Purity ---');
+
+import {
+  isLanguageSubject,
+  isMathSubject,
+  requiresCalculationWorking,
+  requiresMathSymbols
+} from '../src/components/PrintableClassifiedsGenerator';
+
+const mockESLSubject = {
+  id: 'cie-esl-0510',
+  name: 'English as a Second Language',
+  code: '0510',
+  board: 'CIE' as const,
+  category: 'Languages' as const,
+  icon: 'BookOpen',
+  color: 'from-amber-500 to-orange-600',
+  topics: ['Reading', 'Writing', 'Listening']
+};
+
+const mockMathSubject = {
+  id: 'cie-math-0580',
+  name: 'Mathematics',
+  code: '0580',
+  board: 'CIE' as const,
+  category: 'Mathematics' as const,
+  icon: 'Calculator',
+  color: 'from-blue-500 to-indigo-600',
+  topics: ['Number', 'Algebra', 'Geometry']
+};
+
+const mockPhysicsSubject = {
+  id: 'cie-phys-0625',
+  name: 'Physics',
+  code: '0625',
+  board: 'CIE' as const,
+  category: 'Sciences' as const,
+  icon: 'Zap',
+  color: 'from-purple-500 to-indigo-600',
+  topics: ['Motion', 'Forces', 'Electricity']
+};
+
+const mockBioSubject = {
+  id: 'cie-bio-0610',
+  name: 'Biology',
+  code: '0610',
+  board: 'CIE' as const,
+  category: 'Sciences' as const,
+  icon: 'Dna',
+  color: 'from-emerald-500 to-teal-600',
+  topics: ['Cells', 'Transport in Animals', 'Respiration']
+};
+
+assert(isLanguageSubject(mockESLSubject), 'isLanguageSubject correctly identifies English 0510 as language');
+assert(!isLanguageSubject(mockMathSubject), 'isLanguageSubject correctly rejects Mathematics 0580');
+assert(!isLanguageSubject(mockPhysicsSubject), 'isLanguageSubject correctly rejects Physics 0625');
+
+const eslQuestions = getClassifiedQuestions({ subjectCodeOrId: '0510' });
+assert(eslQuestions.length > 0, 'ESL questions retrieved from question pool');
+for (const q of eslQuestions) {
+  for (const sub of q.subParts) {
+    assert(!requiresCalculationWorking(mockESLSubject, q, sub), `ESL question ${q.id} subpart ${sub.part} must NOT require calculation working`);
+    assert(!requiresMathSymbols(mockESLSubject, q, sub), `ESL question ${q.id} subpart ${sub.part} must NOT show math symbols`);
+  }
+}
+
+const mathQuestions = getClassifiedQuestions({ subjectCodeOrId: '0580' });
+assert(mathQuestions.length > 0, 'Math questions retrieved from question pool');
+for (const q of mathQuestions) {
+  for (const sub of q.subParts) {
+    assert(requiresCalculationWorking(mockMathSubject, q, sub), `Math question ${q.id} subpart ${sub.part} requires calculation working`);
+    assert(requiresMathSymbols(mockMathSubject, q, sub), `Math question ${q.id} subpart ${sub.part} requires math symbols`);
+  }
+}
+
+// Qualitative Biology questions (e.g. explain heart ventricles) must not show calculation working
+const bioQuestions = getClassifiedQuestions({ subjectCodeOrId: '0610' });
+const qualBioQuestion = bioQuestions.find(q => q.subParts.some(sp => sp.prompt.toLowerCase().includes('explain why') || sp.prompt.toLowerCase().includes('describe')));
+if (qualBioQuestion) {
+  const qualSub = qualBioQuestion.subParts.find(sp => sp.prompt.toLowerCase().includes('explain why') || sp.prompt.toLowerCase().includes('describe'))!;
+  assert(!requiresCalculationWorking(mockBioSubject, qualBioQuestion, qualSub), `Qualitative bio question ${qualBioQuestion.id} must NOT require calculation working`);
+}
+
 console.log('\n===========================================================');
 console.log(`  CLASSIFIEDS GENERATOR QA AUDIT: ${passCount} PASSED, ${failCount} FAILED`);
 if (failCount === 0) {

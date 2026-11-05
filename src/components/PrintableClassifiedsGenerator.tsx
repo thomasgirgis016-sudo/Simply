@@ -25,7 +25,8 @@ import {
   AlertTriangle,
   Play,
   Calculator,
-  Compass
+  Compass,
+  PenTool
 } from 'lucide-react';
 import { Subject, UserProfile } from '../types';
 import { IGCSE_SUBJECTS } from '../data/subjects';
@@ -62,11 +63,112 @@ interface SubPartSolution {
   isCorrect?: boolean;
 }
 
+/**
+ * Checks if the subject is an English or Language subject.
+ * English & Languages NEVER use "show your working" or mathematical symbols.
+ */
+export function isLanguageSubject(subject?: Subject | { code?: string; category?: string; name?: string }): boolean {
+  if (!subject) return false;
+  const code = (subject.code || '').toLowerCase();
+  const cat = (subject.category || '').toLowerCase();
+  const name = (subject.name || '').toLowerCase();
+
+  if (cat === 'languages') return true;
+  if (['0510', '0511', '0500', '4es1', '4ea1', '0520', '0544', '0547', '0530', '1123'].includes(code)) return true;
+  if (
+    name.includes('english') ||
+    name.includes('french') ||
+    name.includes('spanish') ||
+    name.includes('arabic') ||
+    name.includes('german') ||
+    name.includes('literature')
+  ) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Checks if the subject is Mathematics.
+ */
+export function isMathSubject(subject?: Subject | { code?: string; category?: string; name?: string }): boolean {
+  if (!subject) return false;
+  const code = (subject.code || '').toLowerCase();
+  const cat = (subject.category || '').toLowerCase();
+  const name = (subject.name || '').toLowerCase();
+
+  if (cat === 'mathematics') return true;
+  if (['0580', '0606', '4ma1', '4mb1', '9709', 'wma11', 'wma12', 'wma13', 'wma14'].includes(code)) return true;
+  if (name.includes('math') || name.includes('calculus') || name.includes('algebra')) return true;
+  return false;
+}
+
+/**
+ * Determines whether a specific question/subpart requires mathematical calculation working steps.
+ * Qualitative questions (definitions, explanations, descriptions, notes, essays) do NOT require working steps.
+ */
+export function requiresCalculationWorking(
+  subject: Subject,
+  question: ClassifiedQuestion,
+  sub: ClassifiedSubPart
+): boolean {
+  // English and language subjects NEVER require calculation working
+  if (isLanguageSubject(subject)) return false;
+
+  // Mathematics subjects require calculation working
+  if (isMathSubject(subject)) return true;
+
+  // Check mark schemes for method marks [M1], [M2], etc.
+  const hasMethodMark = sub.markScheme.some(m => m.markType.toUpperCase().includes('M'));
+  if (hasMethodMark) return true;
+
+  // Check if diagramOrMath contains an equation or formula
+  if (sub.diagramOrMath || question.diagramOrMath) return true;
+
+  // Check if prompt asks for mathematical / numerical calculation
+  const combinedText = `${question.prompt} ${sub.prompt} ${sub.finalAnswer}`.toLowerCase();
+  const calculationPattern = /\b(calculate|determine the value|find the value|evaluate|solve|work out|how many moles|mass of pure|orbital speed|percentage purity|resultant force|specific heat|half-life|concentration|resistance|current|voltage|acceleration|velocity)\b/;
+  if (calculationPattern.test(combinedText)) return true;
+
+  // Check if final answer has numerical calculation format and prompt contains calculate/work out
+  if (/\d+/.test(sub.finalAnswer) && /\b(calculate|work out|find|determine)\b/i.test(combinedText)) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Determines whether the mathematical quick-symbol toolbar should appear.
+ * English and non-math qualitative questions NEVER show math symbols.
+ */
+export function requiresMathSymbols(
+  subject: Subject,
+  question: ClassifiedQuestion,
+  sub: ClassifiedSubPart
+): boolean {
+  // English and language subjects NEVER need mathematical symbols
+  if (isLanguageSubject(subject)) return false;
+
+  if (isMathSubject(subject)) return true;
+  if (requiresCalculationWorking(subject, question, sub)) return true;
+
+  const combinedText = `${question.prompt} ${sub.prompt}`;
+  if (/[\\$_\^]/.test(combinedText) || sub.diagramOrMath || question.diagramOrMath) return true;
+
+  return false;
+}
+
 function isAnswerEquivalent(userAns: string, officialAns: string): boolean {
   if (!userAns || !officialAns) return false;
   const cleanU = userAns.trim().toLowerCase().replace(/\s+/g, ' ');
   const cleanO = officialAns.trim().toLowerCase().replace(/\s+/g, ' ');
   if (cleanU === cleanO) return true;
+
+  // Textual overlap match (e.g. for qualitative explanations / English notes)
+  if (cleanU.length >= 4 && cleanO.length >= 4) {
+    if (cleanU.includes(cleanO) || cleanO.includes(cleanU)) return true;
+  }
 
   // Strip common units, markdown, or punctuation
   const stripUnits = (s: string) => s
@@ -102,6 +204,8 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
   const [isConfigDrawerOpen, setIsConfigDrawerOpen] = useState(false);
   const [viewTab, setViewTab] = useState<'worksheet' | 'online-solver' | 'mark-scheme'>('worksheet');
   const [showCoverPageOnScreen, setShowCoverPageOnScreen] = useState(false);
+
+  const isCurrentLanguageSubject = useMemo(() => isLanguageSubject(subject), [subject]);
 
   // Initial Subject Chapters
   const chapters = useMemo(() => {
@@ -195,7 +299,8 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
 
   const handleCheckAnswer = (key: string, finalAnswer: string, maxMarks: number) => {
     const current = solutions[key] || { working: '', userAnswer: '', isRevealed: false, isChecked: false };
-    const isCorrect = isAnswerEquivalent(current.userAnswer, finalAnswer);
+    const candidate = current.userAnswer?.trim() || current.working?.trim() || '';
+    const isCorrect = isAnswerEquivalent(candidate, finalAnswer);
     setSolutions(prev => ({
       ...prev,
       [key]: {
@@ -236,13 +341,24 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
 
   const handleInsertSymbol = (key: string, symbol: string) => {
     const current = solutions[key] || { working: '', userAnswer: '', isRevealed: false, isChecked: false };
-    setSolutions(prev => ({
-      ...prev,
-      [key]: {
-        ...current,
-        working: (current.working || '') + symbol
-      }
-    }));
+    // If user has a working box active, append to working; otherwise append to userAnswer
+    if (current.working !== undefined && current.working.length > 0) {
+      setSolutions(prev => ({
+        ...prev,
+        [key]: {
+          ...current,
+          working: current.working + symbol
+        }
+      }));
+    } else {
+      setSolutions(prev => ({
+        ...prev,
+        [key]: {
+          ...current,
+          userAnswer: (current.userAnswer || '') + symbol
+        }
+      }));
+    }
   };
 
   const handleResetAllSolutions = () => {
@@ -303,12 +419,25 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
   };
 
   // Render Working Lines engine
-  const renderWorkingSpace = (marks: number, style: WorkingSpaceStyle) => {
+  const renderWorkingSpace = (
+    marks: number,
+    style: WorkingSpaceStyle,
+    isLang: boolean = false,
+    isCalc: boolean = true
+  ) => {
     let lineCount = 2;
-    if (marks === 2) lineCount = 4;
-    else if (marks >= 3 && marks <= 4) lineCount = 6;
-    else if (marks >= 5 && marks <= 8) lineCount = 10;
-    else if (marks > 8) lineCount = 14;
+    if (isLang) {
+      if (marks === 1) lineCount = 2;
+      else if (marks === 2) lineCount = 3;
+      else if (marks >= 3 && marks <= 4) lineCount = 5;
+      else if (marks >= 5 && marks <= 8) lineCount = 8;
+      else if (marks > 8) lineCount = 16;
+    } else {
+      if (marks === 2) lineCount = 4;
+      else if (marks >= 3 && marks <= 4) lineCount = 6;
+      else if (marks >= 5 && marks <= 8) lineCount = 10;
+      else if (marks > 8) lineCount = 14;
+    }
 
     if (style === 'blank') {
       const heightPx = marks <= 2 ? '90px' : marks <= 4 ? '160px' : '240px';
@@ -318,13 +447,13 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
           style={{ height: heightPx }}
         >
           <span className="absolute bottom-2 right-2 text-[9pt] text-slate-400 select-none print:text-slate-500 font-serif">
-            [Working space]
+            {isLang ? '[Answer space]' : isCalc ? '[Working space]' : '[Response space]'}
           </span>
         </div>
       );
     }
 
-    if (style === 'grid') {
+    if (style === 'grid' && isCalc) {
       const heightPx = marks <= 2 ? '100px' : marks <= 4 ? '180px' : '260px';
       return (
         <div
@@ -476,7 +605,7 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                   >
                     <option value="dotted">Dotted (Cambridge)</option>
                     <option value="solid">Solid Lines</option>
-                    <option value="grid">Graph Grid</option>
+                    {!isCurrentLanguageSubject && <option value="grid">Graph Grid</option>}
                     <option value="blank">Blank Box</option>
                   </select>
                 </label>
@@ -534,7 +663,9 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                   {activeChapter.title}
                 </h2>
                 <p className="text-xs text-slate-300 mt-0.5">
-                  Type your steps, test your accuracy, and mark yourself with the official Cambridge criteria.
+                  {isCurrentLanguageSubject
+                    ? 'Write your responses, check acceptable examiner answers, and mark your work according to official Cambridge criteria.'
+                    : 'Show your working, calculate your answers, and check them against official Cambridge mark schemes.'}
                 </p>
               </div>
 
@@ -640,6 +771,12 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                         isChecked: false
                       };
 
+                      const isLang = isLanguageSubject(config.subject);
+                      const isCalc = requiresCalculationWorking(config.subject, q, sub);
+                      const hasMath = requiresMathSymbols(config.subject, q, sub);
+                      const isExtendedWriting = isLang && (sub.marks >= 6 || /\b(write|summary|email|article|review|report|letter|essay)\b/i.test(`${sub.prompt} ${q.prompt}`));
+                      const wordCount = state.userAnswer ? state.userAnswer.trim().split(/\s+/).filter(Boolean).length : 0;
+
                       return (
                         <div
                           key={key}
@@ -660,72 +797,190 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                             </span>
                           </div>
 
-                          {/* Interactive Working Space */}
-                          <div>
-                            <div className="flex items-center justify-between mb-1.5">
-                              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                                <span>Your Working Steps:</span>
-                              </label>
-                              {/* Math Quick Symbols */}
-                              <div className="flex items-center gap-1 flex-wrap text-xs">
-                                <span className="text-[10px] text-slate-500 mr-1 hidden sm:inline">Symbols:</span>
-                                {['×', '÷', '²', '³', '√', 'π', 'θ', '°', 'Δ', '±'].map(sym => (
-                                  <button
-                                    key={sym}
-                                    type="button"
-                                    onClick={() => handleInsertSymbol(key, sym)}
-                                    className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono border border-slate-700 cursor-pointer"
-                                  >
-                                    {sym}
-                                  </button>
-                                ))}
+                          {/* ──────────────────────────────────────────────────
+                              CASE 1: CALCULATION / MATH WORKING REQUIRED
+                          ────────────────────────────────────────────────── */}
+                          {isCalc ? (
+                            <>
+                              {/* Calculation Working Steps Box */}
+                              <div>
+                                <div className="flex items-center justify-between mb-1.5">
+                                  <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                                    <PenTool className="h-3.5 w-3.5 text-indigo-400" />
+                                    <span>Show Your Working Steps:</span>
+                                  </label>
+
+                                  {/* Quick Math Symbols (ONLY for subjects/questions that need math!) */}
+                                  {hasMath && (
+                                    <div className="flex items-center gap-1 flex-wrap text-xs">
+                                      <span className="text-[10px] text-slate-500 mr-1 hidden sm:inline">Symbols:</span>
+                                      {['×', '÷', '²', '³', '√', 'π', 'θ', '°', 'Δ', '±'].map(sym => (
+                                        <button
+                                          key={sym}
+                                          type="button"
+                                          onClick={() => handleInsertSymbol(key, sym)}
+                                          className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono border border-slate-700 cursor-pointer"
+                                        >
+                                          {sym}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                                <textarea
+                                  rows={3}
+                                  value={state.working}
+                                  onChange={(e) => handleUpdateWorking(key, e.target.value)}
+                                  placeholder="Show your step-by-step working here (e.g. F = ma = 1200 × 2 = 2400 N)..."
+                                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs sm:text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition font-mono leading-relaxed"
+                                />
                               </div>
-                            </div>
-                            <textarea
-                              rows={3}
-                              value={state.working}
-                              onChange={(e) => handleUpdateWorking(key, e.target.value)}
-                              placeholder={`Show your working steps here (e.g., F = ma = 1200 × 2 = 2400 N)...`}
-                              className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs sm:text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition font-mono leading-relaxed"
-                            />
-                          </div>
 
-                          {/* Final Answer Input & Actions */}
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
-                            <div className="flex items-center gap-2 flex-1">
-                              <span className="text-xs font-bold text-slate-300 shrink-0">Answer:</span>
-                              <input
-                                type="text"
-                                value={state.userAnswer}
-                                onChange={(e) => handleUpdateUserAnswer(key, e.target.value)}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') {
-                                    handleCheckAnswer(key, sub.finalAnswer, sub.marks);
+                              {/* Final Answer Input & Actions */}
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                                <div className="flex items-center gap-2 flex-1">
+                                  <span className="text-xs font-bold text-slate-300 shrink-0">Answer:</span>
+                                  <input
+                                    type="text"
+                                    value={state.userAnswer}
+                                    onChange={(e) => handleUpdateUserAnswer(key, e.target.value)}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter') {
+                                        handleCheckAnswer(key, sub.finalAnswer, sub.marks);
+                                      }
+                                    }}
+                                    placeholder="e.g. 2400 N or x = 3, -3"
+                                    className="flex-1 max-w-md bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs sm:text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 font-mono"
+                                  />
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={() => handleCheckAnswer(key, sub.finalAnswer, sub.marks)}
+                                    className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow transition cursor-pointer"
+                                  >
+                                    <CheckCircle className="h-3.5 w-3.5" />
+                                    <span>Check Answer</span>
+                                  </button>
+
+                                  <button
+                                    onClick={() => handleToggleReveal(key)}
+                                    className="px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs flex items-center gap-1.5 transition cursor-pointer"
+                                  >
+                                    <Lightbulb className="h-3.5 w-3.5 text-amber-400" />
+                                    <span>{state.isRevealed ? 'Hide Scheme' : 'Mark Scheme'}</span>
+                                  </button>
+                                </div>
+                              </div>
+                            </>
+                          ) : isLang ? (
+                            /* ──────────────────────────────────────────────────
+                               CASE 2: ENGLISH & LANGUAGE SUBJECTS
+                               (NO working box, NO math symbols, pure language response)
+                            ────────────────────────────────────────────────── */
+                            <>
+                              <div>
+                                <div className="flex items-center justify-between mb-1.5">
+                                  <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                                    <PenTool className="h-3.5 w-3.5 text-indigo-400" />
+                                    <span>{isExtendedWriting ? 'Your Written Response / Essay:' : 'Your Answer / Notes:'}</span>
+                                  </label>
+                                  {isExtendedWriting && (
+                                    <span className="text-[11px] font-mono font-medium px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-400">
+                                      Word count: <strong className="text-indigo-300">{wordCount}</strong> words
+                                    </span>
+                                  )}
+                                </div>
+
+                                <textarea
+                                  rows={isExtendedWriting ? 8 : 3}
+                                  value={state.userAnswer}
+                                  onChange={(e) => handleUpdateUserAnswer(key, e.target.value)}
+                                  placeholder={
+                                    isExtendedWriting
+                                      ? 'Write your response here using standard paragraphs, clear structure, and appropriate vocabulary...'
+                                      : 'Type your answer or notes here...'
                                   }
-                                }}
-                                placeholder="e.g. 2400 or x = 3, -3"
-                                className="flex-1 max-w-md bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs sm:text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 font-mono"
-                              />
-                            </div>
+                                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs sm:text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition leading-relaxed font-sans"
+                                />
+                              </div>
 
-                            <div className="flex items-center gap-2">
-                              <button
-                                onClick={() => handleCheckAnswer(key, sub.finalAnswer, sub.marks)}
-                                className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow transition cursor-pointer"
-                              >
-                                <CheckCircle className="h-3.5 w-3.5" />
-                                <span>Check Answer</span>
-                              </button>
+                              <div className="flex items-center justify-end gap-2 pt-1">
+                                <button
+                                  onClick={() => handleCheckAnswer(key, sub.finalAnswer, sub.marks)}
+                                  className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow transition cursor-pointer"
+                                >
+                                  <CheckCircle className="h-3.5 w-3.5" />
+                                  <span>{isExtendedWriting ? 'Check Response' : 'Check Answer'}</span>
+                                </button>
 
-                              <button
-                                onClick={() => handleToggleReveal(key)}
-                                className="px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs flex items-center gap-1.5 transition cursor-pointer"
-                              >
-                                <Lightbulb className="h-3.5 w-3.5 text-amber-400" />
-                                <span>{state.isRevealed ? 'Hide Scheme' : 'Mark Scheme'}</span>
-                              </button>
-                            </div>
-                          </div>
+                                <button
+                                  onClick={() => handleToggleReveal(key)}
+                                  className="px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs flex items-center gap-1.5 transition cursor-pointer"
+                                >
+                                  <Lightbulb className="h-3.5 w-3.5 text-amber-400" />
+                                  <span>{state.isRevealed ? 'Hide Scheme' : 'Mark Scheme'}</span>
+                                </button>
+                              </div>
+                            </>
+                          ) : (
+                            /* ──────────────────────────────────────────────────
+                               CASE 3: QUALITATIVE / EXPLANATION QUESTIONS IN SCIENCES
+                               (NO working box, direct answer/explanation)
+                            ────────────────────────────────────────────────── */
+                            <>
+                              <div>
+                                <div className="flex items-center justify-between mb-1.5">
+                                  <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                                    <PenTool className="h-3.5 w-3.5 text-indigo-400" />
+                                    <span>Your Answer / Scientific Explanation:</span>
+                                  </label>
+
+                                  {hasMath && (
+                                    <div className="flex items-center gap-1 flex-wrap text-xs">
+                                      <span className="text-[10px] text-slate-500 mr-1 hidden sm:inline">Symbols:</span>
+                                      {['×', '÷', '²', '³', '√', 'π', 'θ', '°', 'Δ', '±'].map(sym => (
+                                        <button
+                                          key={sym}
+                                          type="button"
+                                          onClick={() => handleInsertSymbol(key, sym)}
+                                          className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono border border-slate-700 cursor-pointer"
+                                        >
+                                          {sym}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+
+                                <textarea
+                                  rows={3}
+                                  value={state.userAnswer}
+                                  onChange={(e) => handleUpdateUserAnswer(key, e.target.value)}
+                                  placeholder="Write your explanation or answer here..."
+                                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs sm:text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition leading-relaxed font-sans"
+                                />
+                              </div>
+
+                              <div className="flex items-center justify-end gap-2 pt-1">
+                                <button
+                                  onClick={() => handleCheckAnswer(key, sub.finalAnswer, sub.marks)}
+                                  className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow transition cursor-pointer"
+                                >
+                                  <CheckCircle className="h-3.5 w-3.5" />
+                                  <span>Check Answer</span>
+                                </button>
+
+                                <button
+                                  onClick={() => handleToggleReveal(key)}
+                                  className="px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs flex items-center gap-1.5 transition cursor-pointer"
+                                >
+                                  <Lightbulb className="h-3.5 w-3.5 text-amber-400" />
+                                  <span>{state.isRevealed ? 'Hide Scheme' : 'Mark Scheme'}</span>
+                                </button>
+                              </div>
+                            </>
+                          )}
 
                           {/* Auto-Check Feedback Banner */}
                           {state.isChecked && (
@@ -741,10 +996,10 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                               )}
                               <div className="flex-1">
                                 <span className="font-bold">
-                                  {state.isCorrect ? 'Correct Final Answer!' : 'Needs Review / Check Working Steps:'}
+                                  {state.isCorrect ? 'Correct / Acceptable Answer!' : 'Review Against Cambridge Criteria:'}
                                 </span>
                                 <span className="ml-1.5">
-                                  Official CAIE Answer: <strong className="font-mono text-white">{sub.finalAnswer}</strong>
+                                  Official CAIE Mark Scheme: <strong className="font-mono text-white">{sub.finalAnswer}</strong>
                                 </span>
                               </div>
                             </div>
@@ -847,7 +1102,7 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
             <div className="flex items-center gap-2">
               <FileText className="h-4 w-4 text-indigo-400" />
               <span>
-                <strong>Printable Exam Geometry:</strong> Formatted for standard A4 paper with dotted answer rules.
+                <strong>Printable Exam Geometry:</strong> Formatted for standard A4 paper with authentic Cambridge response lines.
               </span>
             </div>
             <button
@@ -987,9 +1242,11 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                         <span><strong>Calculators:</strong> Electronic calculators are <strong>not permitted</strong> for this component.</span>
                       )}
                     </li>
-                    <li>
-                      Give non-exact numerical answers correct to <strong>3 significant figures</strong>, or 1 decimal place for angles in degrees, unless a different degree of accuracy is specified in the question.
-                    </li>
+                    {!isCurrentLanguageSubject && (
+                      <li>
+                        Give non-exact numerical answers correct to <strong>3 significant figures</strong>, or 1 decimal place for angles in degrees, unless a different degree of accuracy is specified in the question.
+                      </li>
+                    )}
                     {activeChapter.formulaNotes.length > 0 && (
                       <li>
                         <strong>Formula Reminder:</strong> {activeChapter.formulaNotes.slice(0, 2).join(' • ')}
@@ -1178,6 +1435,9 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                       {/* Subparts */}
                       <div className="space-y-6 mt-4">
                         {question.subParts.map((sub, sIdx) => {
+                          const isLang = isLanguageSubject(config.subject);
+                          const isCalc = requiresCalculationWorking(config.subject, question, sub);
+
                           return (
                             <div key={sIdx} className="pl-6 sm:pl-8 border-l-2 border-slate-200">
                               {/* Subpart prompt & marks */}
@@ -1194,12 +1454,16 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                               {/* Working Lines (Modes A & C) */}
                               {config.bookletMode !== 'Mode B: Inline Revision Guide' && (
                                 <div className="mt-2">
-                                  {renderWorkingSpace(sub.marks, config.workingSpaceStyle)}
-                                  <div className="mt-2 flex items-baseline justify-end gap-2 text-xs text-slate-800">
-                                    <span className="font-serif font-bold">Answer:</span>
-                                    <div className="w-56 sm:w-72 border-b border-dotted border-slate-800 h-4" />
-                                    <span className="font-serif font-bold">[{sub.marks}]</span>
-                                  </div>
+                                  {renderWorkingSpace(sub.marks, config.workingSpaceStyle, isLang, isCalc)}
+                                  
+                                  {/* ONLY calculation questions have the separate right-aligned Cambridge Answer line */}
+                                  {isCalc ? (
+                                    <div className="mt-2 flex items-baseline justify-end gap-2 text-xs text-slate-800">
+                                      <span className="font-serif font-bold">Answer:</span>
+                                      <div className="w-56 sm:w-72 border-b border-dotted border-slate-800 h-4" />
+                                      <span className="font-serif font-bold">[{sub.marks}]</span>
+                                    </div>
+                                  ) : null}
                                 </div>
                               )}
 
