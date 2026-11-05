@@ -1072,7 +1072,7 @@ export const BIOLOGY_0610_TAXONOMY: ChapterTaxonomy[] = [
     title: 'Transport in Animals',
     subjectCode: '0610',
     subjectName: 'Biology',
-    subtopics: ['Double Circulatory System (Systemic & Pulmonary)', 'Heart Anatomy & Valves', 'Blood Vessels (Arteries, Veins, Capillaries Structure & Function)', 'Coronary Heart Disease (CHD) Risk Factors', 'Blood Components (Erythrocytes, Leucocytes, Platelets, Plasma)'],
+    subtopics: ['Transport in Animals & Double Circulation', 'Heart Anatomy & Valves', 'Blood Vessels (Arteries, Veins, Capillaries Structure & Function)', 'Coronary Heart Disease (CHD) Risk Factors', 'Blood Components (Erythrocytes, Leucocytes, Platelets, Plasma)'],
     learningObjectives: ['Describe double circulation and advantages over single circulation', 'Trace blood flow through right and left atria and ventricles, aorta, vena cava, pulmonary artery/vein', 'Compare wall thickness, lumen diameter, and presence of valves in blood vessels', 'Describe role of platelets in clotting and white blood cells in phagocytosis and antibody production'],
     calculatorAllowed: true,
     formulaNotes: ['Left ventricle wall is thicker than right ventricle wall to pump blood at high pressure throughout body'],

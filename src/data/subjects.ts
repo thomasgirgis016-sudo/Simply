@@ -274,7 +274,7 @@ const BASE_SUBJECTS: Subject[] = [
       'Plant Nutrition & Photosynthesis',
       'Human Nutrition & Digestion',
       'Transport in Plants (Xylem & Phloem)',
-      'Transport in Animals (Circulation & Heart)',
+      'Transport in Animals (Heart & Blood Vessels)',
       'Gas Exchange, Respiration & Homeostasis',
       'Coordination, Nervous System & Hormones',
       'Reproduction & Genetics (Inheritance & Mitosis/Meiosis)',
@@ -306,7 +306,7 @@ const BASE_SUBJECTS: Subject[] = [
     icon: 'Atom',
     color: '#059669',
     topics: [
-      'Biology: Cells, Nutrition, Circulation, Respiration',
+      'Biology: Cells, Nutrition, Transport in Animals, Respiration',
       'Chemistry: Atoms, Stoichiometry, Acids, Organic',
       'Physics: Forces, Energy, Thermal, Waves, Electricity'
     ]

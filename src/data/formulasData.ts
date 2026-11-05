@@ -433,7 +433,7 @@ export const COMPREHENSIVE_FORMULAS: FormulaItem[] = [
   {
     id: 'f-b-4',
     subjectId: 'cie-bio-0610',
-    topic: 'Transport in Animals (Circulation)',
+    topic: 'Transport in Animals',
     name: 'Cardiac Output & Heart Rate',
     formula: '\\text{Cardiac Output } (\\text{cm}^3/\\text{min}) = \\text{Stroke Volume } (\\text{cm}^3) \\times \\text{Heart Rate } (\\text{beats/min})',
     whereVariables: 'Stroke Volume = volume of blood pumped per ventricle contraction; Heart Rate = beats per minute',

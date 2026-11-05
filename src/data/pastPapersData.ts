@@ -1113,7 +1113,7 @@ export const SUBJECT_TOPICS_MAP: Record<string, string[]> = {
     'Cell Structure & Active Transport',
     'Biological Molecules & Enzymes',
     'Plant Nutrition & Photosynthesis',
-    'Human Circulatory System & Heart',
+    'Transport in Animals',
     'Respiration & Gas Exchange',
     'Coordination, Nerves & Homeostasis',
     'Reproduction & Meiosis vs Mitosis',

@@ -115,6 +115,28 @@ html.light ::-webkit-scrollbar-thumb:hover {
     color: #475569 !important;
   }
 
+  .classified-print-container {
+    padding: 0 !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+
+  .cover-page {
+    page-break-after: always;
+    break-after: page;
+  }
+
+  .question-block {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .mark-scheme-section {
+    page-break-before: always;
+    break-before: page;
+  }
+
   @page {
     margin: 1.5cm;
     size: A4 portrait;

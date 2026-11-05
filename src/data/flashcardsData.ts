@@ -475,7 +475,7 @@ export const COMPREHENSIVE_FLASHCARDS: Flashcard[] = [
   {
   "id": "fc-bio-111",
   "subjectId": "cie-bio-0610",
-  "topic": "Transport in Animals (Circulation & Heart)",
+  "topic": "Transport in Animals",
   "question": "Explain why the left ventricle wall of the heart is thicker than the right ventricle wall.",
   "answer": "• Right ventricle pumps blood a short distance to the lungs under low pressure (prevents lung capillary damage).\n• Left ventricle has a much thicker muscular wall to pump oxygenated blood at high pressure throughout the entire systemic body circulation against higher resistance.",
   "examinerTip": "Keywords: \"Left ventricle pumps blood around the whole body\", \"generates higher pressure\".",

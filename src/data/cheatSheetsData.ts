@@ -339,7 +339,7 @@ export const CHEAT_SHEETS_DATABASE: SubjectCheatSheet[] = [
         color: 'rose',
         items: [
           {
-            label: 'Heart & Circulatory System',
+            label: 'Heart & Transport in Animals',
             formula: '\\text{Left Ventricle has thickest muscular wall}',
             notes: 'Pumps oxygenated blood to the entire body at high pressure through the Aorta. Right ventricle only pumps to lungs via pulmonary artery.'
           },

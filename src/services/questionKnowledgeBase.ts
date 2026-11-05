@@ -2032,7 +2032,7 @@ const BIO_PAPER_4_BLUEPRINTS: QuestionBlueprint[] = [
   },
   {
     qNum: 4,
-    topic: 'Human Circulatory System, Heart & Coronary Disease',
+    topic: 'Transport in Animals: Heart, Blood Vessels & Coronary Disease',
     difficultyTier: 'Standard Extended',
     componentType: 'Theory',
     marks: 8,
