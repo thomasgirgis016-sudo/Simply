@@ -13,6 +13,7 @@
 import { PAST_PAPERS_DATABASE, OFFICIAL_PAST_PAPER_PDFS, generateQuestionsForPaperPdf } from '../../data/pastPapersData';
 import { OfficialPaperPdf, PastPaperItem } from '../../types';
 import { getTaxonomyForSubject, ChapterTaxonomy } from './taxonomy';
+import { classifiedQuestionsStore } from './classifiedStore';
 
 export interface ClassifiedSubPart {
   part: string;             // e.g. "(a)", "(b)(i)", "(c)"
@@ -2728,16 +2729,30 @@ export function getQuestionsForSubject(subjectCodeOrId: string): ClassifiedQuest
     }
   }
 
+  // Add any questions already cached in classifiedQuestionsStore
+  const storeQuestions = classifiedQuestionsStore.getQuestionsBySyllabus(norm);
+  for (const q of storeQuestions) {
+    if (!existingIds.has(q.id)) {
+      pool.push(q);
+      existingIds.add(q.id);
+    }
+  }
+
   // Sample papers across years, sessions, components and variants
   const sampledPdfs = matchingPdfs.slice(0, 60);
   for (const pdf of sampledPdfs) {
     const rawQuestions = generateQuestionsForPaperPdf(pdf);
+    const convertedBatch: ClassifiedQuestion[] = [];
     for (let i = 0; i < rawQuestions.length; i++) {
       const q = convertPastPaperItemToClassifiedQuestion(rawQuestions[i], pdf, taxonomy, i);
       if (!existingIds.has(q.id)) {
         pool.push(q);
         existingIds.add(q.id);
+        convertedBatch.push(q);
       }
+    }
+    if (convertedBatch.length > 0) {
+      classifiedQuestionsStore.saveQuestions(pdf.id, convertedBatch);
     }
   }
 
