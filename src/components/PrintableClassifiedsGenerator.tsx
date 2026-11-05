@@ -48,6 +48,12 @@ import {
 } from './ClassifiedsConfigPanel';
 import { MathRenderer } from './MathRenderer';
 import { SimplyLogo } from './SimplyLogo';
+import {
+  isPaper2Question,
+  isPaper4Question,
+  isSameMeaningAnswer,
+  getP2McqOptions
+} from '../lib/grading/semanticGrader';
 
 interface PrintableClassifiedsGeneratorProps {
   subject: Subject;
@@ -61,6 +67,7 @@ interface SubPartSolution {
   isRevealed: boolean;
   isChecked: boolean;
   isCorrect?: boolean;
+  matchReason?: string;
 }
 
 /**
@@ -297,10 +304,17 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
     }));
   };
 
-  const handleCheckAnswer = (key: string, finalAnswer: string, maxMarks: number) => {
+  const handleCheckAnswer = (
+    key: string,
+    finalAnswer: string,
+    maxMarks: number,
+    markScheme?: Array<{ requirement: string }>,
+    isP4 = false
+  ) => {
     const current = solutions[key] || { working: '', userAnswer: '', isRevealed: false, isChecked: false };
     const candidate = current.userAnswer?.trim() || current.working?.trim() || '';
-    const isCorrect = isAnswerEquivalent(candidate, finalAnswer);
+    const match = isSameMeaningAnswer(candidate, finalAnswer, markScheme, isP4);
+    const isCorrect = match.isMatch;
     setSolutions(prev => ({
       ...prev,
       [key]: {
@@ -308,6 +322,7 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
         isChecked: true,
         isCorrect,
         isRevealed: true,
+        matchReason: match.reason,
         scoreAwarded: isCorrect ? maxMarks : (current.scoreAwarded !== undefined ? current.scoreAwarded : 0)
       }
     }));
@@ -772,8 +787,10 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                       };
 
                       const isLang = isLanguageSubject(config.subject);
-                      const isCalc = requiresCalculationWorking(config.subject, q, sub);
-                      const hasMath = requiresMathSymbols(config.subject, q, sub);
+                      const isP2 = isPaper2Question(q);
+                      const isP4 = isPaper4Question(q);
+                      const isCalc = !isP2 && requiresCalculationWorking(config.subject, q, sub);
+                      const hasMath = !isP2 && requiresMathSymbols(config.subject, q, sub);
                       const isExtendedWriting = isLang && (sub.marks >= 6 || /\b(write|summary|email|article|review|report|letter|essay)\b/i.test(`${sub.prompt} ${q.prompt}`));
                       const wordCount = state.userAnswer ? state.userAnswer.trim().split(/\s+/).filter(Boolean).length : 0;
 
@@ -792,15 +809,115 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                                 <MathRenderer content={sub.prompt} />
                               </div>
                             </div>
-                            <span className="shrink-0 px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-xs font-mono font-bold text-slate-300">
-                              [{sub.marks} {sub.marks === 1 ? 'mark' : 'marks'}]
-                            </span>
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              {isP2 && (
+                                <span className="px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-[10px] font-bold text-amber-300">
+                                  P2 Multiple Choice
+                                </span>
+                              )}
+                              {isP4 && (
+                                <span className="px-2 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/30 text-[10px] font-bold text-indigo-300">
+                                  P4 Theory
+                                </span>
+                              )}
+                              <span className="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-xs font-mono font-bold text-slate-300">
+                                [{sub.marks} {sub.marks === 1 ? 'mark' : 'marks'}]
+                              </span>
+                            </div>
                           </div>
 
                           {/* ──────────────────────────────────────────────────
-                              CASE 1: CALCULATION / MATH WORKING REQUIRED
+                              CASE 0: PAPER 2 MULTIPLE CHOICE QUESTIONS (MCQ)
+                              (Strictly NOT typable! Select options A, B, C, D)
                           ────────────────────────────────────────────────── */}
-                          {isCalc ? (
+                          {isP2 ? (
+                            <div className="space-y-3 pt-1">
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                                  <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+                                  <span>Paper 2 Multiple Choice (Select A, B, C, or D):</span>
+                                </span>
+                                <span className="text-[11px] text-slate-400 font-medium">Click an option below to answer</span>
+                              </div>
+
+                              {/* MCQ Option Cards Grid */}
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                {getP2McqOptions(q, sub).map(opt => {
+                                  const cleanAns = (state.userAnswer || '').trim().toUpperCase();
+                                  const isSelected = cleanAns === opt.letter || cleanAns === opt.label.toUpperCase();
+                                  const isCorrectOpt = state.isChecked && (
+                                    isSameMeaningAnswer(opt.letter, sub.finalAnswer, sub.markScheme, false).isMatch ||
+                                    isSameMeaningAnswer(opt.label, sub.finalAnswer, sub.markScheme, false).isMatch
+                                  );
+                                  const isWrongOpt = state.isChecked && isSelected && !isCorrectOpt;
+
+                                  return (
+                                    <button
+                                      key={opt.letter}
+                                      type="button"
+                                      onClick={() => {
+                                        handleUpdateUserAnswer(key, opt.letter);
+                                        handleCheckAnswer(key, sub.finalAnswer, sub.marks, sub.markScheme, isP4);
+                                      }}
+                                      className={`p-3 rounded-xl border text-left transition flex items-center gap-3 cursor-pointer ${
+                                        isCorrectOpt
+                                          ? 'border-emerald-500 bg-emerald-500/20 text-white shadow-md'
+                                          : isWrongOpt
+                                          ? 'border-rose-500 bg-rose-500/20 text-white'
+                                          : isSelected
+                                          ? 'border-indigo-500 bg-indigo-500/20 text-white ring-1 ring-indigo-400'
+                                          : 'border-slate-800 bg-slate-900/90 text-slate-200 hover:border-slate-700 hover:bg-slate-900'
+                                      }`}
+                                    >
+                                      <span className={`flex h-7 w-7 items-center justify-center rounded-lg font-bold font-mono text-xs shrink-0 ${
+                                        isCorrectOpt
+                                          ? 'bg-emerald-500 text-slate-950 font-black'
+                                          : isWrongOpt
+                                          ? 'bg-rose-500 text-white font-bold'
+                                          : isSelected
+                                          ? 'bg-indigo-500 text-white font-bold'
+                                          : 'bg-slate-800 text-slate-300'
+                                      }`}>
+                                        {opt.letter}
+                                      </span>
+                                      <span className="text-xs sm:text-sm font-medium flex-1">
+                                        <MathRenderer content={opt.label} />
+                                      </span>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+
+                              {/* MCQ Action Bar */}
+                              <div className="flex items-center justify-between pt-1">
+                                <div className="text-[11px] text-slate-400">
+                                  {state.isChecked && (
+                                    state.isCorrect ? (
+                                      <span className="text-emerald-400 font-bold flex items-center gap-1">
+                                        <CheckCircle2 className="h-3.5 w-3.5" /> Correct! [{sub.marks}/{sub.marks} marks]
+                                      </span>
+                                    ) : (
+                                      <span className="text-rose-400 font-bold flex items-center gap-1">
+                                        <XCircle className="h-3.5 w-3.5" /> Incorrect. Correct Option was: {sub.finalAnswer}
+                                      </span>
+                                    )
+                                  )}
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={() => handleToggleReveal(key)}
+                                  className="px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs flex items-center gap-1.5 transition cursor-pointer"
+                                >
+                                  <Lightbulb className="h-3.5 w-3.5 text-amber-400" />
+                                  <span>{state.isRevealed ? 'Hide Scheme' : 'Mark Scheme'}</span>
+                                </button>
+                              </div>
+                            </div>
+                          ) : isCalc ? (
+                            /* ──────────────────────────────────────────────────
+                               CASE 1: CALCULATION / MATH WORKING REQUIRED
+                            ────────────────────────────────────────────────── */
                             <>
                               {/* Calculation Working Steps Box */}
                               <div>
@@ -846,7 +963,7 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                                     onChange={(e) => handleUpdateUserAnswer(key, e.target.value)}
                                     onKeyDown={(e) => {
                                       if (e.key === 'Enter') {
-                                        handleCheckAnswer(key, sub.finalAnswer, sub.marks);
+                                        handleCheckAnswer(key, sub.finalAnswer, sub.marks, sub.markScheme, isP4);
                                       }
                                     }}
                                     placeholder="e.g. 2400 N or x = 3, -3"
@@ -856,7 +973,7 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
 
                                 <div className="flex items-center gap-2">
                                   <button
-                                    onClick={() => handleCheckAnswer(key, sub.finalAnswer, sub.marks)}
+                                    onClick={() => handleCheckAnswer(key, sub.finalAnswer, sub.marks, sub.markScheme, isP4)}
                                     className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow transition cursor-pointer"
                                   >
                                     <CheckCircle className="h-3.5 w-3.5" />
@@ -907,7 +1024,7 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
 
                               <div className="flex items-center justify-end gap-2 pt-1">
                                 <button
-                                  onClick={() => handleCheckAnswer(key, sub.finalAnswer, sub.marks)}
+                                  onClick={() => handleCheckAnswer(key, sub.finalAnswer, sub.marks, sub.markScheme, isP4)}
                                   className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow transition cursor-pointer"
                                 >
                                   <CheckCircle className="h-3.5 w-3.5" />
@@ -964,7 +1081,7 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
 
                               <div className="flex items-center justify-end gap-2 pt-1">
                                 <button
-                                  onClick={() => handleCheckAnswer(key, sub.finalAnswer, sub.marks)}
+                                  onClick={() => handleCheckAnswer(key, sub.finalAnswer, sub.marks, sub.markScheme, isP4)}
                                   className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow transition cursor-pointer"
                                 >
                                   <CheckCircle className="h-3.5 w-3.5" />
@@ -994,13 +1111,20 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                               ) : (
                                 <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
                               )}
-                              <div className="flex-1">
-                                <span className="font-bold">
-                                  {state.isCorrect ? 'Correct / Acceptable Answer!' : 'Review Against Cambridge Criteria:'}
-                                </span>
-                                <span className="ml-1.5">
-                                  Official CAIE Mark Scheme: <strong className="font-mono text-white">{sub.finalAnswer}</strong>
-                                </span>
+                              <div className="flex-1 space-y-0.5">
+                                <div>
+                                  <span className="font-bold">
+                                    {state.isCorrect ? 'Correct / Acceptable Answer!' : 'Review Against Cambridge Criteria:'}
+                                  </span>
+                                  <span className="ml-1.5">
+                                    Official CAIE Mark Scheme: <strong className="font-mono text-white">{sub.finalAnswer}</strong>
+                                  </span>
+                                </div>
+                                {state.matchReason && (
+                                  <div className="text-[11px] text-slate-300 font-sans">
+                                    ℹ️ {state.matchReason}
+                                  </div>
+                                )}
                               </div>
                             </div>
                           )}

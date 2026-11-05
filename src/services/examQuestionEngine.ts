@@ -1,6 +1,7 @@
 import { PastPaperItem } from '../types';
 import { getAllPastPapers } from '../data/pastPapersData';
 import { evaluateStudentWorking } from './mathWorkingValidator';
+import { isSameMeaningAnswer, isPaper4Question } from '../lib/grading/semanticGrader';
 
 export interface ExamGradingResult {
   paper: PastPaperItem;
@@ -311,6 +312,14 @@ export function evaluateStudentAnswerAgainstMarkScheme(
     });
   });
 
+  const isP4 = isPaper4Question(paper);
+  const semanticEval = isSameMeaningAnswer(sAns, paper.finalAnswer, paper.markScheme, isP4);
+
+  // If student answer has the same meaning as official answer or mark scheme, ensure full credit is granted
+  if (semanticEval.isMatch && !mathFailure) {
+    marksEarned = Math.max(marksEarned, totalMarks);
+  }
+
   // Cap marks between 0 and totalMarks
   marksEarned = Math.min(totalMarks, Math.max(0, marksEarned));
   const percentage = Math.round((marksEarned / totalMarks) * 100);
@@ -322,7 +331,7 @@ export function evaluateStudentAnswerAgainstMarkScheme(
 
   const cleanOfficial = paper.finalAnswer.replace(/\$/g, '').trim().toLowerCase();
   const cleanStudent = sAns.replace(/\$/g, '').trim().toLowerCase();
-  const isExactMatch = cleanStudent.includes(cleanOfficial) || cleanOfficial.includes(cleanStudent);
+  const isExactMatch = semanticEval.isMatch || cleanStudent.includes(cleanOfficial) || cleanOfficial.includes(cleanStudent);
 
   // Generate clean markdown report
   const formattedMarkdown = `### 📋 Official Cambridge Examiner Assessment: ${paper.paperCode} ${paper.questionNumber}

@@ -27,6 +27,7 @@ import { findPastPaperQuestionByReference, evaluateStudentAnswerAgainstMarkSchem
 import { solveQuestionWithGemini, gradeHandwrittenWorkWithGemini } from '../services/gemini';
 import { isSubjectMatch } from '../utils/subjectMatcher';
 import { MathRenderer } from './MathRenderer';
+import { isPaper2Question, isPaper4Question, getP2McqOptions } from '../lib/grading/semanticGrader';
 
 interface QuestionSolverProps {
   subject: Subject;
@@ -622,36 +623,79 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
                       </div>
                     )}
 
-                    {/* Student Answer Input Box */}
+                    {/* Student Answer Input Box / MCQ Options */}
                     <div className="pt-2 border-t border-sky-500/20 space-y-2">
                       <div className="flex items-center justify-between">
                         <label className="text-[11px] font-bold uppercase tracking-wider text-sky-300 flex items-center gap-1.5">
                           <Edit3 className="h-3.5 w-3.5" />
-                          Test Yourself: Enter Your Working or Final Answer to be Graded:
+                          {isPaper2Question(selectedExamPaper)
+                            ? 'Paper 2 Multiple Choice: Select Option A, B, C, or D (Not Typable):'
+                            : 'Test Yourself: Enter Your Working or Final Answer to be Graded:'}
                         </label>
                         <span className="text-[10px] text-slate-400">Total Available: [{selectedExamPaper.marks} Marks]</span>
                       </div>
-                      <textarea
-                        rows={3}
-                        value={studentExamAnswer}
-                        onChange={(e) => setStudentExamAnswer(e.target.value)}
-                        placeholder={
-                          isLanguageOrHumanities
-                            ? "Write your summary points or essay response here (e.g., The advantages of renewable energy include...)"
-                            : "Enter your working steps or final answer (e.g., x = 4.5 or 125 cm³)..."
-                        }
-                        className="w-full rounded-xl border border-sky-500/40 bg-slate-950 p-3 text-sm text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none"
-                      />
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          type="button"
-                          onClick={handleGradeExamAnswer}
-                          disabled={!studentExamAnswer.trim()}
-                          className="rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-md hover:from-sky-500 hover:to-indigo-500 transition cursor-pointer disabled:opacity-50"
-                        >
-                          Grade My Answer Against Official Mark Scheme
-                        </button>
-                      </div>
+
+                      {isPaper2Question(selectedExamPaper) ? (
+                        <div className="space-y-3 pt-1">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            {getP2McqOptions(selectedExamPaper, selectedExamPaper).map((opt) => {
+                              const isSelected = studentExamAnswer.trim().toUpperCase() === opt.letter;
+                              return (
+                                <button
+                                  key={opt.letter}
+                                  type="button"
+                                  onClick={() => {
+                                    setStudentExamAnswer(opt.letter);
+                                    const evalRes = evaluateStudentAnswerAgainstMarkScheme(selectedExamPaper, opt.letter);
+                                    setExamGradingResult(evalRes);
+                                  }}
+                                  className={`p-3 rounded-xl border text-left transition flex items-center gap-3 cursor-pointer ${
+                                    isSelected
+                                      ? 'border-sky-500 bg-sky-500/20 text-white ring-1 ring-sky-400 shadow-md'
+                                      : 'border-slate-800 bg-slate-900/90 text-slate-200 hover:border-slate-700 hover:bg-slate-900'
+                                  }`}
+                                >
+                                  <span className={`flex h-7 w-7 items-center justify-center rounded-lg font-bold font-mono text-xs shrink-0 ${
+                                    isSelected ? 'bg-sky-500 text-white' : 'bg-slate-800 text-slate-300'
+                                  }`}>
+                                    {opt.letter}
+                                  </span>
+                                  <span className="text-xs sm:text-sm font-medium flex-1">
+                                    {opt.label}
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                          <p className="text-[11px] text-slate-400 italic">
+                            Paper 2 is strictly multiple choice. Clicking an option automatically checks your answer against the official Cambridge mark scheme.
+                          </p>
+                        </div>
+                      ) : (
+                        <>
+                          <textarea
+                            rows={3}
+                            value={studentExamAnswer}
+                            onChange={(e) => setStudentExamAnswer(e.target.value)}
+                            placeholder={
+                              isLanguageOrHumanities
+                                ? "Write your summary points or essay response here (e.g., The advantages of renewable energy include...)"
+                                : "Enter your working steps or final answer (e.g., x = 4.5 or 125 cm³)..."
+                            }
+                            className="w-full rounded-xl border border-sky-500/40 bg-slate-950 p-3 text-sm text-white placeholder-slate-500 focus:border-sky-400 focus:outline-none"
+                          />
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              type="button"
+                              onClick={handleGradeExamAnswer}
+                              disabled={!studentExamAnswer.trim()}
+                              className="rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-md hover:from-sky-500 hover:to-indigo-500 transition cursor-pointer disabled:opacity-50"
+                            >
+                              Grade My Answer Against Official Mark Scheme
+                            </button>
+                          </div>
+                        </>
+                      )}
                     </div>
 
                     {/* Grading Assessment Report Card */}
