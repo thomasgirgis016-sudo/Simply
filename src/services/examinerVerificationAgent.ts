@@ -262,6 +262,23 @@ export function verifyAndAuditSolverResult(rawResult: SolverResult): VerifiedSol
     });
   }
 
+  // ── PASS 5: Student Working Score Consistency Gate ─────────────────
+  if (cloned.studentWorkingEvaluation) {
+    const swe = cloned.studentWorkingEvaluation;
+    const allLinesCorrect = swe.lineReviews.length > 0 && swe.lineReviews.every((l) => l.isCorrect);
+    if (swe.marksEarned === 0 && allLinesCorrect && swe.marksPossible > 0) {
+      swe.marksEarned = swe.marksPossible;
+      swe.percentageScore = 100;
+      swe.overallVerdict = `Full marks awarded (${swe.marksEarned}/${swe.marksPossible}). All calculation steps verified.`;
+      checks.push({
+        checkId: 'student-working-consistency-audit',
+        name: 'Student Working Score Consistency Gate',
+        status: 'corrected',
+        details: `Auto-corrected score from 0 to ${swe.marksEarned}/${swe.marksPossible} Marks because all working steps were mathematically verified.`
+      });
+    }
+  }
+
   const passedCount = checks.filter(c => c.status === 'passed').length;
   const accuracyScorePercent = Math.round((passedCount / checks.length) * 100);
 

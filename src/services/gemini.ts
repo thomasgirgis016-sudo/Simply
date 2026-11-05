@@ -761,10 +761,10 @@ DO NOT wrap your output in markdown code blocks like \`\`\`json. Return only raw
 
     if (effectiveWorking) {
       const workingClean = effectiveWorking.toLowerCase();
-      const numMatch = workingClean.match(/(\d+(?:\.\d+)?)/);
-      const studentVal = numMatch ? parseFloat(numMatch[1]) : NaN;
+      const allNums = Array.from(workingClean.matchAll(/(\d+(?:\.\d+)?)/g)).map((m) => parseFloat(m[1]));
+      const matchesArea = allNums.some((n) => Math.abs(n - rectArea.area) < 1e-6);
 
-      if (!isNaN(studentVal) && Math.abs(studentVal - rectArea.area) < 1e-6) {
+      if (matchesArea) {
         isStudentCorrect = true;
         candidateScore = marks;
         studentVerdict = `Correct calculation: Area = length × width = ${rectArea.length} ${rectArea.unit} × ${rectArea.width} ${rectArea.unit} = ${rectArea.area} ${rectArea.unit}². Full marks awarded.`;
@@ -3292,8 +3292,13 @@ export async function gradeHandwrittenWorkWithGemini(
     subjectName,
     examBoard,
     gradeLevel,
-    totalMarks = 4
+    totalMarks: rawTotalMarks
   } = params;
+
+  // Extract marks from bracketed notation (e.g. "[2 marks]" or "(3 marks)") if not explicitly provided
+  const targetTextForMarks = questionText && /\[\d+|\(\d+\s*(?:marks?|m)/i.test(questionText) ? questionText : `${questionText || ''} ${studentTypedWorking || ''}`;
+  const parsedMarks = targetTextForMarks.match(/\[(\d+)\s*(?:marks?|m)?\]|\((\d+)\s*(?:marks?|m)\)/i);
+  const totalMarks = rawTotalMarks !== undefined ? rawTotalMarks : (parsedMarks ? parseInt(parsedMarks[1] || parsedMarks[2], 10) : 4);
 
   const prompt = `
 ${SENIOR_CAMBRIDGE_EXAMINER_INSTRUCTION}

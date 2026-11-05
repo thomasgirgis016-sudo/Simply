@@ -8,14 +8,15 @@ import { CHEAT_SHEETS_DATABASE } from '../src/data/cheatSheetsData';
 import { IGCSE_PERIODIC_TABLE, CAMBRIDGE_EXAM_FORMULAS } from '../src/data/periodicTableData';
 import { OFFICIAL_EXAM_TIMETABLE } from '../src/data/examTimetableData';
 import { validateKatexSyntax, runFullAutonomousQaSweep } from '../src/services/pastPaperQaAgent';
-import { evaluateStudentWorking } from '../src/services/mathWorkingValidator';
+import { evaluateStudentWorking, evaluateSafeArithmetic } from '../src/services/mathWorkingValidator';
 import { searchUniversalKnowledge } from '../src/services/knowledgeEngine';
-import { askAiTutor, solveQuestionWithGemini } from '../src/services/gemini';
+import { askAiTutor, solveQuestionWithGemini, gradeHandwrittenWorkWithGemini } from '../src/services/gemini';
 import { verifyAndAuditSolverResult } from '../src/services/examinerVerificationAgent';
 import { createValidMp3Buffer } from '../api/pdf-proxy';
 import solveHandler from '../api/solve';
 import { AUTHENTIC_PAST_PAPER_CLASSIFIED_QUESTIONS } from '../src/lib/classifieds/questionPool';
 import { generate40McqQuestions } from '../src/services/questionKnowledgeBase';
+import { EXAMINER_PITFALLS_DATABASE } from '../src/components/ExaminerPitfallsHeatmap';
 
 console.log('===========================================================');
 console.log('  SIMPLY IGCSE — COMPLETE WEBSITE FUNCTIONALITY & CONTENT QA');
@@ -518,6 +519,42 @@ const solverTpOnly = await solveQuestionWithGemini({
   gradeLevel: 'IGCSE'
 });
 assertContent(solverTpOnly.studentWorkingEvaluation?.marksEarned === 2, 'Vertex form: turning point only awards 2 / 5 marks', `Got ${solverTpOnly.studentWorkingEvaluation?.marksEarned}`);
+
+// 8aa-1. Handwritten Scorer Mark-Cap & Chemistry Mr Multi-Part Equalities
+const mrReview = await gradeHandwrittenWorkWithGemini({
+  questionText: 'Calculate the relative molecular mass (Mr) of H2O. [2 marks]',
+  studentTypedWorking: 'Mr(H2O) = 2(1) + 16 = 18',
+  subjectName: 'Chemistry (0620)',
+  examBoard: 'Cambridge CIE',
+  gradeLevel: 'IGCSE'
+});
+assertContent(mrReview.totalMarksPossible === 2, 'Chemistry Mr: totalMarksPossible resolves to 2 marks (parsed from [2 marks])', `Got ${mrReview.totalMarksPossible}`);
+assertContent(mrReview.marksEarned === 2, 'Chemistry Mr: awards 2 / 2 marks for valid working and final mass', `Got ${mrReview.marksEarned}`);
+assertContent(mrReview.percentageScore === 100, 'Chemistry Mr: awards 100% score', `Got ${mrReview.percentageScore}%`);
+assertContent(!JSON.stringify(mrReview).includes('[M4]'), 'Chemistry Mr: does not emit [M4] badge on a 2-mark question');
+
+// 8aa-2. Rectangle Geometry Area Matching & Zero Contradiction
+const areaSolver = await solveQuestionWithGemini({
+  questionText: 'Find the area of a rectangle of 5 cm by 3 cm [1 mark]',
+  studentWorking: 'Area = 5 × 3 = 15 cm²',
+  subjectName: 'Mathematics (0580)',
+  examBoard: 'Cambridge CIE',
+  gradeLevel: 'IGCSE'
+});
+assertContent(areaSolver.studentWorkingEvaluation?.marksEarned === 1, 'Rectangle area: "Area = 5 × 3 = 15 cm²" awards 1 / 1 mark', `Got ${areaSolver.studentWorkingEvaluation?.marksEarned}`);
+assertContent(!areaSolver.studentWorkingEvaluation?.overallVerdict?.includes('Calculation slip'), 'Rectangle area: does not emit "Calculation slip" when student gives 15 cm²');
+
+// 8aa-3. Implicit Multiplication in Math Working Validator
+assertContent(evaluateSafeArithmetic('2(1)+16') === 18, 'evaluateSafeArithmetic: evaluates implicit multiplication 2(1)+16 as 18');
+assertContent(evaluateSafeArithmetic('(2)(3)') === 6, 'evaluateSafeArithmetic: evaluates (2)(3) as 6');
+
+// 8aa-4. Photosynthesis Examiner Report Pitfalls
+const photoPitfalls = EXAMINER_PITFALLS_DATABASE.filter(item =>
+  item.topic.toLowerCase().includes('photosynthesis') ||
+  item.commonError.toLowerCase().includes('photosynthesis') ||
+  item.correctMethod.toLowerCase().includes('photosynthesis')
+);
+assertContent(photoPitfalls.length >= 2, 'Examiner pitfalls database contains at least 2 verified photosynthesis pitfalls for Biology 0610', `Found ${photoPitfalls.length}`);
 
 // 8ab. AI Tutor Relevancy: Biology Alveoli & Gas Exchange Adaptations
 const tutorBioAlveoli = await askAiTutor([{ role: 'user', content: 'What are the adaptations of alveoli for gas exchange in human lungs?' }], 'Biology (0610)', 'Cambridge CIE');

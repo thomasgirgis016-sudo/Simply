@@ -44,7 +44,7 @@ const SAMPLE_SPEAKING_CARDS: EslSpeakingPrompt[] = [
       'In the final analysis...'
     ],
     sampleBand9Response:
-      'From my perspective, instant messaging has completely revolutionized adolescent discourse. While the immediacy of global connectivity is undeniably advantageous, it often fosters an unsustainable expectation of constant availability. Consequently, digital communication should complement rather than supplant face-to-face interaction.'
+      'From my perspective, instant messaging and social media platforms have fundamentally transformed adolescent discourse and interpersonal relationships. While the immediacy of global connectivity is undeniably advantageous for collaborating on school assignments and maintaining long-distance friendships, it frequently fosters an unsustainable expectation of constant availability and superficial engagement. Furthermore, excessive screen time can inadvertently erode crucial non-verbal communication skills. In the final analysis, I firmly believe that digital communication should serve as a practical complement rather than a substitute for authentic face-to-face dialogue.'
   },
   {
     id: 'esl-card-2',
@@ -67,7 +67,7 @@ const SAMPLE_SPEAKING_CARDS: EslSpeakingPrompt[] = [
       'Ultimately, sustainable development hinges upon...'
     ],
     sampleBand9Response:
-      'While individual endeavors such as recycling are commendable, they remain largely symbolic unless supported by systemic corporate accountability. Governments must enact stringent carbon taxes and subsidize renewable infrastructure to achieve meaningful ecological preservation.'
+      'It is increasingly apparent that climate change represents the defining challenge of our generation. While individual endeavors such as domestic recycling and adopting reusable packaging are highly commendable, they remain largely symbolic unless reinforced by systemic corporate accountability and decisive government leadership. In my daily routine, I minimize single-use plastics and conserve household energy, yet multinational corporations generate the overwhelming majority of industrial emissions. Therefore, governments must enact stringent carbon taxes and invest heavily in renewable infrastructure to achieve lasting environmental preservation.'
   },
   {
     id: 'esl-card-3',
@@ -90,7 +90,7 @@ const SAMPLE_SPEAKING_CARDS: EslSpeakingPrompt[] = [
       'In conclusion, human-machine synergy is paramount...'
     ],
     sampleBand9Response:
-      'Undoubtedly, automation will disrupt conventional clerical and routine analytical professions. However, uniquely human faculties such as emotional intelligence and lateral creativity remain irreplaceable. Hence, pedagogical paradigms must pivot away from rote memorization toward critical synthesis.'
+      'Undoubtedly, accelerated advancements in artificial intelligence will disrupt conventional clerical, data-entry, and routine diagnostic professions over the next two decades. Nevertheless, uniquely human faculties—most notably empathetic communication, moral judgment, and lateral creative thinking—remain fundamentally irreplaceable by algorithms. In response, modern educational institutions must urgently pivot away from antiquated rote memorization toward cultivating critical analysis and adaptable problem-solving. By establishing human-machine synergy rather than viewing automation purely as a threat, future graduates can harness technological tools to drive meaningful societal innovation.'
   },
   {
     id: 'esl-card-4',
@@ -112,7 +112,7 @@ const SAMPLE_SPEAKING_CARDS: EslSpeakingPrompt[] = [
       'Cross-cultural exchanges fundamentally dismantle stereotypes...'
     ],
     sampleBand9Response:
-      'Tourism undeniably serves as an economic catalyst for developing regions. Nonetheless, unfettered visitor volumes frequently erode indigenous customs and strain local ecosystems. Consequently, destination authorities must institute sustainable visitor quotas and reinvest revenues directly into cultural heritage.'
+      'Tourism undeniably serves as a vital economic catalyst, generating indispensable employment and foreign exchange revenues for historic communities worldwide. Nonetheless, unfettered overtourism frequently compromises fragile historical landmarks, inflates local living costs, and degrades intangible cultural traditions into commercial spectacles. To reconcile this tension, municipal authorities must institute sensible visitor quotas, mandate sustainable tourism certifications, and ring-fence tax revenues specifically for heritage conservation projects. Ultimately, when managed conscientiously, international travel possesses immense power to dismantle cultural prejudices while preserving local identity.'
   }
 ];
 

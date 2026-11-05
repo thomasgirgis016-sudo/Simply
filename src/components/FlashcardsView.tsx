@@ -180,7 +180,12 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
         profile.geminiApiKey,
         profile.selectedModel
       );
-      onAddFlashcards(generated);
+      const tagged = (generated || []).map((c, i) => ({
+        ...c,
+        id: c.id || `gen-${subject.id}-${Date.now()}-${i}`,
+        subjectId: subject.id,
+      }));
+      onAddFlashcards(tagged);
       setIsAiModalOpen(false);
       setAiTopicInput('');
       setSelectedTopic('All');
@@ -203,9 +208,14 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
         profile.selectedModel
       );
       if (generated && generated.length > 0) {
-        onAddFlashcards(generated);
-        if (selectedTopic === 'All' && generated[0].topic) {
-          setSelectedTopic(generated[0].topic);
+        const tagged = generated.map((c, i) => ({
+          ...c,
+          id: c.id || `gen-${subject.id}-${Date.now()}-${i}`,
+          subjectId: subject.id,
+        }));
+        onAddFlashcards(tagged);
+        if (selectedTopic === 'All' && tagged[0].topic) {
+          setSelectedTopic(tagged[0].topic);
         }
         setCurrentIndex(0);
         setIsFlipped(false);
@@ -393,7 +403,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
           >
             All Topics ({subjectCards.length})
           </button>
-          {subject.topics.map((t) => {
+          {Array.from(new Set([...subject.topics, ...subjectCards.map(c => c.topic).filter(Boolean)])).map((t) => {
             const count = subjectCards.filter(c => c.topic === t).length;
             if (count === 0) return null;
             return (

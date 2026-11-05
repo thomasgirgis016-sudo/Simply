@@ -47,17 +47,17 @@ export const PredictedPaperView: React.FC<PredictedPaperViewProps> = ({
       return [
         {
           topic: 'Exercise 4: Summary Writing (100–120 Words)',
-          priorityBadge: 'High Priority Focus: 16 Marks Guaranteed Format',
+          priorityBadge: 'High Priority Focus: 16-Mark Core Syllabus Format',
           historicalFrequency: '16 Marks on Paper 1 (Reading & Writing)',
           weightPercent: 95,
           reason: 'Compulsory 16-mark format under the 2024–2026 Cambridge 0510 syllabus reform. Assesses 10 distinct content points and 6 language marks with strict conciseness within the 120-word limit.'
         },
         {
           topic: 'Exercise 6: Formal Article & Report Writing',
-          priorityBadge: 'High Priority Focus: 16 Marks Guaranteed Format',
+          priorityBadge: 'High Priority Focus: 16-Mark Core Syllabus Format',
           historicalFrequency: '16 Marks on Paper 1 (Reading & Writing)',
           weightPercent: 92,
-          reason: 'Guaranteed 16-mark extended writing task. Requires sophisticated formal register, clear discursive structure, academic connectives, and zero colloquial contractions.'
+          reason: 'Core syllabus 16-mark extended writing task. Requires sophisticated formal register, clear discursive structure, academic connectives, and zero colloquial contractions.'
         },
         {
           topic: 'Exercise 5: Informal Email / Letter Writing',

@@ -62,7 +62,7 @@ export const CHEAT_SHEETS_DATABASE: SubjectCheatSheet[] = [
         ]
       },
       {
-        title: '3. Circle Theorems (8 Guaranteed Traps)',
+        title: '3. Circle Theorems (8 High-Frequency Traps)',
         color: 'rose',
         items: [
           {
@@ -309,7 +309,7 @@ export const CHEAT_SHEETS_DATABASE: SubjectCheatSheet[] = [
     ],
     sections: [
       {
-        title: '1. Food Tests (Guaranteed Paper 6 & Paper 4)',
+        title: '1. Food Tests (Core Paper 6 & Paper 4 Traps)',
         color: 'emerald',
         items: [
           {

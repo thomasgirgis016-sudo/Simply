@@ -4,7 +4,7 @@ export function isSubjectMatch(
   itemSubjectId: string | undefined,
   currentSubject: Subject
 ): boolean {
-  if (!itemSubjectId) return true;
+  if (!itemSubjectId) return false;
   if (itemSubjectId === currentSubject.id || itemSubjectId === currentSubject.name) return true;
 
   const itemId = itemSubjectId.toLowerCase();

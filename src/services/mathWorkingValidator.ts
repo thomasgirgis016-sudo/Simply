@@ -42,19 +42,25 @@ export function evaluateSafeArithmetic(expr: string): number | null {
       .replace(/−/g, '-')
       .replace(/\s+/g, '');
 
+    // Insert explicit multiplication for implicit multiplication: e.g. 2(1), (2)(3), (2)3
+    const normalized = clean
+      .replace(/(\d)\(/g, '$1*(')
+      .replace(/\)(\d)/g, ')*$1')
+      .replace(/\)\(/g, ')*(');
+
     // Check for allowed characters only
-    if (!/^[0-9+\-*/^().]+$/.test(clean)) {
+    if (!/^[0-9+\-*/^().]+$/.test(normalized)) {
       return null;
     }
 
     let pos = 0;
 
     function peek(): string {
-      return clean[pos] || '';
+      return normalized[pos] || '';
     }
 
     function get(): string {
-      return clean[pos++];
+      return normalized[pos++];
     }
 
     function parseExpression(): number {
@@ -117,6 +123,7 @@ export function evaluateSafeArithmetic(expr: string): number | null {
     }
 
     const value = parseExpression();
+    if (pos < normalized.length) return null;
     if (isNaN(value) || !isFinite(value)) return null;
     return value;
   } catch {
@@ -141,71 +148,81 @@ export function validateStudentMathLine(line: string, lineNumber: number = 1): M
   if (cleaned.includes('=')) {
     const parts = cleaned.split('=').map((p) => p.trim());
 
-    // If format is like "10 + 2 = 8" or "10 - 2 = 8" or "x = 10 + 2 = 8"
-    let lhsExpr = '';
-    let rhsExpr = '';
-
-    if (parts.length === 2) {
-      lhsExpr = parts[0];
-      rhsExpr = parts[1];
-    } else if (parts.length === 3 && /^[a-zA-Z]$/.test(parts[0])) {
-      // e.g. "x = 10 + 2 = 8"
-      lhsExpr = parts[1];
-      rhsExpr = parts[2];
+    // Check all adjacent pairs for arithmetic evaluations:
+    // Supports "10 + 2 = 12", "Mr(H2O) = 2(1) + 16 = 18", "Area = 5 * 3 = 15", "x = 10 - 2 = 8"
+    const evalPairs: { lhsStr: string; rhsStr: string; lhsVal: number; rhsVal: number }[] = [];
+    for (let i = 0; i < parts.length - 1; i++) {
+      const p1 = parts[i];
+      const p2 = parts[i + 1];
+      const v1 = evaluateSafeArithmetic(p1);
+      const v2 = evaluateSafeArithmetic(p2);
+      if (v1 !== null && v2 !== null) {
+        evalPairs.push({ lhsStr: p1, rhsStr: p2, lhsVal: v1, rhsVal: v2 });
+      }
     }
 
-    // Attempt to evaluate arithmetic
-    if (lhsExpr && rhsExpr) {
-      const lhsVal = evaluateSafeArithmetic(lhsExpr);
-      const rhsVal = evaluateSafeArithmetic(rhsExpr);
+    if (evalPairs.length > 0) {
+      const mismatch = evalPairs.find((pair) => Math.abs(pair.lhsVal - pair.rhsVal) >= 1e-4);
 
-      if (lhsVal !== null && rhsVal !== null) {
-        const isClose = Math.abs(lhsVal - rhsVal) < 1e-4;
+      if (!mismatch) {
+        // All evaluated equalities hold!
+        // Full working showing both method step and accuracy value earns 2 marks (Method + Accuracy)
+        const lineMarks = parts.length >= 3 ? 2 : 1;
+        const markBadge = lineMarks >= 2 ? '[M1 A1] Method & Accuracy Marks Awarded' : '[M1] Method Mark Awarded (+1 Mark)';
+        return {
+          lineNumber,
+          rawText: trimmed,
+          isMathEquation: true,
+          isCorrect: true,
+          marksEarned: lineMarks,
+          markBadge,
+          exactReason: `✓ Correct mathematical step: "${trimmed}" is accurate. Method and calculation verified.`,
+        };
+      } else {
+        // One of the equalities is flawed! E.g. 10 + 2 = 8
+        const { lhsStr, rhsStr, lhsVal, rhsVal } = mismatch;
+        let correctionHint = '';
+        const testMinus = lhsStr.replace(/\+/g, '-');
+        const testPlus = lhsStr.replace(/-/g, '+');
 
-        if (isClose) {
-          // Correct arithmetic equality!
-          return {
-            lineNumber,
-            rawText: trimmed,
-            isMathEquation: true,
-            isCorrect: true,
-            marksEarned: 1,
-            markBadge: '[M1] Method Mark Awarded (+1 Mark)',
-            exactReason: `✓ Correct mathematical step: "${trimmed}" is accurate (${lhsExpr.trim()} = ${rhsVal}). Method mark awarded.`,
-          };
+        if (evaluateSafeArithmetic(testMinus) === rhsVal) {
+          correctionHint = `You added instead of subtracting. Change "+" to "-": "${testMinus} = ${rhsVal}".`;
+        } else if (evaluateSafeArithmetic(testPlus) === rhsVal) {
+          correctionHint = `You subtracted instead of adding. Change "-" to "+": "${testPlus} = ${rhsVal}".`;
         } else {
-          // Flawed arithmetic equality! E.g. 10 + 2 = 8
-          // Check what the correct operation would be to produce rhsVal
-          let correctionHint = '';
-          const testMinus = lhsExpr.replace(/\+/g, '-');
-          const testPlus = lhsExpr.replace(/-/g, '+');
-
-          if (evaluateSafeArithmetic(testMinus) === rhsVal) {
-            correctionHint = `You added instead of subtracting. Change "+" to "-": "${testMinus} = ${rhsVal}".`;
-          } else if (evaluateSafeArithmetic(testPlus) === rhsVal) {
-            correctionHint = `You subtracted instead of adding. Change "-" to "+": "${testPlus} = ${rhsVal}".`;
-          } else {
-            correctionHint = `Evaluating "${lhsExpr}" yields ${lhsVal}, NOT ${rhsVal}.`;
-          }
-
-          const exactCorrectionLine = evaluateSafeArithmetic(testMinus) === rhsVal
-            ? `${testMinus} = ${rhsVal}`
-            : evaluateSafeArithmetic(testPlus) === rhsVal
-            ? `${testPlus} = ${rhsVal}`
-            : `${lhsExpr} = ${lhsVal}`;
-
-          return {
-            lineNumber,
-            rawText: trimmed,
-            isMathEquation: true,
-            isCorrect: false,
-            marksEarned: 0,
-            markBadge: '[M0] Mark Lost (0 Marks)',
-            exactReason: `✗ Mathematical Contradiction / Arithmetic Error on Line ${lineNumber}: You wrote "${trimmed}", which is untrue because ${lhsExpr.trim()} evaluates to ${lhsVal}, NOT ${rhsVal}. ${correctionHint} In IGCSE marking, writing a false equation forfeits the method mark immediately.`,
-            exactCorrection: `Write instead: ${exactCorrectionLine}`,
-          };
+          correctionHint = `Evaluating "${lhsStr}" yields ${lhsVal}, NOT ${rhsVal}.`;
         }
+
+        const exactCorrectionLine = evaluateSafeArithmetic(testMinus) === rhsVal
+          ? `${testMinus} = ${rhsVal}`
+          : evaluateSafeArithmetic(testPlus) === rhsVal
+          ? `${testPlus} = ${rhsVal}`
+          : `${lhsStr} = ${lhsVal}`;
+
+        return {
+          lineNumber,
+          rawText: trimmed,
+          isMathEquation: true,
+          isCorrect: false,
+          marksEarned: 0,
+          markBadge: '[M0] Mark Lost (0 Marks)',
+          exactReason: `✗ Mathematical Contradiction / Arithmetic Error on Line ${lineNumber}: You wrote "${trimmed}", which is untrue because ${lhsStr.trim()} evaluates to ${lhsVal}, NOT ${rhsVal}. ${correctionHint} In IGCSE marking, writing a false equation forfeits the method mark immediately.`,
+          exactCorrection: `Write instead: ${exactCorrectionLine}`,
+        };
       }
+    }
+
+    // Single equality where lhs is variable/formula and rhs is valid arithmetic (e.g. "Mr = 18", "x = 3", "F = 2400")
+    if (parts.length === 2 && /^[a-zA-Z0-9_\(\)\s\.\+]+$/.test(parts[0]) && evaluateSafeArithmetic(parts[1]) !== null) {
+      return {
+        lineNumber,
+        rawText: trimmed,
+        isMathEquation: true,
+        isCorrect: true,
+        marksEarned: 1,
+        markBadge: '[A1] Accuracy Step Noted',
+        exactReason: `✓ Step noted: "${trimmed}". Stated value is consistent.`,
+      };
     }
   }
 

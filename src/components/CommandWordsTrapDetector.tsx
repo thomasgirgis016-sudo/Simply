@@ -5,7 +5,6 @@ import {
   CheckCircle2,
   XCircle,
   HelpCircle,
-  Sparkles,
   Award,
   ChevronRight,
   ShieldAlert,
@@ -261,7 +260,7 @@ export const CommandWordsTrapDetector: React.FC = () => {
           <div className="mt-8 bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-4 backdrop-blur-md">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-400">
-                <Sparkles className="w-4 h-4 text-amber-400" />
+                <AlertTriangle className="w-4 h-4 text-amber-400" />
                 Examiner Trap Quiz ({quizIndex + 1}/{TRAP_QUIZ.length})
               </div>
               <span className="text-xs font-mono text-emerald-400 font-bold">

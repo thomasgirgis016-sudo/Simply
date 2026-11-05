@@ -148,7 +148,7 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
               {subject.code} • High-Yield Syllabus Summaries
             </span>
             <h2 className="text-xl font-bold text-white mt-1">High-Yield Syllabus Summaries</h2>
-            <p className="text-xs text-slate-400">Guaranteed marks: Key definitions, formula sheets & examiner traps</p>
+            <p className="text-xs text-slate-400">High-yield marks: Key definitions, formula sheets & examiner traps</p>
           </div>
 
           <div className="flex items-center gap-2">
@@ -359,7 +359,7 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
                   <span>Part 4: Cambridge Chief Examiner Reports: Top Traps & Recurring Mistakes</span>
                 </div>
                 <span className="rounded-md bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold text-amber-300 border border-amber-500/25">
-                  Guaranteed Mark Saver
+                  Essential Mark Saver
                 </span>
               </div>
 

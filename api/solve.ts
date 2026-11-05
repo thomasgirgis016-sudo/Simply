@@ -505,13 +505,14 @@ Output STRICTLY JSON array:
 
     // Extract prompt-specified marks if present, summing subpart marks (e.g. "[3 marks] ... [2 marks]" -> 5 marks)
     const combinedPrompt = `${questionText || ''} ${studentWorking || ''}`;
-    const bracketMatches = Array.from(combinedPrompt.matchAll(/\[(\d+)\s*(?:marks?|m)?\]|\((\d+)\s*(?:marks?|m)?\)/gi));
+    const targetTextForMarks = questionText && /\[\d+|\(\d+\s*(?:marks?|m)/i.test(questionText) ? questionText : combinedPrompt;
+    const bracketMatches = Array.from(targetTextForMarks.matchAll(/\[(\d+)\s*(?:marks?|m)?\]|\((\d+)\s*(?:marks?|m)\)/gi));
     let resolvedTotalMarks = totalMarks;
     if (bracketMatches.length > 0) {
       const sum = bracketMatches.reduce((acc, m) => acc + parseInt(m[1] || m[2], 10), 0);
       if (sum > 0) resolvedTotalMarks = sum;
     } else {
-      const wordMatch = combinedPrompt.match(/\b(\d+)\s*(?:marks?|m)\b/i);
+      const wordMatch = targetTextForMarks.match(/\b(\d+)\s*(?:marks?|m)\b/i);
       if (wordMatch) resolvedTotalMarks = parseInt(wordMatch[1], 10);
     }
 
@@ -751,9 +752,9 @@ Output STRICTLY JSON array:
       defaultConcept = 'Geometric Mensuration: Area of Rectangles';
       defaultFormula = `\\text{Area} = \\text{length} \\times \\text{width} = ${rectSolution.length} \\times ${rectSolution.width} = ${rectSolution.area}\\text{ ${rectSolution.unit}}^2`;
       if (studentWorking) {
-        const numMatch = String(studentWorking).match(/(\d+(?:\.\d+)?)/);
-        const studentVal = numMatch ? parseFloat(numMatch[1]) : NaN;
-        if (!isNaN(studentVal) && Math.abs(studentVal - rectSolution.area) < 1e-6) {
+        const allNums = Array.from(String(studentWorking).matchAll(/(\d+(?:\.\d+)?)/g)).map((m) => parseFloat(m[1]));
+        const matchesArea = allNums.some((n) => Math.abs(n - rectSolution.area) < 1e-6);
+        if (matchesArea) {
           isStudentCorrect = true;
           candidateScore = resolvedTotalMarks;
           lineReason = `Correct calculation: Area = length × width = ${rectSolution.length} ${rectSolution.unit} × ${rectSolution.width} ${rectSolution.unit} = ${rectSolution.area} ${rectSolution.unit}². Full marks awarded.`;
@@ -974,18 +975,19 @@ Output STRICTLY JSON array:
     }
 
     if (action === 'handwritten_marking') {
+      const earnedMarks = Math.min(resolvedTotalMarks, candidateScore);
       const fallbackMarking = {
         questionSummary: questionText.slice(0, 80),
-        totalMarksPossible: totalMarks,
-        marksEarned: candidateScore,
-        percentageScore: Math.round((candidateScore / totalMarks) * 100),
+        totalMarksPossible: resolvedTotalMarks,
+        marksEarned: earnedMarks,
+        percentageScore: Math.round((earnedMarks / resolvedTotalMarks) * 100),
         breakdownPointOfFailure: isStudentCorrect ? 'No errors found. All steps valid.' : lineReason,
         lineByLineReview: [
           {
             lineNumber: 1,
             studentLineText: studentWorking || 'Candidate step 1',
             isCorrect: isStudentCorrect,
-            markAwarded: isStudentCorrect ? `[M${totalMarks}]` : (candidateScore > 0 ? `[M${candidateScore}]` : '[M0]'),
+            markAwarded: isStudentCorrect ? `[M${resolvedTotalMarks}]` : (earnedMarks > 0 ? `[M${earnedMarks}]` : '[M0]'),
             examinerAnnotation: lineReason,
             exactCorrection: isStudentCorrect ? 'Valid step.' : lineCorrection,
           }
@@ -995,7 +997,7 @@ Output STRICTLY JSON array:
           'Substitute given variables into formula',
           'Calculate final numerical value to 3 significant figures with units'
         ],
-        examinerFinalVerdict: `Candidate scored ${candidateScore} / ${totalMarks} Marks. ${lineReason}`,
+        examinerFinalVerdict: `Candidate scored ${earnedMarks} / ${resolvedTotalMarks} Marks. ${lineReason}`,
         examinerTipsToRegainMarks: [
           'Always double-check intermediate arithmetic calculations before proceeding.',
           'Show clear method steps [M] to protect against loss of subsequent accuracy marks [A].'

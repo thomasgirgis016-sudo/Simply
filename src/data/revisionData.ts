@@ -1081,7 +1081,7 @@ export const COMPREHENSIVE_REVISION_NOTES: RevisionTopic[] = [
             title: 'Extract Content Points from Text',
             working: '\\text{Advantages: 1. Drastically cuts water consumption. 2. Yields produce all year regardless of weather. 3. Eliminates chemical pesticides.}\\n\\text{Difficulties: 4. Exorbitant initial capital outlay. 5. High electricity consumption for artificial LED lighting. 6. Skilled labour requirements.}',
             markAwarded: '[B1] Independent Mark',
-            explanation: 'Identifies 6 distinct content points (10/10 Content band achieved).'
+            explanation: 'Identifies 6 distinct content points and synthesizes them into a cohesive response within the 100-120 word limit.'
           },
           {
             stepNumber: 2,
@@ -1093,12 +1093,12 @@ export const COMPREHENSIVE_REVISION_NOTES: RevisionTopic[] = [
           {
             stepNumber: 3,
             title: 'Language Mark Criteria Breakdown',
-            working: '\\text{Content: 6 distinct points identified = 6/6 (capped in revised spec) or 10/10.}\\n\\text{Language: High level of accuracy, diverse clause structures, sophisticated vocabulary (exorbitant, erratic, scalability) = 6/6.}',
+            working: '\\text{Mark Scheme: Content (key syllabus points accurately covered) + Language (varied syntax, accurate linkers, sophisticated register) = Full Marks.}',
             markAwarded: '[A1] Accuracy Mark',
             explanation: 'Full marks awarded for natural discourse flow and remaining strictly within the 100-120 word boundary.'
           }
         ],
-        finalAnswer: 'Complete 111-word model paragraph awarded 16/16 marks by Chief Cambridge Examiner.',
+        finalAnswer: 'Complete 111-word model paragraph demonstrating Band 9 mark scheme criteria (16/16 marks).',
         examinerCommentary: 'Candidates frequently score poorly by exceeding 120 words. Any content points written on line 121 or beyond are crossed out and ignored completely by Cambridge examiners.'
       }
     ]

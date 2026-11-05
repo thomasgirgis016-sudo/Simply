@@ -188,6 +188,9 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
     setLoading(true);
     setErrorMessage(null);
     try {
+      const marksMatch = `${questionText} ${studentTypedWorking}`.match(/\[(\d+)\s*(?:marks?|m)?\]|\((\d+)\s*(?:marks?|m)?\)/i);
+      const parsedTotalMarks = marksMatch ? parseInt(marksMatch[1] || marksMatch[2], 10) : undefined;
+
       const res = await gradeHandwrittenWorkWithGemini({
         apiKey: profile.geminiApiKey,
         model: profile.selectedModel,
@@ -198,6 +201,7 @@ export const QuestionSolver: React.FC<QuestionSolverProps> = ({
         subjectName: subject.name,
         examBoard: profile.board === 'Both' ? subject.board : profile.board,
         gradeLevel: profile.grade,
+        totalMarks: parsedTotalMarks,
       });
       setHandwrittenResult(res);
     } catch (err: any) {

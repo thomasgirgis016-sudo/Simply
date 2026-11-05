@@ -169,21 +169,21 @@ const SAMPLE_EXAM_PAPERS: Record<string, ExamQuestionItem[]> = {
       subpart: '(a)',
       marks: 3,
       paperRef: 'CIE 0510/12 May/June 2024 Paper 1 (Reading & Writing) Exercise 1',
-      questionPrompt: 'Read the article about the discovery of deep-sea hydrothermal vents and answer the following questions:\n\n(i) According to paragraph 1, what unexpected feature did scientists observe on the seabed?\n(ii) Give two reasons why scientists initially thought animal life could not survive around the vents.',
+      questionPrompt: 'Read the article about green sea turtle conservation on coastal nesting beaches and answer the following questions:\n\n(i) According to paragraph 1, what natural hazard endangers newly hatched green turtles as they head toward the sea?\n(ii) Give two human activities mentioned in paragraph 2 that disrupt nesting females on beaches at night.',
       diagramOrMath: 'Syllabus Assessment Objectives: R1 (Identify factual details) & R2 (Understand ideas/opinions)',
       markSchemePoints: [
         {
           markType: '[1] Content Mark',
-          requirement: 'Chimneys / mineral towers emitting black clouds of hot mineral-rich fluid / mineral smoke.',
-          guidance: 'Award 1 mark for mentioning chimneys/towers or black smoke fluid.'
+          requirement: 'Predation by coastal predators (such as crabs, birds, or predatory wildlife on the beach).',
+          guidance: 'Award 1 mark for citing natural predators (crabs, birds, foxes).'
         },
         {
           markType: '[2] Content Marks',
-          requirement: 'Extreme pressure (at great depth) AND total absence of sunlight / complete darkness (preventing photosynthesis).',
-          guidance: 'Award 1 mark for each valid reason. Allow boiling temperatures / toxic chemicals.'
+          requirement: 'Artificial beachfront lighting (disorienting turtles) AND noise / movement from tourists or beach vehicle traffic.',
+          guidance: 'Award 1 mark for each distinct human disturbance factor: artificial beachfront lights, tourist foot traffic, vehicular movement.'
         }
       ],
-      finalAnswer: '(i) Mineral chimneys emitting black mineral-rich fluid; (ii) Total absence of sunlight and extreme water pressure.',
+      finalAnswer: '(i) Predation by coastal animals (such as crabs and birds); (ii) Artificial beach lighting and tourist disturbance/vehicle traffic on nesting beaches.',
       examinerTrap: 'Lifting long whole sentences from the text instead of isolating the precise factual answer risks exceeding the line boundary and losing the mark.'
     }
   ],

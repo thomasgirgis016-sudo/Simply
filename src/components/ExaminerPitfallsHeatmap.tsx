@@ -8,7 +8,6 @@ import {
   Award,
   ChevronRight,
   TrendingDown,
-  Sparkles,
   HelpCircle,
   CheckCircle2,
   XCircle,
@@ -179,6 +178,34 @@ export const EXAMINER_PITFALLS_DATABASE: ExaminerPitfall[] = [
     correctMethod: 'Water evaporates from surfaces of mesophyll cells into air spaces [1]. Water vapor diffuses through open stomata [1]. This creates a transpiration pull / suction tension drawing water through xylem due to cohesion between water molecules [1].',
     marksLostAverage: '-2 Marks'
   },
+  {
+    id: 'bio-photosynthesis-1',
+    subjectCode: '0610',
+    subjectName: 'Cambridge IGCSE Biology',
+    paperType: 'Paper 4 (Theory Extended)',
+    topic: 'Photosynthesis Limiting Factors & Graph Plateaus',
+    questionRef: '0610/42/M/J/24 Q3(b)',
+    candidateFailureRate: '67% said "photosynthesis stopped" when the curve flattened',
+    severity: 'critical',
+    commonError: 'Stating that photosynthesis "stops" or "is zero" when the light intensity curve levels off, instead of recognizing that the rate becomes constant because another factor is limiting.',
+    examinerQuote: '"When the curve plateaued, a majority of candidates wrote that photosynthesis stopped. The rate remains constant at its maximum; light is no longer the limiting factor. Carbon dioxide concentration or temperature is now limiting the rate."',
+    correctMethod: 'State: 1. As light intensity increases initially, rate increases linearly (light is limiting) [1]. 2. At higher light intensity, the curve plateaus / levels off because light is no longer limiting [1]. 3. Another factor such as CO₂ concentration or temperature is now the limiting factor [1].',
+    marksLostAverage: '-2 Marks'
+  },
+  {
+    id: 'bio-photosynthesis-2',
+    subjectCode: '0610',
+    subjectName: 'Cambridge IGCSE Biology',
+    paperType: 'Paper 6 (Alternative to Practical)',
+    topic: 'Photosynthesis Starch Testing & Destarching Controls',
+    questionRef: '0610/61/O/N/23 Q1(c)',
+    candidateFailureRate: '62% failed to explain the purpose of destarching',
+    severity: 'high',
+    commonError: 'Stating that the potted plant was placed in a dark cupboard for 48 hours to "kill the plant" or "remove chlorophyll".',
+    examinerQuote: '"Candidates frequently stated that destarching kills the leaf. The purpose of keeping the plant in the dark is solely to ensure that any starch already present in the leaves is converted to sucrose and transported away, so that any starch detected after the light exposure was newly produced during the investigation."',
+    correctMethod: 'Destarching: Place potted plant in darkness for 48 hours [1] so stored starch is broken down into sucrose and transported away/used in respiration [1]. This ensures any starch detected after the experiment was synthesised during the investigation [1].',
+    marksLostAverage: '-1 to -2 Marks'
+  },
 
   // 0510 ESL
   {
@@ -216,6 +243,7 @@ export const ExaminerPitfallsHeatmap: React.FC<{ subjects: Subject[]; profile: U
           item.topic.toLowerCase().includes(q) ||
           item.commonError.toLowerCase().includes(q) ||
           item.examinerQuote.toLowerCase().includes(q) ||
+          item.correctMethod.toLowerCase().includes(q) ||
           item.subjectName.toLowerCase().includes(q);
         if (!match) return false;
       }

@@ -477,13 +477,13 @@ export const ScienceAtpMaster: React.FC<ScienceAtpMasterProps> = ({
           <div className="rounded-3xl border border-slate-800 bg-slate-900/80 p-6 sm:p-8 space-y-6">
             <div>
               <span className="rounded-md bg-indigo-500/20 px-2 py-0.5 text-[10px] font-bold text-indigo-300 uppercase tracking-wider">
-                Guaranteed 6 Marks Template
+                Full 6-Mark Experimental Design Template
               </span>
               <h3 className="text-xl font-bold text-white mt-1">
                 The Cambridge 6-Mark Experimental Blueprint
               </h3>
               <p className="text-xs sm:text-sm text-slate-300 mt-1">
-                Every Paper 6 contains one 6-mark experimental design question. Follow this formula to guarantee all 6 marks regardless of the scenario.
+                Every Paper 6 contains one 6-mark experimental design question. Follow this structured blueprint to target full 6/6 marks regardless of the scenario.
               </p>
             </div>
 

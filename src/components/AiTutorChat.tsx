@@ -57,6 +57,19 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
     scrollToBottom();
   }, [messages, loading]);
 
+  // Reset conversation context and welcome message whenever the active subject changes
+  useEffect(() => {
+    setMessages([
+      {
+        id: `welcome-${subject.id}`,
+        role: 'assistant',
+        content: `Hello ${profile.name}! 👋 I am your **${profile.board === 'Both' ? 'Cambridge & Edexcel' : profile.board} IGCSE Examiner & Co-Pilot** for **${subject.name} (${subject.code})**.\n\nWhether you need help understanding a past paper question, mastering difficult definitions, or breaking down high-mark calculation problems, I'm here to ensure you reach your goal of **${profile.targetGrade}**!\n\nWhat topic would you like to review today?`,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      }
+    ]);
+    setInput('');
+  }, [subject.id, subject.code, subject.name, profile.board, profile.name, profile.targetGrade]);
+
   useEffect(() => {
     if (initialQuestion) {
       handleSend(initialQuestion);
@@ -348,7 +361,7 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
 
       {/* Exam Code & Question Quick Selector */}
       {examQuestionsForSubject.length > 0 && (
-        <div className="border-t border-slate-800/80 bg-slate-950/80 px-4 py-1.5 flex items-center gap-2 overflow-x-auto no-scrollbar">
+        <div className="border-t border-slate-800/80 bg-slate-950/80 px-4 py-2 flex items-center gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
           <span className="text-[10px] font-bold uppercase tracking-wider text-sky-400 shrink-0 flex items-center gap-1">
             <BookOpen className="h-3 w-3" />
             Exam Qs & Mark Schemes:
@@ -381,7 +394,7 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
       )}
 
       {/* Quick Prompts Bar */}
-      <div className="border-t border-slate-800/80 bg-slate-950/50 px-4 py-2 flex items-center gap-2 overflow-x-auto no-scrollbar">
+      <div className="border-t border-slate-800/80 bg-slate-950/50 px-4 py-2 flex items-center gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
         <HelpCircle className="h-3.5 w-3.5 text-blue-400 shrink-0" />
         {quickQuestions.map((q, idx) => (
           <button
