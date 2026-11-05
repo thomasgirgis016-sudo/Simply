@@ -41,7 +41,8 @@ import {
   Zap,
   Info,
   BookMarked,
-  FileText
+  FileText,
+  Headphones
 } from 'lucide-react';
 import { UserProfile, Subject, UserAccount } from '../types';
 import { SimplyLogo } from './SimplyLogo';
@@ -66,6 +67,7 @@ export type ActiveTab =
   | 'solver'
   | 'checklist'
   | 'esl-speaking'
+  | 'listening'
   | 'flashcards'
   | 'formulas'
   | 'chat'
@@ -188,6 +190,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'solver', label: 'Mark Scheme Step-by-Step Solver', icon: Calculator, color: 'text-blue-400' },
     { id: 'checklist', label: 'Syllabus Tracker', icon: ListChecks, color: 'text-emerald-400' },
     { id: 'esl-speaking', label: 'ESL Speaking Oral', icon: Mic, color: 'text-teal-400' },
+    { id: 'listening', label: 'Listening Practice', icon: Headphones, color: 'text-indigo-400' },
     { id: 'flashcards', label: 'Topic Active Recall Decks', icon: Layers, color: 'text-blue-400' },
     { id: 'formulas', label: 'Formulas & Commands', icon: BookmarkCheck, color: 'text-amber-400' },
     { id: 'chat', label: 'Examiner Walkthrough Co-Pilot', icon: MessageSquare, color: 'text-sky-400' },

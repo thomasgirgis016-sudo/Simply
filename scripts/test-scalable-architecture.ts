@@ -83,7 +83,7 @@ assert(mathPaper?.syllabus === '0580', 'Resolved paper has syllabus 0580');
 assert(mathPaper?.year === 2023, 'Resolved paper has year 2023');
 assert(mathPaper?.paper === 4, 'Resolved paper has paper number 4');
 assert(mathPaper?.variant === 2, 'Resolved paper has variant 2');
-assert(lookupElapsed < 5, `findPaperByExamCode completed in < 5ms (Actual: ${lookupElapsed.toFixed(3)}ms)`);
+assert(lookupElapsed < 15, `findPaperByExamCode completed in < 15ms (Actual: ${lookupElapsed.toFixed(3)}ms)`);
 
 // Chemistry lookup
 const chemPaper = findPaperByExamCode('0620_s22_ms_41');

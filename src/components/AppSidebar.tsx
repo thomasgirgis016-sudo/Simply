@@ -44,7 +44,8 @@ import {
   X,
   Atom,
   Download,
-  Smartphone
+  Smartphone,
+  Headphones
 } from 'lucide-react';
 import { Subject, UserProfile, UserAccount } from '../types';
 import { ActiveTab } from './Navbar';
@@ -121,6 +122,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
         { id: 'solver', label: 'Mark Scheme Step-by-Step Solver', icon: Calculator, color: 'text-blue-400' },
         { id: 'chat', label: 'Examiner Walkthrough Co-Pilot', icon: MessageSquare, color: 'text-sky-400' },
         { id: 'esl-speaking', label: 'ESL Speaking Oral', icon: Mic, color: 'text-teal-400' },
+        { id: 'listening', label: 'Listening Practice & Exam', icon: Headphones, color: 'text-indigo-400' },
       ]
     },
     {

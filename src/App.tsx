@@ -27,6 +27,7 @@ import { SplitScreenPaperViewer } from './components/SplitScreenPaperViewer';
 import { PastPaperFinder } from './components/PastPaperFinder';
 import { SyllabusChecklist } from './components/SyllabusChecklist';
 import { EslSpeakingSimulator } from './components/EslSpeakingSimulator';
+import { ListeningSimulator } from './components/ListeningSimulator';
 import { HomeView } from './components/HomeView';
 import { AdminDashboard } from './components/AdminDashboard';
 import { AccountGate } from './components/AccountGate';
@@ -384,6 +385,7 @@ export function App() {
         'finder',
         'checklist',
         'esl-speaking',
+        'listening',
         'flashcards',
         'quiz',
         'revision',
@@ -580,6 +582,7 @@ export function App() {
       case 'chat': return 'the Examiner Walkthrough Co-Pilot';
       case 'checklist': return 'the Interactive Syllabus Checklist';
       case 'esl-speaking': return 'the ESL Speaking Oral Exam Simulator';
+      case 'listening': return 'the Multi-Board English Listening Simulator';
       case 'boundaries': return 'the Grade Boundaries Calculator';
       case 'split': return 'the Split-Screen Exam Viewer';
       case 'analytics': return 'the School & Teacher Analytics Diagnostics';
@@ -840,6 +843,13 @@ export function App() {
             {activeTab === 'esl-speaking' && (
               <EslSpeakingSimulator
                 activeSubject={activeSubject}
+                profile={profile}
+              />
+            )}
+
+            {activeTab === 'listening' && (
+              <ListeningSimulator
+                subject={activeSubject}
                 profile={profile}
               />
             )}

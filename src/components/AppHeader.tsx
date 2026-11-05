@@ -66,6 +66,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       case 'solver': return 'Mark Scheme Step-by-Step Solver';
       case 'chat': return 'Examiner Walkthrough Co-Pilot';
       case 'esl-speaking': return 'ESL Speaking Simulator';
+      case 'listening': return 'Multi-Board Listening Simulator';
       case 'atp': return 'Paper 6 ATP Lab Master';
       case 'pitfalls': return 'Examiner Pitfall Heatmap';
       case 'mistakes': return 'Personal Error & Mistake Log';
