@@ -36,6 +36,7 @@ interface AppHeaderProps {
   onOpenPwaModal?: () => void;
   onOpenParentReport?: () => void;
   onOpenAuth: (mode?: 'signin' | 'signup') => void;
+  onNavigateTab?: (tab: ActiveTab) => void;
   designTheme?: 'liquid' | 'executive';
   onToggleDesignTheme?: () => void;
 }
@@ -57,6 +58,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   onOpenPwaModal,
   onOpenParentReport,
   onOpenAuth,
+  onNavigateTab,
   designTheme = 'liquid',
   onToggleDesignTheme,
 }) => {
@@ -200,6 +202,23 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             >
               <Crown className="h-3.5 w-3.5" />
               <span>{currentUser?.isPro ? 'PRO' : 'Get Pro'}</span>
+            </button>
+          )}
+
+          {/* Founder / Administrator Console Direct Access Pill */}
+          {(currentUser?.role === 'founder' || currentUser?.role === 'admin') && onNavigateTab && (
+            <button
+              onClick={() => onNavigateTab('admin')}
+              className={`flex items-center gap-1.5 rounded-xl border px-2.5 sm:px-3 py-1 text-xs font-black transition cursor-pointer shrink-0 shadow-sm ${
+                activeTab === 'admin'
+                  ? 'border-amber-400 bg-amber-500 text-slate-950 shadow-amber-500/30'
+                  : 'border-amber-500/50 bg-amber-500/15 text-amber-300 hover:bg-amber-500/25 shadow-amber-500/10'
+              }`}
+              title="Open Founder & Administrator Management Console"
+            >
+              <Crown className="h-3.5 w-3.5 text-amber-400" />
+              <span className="hidden sm:inline">Founder Console</span>
+              <span className="sm:hidden">Console</span>
             </button>
           )}
 

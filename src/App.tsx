@@ -743,6 +743,7 @@ export function App() {
             setAuthMode(mode || 'signin');
             setIsAuthOpen(true);
           }}
+          onNavigateTab={setActiveTab}
         />
 
         {/* Main Container */}

@@ -55,6 +55,67 @@ function savePersistedSessions() {
 // Initial hydration
 loadPersistedSessions();
 
+// Global persistent accounts registry (syncs accounts created across devices/browsers/incognito)
+const USERS_TMP_FILE = path.join(
+  process.platform === 'win32' ? process.env.TEMP || 'C:\\Windows\\Temp' : '/tmp',
+  'simply_persisted_users.json'
+);
+
+const FOUNDER_USER_SERVER = {
+  id: 'founder_thomas',
+  name: 'Thomas',
+  email: 'thomas@simplyigcse.com',
+  passwordHash: '',
+  grade: 'Year 11 / Grade 10 (IGCSE Exam Yr)',
+  board: 'Both',
+  targetGrade: '9 / A*',
+  selectedSubjectIds: ['cie-math-0580', 'cie-esl-0510', 'cie-physics-0625', 'cie-chem-0620', 'cie-bio-0610'],
+  role: 'founder',
+  title: 'Founder & Head of Platform',
+  status: 'approved',
+  plan: 'pro',
+  isPro: true,
+  currentSessionToken: 'sess_founder_thomas_permanent',
+  approvedAt: '2026-01-01T00:00:00.000Z',
+  approvedBy: 'system',
+  createdAt: '2026-01-01T00:00:00.000Z'
+};
+
+const GLOBAL_PERSISTED_USERS: Map<string, any> = new Map();
+
+function loadPersistedUsers() {
+  try {
+    if (fs.existsSync(USERS_TMP_FILE)) {
+      const data = JSON.parse(fs.readFileSync(USERS_TMP_FILE, 'utf-8'));
+      if (Array.isArray(data)) {
+        for (const u of data) {
+          if (u && (u.id || u.email)) {
+            GLOBAL_PERSISTED_USERS.set((u.email || u.id).toLowerCase(), u);
+          }
+        }
+      }
+    }
+  } catch {
+    // ignore
+  }
+
+  // Ensure Founder is always present
+  if (!GLOBAL_PERSISTED_USERS.has('thomas@simplyigcse.com')) {
+    GLOBAL_PERSISTED_USERS.set('thomas@simplyigcse.com', FOUNDER_USER_SERVER);
+  }
+}
+
+function savePersistedUsers() {
+  try {
+    const list = Array.from(GLOBAL_PERSISTED_USERS.values());
+    fs.writeFileSync(USERS_TMP_FILE, JSON.stringify(list, null, 2), 'utf-8');
+  } catch {
+    // ignore
+  }
+}
+
+loadPersistedUsers();
+
 export default async function handler(req: any, res?: any) {
   // CORS Headers
   const headers = {
@@ -89,6 +150,79 @@ export default async function handler(req: any, res?: any) {
 
     const normalizedEmail = String(email).trim().toLowerCase();
     const cleanCode = String(code).trim();
+
+    // ================= PERSISTENT USER REGISTRY ACTIONS =================
+    if (action === 'get_users') {
+      loadPersistedUsers();
+      const usersList = Array.from(GLOBAL_PERSISTED_USERS.values());
+      const payload = { success: true, users: usersList };
+      if (res?.status) return res.status(200).json(payload);
+      return new Response(JSON.stringify(payload), { status: 200, headers });
+    }
+
+    if (action === 'sync_user' || action === 'register_user') {
+      const { user: userToSync } = body;
+      if (userToSync && (userToSync.email || userToSync.id)) {
+        loadPersistedUsers();
+        const key = (userToSync.email || userToSync.id).toLowerCase();
+        GLOBAL_PERSISTED_USERS.set(key, userToSync);
+        savePersistedUsers();
+        console.log(`[USER SYNC SUCCESS] Account <${userToSync.email}> synced across all platform nodes.`);
+        const payload = { success: true, user: userToSync };
+        if (res?.status) return res.status(200).json(payload);
+        return new Response(JSON.stringify(payload), { status: 200, headers });
+      }
+      const payload = { success: false, error: 'User payload required.' };
+      if (res?.status) return res.status(400).json(payload);
+      return new Response(JSON.stringify(payload), { status: 400, headers });
+    }
+
+    if (action === 'update_user') {
+      const { userId, updates } = body;
+      loadPersistedUsers();
+      const targetUser = Array.from(GLOBAL_PERSISTED_USERS.values()).find(
+        u => u.id === userId || (u.email && u.email.toLowerCase() === String(userId).toLowerCase())
+      );
+      if (targetUser && updates && typeof updates === 'object') {
+        Object.assign(targetUser, updates);
+        GLOBAL_PERSISTED_USERS.set((targetUser.email || targetUser.id).toLowerCase(), targetUser);
+        savePersistedUsers();
+        const payload = { success: true, user: targetUser };
+        if (res?.status) return res.status(200).json(payload);
+        return new Response(JSON.stringify(payload), { status: 200, headers });
+      }
+      const payload = { success: false, error: 'User not found to update.' };
+      if (res?.status) return res.status(404).json(payload);
+      return new Response(JSON.stringify(payload), { status: 404, headers });
+    }
+
+    if (action === 'delete_user') {
+      const { userId } = body;
+      loadPersistedUsers();
+      const cleanId = String(userId || '').toLowerCase();
+      let deleted = false;
+      for (const [k, v] of GLOBAL_PERSISTED_USERS.entries()) {
+        if (v.id.toLowerCase() === cleanId || k === cleanId) {
+          if (v.role !== 'founder' && v.id !== 'founder_thomas') {
+            GLOBAL_PERSISTED_USERS.delete(k);
+            deleted = true;
+          }
+        }
+      }
+      savePersistedUsers();
+      const payload = { success: deleted };
+      if (res?.status) return res.status(200).json(payload);
+      return new Response(JSON.stringify(payload), { status: 200, headers });
+    }
+
+    if (action === 'purge_users') {
+      GLOBAL_PERSISTED_USERS.clear();
+      GLOBAL_PERSISTED_USERS.set('thomas@simplyigcse.com', FOUNDER_USER_SERVER);
+      savePersistedUsers();
+      const payload = { success: true, users: [FOUNDER_USER_SERVER] };
+      if (res?.status) return res.status(200).json(payload);
+      return new Response(JSON.stringify(payload), { status: 200, headers });
+    }
 
     // 0a. Cross-Device Single Session: Register Active Device Session (Invalidating Previous Devices)
     if (action === 'register_session') {

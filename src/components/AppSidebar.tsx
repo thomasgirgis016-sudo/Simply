@@ -119,6 +119,12 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   }, [profile.lastWeeklyReportSentAt]);
 
   const navGroups = [
+    ...(currentUser?.role === 'founder' || currentUser?.role === 'admin' ? [{
+      group: 'Founder & Platform',
+      items: [
+        { id: 'admin', label: 'Founder Console (Live)', icon: Crown, color: 'text-amber-400' },
+      ]
+    }] : []),
     {
       group: 'Overview',
       items: [

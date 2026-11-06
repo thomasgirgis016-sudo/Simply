@@ -80,7 +80,8 @@ import {
   updateStaffAccessCode,
   addStaffAccessCode,
   deleteStaffAccessCode,
-  purgeAllAccountsExceptFounder
+  purgeAllAccountsExceptFounder,
+  syncUsersWithServer
 } from '../services/auth';
 import {
   getAuditLogs,
@@ -156,13 +157,44 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [addError, setAddError] = useState('');
   const [isAdding, setIsAdding] = useState(false);
 
-  const reloadUsers = () => {
+  const reloadUsers = async () => {
+    // 1. Immediately read local storage
     setUsers(getAllUsers());
     if (onRefreshUser) onRefreshUser();
+
+    // 2. Fetch latest live users from server (cross-device & cross-browser synchronization)
+    try {
+      const live = await syncUsersWithServer();
+      setUsers(live);
+    } catch {}
   };
 
   useEffect(() => {
     reloadUsers();
+
+    // Background polling: every 3.5s automatically poll server so any account registered anywhere appears immediately
+    const pollTimer = setInterval(() => {
+      reloadUsers();
+    }, 3500);
+
+    // Cross-tab and window event listener
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'simply_igcse_users' || !e.key) {
+        reloadUsers();
+      }
+    };
+    const handleCustomUpdate = () => reloadUsers();
+
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener('simply_users_updated', handleCustomUpdate);
+    window.addEventListener('focus', reloadUsers);
+
+    return () => {
+      clearInterval(pollTimer);
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('simply_users_updated', handleCustomUpdate);
+      window.removeEventListener('focus', reloadUsers);
+    };
   }, []);
 
   const showToast = (msg: string) => {
@@ -200,7 +232,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     const total = users.length;
     const pending = users.filter((u) => u.status === 'pending').length;
     const approved = users.filter((u) => u.status === 'approved' || !u.status).length;
-    const admins = users.filter((u) => u.role === 'admin').length;
+    const admins = users.filter((u) => u.role === 'admin' || u.role === 'founder').length;
     return { total, pending, approved, admins };
   }, [users]);
 
@@ -242,6 +274,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       const matchesRole =
         roleFilter === 'all' ||
         (roleFilter === 'student' && (!u.role || u.role === 'student')) ||
+        (roleFilter === 'admin' && (u.role === 'admin' || u.role === 'founder')) ||
         u.role === roleFilter;
 
       const matchesPlan =

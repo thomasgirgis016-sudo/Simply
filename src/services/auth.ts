@@ -55,8 +55,72 @@ export function purgeAllAccountsExceptFounder(): UserAccount[] {
   try {
     localStorage.setItem('simply_device_session_token', 'sess_founder_thomas_permanent');
     localStorage.setItem(STORAGE_PURGED_FLAG, 'true');
+    fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'purge_users' })
+    }).catch(() => {});
   } catch {}
   return users;
+}
+
+// Sync users between server and localStorage (cross-device & cross-browser synchronization)
+export async function syncUsersWithServer(): Promise<UserAccount[]> {
+  try {
+    const res = await fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'get_users' })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data.success && Array.isArray(data.users)) {
+      const serverUsers: UserAccount[] = data.users;
+      const localUsers = getAllUsers();
+
+      // Merge by email or id
+      const map = new Map<string, UserAccount>();
+      for (const u of localUsers) {
+        if (u && (u.email || u.id)) map.set((u.email || u.id).toLowerCase(), u);
+      }
+      for (const u of serverUsers) {
+        if (u && (u.email || u.id)) {
+          const key = (u.email || u.id).toLowerCase();
+          const existing = map.get(key);
+          if (!existing) {
+            map.set(key, u);
+          } else {
+            // Merge with server version, keeping updated attributes
+            map.set(key, { ...existing, ...u });
+          }
+        }
+      }
+
+      // Always ensure founder
+      if (!map.has('thomas@simplyigcse.com')) {
+        map.set('thomas@simplyigcse.com', { ...FOUNDER_ACCOUNT });
+      }
+
+      const merged = Array.from(map.values());
+      try {
+        localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(merged));
+      } catch {}
+      return merged;
+    }
+  } catch {
+    // Offline or network error
+  }
+  return getAllUsers();
+}
+
+// Sync single user to server
+export function syncUserToServer(user: UserAccount): void {
+  try {
+    fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'sync_user', user })
+    }).catch(() => {});
+  } catch {}
 }
 
 // Get all registered accounts
@@ -104,6 +168,9 @@ export function getAllUsers(): UserAccount[] {
 export function saveAllUsers(users: UserAccount[]) {
   try {
     localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(users));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('simply_users_updated', { detail: users }));
+    }
   } catch (err) {
     console.error('Failed to save users:', err);
   }
@@ -190,6 +257,9 @@ export async function registerStudent(params: {
   saveAllUsers(users);
   localStorage.setItem('simply_device_session_token', newUser.currentSessionToken || '');
   setActiveUser(newUser);
+
+  // Sync to server so any admin / founder console immediately sees this account
+  syncUserToServer(newUser);
 
   if (newUser.currentSessionToken) {
     notifyServerOfSession(newUser, newUser.currentSessionToken);
@@ -600,6 +670,7 @@ export function approveUser(userId: string, adminEmail?: string): boolean {
   user.approvedAt = new Date().toISOString();
   user.approvedBy = adminEmail || 'Admin';
   saveAllUsers(users);
+  syncUserToServer(user);
 
   // If approving currently active user, update active user
   const active = getActiveUser();
@@ -618,6 +689,7 @@ export function rejectUser(userId: string): boolean {
 
   user.status = 'rejected';
   saveAllUsers(users);
+  syncUserToServer(user);
 
   const active = getActiveUser();
   if (active && active.id === userId) {
@@ -635,6 +707,7 @@ export function toggleUserRole(userId: string): boolean {
 
   user.role = user.role === 'admin' ? 'student' : 'admin';
   saveAllUsers(users);
+  syncUserToServer(user);
 
   const active = getActiveUser();
   if (active && active.id === userId) {
@@ -652,6 +725,13 @@ export function deleteUser(userId: string): boolean {
 
   if (users.length !== initialLen) {
     saveAllUsers(users);
+    try {
+      fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete_user', userId })
+      }).catch(() => {});
+    } catch {}
 
     const active = getActiveUser();
     if (active && active.id === userId) {
@@ -835,6 +915,7 @@ export function updateUserSubscriptionPlan(
   users[idx].proExpiresAt = expiry;
   users[idx].status = 'approved';
   saveAllUsers(users);
+  syncUserToServer(users[idx]);
 
   const active = getActiveUser();
   if (active && (active.id === users[idx].id || active.email.toLowerCase() === users[idx].email.toLowerCase())) {
