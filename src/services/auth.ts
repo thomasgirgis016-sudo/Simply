@@ -1,4 +1,5 @@
 import { UserAccount, GradeLevel, ExamBoard, TargetGrade, UserRole, AccountStatus, SubscriptionPlan, BillingCycle, MAX_STUDENT_SUBJECTS, StaffAccessCode } from '../types';
+import { safeSetItem } from './storage';
 
 const STORAGE_USERS_KEY = 'simply_igcse_users';
 const STORAGE_ACTIVE_USER_ID = 'simply_igcse_active_user_id';
@@ -173,7 +174,7 @@ export function getAllUsers(): UserAccount[] {
 // Save accounts
 export function saveAllUsers(users: UserAccount[]) {
   try {
-    localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(users));
+    safeSetItem(STORAGE_USERS_KEY, JSON.stringify(users));
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('simply_users_updated', { detail: users }));
     }

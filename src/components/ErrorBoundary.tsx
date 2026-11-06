@@ -31,6 +31,11 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   handleReload = () => {
+    try {
+      localStorage.removeItem('simply_igcse_revision');
+      localStorage.removeItem('simply_igcse_flashcards');
+      localStorage.removeItem('simply_igcse_quizzes');
+    } catch {}
     window.location.reload();
   };
 
@@ -40,6 +45,7 @@ export class ErrorBoundary extends Component<Props, State> {
       localStorage.removeItem('simply_igcse_flashcards');
       localStorage.removeItem('simply_igcse_quizzes');
       localStorage.removeItem('simply_igcse_revision');
+      localStorage.removeItem('simply_igcse_custom_past_papers');
       sessionStorage.clear();
     } catch (e) {
       console.warn('Cache clear error:', e);
@@ -49,6 +55,9 @@ export class ErrorBoundary extends Component<Props, State> {
 
   handleFounderRecovery = () => {
     try {
+      localStorage.removeItem('simply_igcse_revision');
+      localStorage.removeItem('simply_igcse_flashcards');
+      localStorage.removeItem('simply_igcse_quizzes');
       localStorage.setItem('simply_active_user_id', 'founder_thomas');
     } catch {}
     window.location.href = window.location.pathname + '?admin=portal';

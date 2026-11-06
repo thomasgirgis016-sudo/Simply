@@ -65,6 +65,7 @@ import { AppHeader } from './components/AppHeader';
 import { SimplyLogo } from './components/SimplyLogo';
 import { getActiveUser, setActiveUser, grantUserProSubscription, hasActiveSubscription, updateUserAccount, validateActiveSession, validateActiveSessionAsync, logoutUser, getAllUsers } from './services/auth';
 import { getAutoSchedulerConfig, runAutomatedWeeklyDispatch } from './services/whatsappService';
+import { safeSetItem } from './services/storage';
 import {
   Camera,
   Layers,
@@ -359,22 +360,38 @@ export function App() {
   // Cross-component question passing to chat
   const [chatInitialQuestion, setChatInitialQuestion] = useState<string | undefined>(undefined);
 
-  // Sync to local storage
+  // Auto-clean bloated legacy caches from localStorage to guarantee quota is always free
   useEffect(() => {
-    localStorage.setItem('simply_igcse_profile', JSON.stringify(profile));
+    try {
+      localStorage.removeItem('simply_igcse_revision');
+      // If flashcards/quizzes in storage match initial, remove them to free 2MB+ of storage
+      const savedCards = localStorage.getItem('simply_igcse_flashcards');
+      if (savedCards && JSON.parse(savedCards).length === INITIAL_FLASHCARDS.length) {
+        localStorage.removeItem('simply_igcse_flashcards');
+      }
+      const savedQuiz = localStorage.getItem('simply_igcse_quizzes');
+      if (savedQuiz && JSON.parse(savedQuiz).length === INITIAL_QUIZZES.length) {
+        localStorage.removeItem('simply_igcse_quizzes');
+      }
+    } catch {}
+  }, []);
+
+  // Safe sync to local storage (Protected against QuotaExceededError)
+  useEffect(() => {
+    safeSetItem('simply_igcse_profile', JSON.stringify(profile));
   }, [profile]);
 
   useEffect(() => {
-    localStorage.setItem('simply_igcse_flashcards', JSON.stringify(flashcards));
+    if (flashcards.length !== INITIAL_FLASHCARDS.length) {
+      safeSetItem('simply_igcse_flashcards', JSON.stringify(flashcards));
+    }
   }, [flashcards]);
 
   useEffect(() => {
-    localStorage.setItem('simply_igcse_quizzes', JSON.stringify(quizzes));
+    if (quizzes.length !== INITIAL_QUIZZES.length) {
+      safeSetItem('simply_igcse_quizzes', JSON.stringify(quizzes));
+    }
   }, [quizzes]);
-
-  useEffect(() => {
-    localStorage.setItem('simply_igcse_revision', JSON.stringify(revisionNotes));
-  }, [revisionNotes]);
 
   // Cross-Device Single Active Session Enforcement Heartbeat
   useEffect(() => {
