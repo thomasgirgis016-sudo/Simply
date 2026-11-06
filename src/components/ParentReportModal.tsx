@@ -44,12 +44,13 @@ export const ParentReportModal: React.FC<ParentReportModalProps> = ({
     year: 'numeric'
   });
 
-  // Calculate dummy or stored performance metrics
-  const targetGrade = profile.targetGrade || '9 / A*';
-  const projectedGrade = '8 / A*';
-  const overallMockAverage = 84;
-  const totalQuestionsSolved = 142;
-  const syllabusCoveragePercent = 78;
+  // Generate accurate, individualized academic assessment metrics
+  const detailedReport = generateDetailedReport(profile, subjects);
+  const targetGrade = detailedReport.targetGrade;
+  const projectedGrade = detailedReport.projectedGrade;
+  const overallMockAverage = detailedReport.mockExamAverage;
+  const totalQuestionsSolved = detailedReport.totalQuestionsSolved;
+  const syllabusCoveragePercent = detailedReport.readinessIndex;
 
   // Selected subjects summary
   const studentSubjects = subjects.filter(s =>

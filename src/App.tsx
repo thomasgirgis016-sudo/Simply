@@ -48,6 +48,7 @@ import { MistakeNotebookView } from './components/MistakeNotebookView';
 import { NightBeforeCheatSheets } from './components/NightBeforeCheatSheets';
 import { HandwritingScannerModal } from './components/HandwritingScannerModal';
 import { ParentReportModal } from './components/ParentReportModal';
+import { DetailedStudentReportModal } from './components/DetailedStudentReportModal';
 import { StudyDuelModal } from './components/StudyDuelModal';
 import { PaymentModal } from './components/PaymentModal';
 import { SettingsModal } from './components/SettingsModal';
@@ -64,7 +65,8 @@ import { AppSidebar } from './components/AppSidebar';
 import { AppHeader } from './components/AppHeader';
 import { SimplyLogo } from './components/SimplyLogo';
 import { getActiveUser, setActiveUser, grantUserProSubscription, hasActiveSubscription, updateUserAccount, validateActiveSession, validateActiveSessionAsync, logoutUser, getAllUsers, syncUsersWithServer } from './services/auth';
-import { getAutoSchedulerConfig, runAutomatedWeeklyDispatch } from './services/whatsappService';
+import { getAutoSchedulerConfig, runAutomatedWeeklyDispatch, isWeeklyReportDue } from './services/whatsappService';
+import { generateDetailedReport, DetailedStudentReport } from './services/studentReports';
 import { safeSetItem } from './services/storage';
 import {
   Camera,
@@ -151,6 +153,8 @@ export function App() {
   const [isExamHudOpen, setIsExamHudOpen] = useState(false);
   const [isPwaModalOpen, setIsPwaModalOpen] = useState(false);
   const [isRevisionKitOpen, setIsRevisionKitOpen] = useState(false);
+  const [isDetailedReportOpen, setIsDetailedReportOpen] = useState(false);
+  const [viewedReport, setViewedReport] = useState<DetailedStudentReport | null>(null);
 
   // Initialize PWA beforeinstallprompt listener
   useEffect(() => {
@@ -265,7 +269,7 @@ export function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Secret Admin Access via URL (?admin=portal / ?admin=true) or Hotkey (Ctrl+Shift+A)
+  // Secret Admin Access (?admin=portal) & Direct Weekly Report Viewer (?tab=report&id=...)
   useEffect(() => {
     if (typeof window === 'undefined') return;
     try {
@@ -276,8 +280,17 @@ export function App() {
         const cleanUrl = `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`;
         window.history.replaceState(null, '', cleanUrl);
       }
+
+      if (params.get('tab') === 'report') {
+        const studentId = params.get('id');
+        const allRegistered = getAllUsers();
+        const targetStudent = studentId ? allRegistered.find(u => u.id === studentId) || profile : profile;
+        const rep = generateDetailedReport(targetStudent, IGCSE_SUBJECTS);
+        setViewedReport(rep);
+        setIsDetailedReportOpen(true);
+      }
     } catch (e) {
-      console.warn('Admin param detection bypassed:', e);
+      console.warn('URL param detection bypassed:', e);
     }
 
     const handleSecretShortcut = (e: KeyboardEvent) => {
@@ -288,6 +301,40 @@ export function App() {
     };
     window.addEventListener('keydown', handleSecretShortcut);
     return () => window.removeEventListener('keydown', handleSecretShortcut);
+  }, []);
+
+  // Automated 7-Day Weekly Parent Report Dispatch Background Scheduler
+  useEffect(() => {
+    let intervalId: any;
+    const runAutoWeeklySchedule = async () => {
+      try {
+        const config = getAutoSchedulerConfig();
+        if (!config.enabled) return;
+
+        const users = getAllUsers();
+        const due = users.filter(u => u.role === 'student' && isWeeklyReportDue(u));
+        if (due.length > 0) {
+          console.log(`[Simply AutoScheduler] Found ${due.length} weekly parent reports due. Running automated dispatch...`);
+          const result = await runAutomatedWeeklyDispatch(users, IGCSE_SUBJECTS);
+          if (result.totalDispatched > 0) {
+            console.log(`[Simply AutoScheduler] Successfully dispatched ${result.totalDispatched} automated weekly reports.`);
+          }
+        }
+      } catch (err) {
+        console.warn('[Simply AutoScheduler] Weekly dispatch runner warning:', err);
+      }
+    };
+
+    // Initial check 3.5 seconds after app startup
+    const timeoutId = setTimeout(runAutoWeeklySchedule, 3500);
+
+    // Periodic background check every 15 minutes
+    intervalId = setInterval(runAutoWeeklySchedule, 15 * 60 * 1000);
+
+    return () => {
+      clearTimeout(timeoutId);
+      clearInterval(intervalId);
+    };
   }, []);
 
   // 5. Content Data State (Merge with INITIAL data so new cards/quizzes/notes automatically appear)
@@ -1266,6 +1313,13 @@ export function App() {
         profile={profile}
         subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
         onUpdateProfile={handleUpdateProfile}
+      />
+
+      {/* Official Academic Assessment Audit & PDF Statement Modal */}
+      <DetailedStudentReportModal
+        isOpen={isDetailedReportOpen}
+        onClose={() => setIsDetailedReportOpen(false)}
+        report={viewedReport}
       />
 
       {/* Collaborative Study Duel (Past Paper Sprint) Modal */}

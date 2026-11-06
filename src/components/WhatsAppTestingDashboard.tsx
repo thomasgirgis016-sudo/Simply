@@ -23,7 +23,9 @@ import {
   Zap,
   RefreshCw,
   Trash2,
-  Copy
+  Copy,
+  Settings,
+  Share2
 } from 'lucide-react';
 import { UserAccount, Subject } from '../types';
 import {
@@ -39,6 +41,7 @@ import {
   openWhatsAppWeb,
   sendWhatsAppMessage,
   runAutomatedWeeklyDispatch,
+  resetAllWeeklyReportTimers,
   sanitizeWhatsAppPhone
 } from '../services/whatsappService';
 import { generateDetailedReport, DetailedStudentReport } from '../services/studentReports';
@@ -86,6 +89,8 @@ export const WhatsAppTestingDashboard: React.FC<WhatsAppTestingDashboardProps> =
 
   // Roster Search
   const [rosterSearch, setRosterSearch] = useState('');
+  const [webhookUrlInput, setWebhookUrlInput] = useState(autoConfig.webhookUrl || '');
+  const [isGatewaySettingsOpen, setIsGatewaySettingsOpen] = useState(false);
 
   // Reload logs periodically
   useEffect(() => {
@@ -212,12 +217,12 @@ export const WhatsAppTestingDashboard: React.FC<WhatsAppTestingDashboardProps> =
     }
   };
 
-  // Action: Run batch auto-dispatch for all due students
-  const handleRunBatchAutoDispatch = async () => {
+  // Action: Run batch auto-dispatch for all due students (or force test all)
+  const handleRunBatchAutoDispatch = async (forceAll: boolean = false) => {
     setIsBatchRunning(true);
     setBatchResults(null);
     try {
-      const result = await runAutomatedWeeklyDispatch(students, subjects);
+      const result = await runAutomatedWeeklyDispatch(students, subjects, { forceAll });
       setBatchResults(result);
       setLogs(getWhatsAppLogs());
       if (onRefreshStudents) onRefreshStudents();
@@ -227,6 +232,13 @@ export const WhatsAppTestingDashboard: React.FC<WhatsAppTestingDashboardProps> =
     } finally {
       setIsBatchRunning(false);
     }
+  };
+
+  const handleResetAllTimers = () => {
+    const count = resetAllWeeklyReportTimers(students);
+    setLogs(getWhatsAppLogs());
+    if (onRefreshStudents) onRefreshStudents();
+    showToast(`✓ Reset 7-day cooldown for ${count} students. Reports are now ready for re-testing!`);
   };
 
   const handleToggleAutoScheduler = () => {
@@ -573,18 +585,38 @@ export const WhatsAppTestingDashboard: React.FC<WhatsAppTestingDashboardProps> =
               </div>
             </div>
 
-            <button
-              onClick={handleRunBatchAutoDispatch}
-              disabled={isBatchRunning || stats.dueCount === 0}
-              className={`rounded-xl px-5 py-3 text-xs font-black shadow-xl flex items-center justify-center gap-2 cursor-pointer transition ${
-                stats.dueCount > 0
-                  ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:brightness-110 active:scale-95'
-                  : 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed opacity-60'
-              }`}
-            >
-              <Zap className="h-4 w-4 fill-current" />
-              <span>{isBatchRunning ? 'Scanning & Dispatching...' : `Dispatch All ${stats.dueCount} Due Reports`}</span>
-            </button>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => handleRunBatchAutoDispatch(false)}
+                disabled={isBatchRunning || stats.dueCount === 0}
+                className={`rounded-xl px-4 py-2.5 text-xs font-black shadow-xl flex items-center justify-center gap-1.5 cursor-pointer transition ${
+                  stats.dueCount > 0
+                    ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:brightness-110 active:scale-95'
+                    : 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed opacity-60'
+                }`}
+              >
+                <Zap className="h-4 w-4 fill-current" />
+                <span>{isBatchRunning ? 'Dispatching...' : `Dispatch Due (${stats.dueCount})`}</span>
+              </button>
+
+              <button
+                onClick={() => handleRunBatchAutoDispatch(true)}
+                disabled={isBatchRunning}
+                className="rounded-xl border border-amber-500/40 bg-amber-500/15 px-3.5 py-2.5 text-xs font-bold text-amber-300 hover:bg-amber-500/25 transition cursor-pointer flex items-center gap-1.5"
+                title="Test dispatch immediately for all enrolled students without waiting 7 days"
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                <span>Force Test All</span>
+              </button>
+
+              <button
+                onClick={handleResetAllTimers}
+                className="rounded-xl border border-slate-700 bg-slate-800/80 px-3 py-2.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition cursor-pointer"
+                title="Reset all student sent timers to test 7-day due state"
+              >
+                <span>Reset Timers</span>
+              </button>
+            </div>
           </div>
 
           {/* Batch Result Summary if available */}
@@ -605,6 +637,72 @@ export const WhatsAppTestingDashboard: React.FC<WhatsAppTestingDashboardProps> =
               )}
             </div>
           )}
+
+          {/* Outbound Webhook / Live Dispatch Gateway Settings */}
+          <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
+            <div className="flex items-center justify-between cursor-pointer" onClick={() => setIsGatewaySettingsOpen(!isGatewaySettingsOpen)}>
+              <div className="flex items-center gap-2">
+                <Settings className="h-4 w-4 text-cyan-400" />
+                <span className="text-xs font-bold text-slate-200 uppercase tracking-wider">Outbound Live WhatsApp Gateway & Webhook Settings</span>
+                {autoConfig.webhookUrl && (
+                  <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-bold text-emerald-300 border border-emerald-500/30">
+                    Webhook Bound
+                  </span>
+                )}
+              </div>
+              <button
+                type="button"
+                className="text-xs text-slate-400 hover:text-white transition"
+              >
+                {isGatewaySettingsOpen ? '▲ Hide' : '▼ Configure'}
+              </button>
+            </div>
+
+            {isGatewaySettingsOpen && (
+              <div className="mt-4 pt-3 border-t border-slate-800 space-y-3 animate-fadeIn">
+                <p className="text-[11px] text-slate-300 leading-relaxed">
+                  Connect any live WhatsApp HTTP Webhook gateway (e.g. <strong>CallMeBot</strong>, <strong>Green API</strong>, <strong>UltraMsg</strong>, <strong>Twilio</strong>, or <strong>Make/Zapier</strong>). When the automated background engine runs, it automatically dispatches HTTP POST payloads to your gateway.
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input
+                    type="url"
+                    placeholder="https://api.ultramsg.com/instance/messages/chat or your webhook URL..."
+                    value={webhookUrlInput}
+                    onChange={(e) => setWebhookUrlInput(e.target.value)}
+                    className="flex-1 rounded-xl border border-slate-700 bg-slate-950 px-3.5 py-2 text-xs font-mono text-white placeholder-slate-500 focus:border-cyan-400 focus:outline-none"
+                  />
+                  <button
+                    onClick={() => {
+                      const next = saveAutoSchedulerConfig({ webhookUrl: webhookUrlInput.trim() });
+                      setAutoConfig(next);
+                      showToast('✓ Outbound WhatsApp Gateway Webhook URL saved successfully!');
+                    }}
+                    className="rounded-xl bg-cyan-600 hover:bg-cyan-500 px-4 py-2 text-xs font-bold text-white transition cursor-pointer"
+                  >
+                    Save Webhook URL
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-2 pt-1">
+                  <input
+                    type="checkbox"
+                    id="autoOpenWebCheck"
+                    checked={Boolean(autoConfig.autoOpenWebLink)}
+                    onChange={(e) => {
+                      const next = saveAutoSchedulerConfig({ autoOpenWebLink: e.target.checked });
+                      setAutoConfig(next);
+                      showToast(e.target.checked ? '✓ WhatsApp Web auto-launch on dispatch ENABLED' : 'WhatsApp Web auto-launch disabled');
+                    }}
+                    className="rounded border-slate-700 bg-slate-950 text-emerald-500 focus:ring-0 cursor-pointer"
+                  />
+                  <label htmlFor="autoOpenWebCheck" className="text-xs text-slate-300 cursor-pointer select-none">
+                    Automatically launch WhatsApp Web / App (wa.me) when dispatching individual reports
+                  </label>
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Student Roster Table */}
           <div className="rounded-2xl border border-slate-800 bg-slate-900/80 overflow-hidden">
@@ -685,7 +783,7 @@ export const WhatsAppTestingDashboard: React.FC<WhatsAppTestingDashboardProps> =
 
                         <td className="py-3 px-4 text-right">
                           <div className="inline-flex items-center gap-1.5">
-                            {/* View in-app detailed report */}
+                            {/* View in-app detailed report & Download PDF */}
                             <button
                               onClick={() => setActiveReportModal(report)}
                               className="rounded-lg border border-slate-700 bg-slate-800 p-1.5 text-slate-300 hover:text-white transition"
@@ -694,7 +792,38 @@ export const WhatsAppTestingDashboard: React.FC<WhatsAppTestingDashboardProps> =
                               <FileText className="h-3.5 w-3.5" />
                             </button>
 
-                            {/* Dispatch individual report */}
+                            {/* Direct WhatsApp Web Launch (wa.me) */}
+                            <button
+                              disabled={!hasPhone}
+                              onClick={() => {
+                                const msg = buildTemplateMessage('weekly_report', {
+                                  studentName: student.name,
+                                  targetGrade: student.targetGrade,
+                                  detailedReport: report,
+                                  webReportUrl: `https://simply-igcse.com/?tab=report&id=${student.id}`
+                                });
+                                openWhatsAppWeb(student.parentWhatsapp!, msg);
+                                sendWhatsAppMessage({
+                                  recipientPhone: student.parentWhatsapp!,
+                                  recipientName: `${student.name}'s Parent`,
+                                  studentId: student.id,
+                                  templateType: 'weekly_report',
+                                  messageBody: msg,
+                                  mode: 'wa_web',
+                                  pdfReportId: report.reportId
+                                });
+                                setLogs(getWhatsAppLogs());
+                                if (onRefreshStudents) onRefreshStudents();
+                                showToast(`✓ WhatsApp Web launched with weekly report for ${student.name}!`);
+                              }}
+                              className="rounded-lg border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/20 px-2.5 py-1 text-[11px] font-bold text-emerald-300 transition disabled:opacity-40 cursor-pointer flex items-center gap-1"
+                              title="Open directly in WhatsApp Web / App"
+                            >
+                              <Share2 className="h-3 w-3" />
+                              <span>WhatsApp</span>
+                            </button>
+
+                            {/* Dispatch individual report via Automated API */}
                             <button
                               disabled={!hasPhone}
                               onClick={async () => {
@@ -717,12 +846,13 @@ export const WhatsAppTestingDashboard: React.FC<WhatsAppTestingDashboardProps> =
 
                                 setLogs(getWhatsAppLogs());
                                 if (onRefreshStudents) onRefreshStudents();
-                                showToast(`✓ Dispatched weekly report to ${student.name}'s parent!`);
+                                showToast(`✓ Dispatched automated report to ${student.name}'s parent!`);
                               }}
-                              className="rounded-lg bg-emerald-600/90 hover:bg-emerald-500 px-2.5 py-1 text-[11px] font-bold text-white transition disabled:opacity-40 cursor-pointer"
-                              title="Send weekly report via automated API"
+                              className="rounded-lg bg-emerald-600/90 hover:bg-emerald-500 px-2.5 py-1 text-[11px] font-bold text-white transition disabled:opacity-40 cursor-pointer flex items-center gap-1"
+                              title="Send weekly report via automated API / webhook"
                             >
-                              Send Report
+                              <Zap className="h-3 w-3" />
+                              <span>Auto Dispatch</span>
                             </button>
                           </div>
                         </td>

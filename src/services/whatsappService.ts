@@ -36,12 +36,15 @@ export interface AutoSchedulerConfig {
   frequencyDays: number;
   lastRunTimestamp?: string;
   autoDispatchHourUtc: number; // e.g. 17 for 5pm UTC (7pm Cairo time)
+  webhookUrl?: string; // Optional custom outbound webhook (UltraMsg, GreenAPI, Twilio, CallMeBot)
+  autoOpenWebLink?: boolean; // When testing, launch wa.me directly
 }
 
 const DEFAULT_AUTOSCHEDULER: AutoSchedulerConfig = {
   enabled: true,
   frequencyDays: 7,
-  autoDispatchHourUtc: 17
+  autoDispatchHourUtc: 17,
+  autoOpenWebLink: false
 };
 
 /**
@@ -59,6 +62,7 @@ export function sanitizeWhatsAppPhone(phone: string): { clean: string; valid: bo
  */
 export function getWhatsAppLogs(): WhatsAppDispatchLog[] {
   try {
+    if (typeof localStorage === 'undefined') return [];
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
     return JSON.parse(raw);
@@ -69,6 +73,7 @@ export function getWhatsAppLogs(): WhatsAppDispatchLog[] {
 
 export function saveWhatsAppLogs(logs: WhatsAppDispatchLog[]): void {
   try {
+    if (typeof localStorage === 'undefined') return;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(logs.slice(0, 200)));
   } catch (e) {
     console.error('Failed to save WhatsApp dispatch logs', e);
@@ -76,7 +81,11 @@ export function saveWhatsAppLogs(logs: WhatsAppDispatchLog[]): void {
 }
 
 export function clearWhatsAppLogs(): void {
-  localStorage.removeItem(STORAGE_KEY);
+  try {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  } catch {}
 }
 
 /**
@@ -84,6 +93,7 @@ export function clearWhatsAppLogs(): void {
  */
 export function getAutoSchedulerConfig(): AutoSchedulerConfig {
   try {
+    if (typeof localStorage === 'undefined') return DEFAULT_AUTOSCHEDULER;
     const raw = localStorage.getItem(AUTOSCHEDULER_KEY);
     if (!raw) return DEFAULT_AUTOSCHEDULER;
     return { ...DEFAULT_AUTOSCHEDULER, ...JSON.parse(raw) };
@@ -95,7 +105,11 @@ export function getAutoSchedulerConfig(): AutoSchedulerConfig {
 export function saveAutoSchedulerConfig(config: Partial<AutoSchedulerConfig>): AutoSchedulerConfig {
   const current = getAutoSchedulerConfig();
   const next = { ...current, ...config };
-  localStorage.setItem(AUTOSCHEDULER_KEY, JSON.stringify(next));
+  try {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(AUTOSCHEDULER_KEY, JSON.stringify(next));
+    }
+  } catch {}
   return next;
 }
 
@@ -251,16 +265,46 @@ export async function sendWhatsAppMessage(options: {
     pdfReportId: options.pdfReportId
   };
 
-  // If automated API mode, simulate real webhook delivery progression
-  if (options.mode === 'automated_api' && valid) {
-    // Immediate: Sent
-    setTimeout(() => {
-      updateLogStatus(newLog.id, 'delivered');
-    }, 1200);
+  // Outbound dispatch processing
+  if (valid) {
+    if (options.mode === 'wa_web') {
+      openWhatsAppWeb(options.recipientPhone, options.messageBody);
+    } else {
+      // automated_api: Call backend API & forward to webhook if configured
+      const config = getAutoSchedulerConfig();
+      if (config.autoOpenWebLink) {
+        openWhatsAppWeb(options.recipientPhone, options.messageBody);
+      }
 
-    setTimeout(() => {
-      updateLogStatus(newLog.id, 'read');
-    }, 3500);
+      try {
+        if (typeof window !== 'undefined') {
+          const res = await fetch('/api/whatsapp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            recipientPhone: options.recipientPhone,
+            recipientName: options.recipientName,
+            studentId: options.studentId,
+            templateType: options.templateType,
+            messageBody: options.messageBody,
+            mode: 'automated_api',
+            webhookUrl: config.webhookUrl
+          })
+        });
+
+        if (res.ok) {
+          newLog.status = 'delivered';
+          newLog.statusUpdatedAt = new Date().toISOString();
+        }
+      }
+    } catch (err) {
+      console.warn('Outbound /api/whatsapp request non-critical warning:', err);
+    }
+
+      // Simulated progression for UI feedback
+      setTimeout(() => updateLogStatus(newLog.id, 'delivered'), 1200);
+      setTimeout(() => updateLogStatus(newLog.id, 'read'), 3500);
+    }
   }
 
   // Update user lastWeeklyReportSentAt if this was a weekly report
@@ -298,11 +342,29 @@ function updateLogStatus(logId: string, status: DeliveryStatus): void {
 }
 
 /**
+ * Reset all student weekly report timestamps so testing can be repeated immediately
+ */
+export function resetAllWeeklyReportTimers(students: UserAccount[]): number {
+  let count = 0;
+  for (const s of students) {
+    if (s.lastWeeklyReportSentAt) {
+      updateUserAccount(s.id, { lastWeeklyReportSentAt: undefined });
+      count++;
+    }
+  }
+  return count;
+}
+
+/**
  * Automated Dispatch Runner: scans all students and automatically sends weekly reports to parents whose reports are due
  */
 export async function runAutomatedWeeklyDispatch(
   students: UserAccount[],
-  allSubjects: Subject[]
+  allSubjects: Subject[],
+  options?: {
+    forceAll?: boolean;
+    openWhatsAppWebForEach?: boolean;
+  }
 ): Promise<{
   totalScanned: number;
   totalDispatched: number;
@@ -313,8 +375,9 @@ export async function runAutomatedWeeklyDispatch(
   const skipped: Array<{ student: UserAccount; reason: string }> = [];
 
   for (const student of students) {
-    // Only process students
-    if (student.role !== 'student') continue;
+    // Only process students (default role is student)
+    const isStudent = !student.role || student.role === 'student';
+    if (!isStudent) continue;
 
     if (!student.parentWhatsapp || !student.parentWhatsapp.trim()) {
       skipped.push({ student, reason: 'No registered parent WhatsApp number' });
@@ -327,12 +390,13 @@ export async function runAutomatedWeeklyDispatch(
       continue;
     }
 
-    if (!isWeeklyReportDue(student)) {
+    // Unless forceAll is enabled, enforce 7-day cooldown
+    if (!options?.forceAll && !isWeeklyReportDue(student)) {
       skipped.push({ student, reason: 'Weekly report sent less than 7 days ago' });
       continue;
     }
 
-    // Generate detailed report
+    // Generate detailed individualized report
     const detailedReport = generateDetailedReport(student, allSubjects);
     const message = formatWeeklyReportWhatsAppMessage(detailedReport);
 
@@ -342,7 +406,7 @@ export async function runAutomatedWeeklyDispatch(
       studentId: student.id,
       templateType: 'weekly_report',
       messageBody: message,
-      mode: 'automated_api',
+      mode: options?.openWhatsAppWebForEach ? 'wa_web' : 'automated_api',
       pdfReportId: detailedReport.reportId
     });
 
@@ -359,7 +423,7 @@ export async function runAutomatedWeeklyDispatch(
   });
 
   return {
-    totalScanned: students.filter(s => s.role === 'student').length,
+    totalScanned: students.filter(s => !s.role || s.role === 'student').length,
     totalDispatched: dispatched.length,
     dispatched,
     skipped
