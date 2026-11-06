@@ -116,9 +116,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     >
       {designTheme === 'liquid' && <div className="liquid-glare" />}
       {/* Single Clean Header Row: Brand, Active Subject & Essential Status */}
-      <div className="flex h-13 sm:h-16 w-full items-center justify-between px-3 sm:px-6 relative z-10 gap-2">
+      <div className="flex h-13 sm:h-16 w-full items-center justify-between px-2.5 sm:px-6 relative z-10 gap-1.5 sm:gap-2">
         {/* 1. Brand Logo & Desktop Breadcrumbs */}
-        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 shrink-0">
           <SimplyLogo size="sm" showText={true} />
 
           {/* Desktop Breadcrumbs & Page Title */}
@@ -137,7 +137,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         </div>
 
         {/* 2. Center/Right Controls: Subject Selector, Streak, Profile */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0">
+        <div className="flex items-center gap-1 sm:gap-2 min-w-0 shrink-0">
           {/* Active Subject Selector Pill (Compact on Mobile, Full on Desktop) */}
           <div className="relative">
             <select
@@ -146,7 +146,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 const found = subjects.find((s) => s.id === e.target.value);
                 if (found) onSelectSubject(found);
               }}
-              className="appearance-none rounded-xl border border-indigo-500/35 bg-slate-900/90 py-1.5 pl-2.5 pr-6 sm:pr-8 text-xs font-mono font-bold text-indigo-200 shadow-sm hover:border-indigo-400 focus:outline-none cursor-pointer max-w-[110px] sm:max-w-[260px] truncate"
+              className="appearance-none rounded-xl border border-indigo-500/35 bg-slate-900/90 py-1 sm:py-1.5 pl-2 sm:pl-2.5 pr-5 sm:pr-8 text-[11px] sm:text-xs font-mono font-bold text-indigo-200 shadow-sm hover:border-indigo-400 focus:outline-none cursor-pointer max-w-[85px] sm:max-w-[260px] truncate"
             >
               {subjects.map((s) => (
                 <option key={s.id} value={s.id} className="bg-slate-900 text-white font-sans">
@@ -154,16 +154,16 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 </option>
               ))}
             </select>
-            <ChevronDown className="pointer-events-none absolute right-2 sm:right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-indigo-400" />
+            <ChevronDown className="pointer-events-none absolute right-1.5 sm:right-2.5 top-1/2 -translate-y-1/2 h-3 w-3 sm:h-3.5 sm:w-3.5 text-indigo-400" />
           </div>
 
           {/* Daily Streak Flame Pill */}
           <div
-            className="flex items-center gap-1 sm:gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 px-2 sm:px-2.5 py-1 text-xs font-black text-amber-300 shadow-sm cursor-default shrink-0"
+            className="flex items-center gap-1 sm:gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 px-1.5 sm:px-2.5 py-1 text-[11px] sm:text-xs font-black text-amber-300 shadow-sm cursor-default shrink-0"
             title={`${streak.currentStreak} Day Study Streak`}
           >
-            <Flame className="h-3.5 w-3.5 text-amber-400 fill-amber-400 animate-pulse" />
-            <span className="font-mono text-xs">{streak.currentStreak}d</span>
+            <Flame className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-amber-400 fill-amber-400 animate-pulse" />
+            <span className="font-mono text-[11px] sm:text-xs">{streak.currentStreak}d</span>
           </div>
 
           {/* Desktop-Only: Parent Weekly WhatsApp Report Button */}
@@ -234,7 +234,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           ) : (
             <button
               onClick={() => onOpenAuth('signin')}
-              className="rounded-xl border border-slate-700 bg-slate-800 px-2.5 py-1 text-xs font-bold text-slate-200 hover:text-white transition cursor-pointer shrink-0"
+              className="rounded-xl border border-slate-700 bg-slate-800 px-2 sm:px-2.5 py-1 text-[11px] sm:text-xs font-bold text-slate-200 hover:text-white transition cursor-pointer shrink-0 whitespace-nowrap"
             >
               Sign In
             </button>

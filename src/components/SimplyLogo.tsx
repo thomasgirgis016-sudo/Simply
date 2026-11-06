@@ -16,10 +16,10 @@ export const SimplyLogo: React.FC<SimplyLogoProps> = ({
   const [imgError, setImgError] = useState(false);
 
   const sizeMap = {
-    sm: { img: 'h-8 w-8 sm:h-10 sm:w-10', text: 'text-lg sm:text-xl', sub: 'text-[10px]' },
-    md: { img: 'h-12 w-12 sm:h-14 sm:w-14', text: 'text-2xl sm:text-3xl', sub: 'text-xs' },
-    lg: { img: 'h-20 w-20 sm:h-24 sm:w-24', text: 'text-3xl sm:text-4xl', sub: 'text-sm' },
-    xl: { img: 'h-28 w-28 sm:h-36 sm:w-36', text: 'text-4xl sm:text-5xl', sub: 'text-base' },
+    sm: { img: 'h-7 w-7 sm:h-9 sm:w-9', text: 'text-base sm:text-xl', sub: 'text-[10px]' },
+    md: { img: 'h-10 w-10 sm:h-14 sm:w-14', text: 'text-xl sm:text-3xl', sub: 'text-xs' },
+    lg: { img: 'h-16 w-16 sm:h-24 sm:w-24', text: 'text-2xl sm:text-4xl', sub: 'text-sm' },
+    xl: { img: 'h-20 w-20 sm:h-36 sm:w-36', text: 'text-3xl sm:text-5xl', sub: 'text-base' },
   };
 
   const currentSize = sizeMap[size];
@@ -39,7 +39,7 @@ export const SimplyLogo: React.FC<SimplyLogoProps> = ({
   }
 
   return (
-    <div className={`inline-flex items-center gap-3 select-none ${className}`}>
+    <div className={`inline-flex items-center gap-2 sm:gap-3 select-none ${className}`}>
       {/* Official Graduation Cap "S" Icon with Background Removed */}
       <div className="relative shrink-0 flex items-center justify-center">
         {!imgError ? (
@@ -107,17 +107,17 @@ export const SimplyLogo: React.FC<SimplyLogoProps> = ({
       {/* Typography: "Simply" */}
       {showText && variant === 'full' && (
         <div className="flex flex-col leading-none justify-center">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <span
               className={`font-black tracking-tight text-white ${currentSize.text} font-['Plus_Jakarta_Sans',sans-serif]`}
             >
               Simply
             </span>
-            <span className="rounded-md bg-gradient-to-r from-[#FF5E62] to-[#FFA63A] px-2 py-0.5 text-[10px] sm:text-xs font-black uppercase tracking-wider text-slate-950 shadow-md">
+            <span className="rounded-md bg-gradient-to-r from-[#FF5E62] to-[#FFA63A] px-1.5 py-0.5 sm:px-2 sm:py-0.5 text-[9px] sm:text-xs font-black uppercase tracking-wider text-slate-950 shadow-md">
               IGCSE
             </span>
           </div>
-          <span className={`font-semibold tracking-wide text-slate-400 mt-1 ${currentSize.sub}`}>
+          <span className={`hidden sm:block font-semibold tracking-wide text-slate-400 mt-1 ${currentSize.sub}`}>
             Cambridge & Edexcel Exam Suite
           </span>
         </div>
