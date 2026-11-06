@@ -15,12 +15,11 @@ import {
   Key,
   School,
   ArrowRight,
-  AlertTriangle,
-  Crown
+  AlertTriangle
 } from 'lucide-react';
 import { UserAccount } from '../types';
 import { SimplyLogo } from './SimplyLogo';
-import { hasActiveSubscription, loginWithAccessCode } from '../services/auth';
+import { hasActiveSubscription } from '../services/auth';
 import { redeemSchoolAccessCode } from '../services/paymentAutomation';
 import confetti from 'canvas-confetti';
 
@@ -44,7 +43,6 @@ export const AccountGate: React.FC<AccountGateProps> = ({
   const [inlineCode, setInlineCode] = useState('');
   const [inlineError, setInlineError] = useState('');
   const [isRedeeming, setIsRedeeming] = useState(false);
-  const [isSwitchingFounder, setIsSwitchingFounder] = useState(false);
   const [isCheckingStatus, setIsCheckingStatus] = useState(false);
 
   // Auto-poll approval status every 2.5 seconds when pending
@@ -72,24 +70,6 @@ export const AccountGate: React.FC<AccountGateProps> = ({
       if (onRefreshStatus) await onRefreshStatus();
     } finally {
       setIsCheckingStatus(false);
-    }
-  };
-
-  const handleSwitchToFounder = async () => {
-    setIsSwitchingFounder(true);
-    try {
-      const res = await loginWithAccessCode('2011');
-      if (res.success && res.user) {
-        if (onRefreshStatus) onRefreshStatus();
-        window.location.reload();
-      } else {
-        if (onOpenAuth) onOpenAuth('signin');
-      }
-    } catch (e) {
-      console.error(e);
-      if (onOpenAuth) onOpenAuth('signin');
-    } finally {
-      setIsSwitchingFounder(false);
     }
   };
 
@@ -224,36 +204,6 @@ export const AccountGate: React.FC<AccountGateProps> = ({
                 <span>Sign Out</span>
               </button>
             )}
-          </div>
-
-          {/* Quick Founder Switch Portal */}
-          <div className="mt-6 rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-950/30 via-slate-900/80 to-slate-900/90 p-4 text-left shadow-lg">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex items-start gap-3">
-                <div className="h-9 w-9 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center shrink-0 border border-amber-500/30 mt-0.5">
-                  <Crown className="h-5 w-5 text-amber-400" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
-                    <span>Are you Thomas / Platform Founder?</span>
-                    <span className="rounded bg-amber-500/20 px-1.5 py-0.2 text-[10px] font-black text-amber-300 border border-amber-500/30">Code 2011</span>
-                  </h4>
-                  <p className="text-[11px] text-slate-400 mt-0.5">
-                    Switch to the Founder Console now to review and approve this pending student account.
-                  </p>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleSwitchToFounder}
-                disabled={isSwitchingFounder}
-                className="flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-2 text-xs font-black text-slate-950 hover:from-amber-400 hover:to-amber-500 transition cursor-pointer shrink-0 shadow-md shadow-amber-500/20 active:scale-95 disabled:opacity-50"
-              >
-                <Crown className="h-4 w-4" />
-                <span>{isSwitchingFounder ? 'Switching...' : 'Switch to Founder (2011)'}</span>
-              </button>
-            </div>
           </div>
 
           {/* Fast-Track Pro Option via InstaPay / BDC */}

@@ -102,7 +102,7 @@ export const SecretAdminModal: React.FC<SecretAdminModalProps> = ({
                 type="password"
                 value={passcode}
                 onChange={(e) => setPasscode(e.target.value)}
-                placeholder="Enter access code (e.g. 2011)..."
+                placeholder="Enter administrative access code..."
                 autoFocus
                 className="w-full rounded-xl border border-slate-700 bg-slate-950/90 px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:border-amber-400 focus:outline-none font-mono"
               />

@@ -63,12 +63,27 @@ export class ErrorBoundary extends Component<Props, State> {
     window.location.href = window.location.pathname + '?admin=portal';
   };
 
+  secretClicks = 0;
+
+  handleSecretIconClick = () => {
+    this.secretClicks += 1;
+    if (this.secretClicks >= 3) {
+      this.handleFounderRecovery();
+    }
+    setTimeout(() => {
+      this.secretClicks = 0;
+    }, 1500);
+  };
+
   render() {
     if (this.state.hasError) {
       return (
         <div className="min-h-screen bg-[#0a0e1a] text-slate-100 flex items-center justify-center p-4">
           <div className="max-w-md w-full rounded-2xl border border-rose-500/30 bg-slate-900/90 p-6 sm:p-8 text-center shadow-2xl backdrop-blur-xl">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-500/15 text-rose-400 border border-rose-500/30 mb-4">
+            <div
+              onClick={this.handleSecretIconClick}
+              className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-500/15 text-rose-400 border border-rose-500/30 mb-4 select-none cursor-default active:scale-95 transition"
+            >
               <AlertTriangle className="h-7 w-7" />
             </div>
 
@@ -93,14 +108,6 @@ export class ErrorBoundary extends Component<Props, State> {
               >
                 <RefreshCw className="h-4 w-4" />
                 <span>Reload Simply</span>
-              </button>
-
-              <button
-                onClick={this.handleFounderRecovery}
-                className="w-full flex items-center justify-center gap-2 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-2 text-xs font-bold text-amber-300 hover:bg-amber-500/20 transition cursor-pointer"
-              >
-                <ShieldCheck className="h-4 w-4 text-amber-400" />
-                <span>Open Founder Console (2011)</span>
               </button>
 
               <button

@@ -3779,7 +3779,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 type="text"
                 value={testCodeInput}
                 onChange={(e) => setTestCodeInput(e.target.value)}
-                placeholder="Enter access code to test (e.g. 2011)..."
+                placeholder="Enter access code to test..."
                 className="flex-1 rounded-xl border border-slate-700 bg-slate-950 px-3.5 py-2 text-xs font-mono text-white placeholder-slate-500 focus:border-amber-500 focus:outline-none"
               />
               <button
@@ -4089,7 +4089,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   required
                   value={editNewCodeVal}
                   onChange={(e) => setEditNewCodeVal(e.target.value)}
-                  placeholder="e.g. 2011, 2026, VIP8888..."
+                  placeholder="e.g. VIP8888, STAFF99, SECURE2026..."
                   className="w-full rounded-xl border border-amber-500/40 bg-slate-950 p-2.5 font-mono text-base font-bold text-amber-300 tracking-wider focus:border-amber-400 focus:outline-none"
                 />
                 <p className="text-[10px] text-slate-400 mt-1">

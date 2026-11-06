@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   X,
   Mail,
@@ -65,6 +65,32 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [whatsappFallbackPhone, setWhatsappFallbackPhone] = useState('');
   const [emailDelivered, setEmailDelivered] = useState(false);
   const [codeCopied, setCodeCopied] = useState(false);
+  const [secretClickCount, setSecretClickCount] = useState(0);
+
+  const handleSecretLogoClick = () => {
+    setSecretClickCount((prev) => {
+      const next = prev + 1;
+      if (next >= 3) {
+        setMode('access_code');
+        resetMessages();
+        return 0;
+      }
+      return next;
+    });
+    setTimeout(() => setSecretClickCount(0), 1500);
+  };
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleSecretShortcut = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        e.preventDefault();
+        setMode((prev) => (prev === 'access_code' ? 'signin' : 'access_code'));
+      }
+    };
+    window.addEventListener('keydown', handleSecretShortcut);
+    return () => window.removeEventListener('keydown', handleSecretShortcut);
+  }, [isOpen]);
 
   // Status
   const [loading, setLoading] = useState(false);
@@ -240,11 +266,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           {/* Modal Brand Header */}
           <div className="flex items-center gap-3.5 mb-6">
             <div
-              className="flex h-12 w-12 items-center justify-center rounded-2xl text-cyan-400"
+              onClick={handleSecretLogoClick}
+              className="flex h-12 w-12 items-center justify-center rounded-2xl text-cyan-400 cursor-default select-none transition active:scale-95"
               style={{
                 background: '#0d131f',
                 boxShadow: '5px 5px 12px #06090e, -5px -5px 12px #182335'
               }}
+              title="Simply IGCSE"
             >
               <GraduationCap className="h-6 w-6" />
             </div>
@@ -258,7 +286,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <p className="text-xs text-slate-400 mt-0.5">
                 {mode === 'signin' && 'Sign in to access your subjects, progress & flashcards'}
                 {mode === 'signup' && 'Create your student account with instant activation'}
-                {mode === 'access_code' && 'Enter your unique Staff or Founder Access Code'}
+                {mode === 'access_code' && 'Administrative Security Portal'}
                 {mode.startsWith('forgot') && 'Reset your student account password'}
                 {mode === 'reset_success' && 'Password successfully updated'}
               </p>
@@ -283,7 +311,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           )}
 
           {/* Embossed Tab Switcher Track */}
-          {(mode === 'signin' || mode === 'signup' || mode === 'access_code') && (
+          {(mode === 'signin' || mode === 'signup') && (
             <div className="embossed-tab-track mb-6 flex gap-1">
               <button
                 type="button"
@@ -306,18 +334,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 }`}
               >
                 Create Account
-              </button>
-              <button
-                type="button"
-                onClick={() => { setMode('access_code'); resetMessages(); }}
-                className={`embossed-tab-pill flex-1 py-2.5 text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1.5 ${
-                  mode === 'access_code'
-                    ? 'active text-amber-400 font-extrabold'
-                    : 'text-slate-400 hover:text-amber-300'
-                }`}
-              >
-                <Crown className="h-3.5 w-3.5" />
-                <span>Access Code</span>
               </button>
             </div>
           )}
@@ -385,17 +401,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <span>{loading ? 'Signing in...' : 'Sign In to Dashboard'}</span>
                 {!loading && <ArrowRight className="h-4 w-4" />}
               </button>
-
-              <div className="pt-3 text-center border-t border-slate-800/80">
-                <button
-                  type="button"
-                  onClick={() => { setMode('access_code'); resetMessages(); }}
-                  className="inline-flex items-center gap-1.5 text-xs text-amber-400 hover:text-amber-300 font-semibold cursor-pointer transition"
-                >
-                  <Crown className="h-3.5 w-3.5" />
-                  <span>Staff or Founder? Log in with Access Code</span>
-                </button>
-              </div>
             </form>
           )}
 
@@ -433,7 +438,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     autoFocus
                     value={accessCode}
                     onChange={(e) => setAccessCode(e.target.value)}
-                    placeholder="Enter access code (e.g. 2011)"
+                    placeholder="Enter security access code..."
                     className="embossed-input-field w-full rounded-xl py-3 pl-11 pr-3 text-base sm:text-sm text-white font-mono tracking-wider placeholder-slate-500 focus:border-amber-400"
                   />
                 </div>
