@@ -63,7 +63,7 @@ import { initPwaListener } from './services/pwaService';
 import { AppSidebar } from './components/AppSidebar';
 import { AppHeader } from './components/AppHeader';
 import { SimplyLogo } from './components/SimplyLogo';
-import { getActiveUser, setActiveUser, grantUserProSubscription, hasActiveSubscription, updateUserAccount, validateActiveSession, validateActiveSessionAsync, logoutUser, getAllUsers } from './services/auth';
+import { getActiveUser, setActiveUser, grantUserProSubscription, hasActiveSubscription, updateUserAccount, validateActiveSession, validateActiveSessionAsync, logoutUser, getAllUsers, syncUsersWithServer } from './services/auth';
 import { getAutoSchedulerConfig, runAutomatedWeeklyDispatch } from './services/whatsappService';
 import { safeSetItem } from './services/storage';
 import {
@@ -562,9 +562,12 @@ export function App() {
     if (firstSubject) setActiveSubject(firstSubject);
   };
 
-  const handleRefreshStatus = () => {
+  const handleRefreshStatus = async () => {
+    try {
+      await syncUsersWithServer();
+    } catch {}
     const user = getActiveUser();
-    setCurrentUser(user);
+    setCurrentUser(user ? { ...user } : null);
     if (user) {
       setProfile(prev => ({
         ...prev,
@@ -573,6 +576,27 @@ export function App() {
       }));
     }
   };
+
+  // Cross-tab and live sync listener for user status and approval changes
+  useEffect(() => {
+    const handleUsersUpdated = () => {
+      const freshActive = getActiveUser();
+      if (freshActive) {
+        setCurrentUser({ ...freshActive });
+        setProfile(prev => ({
+          ...prev,
+          role: freshActive.role,
+          status: freshActive.status
+        }));
+      }
+    };
+    window.addEventListener('simply_users_updated', handleUsersUpdated);
+    window.addEventListener('storage', handleUsersUpdated);
+    return () => {
+      window.removeEventListener('simply_users_updated', handleUsersUpdated);
+      window.removeEventListener('storage', handleUsersUpdated);
+    };
+  }, []);
 
   const handleLogout = () => {
     logoutUser();

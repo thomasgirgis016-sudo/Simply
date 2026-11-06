@@ -327,6 +327,8 @@ export async function loginStudent(email: string, password: string): Promise<{ s
   }
 
   // 2. Standard student account login verification
+  // First sync with server to ensure accounts created or approved on other devices are immediately retrieved!
+  await syncUsersWithServer();
   const users = getAllUsers();
   const user = users.find(u => u.email.toLowerCase() === normalizedEmail);
   if (!user) {
@@ -669,7 +671,7 @@ function getResetCodes(): Record<string, { code: string; expiresAt: number }> {
 // ================= ADMIN DASHBOARD FUNCTIONS =================
 
 // Approve account
-export function approveUser(userId: string, adminEmail?: string): boolean {
+export function approveUser(userId: string, adminEmail?: string, plan: SubscriptionPlan = 'pro'): boolean {
   const users = getAllUsers();
   const user = users.find(u => u.id === userId);
   if (!user) return false;
@@ -677,6 +679,11 @@ export function approveUser(userId: string, adminEmail?: string): boolean {
   user.status = 'approved';
   user.approvedAt = new Date().toISOString();
   user.approvedBy = adminEmail || 'Admin';
+  // Guarantee active student access when approved by founder/admin
+  if (!user.plan || user.plan === 'free') {
+    user.plan = plan;
+    user.isPro = true;
+  }
   saveAllUsers(users);
   syncUserToServer(user);
 
@@ -759,7 +766,12 @@ export function approveAllPendingUsers(adminEmail?: string): number {
       u.status = 'approved';
       u.approvedAt = new Date().toISOString();
       u.approvedBy = adminEmail || 'Admin';
+      if (!u.plan || u.plan === 'free') {
+        u.plan = 'pro';
+        u.isPro = true;
+      }
       count++;
+      syncUserToServer(u);
     }
   }
   if (count > 0) {
@@ -987,6 +999,8 @@ export function updateUserAccount(
 export function hasActiveSubscription(user: UserAccount | null): boolean {
   if (!user) return false;
   if (user.role === 'admin' || user.role === 'founder') return true;
+  // Approved students admitted by school/founder have full platform access
+  if (user.status === 'approved') return true;
   if (user.isEnrolledViaSchool) return true;
   if (user.isPro) {
     if (!user.proExpiresAt) return true;

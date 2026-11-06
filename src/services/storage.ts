@@ -13,7 +13,7 @@ const DISPOSABLE_KEYS = [
 ];
 
 export function safeSetItem(key: string, value: string): boolean {
-  if (typeof window === 'undefined' || !window.localStorage) {
+  if (typeof localStorage === 'undefined') {
     return false;
   }
   try {
@@ -55,7 +55,7 @@ export function safeSetItem(key: string, value: string): boolean {
 }
 
 export function safeGetItem(key: string): string | null {
-  if (typeof window === 'undefined' || !window.localStorage) {
+  if (typeof localStorage === 'undefined') {
     return null;
   }
   try {
@@ -67,7 +67,7 @@ export function safeGetItem(key: string): string | null {
 }
 
 export function safeRemoveItem(key: string): void {
-  if (typeof window === 'undefined' || !window.localStorage) {
+  if (typeof localStorage === 'undefined') {
     return;
   }
   try {

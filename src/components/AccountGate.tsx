@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Lock,
   Clock,
@@ -45,6 +45,35 @@ export const AccountGate: React.FC<AccountGateProps> = ({
   const [inlineError, setInlineError] = useState('');
   const [isRedeeming, setIsRedeeming] = useState(false);
   const [isSwitchingFounder, setIsSwitchingFounder] = useState(false);
+  const [isCheckingStatus, setIsCheckingStatus] = useState(false);
+
+  // Auto-poll approval status every 2.5 seconds when pending
+  useEffect(() => {
+    if (!currentUser || currentUser.status !== 'pending') return;
+
+    let isPolling = false;
+    const poll = async () => {
+      if (isPolling) return;
+      isPolling = true;
+      try {
+        if (onRefreshStatus) await onRefreshStatus();
+      } catch {} finally {
+        isPolling = false;
+      }
+    };
+
+    const interval = setInterval(poll, 2500);
+    return () => clearInterval(interval);
+  }, [currentUser?.status, onRefreshStatus]);
+
+  const handleManualCheckStatus = async () => {
+    setIsCheckingStatus(true);
+    try {
+      if (onRefreshStatus) await onRefreshStatus();
+    } finally {
+      setIsCheckingStatus(false);
+    }
+  };
 
   const handleSwitchToFounder = async () => {
     setIsSwitchingFounder(true);
@@ -177,11 +206,12 @@ export const AccountGate: React.FC<AccountGateProps> = ({
           <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
             {onRefreshStatus && (
               <button
-                onClick={onRefreshStatus}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#FF5E62] to-[#FFA63A] px-5 py-2.5 text-xs font-bold text-slate-950 shadow-md shadow-amber-500/20 hover:opacity-95 transition active:scale-95 cursor-pointer"
+                onClick={handleManualCheckStatus}
+                disabled={isCheckingStatus}
+                className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#FF5E62] to-[#FFA63A] px-5 py-2.5 text-xs font-bold text-slate-950 shadow-md shadow-amber-500/20 hover:opacity-95 transition active:scale-95 cursor-pointer disabled:opacity-50"
               >
-                <RefreshCw className="h-4 w-4" />
-                <span>Check Approval Status</span>
+                <RefreshCw className={`h-4 w-4 ${isCheckingStatus ? 'animate-spin' : ''}`} />
+                <span>{isCheckingStatus ? 'Checking Server...' : 'Check Approval Status'}</span>
               </button>
             )}
 
