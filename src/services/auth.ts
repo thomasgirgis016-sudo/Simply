@@ -125,6 +125,7 @@ export async function registerStudent(params: {
   board: ExamBoard;
   targetGrade: TargetGrade;
   selectedSubjectIds: string[];
+  parentWhatsapp?: string;
 }): Promise<{ success: boolean; user?: UserAccount; error?: string; isPendingApproval?: boolean }> {
   const users = getAllUsers();
   const normalizedEmail = params.email.trim().toLowerCase();
@@ -161,6 +162,7 @@ export async function registerStudent(params: {
     selectedSubjectIds: params.selectedSubjectIds.length > 0 
       ? params.selectedSubjectIds.slice(0, 5) 
       : ['cie-math-0580', 'cie-esl-0510', 'cie-physics-0625', 'cie-chem-0620', 'cie-bio-0610'],
+    parentWhatsapp: params.parentWhatsapp ? params.parentWhatsapp.trim() : undefined,
     role,
     status,
     plan: 'free',
@@ -929,6 +931,9 @@ export function validateActiveSession(currentUser: UserAccount | null): { valid:
  * Any other device currently using this account will be invalidated on their next heartbeat.
  */
 export async function notifyServerOfSession(user: { id: string; email: string }, sessionToken: string): Promise<void> {
+  if (typeof window === 'undefined' || !window.location || !window.location.origin) {
+    return;
+  }
   try {
     await fetch('/api/auth', {
       method: 'POST',
@@ -961,6 +966,9 @@ export async function validateActiveSessionAsync(currentUser: UserAccount | null
   }
 
   // 2. Cross-device check against server registry
+  if (typeof window === 'undefined' || !window.location || !window.location.origin) {
+    return { valid: true };
+  }
   try {
     const res = await fetch('/api/auth', {
       method: 'POST',

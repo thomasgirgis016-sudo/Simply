@@ -110,6 +110,9 @@ export function App() {
         board: active.board,
         targetGrade: active.targetGrade,
         selectedSubjectIds: active.selectedSubjectIds,
+        extraSubjectIds: active.extraSubjectIds,
+        parentWhatsapp: active.parentWhatsapp,
+        lastWeeklyReportSentAt: active.lastWeeklyReportSentAt,
         geminiApiKey: '',
         selectedModel: 'gemini-1.5-flash',
       };
@@ -502,6 +505,9 @@ export function App() {
       board: user.board,
       targetGrade: user.targetGrade,
       selectedSubjectIds: user.selectedSubjectIds,
+      extraSubjectIds: user.extraSubjectIds,
+      parentWhatsapp: user.parentWhatsapp,
+      lastWeeklyReportSentAt: user.lastWeeklyReportSentAt,
       role: user.role,
       status: user.status
     }));
@@ -569,6 +575,8 @@ export function App() {
         targetGrade: updated.targetGrade ?? currentUser.targetGrade,
         selectedSubjectIds: updated.selectedSubjectIds ?? currentUser.selectedSubjectIds,
         extraSubjectIds: updated.extraSubjectIds ?? currentUser.extraSubjectIds,
+        parentWhatsapp: updated.parentWhatsapp !== undefined ? updated.parentWhatsapp : currentUser.parentWhatsapp,
+        lastWeeklyReportSentAt: updated.lastWeeklyReportSentAt !== undefined ? updated.lastWeeklyReportSentAt : currentUser.lastWeeklyReportSentAt,
       });
       if (updatedUser) {
         setCurrentUser(updatedUser);
@@ -679,6 +687,7 @@ export function App() {
         onOpenExamHud={() => setIsExamHudOpen(true)}
         onOpenRevisionKit={() => setIsRevisionKitOpen(true)}
         onOpenPwaModal={() => setIsPwaModalOpen(true)}
+        onOpenParentReport={() => setIsParentReportOpen(true)}
         isMobileOpen={isMobileSidebarOpen}
         onCloseMobile={() => setIsMobileSidebarOpen(false)}
         designTheme={designTheme}
@@ -704,6 +713,7 @@ export function App() {
           onOpenExamHud={() => setIsExamHudOpen(true)}
           onOpenRevisionKit={() => setIsRevisionKitOpen(true)}
           onOpenPwaModal={() => setIsPwaModalOpen(true)}
+          onOpenParentReport={() => setIsParentReportOpen(true)}
           onOpenAuth={(mode) => {
             setAuthMode(mode || 'signin');
             setIsAuthOpen(true);
@@ -1185,6 +1195,7 @@ export function App() {
         onClose={() => setIsParentReportOpen(false)}
         profile={profile}
         subjects={enrolledSubjects.length > 0 ? enrolledSubjects : IGCSE_SUBJECTS}
+        onUpdateProfile={handleUpdateProfile}
       />
 
       {/* Collaborative Study Duel (Past Paper Sprint) Modal */}

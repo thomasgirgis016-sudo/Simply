@@ -20,6 +20,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const [board, setBoard] = useState<ExamBoard>(profile.board);
   const [grade, setGrade] = useState<GradeLevel>(profile.grade);
   const [targetGrade, setTargetGrade] = useState<TargetGrade>(profile.targetGrade);
+  const [parentWhatsapp, setParentWhatsapp] = useState(profile.parentWhatsapp || '');
 
   // Base enrolled subjects are locked permanently after signup (max 5)
   const baseSubjectIds = useMemo(() => {
@@ -79,6 +80,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
       targetGrade,
       selectedSubjectIds: baseSubjectIds,
       extraSubjectIds,
+      parentWhatsapp: parentWhatsapp.trim() || undefined,
     });
     onClose();
   };
@@ -110,20 +112,40 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
         </div>
 
         <div className="space-y-6">
-          {/* Student Name */}
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-              Your Name / Nickname
-            </label>
-            <div className="relative">
-              <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. Thomas"
-                className="w-full rounded-xl border border-slate-700 bg-slate-950/80 py-2.5 pl-10 pr-3 text-base sm:text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
-              />
+          {/* Student Name & Parent WhatsApp */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+                Your Name / Nickname
+              </label>
+              <div className="relative">
+                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g. Thomas"
+                  className="w-full rounded-xl border border-slate-700 bg-slate-950/80 py-2.5 pl-10 pr-3 text-base sm:text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5 flex items-center justify-between">
+                <span>Parent's WhatsApp</span>
+                <span className="text-[10px] text-emerald-400 font-semibold">Weekly Report</span>
+              </label>
+              <div className="relative">
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm leading-none">📱</span>
+                <input
+                  type="tel"
+                  value={parentWhatsapp}
+                  onChange={(e) => setParentWhatsapp(e.target.value)}
+                  placeholder="e.g. +20 100 123 4567"
+                  className="w-full rounded-xl border border-slate-700 bg-slate-950/80 py-2.5 pl-10 pr-3 text-base sm:text-sm text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none"
+                />
+              </div>
+              <p className="text-[10px] text-slate-400 mt-1">Automatic weekly report sent to this number</p>
             </div>
           </div>
 

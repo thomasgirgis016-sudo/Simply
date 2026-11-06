@@ -33,6 +33,8 @@ export interface UserAccount {
   targetGrade: TargetGrade;
   selectedSubjectIds: string[]; // Base enrolled subjects (max 5)
   extraSubjectIds?: string[]; // Additional enrolled subjects (+£28/mo each)
+  parentWhatsapp?: string; // Parent WhatsApp phone number with country code for weekly automated reports
+  lastWeeklyReportSentAt?: string; // Timestamp of latest weekly progress dispatch
   role?: UserRole;
   title?: string;
   status?: AccountStatus;
@@ -80,6 +82,8 @@ export interface UserProfile {
   targetGrade: TargetGrade;
   selectedSubjectIds: string[]; // max 5 base subjects
   extraSubjectIds?: string[]; // additional subjects (+£28/mo each)
+  parentWhatsapp?: string; // Parent WhatsApp phone number with country code for weekly automated reports
+  lastWeeklyReportSentAt?: string; // Timestamp of latest weekly progress dispatch
   role?: UserRole;
   status?: AccountStatus;
   plan?: SubscriptionPlan;

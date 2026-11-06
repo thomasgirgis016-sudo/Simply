@@ -54,6 +54,7 @@ import {
   isSameMeaningAnswer,
   getP2McqOptions
 } from '../lib/grading/semanticGrader';
+import { addMistakeItem } from '../services/mistakeNotebook';
 
 interface PrintableClassifiedsGeneratorProps {
   subject: Subject;
@@ -339,6 +340,35 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
       const candidate = explicitAnswer !== undefined ? explicitAnswer : (current.userAnswer?.trim() || current.working?.trim() || '');
       const match = isSameMeaningAnswer(candidate, finalAnswer, markScheme, isP4);
       const isCorrect = match.isMatch;
+
+      // Auto-log to Mistake Notebook if answered incorrectly with an actual attempt
+      if (!isCorrect && candidate.trim() !== '') {
+        try {
+          const [qId, sIdxStr] = key.split('-');
+          const sIdx = parseInt(sIdxStr, 10);
+          const question = finalQuestions.find(q => q.id === qId);
+          if (question) {
+            const subPart = question.subParts[sIdx] || question.subParts[0];
+            addMistakeItem({
+              subjectId: config.subject.id,
+              subjectCode: config.subject.code,
+              topic: activeChapter.title,
+              paperCode: question.source || `${config.subject.code} Classifieds (${question.season} ${question.year})`,
+              questionNumber: `Q${question.questionNumber}${subPart?.part ? ` ${subPart.part}` : ''}`,
+              questionPrompt: (subPart?.prompt || question.prompt || 'Classified Question').slice(0, 300),
+              myMistakeAnswer: candidate,
+              markSchemeAnswer: finalAnswer,
+              examinerTip: match.reason || 'Check mark scheme keywords and command word precision.',
+              reason: isP4 ? 'misread_command' : 'concept_gap',
+              marksLost: maxMarks,
+              totalMarks: maxMarks
+            });
+          }
+        } catch (e) {
+          console.warn('Failed to auto-log mistake:', e);
+        }
+      }
+
       return {
         ...prev,
         [key]: {
@@ -1148,6 +1178,13 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                                 {state.matchReason && (
                                   <div className="text-[11px] text-slate-300 font-sans">
                                     ℹ️ {state.matchReason}
+                                  </div>
+                                )}
+                                {!state.isCorrect && (
+                                  <div className="pt-1">
+                                    <span className="text-[10px] font-semibold text-rose-300 bg-rose-500/20 border border-rose-500/40 px-2 py-0.5 rounded-full inline-flex items-center gap-1">
+                                      🔖 Auto-logged to Mistake Notebook (?tab=mistakes)
+                                    </span>
                                   </div>
                                 )}
                               </div>

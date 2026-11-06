@@ -34,6 +34,7 @@ interface AppHeaderProps {
   onOpenExamHud?: () => void;
   onOpenRevisionKit?: () => void;
   onOpenPwaModal?: () => void;
+  onOpenParentReport?: () => void;
   onOpenAuth: (mode?: 'signin' | 'signup') => void;
   designTheme?: 'liquid' | 'executive';
   onToggleDesignTheme?: () => void;
@@ -54,12 +55,23 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   onOpenExamHud,
   onOpenRevisionKit,
   onOpenPwaModal,
+  onOpenParentReport,
   onOpenAuth,
   designTheme = 'liquid',
   onToggleDesignTheme,
 }) => {
   const streak = getDailyStreak();
   const isSubscribed = Boolean(currentUser && hasActiveSubscription(currentUser));
+
+  const isWeeklyReportDue = React.useMemo(() => {
+    if (!profile.lastWeeklyReportSentAt) return true;
+    try {
+      const sentTime = new Date(profile.lastWeeklyReportSentAt).getTime();
+      return Date.now() - sentTime >= 7 * 24 * 60 * 60 * 1000;
+    } catch {
+      return true;
+    }
+  }, [profile.lastWeeklyReportSentAt]);
 
   const getPageTitle = (tab: ActiveTab) => {
     switch (tab) {
@@ -158,6 +170,28 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             <Flame className="h-3.5 w-3.5 text-amber-400 fill-amber-400 animate-pulse" />
             <span className="font-mono text-xs">{streak.currentStreak}d</span>
           </div>
+
+          {/* Parent Weekly WhatsApp Report Button */}
+          {onOpenParentReport && (
+            <button
+              onClick={onOpenParentReport}
+              className={`flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-xs font-semibold border transition cursor-pointer ${
+                isWeeklyReportDue
+                  ? 'border-emerald-500/50 bg-emerald-500/20 text-emerald-300 shadow-sm shadow-emerald-500/10'
+                  : 'border-slate-800 bg-slate-900/90 text-slate-400 hover:text-white hover:border-slate-700'
+              }`}
+              title={
+                isWeeklyReportDue
+                  ? 'Weekly Parent WhatsApp Report is ready to send!'
+                  : 'Send Weekly Progress Report to Parent via WhatsApp'
+              }
+            >
+              <span className="text-xs">📱</span>
+              <span className="hidden sm:inline font-bold">
+                {isWeeklyReportDue ? 'Parent Report Due' : 'Parent Report'}
+              </span>
+            </button>
+          )}
 
           {/* Pro Upgrade / Status Pill */}
           {onOpenPayment && (

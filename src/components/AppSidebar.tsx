@@ -74,6 +74,7 @@ interface AppSidebarProps {
   onOpenExamHud?: () => void;
   onOpenRevisionKit?: () => void;
   onOpenPwaModal?: () => void;
+  onOpenParentReport?: () => void;
   isMobileOpen: boolean;
   onCloseMobile: () => void;
   designTheme?: 'liquid' | 'executive';
@@ -99,12 +100,23 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   onOpenExamHud,
   onOpenRevisionKit,
   onOpenPwaModal,
+  onOpenParentReport,
   isMobileOpen,
   onCloseMobile,
   designTheme = 'liquid',
   onToggleDesignTheme,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const isWeeklyReportDue = React.useMemo(() => {
+    if (!profile.lastWeeklyReportSentAt) return true;
+    try {
+      const sentTime = new Date(profile.lastWeeklyReportSentAt).getTime();
+      return Date.now() - sentTime >= 7 * 24 * 60 * 60 * 1000;
+    } catch {
+      return true;
+    }
+  }, [profile.lastWeeklyReportSentAt]);
 
   const navGroups = [
     {
@@ -373,6 +385,34 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
               >
                 <Calculator className="h-4 w-4 text-amber-400 shrink-0" />
                 {!isCollapsed && <span>Scientific Calculator</span>}
+              </button>
+            )}
+
+            {/* Parent Weekly WhatsApp Report Button */}
+            {onOpenParentReport && (
+              <button
+                onClick={() => {
+                  onOpenParentReport();
+                  onCloseMobile();
+                }}
+                className={`w-full flex items-center justify-between rounded-xl border px-2.5 py-1.5 text-xs font-semibold transition cursor-pointer ${
+                  isWeeklyReportDue
+                    ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25 shadow-sm'
+                    : 'border-slate-800 bg-slate-900/70 hover:bg-slate-900 text-slate-300'
+                }`}
+                title="Send Weekly Progress Report to Parent via WhatsApp"
+              >
+                <div className="flex items-center gap-2.5 truncate">
+                  <span className="text-emerald-400 shrink-0 text-sm">📱</span>
+                  {!isCollapsed && <span className="truncate">Parent WhatsApp Report</span>}
+                </div>
+                {!isCollapsed && (
+                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0 ${
+                    isWeeklyReportDue ? 'bg-emerald-500/25 text-emerald-300' : 'bg-slate-800 text-slate-400'
+                  }`}>
+                    {isWeeklyReportDue ? 'Due' : 'Sent'}
+                  </span>
+                )}
               </button>
             )}
 

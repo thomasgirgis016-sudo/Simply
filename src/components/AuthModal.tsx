@@ -13,7 +13,9 @@ import {
   ShieldCheck,
   Crown,
   Eye,
-  EyeOff
+  EyeOff,
+  Phone,
+  MessageCircle
 } from 'lucide-react';
 import { UserAccount, GradeLevel, ExamBoard, TargetGrade, MAX_STUDENT_SUBJECTS } from '../types';
 import { registerStudent, loginStudent, loginWithAccessCode, requestPasswordReset, completePasswordReset } from '../services/auth';
@@ -50,6 +52,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     'cie-chem-0620',
     'cie-bio-0610'
   ]);
+  const [parentCountryCode, setParentCountryCode] = useState('+20');
+  const [parentPhone, setParentPhone] = useState('');
 
   // Forgot password flow state
   const [resetCode, setResetCode] = useState('');
@@ -109,6 +113,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     resetMessages();
     setLoading(true);
 
+    const formattedParentWhatsapp = parentPhone.trim()
+      ? `${parentCountryCode}${parentPhone.trim().replace(/^0+/, '')}`
+      : undefined;
+
     try {
       const res = await registerStudent({
         name,
@@ -117,7 +125,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         grade,
         board,
         targetGrade,
-        selectedSubjectIds: selectedSubjects
+        selectedSubjectIds: selectedSubjects,
+        parentWhatsapp: formattedParentWhatsapp
       });
 
       if (res.success && res.user) {
@@ -563,6 +572,49 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <option value="Year 12 / Grade 11 (AS Level)">Year 12 / Grade 11 (AS Level)</option>
                   <option value="Year 13 / Grade 12 (A Level)">Year 13 / Grade 12 (A Level)</option>
                 </select>
+              </div>
+
+              {/* Parent's WhatsApp Phone Number (Weekly automated progress reporting) */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5 ml-1">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                    <MessageCircle className="h-3.5 w-3.5 text-emerald-400" />
+                    <span>Parent's WhatsApp Number</span>
+                  </label>
+                  <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                    Weekly Report
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <select
+                    value={parentCountryCode}
+                    onChange={(e) => setParentCountryCode(e.target.value)}
+                    className="embossed-input-field rounded-xl py-2.5 px-2.5 text-xs text-white w-28 shrink-0 font-mono"
+                  >
+                    <option value="+20">🇪🇬 +20 (Egypt)</option>
+                    <option value="+966">🇸🇦 +966 (KSA)</option>
+                    <option value="+971">🇦🇪 +971 (UAE)</option>
+                    <option value="+965">🇰🇼 +965 (Kuwait)</option>
+                    <option value="+974">🇶🇦 +974 (Qatar)</option>
+                    <option value="+968">🇴🇲 +968 (Oman)</option>
+                    <option value="+962">🇯🇴 +962 (Jordan)</option>
+                    <option value="+44">🇬🇧 +44 (UK)</option>
+                    <option value="+1">🇺🇸 +1 (US)</option>
+                  </select>
+                  <div className="relative flex-1">
+                    <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                    <input
+                      type="tel"
+                      value={parentPhone}
+                      onChange={(e) => setParentPhone(e.target.value)}
+                      placeholder="101 234 5678"
+                      className="embossed-input-field w-full rounded-xl py-2.5 pl-10 pr-3 text-sm text-white placeholder-slate-500 font-mono"
+                    />
+                  </div>
+                </div>
+                <p className="text-[11px] text-slate-400 mt-1 ml-1">
+                  Each week, an automated Cambridge progress breakdown & streak report is sent to this number.
+                </p>
               </div>
 
               {/* Quick Subjects Check */}
