@@ -3213,6 +3213,13 @@ export function generate40McqQuestions(pdf: OfficialPaperPdf): PastPaperItem[] {
       `[C] ${optionC}\n` +
       `[D] ${optionD}`;
 
+    const mcqOptions: Array<{ letter: 'A' | 'B' | 'C' | 'D'; label: string }> = [
+      { letter: 'A', label: optionA },
+      { letter: 'B', label: optionB },
+      { letter: 'C', label: optionC },
+      { letter: 'D', label: optionD }
+    ];
+
     items.push({
       id: `pp-${pdf.id}-q${q}`,
       subjectId: pdf.subjectId,
@@ -3226,11 +3233,13 @@ export function generate40McqQuestions(pdf: OfficialPaperPdf): PastPaperItem[] {
       topic,
       difficultyTier: pdf.tier === 'Core' ? 'Core' : 'Standard Extended',
       componentType: 'MCQ',
+      options: mcqOptions,
       subParts: [
         {
           part: '(a)',
           marks: 1,
           prompt,
+          options: mcqOptions,
           markScheme: [{ markType: '[B1]', requirement: `Correct Answer: Option [${correct}] - ${explanation}` }],
           finalAnswer: `Option ${correct}`
         }

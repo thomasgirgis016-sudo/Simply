@@ -21,6 +21,7 @@ export type SubscriptionPlan = 'free' | 'plus' | 'pro' | 'class' | 'school';
 export type BillingCycle = 'monthly' | 'annual';
 
 export const MAX_STUDENT_SUBJECTS = 5;
+export const EXTRA_SUBJECT_PRICE_GBP = 28; // £28 per month per additional enrolled subject
 
 export interface UserAccount {
   id: string;
@@ -30,7 +31,8 @@ export interface UserAccount {
   grade: GradeLevel;
   board: ExamBoard;
   targetGrade: TargetGrade;
-  selectedSubjectIds: string[]; // max 5 subjects
+  selectedSubjectIds: string[]; // Base enrolled subjects (max 5)
+  extraSubjectIds?: string[]; // Additional enrolled subjects (+£28/mo each)
   role?: UserRole;
   title?: string;
   status?: AccountStatus;
@@ -76,7 +78,8 @@ export interface UserProfile {
   grade: GradeLevel;
   board: ExamBoard;
   targetGrade: TargetGrade;
-  selectedSubjectIds: string[]; // max 5 subjects
+  selectedSubjectIds: string[]; // max 5 base subjects
+  extraSubjectIds?: string[]; // additional subjects (+£28/mo each)
   role?: UserRole;
   status?: AccountStatus;
   plan?: SubscriptionPlan;
@@ -297,6 +300,7 @@ export interface PastPaperSubPart {
   marks: number;
   prompt: string;
   diagramOrMath?: string;
+  options?: Array<{ letter: 'A' | 'B' | 'C' | 'D'; label: string }>;
   markScheme: {
     markType: string; // e.g. "[M1]", "[A1]", "[B1]"
     requirement: string;
@@ -325,6 +329,7 @@ export interface PastPaperItem {
   diagramOrMath?: string;
   marks: number;
   componentType?: 'MCQ' | 'Theory' | 'Alternative to Practical' | 'Coursework';
+  options?: Array<{ letter: 'A' | 'B' | 'C' | 'D'; label: string }>;
   subParts?: PastPaperSubPart[];
   markScheme: {
     markType: string;

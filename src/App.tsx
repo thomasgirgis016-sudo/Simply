@@ -553,12 +553,27 @@ export function App() {
   const handleUpdateProfile = (updated: Partial<UserProfile>) => {
     setProfile(prev => {
       const next = { ...prev, ...updated };
-      if (next.selectedSubjectIds.length > 0 && !next.selectedSubjectIds.includes(activeSubject.id)) {
-        const first = IGCSE_SUBJECTS.find(s => next.selectedSubjectIds.includes(s.id));
+      const allEnrolled = [...(next.selectedSubjectIds || []), ...(next.extraSubjectIds || [])];
+      if (allEnrolled.length > 0 && !allEnrolled.includes(activeSubject.id)) {
+        const first = IGCSE_SUBJECTS.find(s => allEnrolled.includes(s.id));
         if (first) setActiveSubject(first);
       }
       return next;
     });
+
+    if (currentUser) {
+      const updatedUser = updateUserAccount(currentUser.id, {
+        name: updated.name ?? currentUser.name,
+        grade: updated.grade ?? currentUser.grade,
+        board: updated.board ?? currentUser.board,
+        targetGrade: updated.targetGrade ?? currentUser.targetGrade,
+        selectedSubjectIds: updated.selectedSubjectIds ?? currentUser.selectedSubjectIds,
+        extraSubjectIds: updated.extraSubjectIds ?? currentUser.extraSubjectIds,
+      });
+      if (updatedUser) {
+        setCurrentUser(updatedUser);
+      }
+    }
   };
 
   const handleAddFlashcards = (newCards: Flashcard[]) => {
@@ -858,6 +873,7 @@ export function App() {
               <PrintableClassifiedsGenerator
                 subject={activeSubject}
                 profile={profile}
+                currentUser={currentUser}
               />
             )}
 

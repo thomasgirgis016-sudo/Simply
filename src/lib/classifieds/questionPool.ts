@@ -14,12 +14,14 @@ import { PAST_PAPERS_DATABASE, OFFICIAL_PAST_PAPER_PDFS, generateQuestionsForPap
 import { OfficialPaperPdf, PastPaperItem } from '../../types';
 import { getTaxonomyForSubject, ChapterTaxonomy } from './taxonomy';
 import { classifiedQuestionsStore } from './classifiedStore';
+import { McqOption } from '../grading/semanticGrader';
 
 export interface ClassifiedSubPart {
   part: string;             // e.g. "(a)", "(b)(i)", "(c)"
   prompt: string;           // Subpart question prompt
   marks: number;            // Mark allocation e.g. 2
   diagramOrMath?: string;   // KaTeX equation or diagram
+  options?: McqOption[];    // P2 Multiple Choice Options (A, B, C, D)
   markScheme: Array<{
     markType: string;       // "[M1]", "[A1]", "[B1]", "[B2]", "[SC1]"
     requirement: string;    // Official Cambridge MS criteria
@@ -43,6 +45,7 @@ export interface ClassifiedQuestion {
   questionNumber: string;   // e.g. "1", "2"
   prompt: string;           // Overall question context
   diagramOrMath?: string;
+  options?: McqOption[];    // P2 Multiple Choice Options (A, B, C, D)
   subParts: ClassifiedSubPart[];
   totalMarks: number;
   examinerReportNotes: string[];
@@ -2639,6 +2642,7 @@ export function convertPastPaperItemToClassifiedQuestion(
         prompt: sp.prompt || '',
         marks: sp.marks || 1,
         diagramOrMath: sp.diagramOrMath,
+        options: (sp as any).options || (pp as any).options,
         markScheme: (sp.markScheme || []).map(ms => ({
           markType: ms.markType.startsWith('[') ? ms.markType : `[${ms.markType}]`,
           requirement: ms.requirement || '',
@@ -2651,6 +2655,7 @@ export function convertPastPaperItemToClassifiedQuestion(
         prompt: pp.questionPrompt || 'Calculate the required value.',
         marks: pp.marks || 1,
         diagramOrMath: pp.diagramOrMath,
+        options: (pp as any).options,
         markScheme: (pp.markScheme && pp.markScheme.length > 0)
           ? pp.markScheme.map(ms => ({
               markType: ms.markType.startsWith('[') ? ms.markType : `[${ms.markType}]`,
@@ -2686,6 +2691,7 @@ export function convertPastPaperItemToClassifiedQuestion(
     questionNumber: qNum,
     prompt: pp.questionPrompt || subParts[0].prompt,
     diagramOrMath: pp.diagramOrMath,
+    options: (pp as any).options,
     subParts,
     totalMarks: totalMarks > 0 ? totalMarks : (pp.marks || 4),
     examinerReportNotes: subParts.map(sp => sp.markScheme[0]?.guidance).filter(Boolean) as string[]

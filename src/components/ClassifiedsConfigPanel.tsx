@@ -17,9 +17,11 @@ import {
   Printer,
   HelpCircle,
   Clock,
-  Eye
+  Eye,
+  CheckSquare,
+  Square
 } from 'lucide-react';
-import { Subject } from '../types';
+import { Subject, UserAccount, UserProfile } from '../types';
 import { IGCSE_SUBJECTS } from '../data/subjects';
 import { getTaxonomyForSubject, ChapterTaxonomy } from '../lib/classifieds/taxonomy';
 import { ClassifiedQuestion } from '../lib/classifieds/questionPool';
@@ -30,6 +32,7 @@ export type WorkingSpaceStyle = 'dotted' | 'solid' | 'grid' | 'blank';
 export interface ClassifiedsConfig {
   subject: Subject;
   selectedChapterId: string;
+  selectedChapterIds: string[]; // Supports selecting multiple topics/chapters
   selectedSubtopics: string[];
   selectedYears: number[];
   selectedSeasons: ('May/June' | 'Oct/Nov' | 'Feb/March')[];
@@ -50,6 +53,8 @@ interface ClassifiedsConfigPanelProps {
   isOpen: boolean;
   onClose: () => void;
   onTriggerPrint: () => void;
+  currentUser?: UserAccount | null;
+  profile?: UserProfile;
 }
 
 export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
@@ -60,12 +65,53 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
   isOpen,
   onClose,
   onTriggerPrint,
+  currentUser,
+  profile,
 }) => {
   const [activeStep, setActiveStep] = useState<1 | 2 | 3 | 4>(1);
+
+  // Check if current user has administrator / founder privileges
+  const isAdmin = Boolean(
+    currentUser &&
+    (currentUser.role === 'admin' ||
+      currentUser.role === 'founder' ||
+      currentUser.title?.toLowerCase().includes('founder') ||
+      currentUser.title?.toLowerCase().includes('admin') ||
+      currentUser.email === 'admin@simplyigcse.com')
+  );
+
+  // Determine student's enrolled subject IDs (base 5 subjects + any extra purchased ones)
+  const studentEnrolledSubjectIds = useMemo(() => {
+    const list = currentUser?.selectedSubjectIds || profile?.selectedSubjectIds || [];
+    const extras = currentUser?.extraSubjectIds || profile?.extraSubjectIds || [];
+    return Array.from(new Set([...list, ...extras]));
+  }, [currentUser, profile]);
+
+  // Strictly filter subjects: Admin accounts get all 39 subjects, students only get their chosen enrolled subjects
+  const selectableSubjects = useMemo(() => {
+    if (isAdmin) {
+      return IGCSE_SUBJECTS;
+    }
+    if (studentEnrolledSubjectIds.length > 0) {
+      const filtered = IGCSE_SUBJECTS.filter(s => studentEnrolledSubjectIds.includes(s.id));
+      if (filtered.length > 0) return filtered;
+    }
+    // Fallback: If no enrolled subjects yet, include current subject and up to 5 subjects
+    const fallback = IGCSE_SUBJECTS.filter(s => s.id === config.subject.id);
+    const others = IGCSE_SUBJECTS.filter(s => s.id !== config.subject.id).slice(0, 4);
+    return [...fallback, ...others];
+  }, [isAdmin, studentEnrolledSubjectIds, config.subject]);
 
   const chapters: ChapterTaxonomy[] = useMemo(() => {
     return getTaxonomyForSubject(config.subject.code || config.subject.id);
   }, [config.subject]);
+
+  const activeSelectedChapterIds = useMemo(() => {
+    if (config.selectedChapterIds && config.selectedChapterIds.length > 0) {
+      return config.selectedChapterIds;
+    }
+    return [config.selectedChapterId || chapters[0]?.id || '0580-01'];
+  }, [config.selectedChapterIds, config.selectedChapterId, chapters]);
 
   const activeChapter: ChapterTaxonomy = useMemo(() => {
     return chapters.find(c => c.id === config.selectedChapterId) || chapters[0] || {
@@ -209,56 +255,135 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
             {activeStep === 1 && (
               <div className="space-y-6">
                 <div>
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2">
-                    1. Cambridge IGCSE Syllabus Subject
-                  </label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                      1. Syllabus Subject
+                    </label>
+                    {isAdmin ? (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                        👑 Admin: All 39 Syllabuses
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                        📚 {selectableSubjects.length} Enrolled Subjects
+                      </span>
+                    )}
+                  </div>
                   <select
                     value={config.subject.id}
                     onChange={(e) => {
-                      const found = IGCSE_SUBJECTS.find(s => s.id === e.target.value);
+                      const found = selectableSubjects.find(s => s.id === e.target.value) || IGCSE_SUBJECTS.find(s => s.id === e.target.value);
                       if (found) {
                         const newTax = getTaxonomyForSubject(found.code || found.id);
+                        const firstChId = newTax[0]?.id || '0580-01';
                         onChangeConfig(prev => ({
                           ...prev,
                           subject: found,
-                          selectedChapterId: newTax[0]?.id || '0580-01',
+                          selectedChapterId: firstChId,
+                          selectedChapterIds: [firstChId],
                           selectedSubtopics: []
                         }));
                       }
                     }}
                     className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-white focus:outline-none focus:border-indigo-500"
                   >
-                    {IGCSE_SUBJECTS.map(s => (
+                    {selectableSubjects.map(s => (
                       <option key={s.id} value={s.id}>
                         {s.code} • {s.name} ({s.board})
                       </option>
                     ))}
                   </select>
+                  {!isAdmin && (
+                    <p className="text-[11px] text-slate-400 mt-1.5">
+                      Showing your chosen subjects. Additional subjects can be enrolled from Profile for +£28/mo.
+                    </p>
+                  )}
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2">
-                    2. Syllabus Chapter ({chapters.length} Official Units)
-                  </label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                      2. Syllabus Topics ({activeSelectedChapterIds.length} of {chapters.length} Selected)
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const allIds = chapters.map(c => c.id);
+                          onChangeConfig(prev => ({
+                            ...prev,
+                            selectedChapterIds: allIds,
+                            selectedChapterId: allIds[0] || prev.selectedChapterId,
+                            selectedSubtopics: []
+                          }));
+                        }}
+                        className="text-[11px] font-bold text-indigo-400 hover:text-indigo-300 transition cursor-pointer"
+                      >
+                        Select All
+                      </button>
+                      <span className="text-slate-600">•</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const firstId = chapters[0]?.id || '0580-01';
+                          onChangeConfig(prev => ({
+                            ...prev,
+                            selectedChapterIds: [firstId],
+                            selectedChapterId: firstId,
+                            selectedSubtopics: []
+                          }));
+                        }}
+                        className="text-[11px] font-bold text-slate-400 hover:text-slate-300 transition cursor-pointer"
+                      >
+                        Reset to 1
+                      </button>
+                    </div>
+                  </div>
+
+                  <p className="text-[11px] text-slate-400 mb-2">
+                    Select one or more topics to compile into your classified past paper revision booklet:
+                  </p>
+
                   <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
                     {chapters.map((ch) => {
-                      const isSelected = ch.id === config.selectedChapterId;
+                      const isSelected = activeSelectedChapterIds.includes(ch.id);
                       return (
                         <div
                           key={ch.id}
                           onClick={() => {
-                            onChangeConfig(prev => ({
-                              ...prev,
-                              selectedChapterId: ch.id,
-                              selectedSubtopics: []
-                            }));
+                            onChangeConfig(prev => {
+                              const curr = prev.selectedChapterIds && prev.selectedChapterIds.length > 0
+                                ? prev.selectedChapterIds
+                                : [prev.selectedChapterId];
+                              const exists = curr.includes(ch.id);
+                              let next: string[];
+                              if (exists) {
+                                if (curr.length === 1) return prev; // Keep at least one
+                                next = curr.filter(id => id !== ch.id);
+                              } else {
+                                next = [...curr, ch.id];
+                              }
+                              return {
+                                ...prev,
+                                selectedChapterIds: next,
+                                selectedChapterId: next[0] || ch.id,
+                                selectedSubtopics: []
+                              };
+                            });
                           }}
-                          className={`p-3 rounded-xl border text-left cursor-pointer transition flex items-start gap-3 ${
+                          className={`p-3 rounded-xl border text-left cursor-pointer transition flex items-start gap-3 select-none ${
                             isSelected
-                              ? 'bg-indigo-600/15 border-indigo-500/60 text-white'
+                              ? 'bg-indigo-600/15 border-indigo-500/60 text-white ring-1 ring-indigo-500/40'
                               : 'bg-slate-950/60 border-slate-800 text-slate-300 hover:border-slate-700'
                           }`}
                         >
+                          <div className="shrink-0 mt-0.5 text-indigo-400">
+                            {isSelected ? (
+                              <CheckSquare className="h-4 w-4 text-indigo-400" />
+                            ) : (
+                              <Square className="h-4 w-4 text-slate-600" />
+                            )}
+                          </div>
                           <span className={`text-[11px] font-mono font-bold px-2 py-0.5 rounded ${
                             isSelected ? 'bg-indigo-500 text-white' : 'bg-slate-800 text-slate-400'
                           }`}>
@@ -270,20 +395,23 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                               {ch.subtopics.slice(0, 3).join(', ')}...
                             </p>
                           </div>
-                          {isSelected && <CheckCircle2 className="h-4 w-4 text-indigo-400 shrink-0 mt-0.5" />}
                         </div>
                       );
                     })}
                   </div>
                 </div>
 
-                {activeChapter.subtopics.length > 0 && (
+                {chapters.some(c => activeSelectedChapterIds.includes(c.id) && c.subtopics.length > 0) && (
                   <div>
                     <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2">
                       3. Sub-Topic Refinement (Optional)
                     </label>
                     <div className="flex flex-wrap gap-2">
-                      {activeChapter.subtopics.map(sub => {
+                      {Array.from(new Set(
+                        chapters
+                          .filter(c => activeSelectedChapterIds.includes(c.id))
+                          .flatMap(c => c.subtopics)
+                      )).map(sub => {
                         const isSubActive = config.selectedSubtopics.includes(sub);
                         return (
                           <button

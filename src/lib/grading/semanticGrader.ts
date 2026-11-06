@@ -255,6 +255,42 @@ export function isSameMeaningAnswer(
     return { isMatch: false, reason: 'Empty student response.' };
   }
 
+  // 0. High-Priority Cambridge Paper 2 MCQ Option Matching (e.g. "B" vs "Option B" or "Option [B]")
+  const extractMcqLetter = (str: string): string | null => {
+    if (!str) return null;
+    const trimmed = str.trim();
+    if (/^[A-D]$/i.test(trimmed)) return trimmed.toUpperCase();
+    const m = trimmed.match(/^(?:Option\s*)?\[?\(?([A-D])\]?\)?(?:\.|\:|\s*[-–]\s*|\s|$)/i);
+    if (m) return m[1].toUpperCase();
+    const m2 = trimmed.match(/\bOption\s*\[?([A-D])\]?/i);
+    if (m2) return m2[1].toUpperCase();
+    return null;
+  };
+
+  const sLetter = extractMcqLetter(studentAnswer);
+  const oLetter = extractMcqLetter(officialAnswer);
+
+  if (sLetter && oLetter) {
+    if (sLetter === oLetter) {
+      return { isMatch: true, reason: `Correct MCQ Option [${sLetter}] selected.` };
+    } else {
+      return { isMatch: false, reason: `Selected Option [${sLetter}], but official mark scheme specifies Option [${oLetter}].` };
+    }
+  }
+
+  if (sLetter && markSchemeRequirements && markSchemeRequirements.length > 0) {
+    for (const req of markSchemeRequirements) {
+      const reqLetter = extractMcqLetter(req.requirement);
+      if (reqLetter) {
+        if (sLetter === reqLetter) {
+          return { isMatch: true, reason: `Correct: Option [${sLetter}] satisfies mark scheme requirement.` };
+        } else {
+          return { isMatch: false, reason: `Selected Option [${sLetter}], but mark scheme requires Option [${reqLetter}].` };
+        }
+      }
+    }
+  }
+
   const sNorm = normalizeCleanText(studentAnswer);
   const oNorm = normalizeCleanText(officialAnswer);
 
@@ -338,39 +374,94 @@ export function getP2McqOptions(
     questionPrompt?: string;
     paperCode?: string;
     source?: string;
+    options?: McqOption[];
   },
   subPart: {
     finalAnswer: string;
     prompt?: string;
     questionPrompt?: string;
+    options?: McqOption[];
+    markScheme?: Array<{ requirement: string }>;
   }
 ): McqOption[] {
-  const ansClean = subPart.finalAnswer.trim();
-
-  // If the answer is already a single letter A, B, C, or D:
-  if (/^[A-D]$/i.test(ansClean)) {
-    const letters: Array<'A' | 'B' | 'C' | 'D'> = ['A', 'B', 'C', 'D'];
-    return letters.map(letter => ({
-      letter,
-      label: `Option ${letter}`
-    }));
+  // 1. Direct options array if available on subpart or question
+  if (subPart.options && subPart.options.length === 4) {
+    return subPart.options;
+  }
+  if (question.options && question.options.length === 4) {
+    return question.options;
   }
 
-  // If prompt has options formatted like "A 1200 N \n B 2400 N \n C 3600 N \n D 4800 N"
-  const prompt = `${question.prompt || question.questionPrompt || ''} ${subPart.prompt || subPart.questionPrompt || ''}`;
-  const mcqMatch = prompt.match(/\bA[:\.\s]+([^\n\r]+)[\s\S]*?\bB[:\.\s]+([^\n\r]+)[\s\S]*?\bC[:\.\s]+([^\n\r]+)[\s\S]*?\bD[:\.\s]+([^\n\r]+)/i);
+  const ansClean = subPart.finalAnswer.trim();
+  const fullText = `${question.prompt || ''}\n${question.questionPrompt || ''}\n${subPart.prompt || ''}\n${subPart.questionPrompt || ''}`;
 
-  if (mcqMatch) {
+  // 2. Comprehensive bracketed extraction: [A] ... [B] ... [C] ... [D] ...
+  const bracketMatch = fullText.match(/\[A\]\s*([^\[\]\n\r]+)[\s\S]*?\[B\]\s*([^\[\]\n\r]+)[\s\S]*?\[C\]\s*([^\[\]\n\r]+)[\s\S]*?\[D\]\s*([^\[\]\n\r]+)/i);
+  if (bracketMatch) {
     return [
-      { letter: 'A', label: mcqMatch[1].trim() },
-      { letter: 'B', label: mcqMatch[2].trim() },
-      { letter: 'C', label: mcqMatch[3].trim() },
-      { letter: 'D', label: mcqMatch[4].trim() },
+      { letter: 'A', label: bracketMatch[1].trim() },
+      { letter: 'B', label: bracketMatch[2].trim() },
+      { letter: 'C', label: bracketMatch[3].trim() },
+      { letter: 'D', label: bracketMatch[4].trim() },
     ];
   }
 
-  // Authentic distractor synthesis around the correct finalAnswer
-  // Determine if numerical or textual
+  // 3. Parentheses extraction: (A) ... (B) ... (C) ... (D) ...
+  const parenMatch = fullText.match(/\(A\)\s*([^\(\)\n\r]+)[\s\S]*?\(B\)\s*([^\(\)\n\r]+)[\s\S]*?\(C\)\s*([^\(\)\n\r]+)[\s\S]*?\(D\)\s*([^\(\)\n\r]+)/i);
+  if (parenMatch) {
+    return [
+      { letter: 'A', label: parenMatch[1].trim() },
+      { letter: 'B', label: parenMatch[2].trim() },
+      { letter: 'C', label: parenMatch[3].trim() },
+      { letter: 'D', label: parenMatch[4].trim() },
+    ];
+  }
+
+  // 4. Standard prefix extraction: A. ... B. ... C. ... D. ... or A: ... or A) ...
+  const prefixMatch = fullText.match(/(?:^|\n)\s*A[:\.\)\-]\s*([^\n\r]+)[\s\S]*?\n\s*B[:\.\)\-]\s*([^\n\r]+)[\s\S]*?\n\s*C[:\.\)\-]\s*([^\n\r]+)[\s\S]*?\n\s*D[:\.\)\-]\s*([^\n\r]+)/i);
+  if (prefixMatch) {
+    return [
+      { letter: 'A', label: prefixMatch[1].trim() },
+      { letter: 'B', label: prefixMatch[2].trim() },
+      { letter: 'C', label: prefixMatch[3].trim() },
+      { letter: 'D', label: prefixMatch[4].trim() },
+    ];
+  }
+
+  // 5. Line-by-line scanner for letter choices
+  const lines = fullText.split(/[\r\n]+/);
+  let optA = '', optB = '', optC = '', optD = '';
+  for (const line of lines) {
+    const trimmed = line.trim();
+    const ma = trimmed.match(/^(?:\[A\]|\(A\)|\bOption\s*A\b|A[\.\:\)\-])\s*(.+)$/i);
+    if (ma && !optA) { optA = ma[1].trim(); continue; }
+    const mb = trimmed.match(/^(?:\[B\]|\(B\)|\bOption\s*B\b|B[\.\:\)\-])\s*(.+)$/i);
+    if (mb && !optB) { optB = mb[1].trim(); continue; }
+    const mc = trimmed.match(/^(?:\[C\]|\(C\)|\bOption\s*C\b|C[\.\:\)\-])\s*(.+)$/i);
+    if (mc && !optC) { optC = mc[1].trim(); continue; }
+    const md = trimmed.match(/^(?:\[D\]|\(D\)|\bOption\s*D\b|D[\.\:\)\-])\s*(.+)$/i);
+    if (md && !optD) { optD = md[1].trim(); continue; }
+  }
+  if (optA && optB && optC && optD) {
+    return [
+      { letter: 'A', label: optA },
+      { letter: 'B', label: optB },
+      { letter: 'C', label: optC },
+      { letter: 'D', label: optD },
+    ];
+  }
+
+  // 6. Check markScheme requirement for explanation of correct option
+  let msExplanation = '';
+  if (subPart.markScheme && subPart.markScheme.length > 0) {
+    const firstReq = subPart.markScheme[0]?.requirement || '';
+    const explMatch = firstReq.match(/Option\s*\[?([A-D])\]?\s*[-–:]\s*(.+)$/i);
+    if (explMatch) {
+      msExplanation = explMatch[2].trim();
+    }
+  }
+
+  // 7. Numerical distractor synthesis around the correct finalAnswer
   const numMatch = ansClean.match(/-?\d+(?:\.\d+)?/);
   if (numMatch) {
     const baseVal = parseFloat(numMatch[0]);
@@ -384,7 +475,6 @@ export function getP2McqOptions(
       isInt ? baseVal + 10 : Number((baseVal * 10).toFixed(2)),
     ];
 
-    // Guarantee the correct answer is assigned to letter B or A consistently
     return [
       { letter: 'A', label: `${distractorVals[1]} ${unit}`.trim() },
       { letter: 'B', label: `${distractorVals[0]} ${unit}`.trim() }, // Correct
@@ -393,11 +483,13 @@ export function getP2McqOptions(
     ];
   }
 
-  // Qualitative options
+  // 8. If clean answer is qualitative or descriptive:
+  const correctLabel = msExplanation || (ansClean.replace(/^Option\s*\[?([A-D])\]?\s*[-–:]?\s*/i, '').trim()) || 'Verified syllabus response';
+
   return [
-    { letter: 'A', label: ansClean.includes('increase') ? 'Decreases uniformly' : 'Option A' },
-    { letter: 'B', label: ansClean }, // Correct answer text
-    { letter: 'C', label: ansClean.includes('increase') ? 'Remains constant' : 'Option C' },
-    { letter: 'D', label: 'Increases then decreases' },
+    { letter: 'A', label: correctLabel.toLowerCase().includes('increase') ? 'Decreases gradually' : 'Initial condition unchanged' },
+    { letter: 'B', label: correctLabel }, // Correct option text
+    { letter: 'C', label: correctLabel.toLowerCase().includes('increase') ? 'Remains constant' : 'Net equilibrium shifts opposite' },
+    { letter: 'D', label: 'Rate accelerates exponentially' },
   ];
 }

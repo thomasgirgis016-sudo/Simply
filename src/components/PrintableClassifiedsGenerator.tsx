@@ -28,7 +28,7 @@ import {
   Compass,
   PenTool
 } from 'lucide-react';
-import { Subject, UserProfile } from '../types';
+import { Subject, UserProfile, UserAccount } from '../types';
 import { IGCSE_SUBJECTS } from '../data/subjects';
 import {
   getTaxonomyForSubject,
@@ -58,6 +58,7 @@ import {
 interface PrintableClassifiedsGeneratorProps {
   subject: Subject;
   profile?: UserProfile;
+  currentUser?: UserAccount | null;
 }
 
 interface SubPartSolution {
@@ -204,9 +205,23 @@ function isAnswerEquivalent(userAns: string, officialAns: string): boolean {
   return false;
 }
 
+/**
+ * Strips raw embedded [A] ... [D] options from the question stem if it's Paper 2,
+ * ensuring option names are cleanly placed solely in the interactive buttons.
+ */
+function cleanStemPrompt(prompt: string, isP2: boolean): string {
+  if (!isP2 || !prompt) return prompt;
+  return prompt
+    .replace(/\n\s*\[A\]\s*[\s\S]*?\[D\][^\n\r]*/gi, '')
+    .replace(/\n\s*\(A\)\s*[\s\S]*?\(D\)[^\n\r]*/gi, '')
+    .replace(/(?:\r?\n){2,}\s*A[:\.\)\-][\s\S]*?D[:\.\)\-][^\n\r]*/gi, '')
+    .trim();
+}
+
 export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGeneratorProps> = ({
   subject,
   profile,
+  currentUser,
 }) => {
   const [isConfigDrawerOpen, setIsConfigDrawerOpen] = useState(false);
   const [viewTab, setViewTab] = useState<'worksheet' | 'online-solver' | 'mark-scheme'>('worksheet');
@@ -223,6 +238,7 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
   const [config, setConfig] = useState<ClassifiedsConfig>(() => ({
     subject,
     selectedChapterId: chapters[0]?.id || '0580-01',
+    selectedChapterIds: [chapters[0]?.id || '0580-01'],
     selectedSubtopics: [],
     selectedYears: [2021, 2022, 2023, 2024, 2025, 2026],
     selectedSeasons: ['May/June', 'Oct/Nov'],
@@ -235,13 +251,15 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
     selectedQuestionIds: []
   }));
 
-  // Update selectedChapterId when subject prop changes
+  // Update selectedChapterId & selectedChapterIds when subject prop changes
   React.useEffect(() => {
     const newTax = getTaxonomyForSubject(subject.code || subject.id);
+    const initialId = newTax[0]?.id || '0580-01';
     setConfig(prev => ({
       ...prev,
       subject,
-      selectedChapterId: newTax[0]?.id || '0580-01',
+      selectedChapterId: initialId,
+      selectedChapterIds: [initialId],
       selectedSubtopics: [],
       selectedQuestionIds: []
     }));
@@ -252,18 +270,22 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
     return currentTax.find(c => c.id === config.selectedChapterId) || currentTax[0] || chapters[0];
   }, [config.subject, config.selectedChapterId, chapters]);
 
-  // Raw questions matching filter criteria
+  // Raw questions matching filter criteria (supporting multi-topic compilation)
   const rawMatchingQuestions = useMemo(() => {
+    const targetChapterIds = config.selectedChapterIds && config.selectedChapterIds.length > 0
+      ? config.selectedChapterIds
+      : [config.selectedChapterId];
+
     return getClassifiedQuestions({
       subjectCodeOrId: config.subject.code || config.subject.id,
-      chapterIds: [config.selectedChapterId],
+      chapterIds: targetChapterIds,
       subtopics: config.selectedSubtopics.length > 0 ? config.selectedSubtopics : undefined,
       years: config.selectedYears,
       seasons: config.selectedSeasons,
       tier: config.tier,
       limit: config.questionQuantity > 0 ? config.questionQuantity : undefined
     });
-  }, [config.subject, config.selectedChapterId, config.selectedSubtopics, config.selectedYears, config.selectedSeasons, config.tier, config.questionQuantity]);
+  }, [config.subject, config.selectedChapterId, config.selectedChapterIds, config.selectedSubtopics, config.selectedYears, config.selectedSeasons, config.tier, config.questionQuantity]);
 
   // Working set of ordered questions
   const [orderedQuestions, setOrderedQuestions] = useState<ClassifiedQuestion[]>(rawMatchingQuestions);
@@ -309,23 +331,27 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
     finalAnswer: string,
     maxMarks: number,
     markScheme?: Array<{ requirement: string }>,
-    isP4 = false
+    isP4 = false,
+    explicitAnswer?: string
   ) => {
-    const current = solutions[key] || { working: '', userAnswer: '', isRevealed: false, isChecked: false };
-    const candidate = current.userAnswer?.trim() || current.working?.trim() || '';
-    const match = isSameMeaningAnswer(candidate, finalAnswer, markScheme, isP4);
-    const isCorrect = match.isMatch;
-    setSolutions(prev => ({
-      ...prev,
-      [key]: {
-        ...current,
-        isChecked: true,
-        isCorrect,
-        isRevealed: true,
-        matchReason: match.reason,
-        scoreAwarded: isCorrect ? maxMarks : (current.scoreAwarded !== undefined ? current.scoreAwarded : 0)
-      }
-    }));
+    setSolutions(prev => {
+      const current = prev[key] || { working: '', userAnswer: '', isRevealed: false, isChecked: false };
+      const candidate = explicitAnswer !== undefined ? explicitAnswer : (current.userAnswer?.trim() || current.working?.trim() || '');
+      const match = isSameMeaningAnswer(candidate, finalAnswer, markScheme, isP4);
+      const isCorrect = match.isMatch;
+      return {
+        ...prev,
+        [key]: {
+          ...current,
+          userAnswer: explicitAnswer !== undefined ? explicitAnswer : current.userAnswer,
+          isChecked: true,
+          isCorrect,
+          isRevealed: true,
+          matchReason: match.reason,
+          scoreAwarded: isCorrect ? maxMarks : 0
+        }
+      };
+    });
   };
 
   const handleToggleReveal = (key: string) => {
@@ -764,7 +790,7 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                   {/* Main Question Stem */}
                   {q.prompt && (
                     <div className="text-sm sm:text-base text-slate-200 leading-relaxed font-sans">
-                      <MathRenderer content={q.prompt} />
+                      <MathRenderer content={cleanStemPrompt(q.prompt, isPaper2Question(q))} />
                     </div>
                   )}
 
@@ -856,8 +882,7 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                                       key={opt.letter}
                                       type="button"
                                       onClick={() => {
-                                        handleUpdateUserAnswer(key, opt.letter);
-                                        handleCheckAnswer(key, sub.finalAnswer, sub.marks, sub.markScheme, isP4);
+                                        handleCheckAnswer(key, sub.finalAnswer, sub.marks, sub.markScheme, isP4, opt.letter);
                                       }}
                                       className={`p-3 rounded-xl border text-left transition flex items-center gap-3 cursor-pointer ${
                                         isCorrectOpt
@@ -1748,6 +1773,8 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
         isOpen={isConfigDrawerOpen}
         onClose={() => setIsConfigDrawerOpen(false)}
         onTriggerPrint={handlePrint}
+        currentUser={currentUser}
+        profile={profile}
       />
     </div>
   );
