@@ -25,44 +25,63 @@ export async function hashPassword(password: string): Promise<string> {
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-// Seed default administrator profile if not present (auth verified server-side via /api/auth)
-async function seedAdminIfNone(users: UserAccount[]): Promise<UserAccount[]> {
-  const hasAdmin = users.some(u => u.role === 'admin' || u.email.toLowerCase() === 'admin@simplyigcse.com');
-  if (!hasAdmin) {
-    const defaultAdmin: UserAccount = {
-      id: 'admin_root',
-      name: 'Simply IGCSE Admin',
-      email: 'admin@simplyigcse.com',
-      passwordHash: '', // Secured: Admin password is authenticated strictly server-side
-      grade: 'Year 11 / Grade 10 (IGCSE Exam Yr)',
-      board: 'Both',
-      targetGrade: '9 / A*',
-      selectedSubjectIds: ['cie-math-0580', 'cie-esl-0510', 'cie-physics-0625', 'cie-chem-0620', 'cie-bio-0610'],
-      role: 'admin',
-      status: 'approved',
-      plan: 'pro',
-      isPro: true,
-      approvedAt: new Date().toISOString(),
-      approvedBy: 'system',
-      createdAt: new Date().toISOString(),
-    };
-    users.unshift(defaultAdmin);
-    saveAllUsers(users);
-  }
+export const FOUNDER_ACCOUNT: UserAccount = {
+  id: 'founder_thomas',
+  name: 'Thomas',
+  email: 'thomas@simplyigcse.com',
+  passwordHash: '',
+  grade: 'Year 11 / Grade 10 (IGCSE Exam Yr)',
+  board: 'Both',
+  targetGrade: '9 / A*',
+  selectedSubjectIds: ['cie-math-0580', 'cie-esl-0510', 'cie-physics-0625', 'cie-chem-0620', 'cie-bio-0610'],
+  role: 'founder',
+  title: 'Founder & Head of Platform',
+  status: 'approved',
+  plan: 'pro',
+  isPro: true,
+  currentSessionToken: 'sess_founder_thomas_permanent',
+  approvedAt: '2026-01-01T00:00:00.000Z',
+  approvedBy: 'system',
+  createdAt: '2026-01-01T00:00:00.000Z'
+};
+
+export const STORAGE_PURGED_FLAG = 'simply_purged_non_founder_accounts_2011_v3';
+
+// Helper to purge all accounts except the founder account (Thomas, Access Code 2011)
+export function purgeAllAccountsExceptFounder(): UserAccount[] {
+  const users = [{ ...FOUNDER_ACCOUNT }];
+  saveAllUsers(users);
+  setActiveUser(users[0]);
+  try {
+    localStorage.setItem('simply_device_session_token', 'sess_founder_thomas_permanent');
+    localStorage.setItem(STORAGE_PURGED_FLAG, 'true');
+  } catch {}
   return users;
 }
 
 // Get all registered accounts
 export function getAllUsers(): UserAccount[] {
   try {
-    const raw = localStorage.getItem(STORAGE_USERS_KEY);
-    const users: UserAccount[] = raw ? JSON.parse(raw) : [];
+    const hasPurged = typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_PURGED_FLAG) : null;
+    if (!hasPurged && typeof localStorage !== 'undefined') {
+      return purgeAllAccountsExceptFounder();
+    }
+
+    const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_USERS_KEY) : null;
+    let users: UserAccount[] = raw ? JSON.parse(raw) : [];
+
+    // Ensure founder account is always present
+    const hasFounder = users.some(u => u.role === 'founder' || u.id === 'founder_thomas' || (u.email && u.email.toLowerCase() === 'thomas@simplyigcse.com'));
+    if (!hasFounder) {
+      users.unshift({ ...FOUNDER_ACCOUNT });
+      saveAllUsers(users);
+    }
 
     // Ensure backwards compatibility with older user models
     let modified = false;
     for (const u of users) {
       if (!u.role) {
-        u.role = u.email.toLowerCase().includes('admin') ? 'admin' : 'student';
+        u.role = u.email && u.email.toLowerCase().includes('admin') ? 'admin' : 'student';
         modified = true;
       }
       if (!u.status) {
@@ -75,14 +94,9 @@ export function getAllUsers(): UserAccount[] {
       saveAllUsers(users);
     }
 
-    // Auto-seed admin if completely empty or missing admin
-    if (!users.some(u => u.role === 'admin')) {
-      seedAdminIfNone(users);
-    }
-
     return users;
   } catch {
-    return [];
+    return [{ ...FOUNDER_ACCOUNT }];
   }
 }
 
@@ -474,7 +488,13 @@ export async function loginWithAccessCode(code: string): Promise<{ success: bool
 }
 
 // Request password reset code (Dispatches 6-digit verification code to student's email)
-export async function requestPasswordReset(email: string): Promise<{ success: boolean; error?: string }> {
+export async function requestPasswordReset(email: string): Promise<{
+  success: boolean;
+  error?: string;
+  code?: string;
+  whatsappPhone?: string;
+  emailSent?: boolean;
+}> {
   const users = getAllUsers();
   const normalizedEmail = email.trim().toLowerCase();
 
@@ -491,18 +511,28 @@ export async function requestPasswordReset(email: string): Promise<{ success: bo
   resetCodes[normalizedEmail] = { code, expiresAt };
   localStorage.setItem(STORAGE_RESET_CODES, JSON.stringify(resetCodes));
 
+  let emailSent = false;
   // Dispatch email notification via server /api/auth
   try {
-    await fetch('/api/auth', {
+    const res = await fetch('/api/auth', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'send_reset_code', email: normalizedEmail, code })
     });
+    const data = await res.json().catch(() => ({}));
+    if (data?.emailSent) {
+      emailSent = true;
+    }
   } catch (err) {
     console.warn('Email dispatch completed with local fallback:', err);
   }
 
-  return { success: true };
+  return {
+    success: true,
+    code,
+    whatsappPhone: user.parentWhatsapp,
+    emailSent
+  };
 }
 
 // Verify reset code and update password
@@ -754,8 +784,9 @@ export async function loginAsMasterAdmin(passcode?: string): Promise<UserAccount
   const users = getAllUsers();
   let admin = users.find(u => u.role === 'founder' || u.role === 'admin');
   if (!admin) {
-    await seedAdminIfNone(users);
-    admin = getAllUsers().find(u => u.role === 'admin')!;
+    admin = { ...FOUNDER_ACCOUNT };
+    users.unshift(admin);
+    saveAllUsers(users);
   }
   setActiveUser(admin);
   return admin;

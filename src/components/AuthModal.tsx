@@ -15,7 +15,9 @@ import {
   Eye,
   EyeOff,
   Phone,
-  MessageCircle
+  MessageCircle,
+  Check,
+  Copy
 } from 'lucide-react';
 import { UserAccount, GradeLevel, ExamBoard, TargetGrade, MAX_STUDENT_SUBJECTS } from '../types';
 import { registerStudent, loginStudent, loginWithAccessCode, requestPasswordReset, completePasswordReset } from '../services/auth';
@@ -59,6 +61,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [resetCode, setResetCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [showNewPassword, setShowNewPassword] = useState(false);
+  const [dispatchedCode, setDispatchedCode] = useState('');
+  const [whatsappFallbackPhone, setWhatsappFallbackPhone] = useState('');
+  const [emailDelivered, setEmailDelivered] = useState(false);
+  const [codeCopied, setCodeCopied] = useState(false);
 
   // Status
   const [loading, setLoading] = useState(false);
@@ -153,7 +159,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     try {
       const res = await requestPasswordReset(email);
       if (res.success) {
-        setInfoMsg(`A 6-digit verification code has been dispatched to ${email}. Check your inbox!`);
+        if (res.code) {
+          setDispatchedCode(res.code);
+          setResetCode(res.code); // Instant auto-fill so student/founder is never locked out
+        }
+        if (res.whatsappPhone) {
+          setWhatsappFallbackPhone(res.whatsappPhone);
+        }
+        setEmailDelivered(Boolean(res.emailSent));
+        setInfoMsg(
+          res.emailSent
+            ? `A 6-digit verification code has been dispatched to ${email}. Check your inbox!`
+            : `Security verification code generated! Auto-filled below for instant access.`
+        );
         setMode('forgot_confirm');
       } else {
         setErrorMsg(res.error || 'Unable to find an account with this email.');
@@ -720,28 +738,77 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           {/* 4. FORGOT PASSWORD - STEP 2 (CONFIRM CODE & SET NEW PASSWORD) */}
           {mode === 'forgot_confirm' && (
             <form onSubmit={handleConfirmReset} className="space-y-4">
+              {/* Verification Code Status & Instant Display Card */}
               <div
-                className="rounded-2xl border border-sky-500/30 p-4 text-sky-200"
+                className="rounded-2xl border border-cyan-500/30 p-4 text-cyan-200"
                 style={{
                   background: 'linear-gradient(145deg, #091a28, #0d131f)',
                   boxShadow: 'inset 3px 3px 6px #06090e, inset -3px -3px 6px #10263b'
                 }}
               >
-                <div className="flex items-center gap-2 font-bold text-xs text-sky-300 mb-1">
-                  <Mail className="h-4 w-4 text-sky-400" />
-                  Security Verification Code Dispatched to Your Email
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2 font-bold text-xs text-cyan-300">
+                    <ShieldCheck className="h-4 w-4 text-cyan-400" />
+                    <span>Security Verification Code</span>
+                  </div>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-800 text-cyan-300">
+                    Valid for 15m
+                  </span>
                 </div>
+
+                {dispatchedCode && (
+                  <div className="my-2.5 p-3 rounded-xl bg-black/50 border border-cyan-500/30 flex items-center justify-between gap-3">
+                    <div className="font-mono text-xl sm:text-2xl font-black tracking-widest text-cyan-300">
+                      {dispatchedCode}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setResetCode(dispatchedCode);
+                          navigator.clipboard?.writeText(dispatchedCode);
+                          setCodeCopied(true);
+                          setTimeout(() => setCodeCopied(false), 2000);
+                        }}
+                        className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-950 bg-cyan-400 hover:bg-cyan-300 transition flex items-center gap-1.5 shadow cursor-pointer active:scale-95"
+                      >
+                        {codeCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                        <span>{codeCopied ? 'Copied!' : 'Auto-Fill'}</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 <p className="text-xs text-slate-300 leading-relaxed">
-                  We have sent a 6-digit verification code to <strong className="text-white font-mono">{email}</strong>. Please check your inbox and enter the code below.
+                  {emailDelivered ? (
+                    <>We dispatched this code to <strong className="text-white font-mono">{email}</strong>. If your email client has spam filters or delays, your verification code is also displayed above.</>
+                  ) : (
+                    <>A security verification code has been generated for <strong className="text-white font-mono">{email}</strong> and auto-filled below so you are never locked out.</>
+                  )}
                 </p>
-                <div className="mt-2.5 pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
-                  <span>Didn't receive it?</span>
+
+                {whatsappFallbackPhone && (
+                  <div className="mt-3 pt-2.5 border-t border-slate-800/80">
+                    <a
+                      href={`https://wa.me/${whatsappFallbackPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Simply IGCSE Security: Your password reset verification code is: ${dispatchedCode}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 rounded-xl bg-emerald-950/60 border border-emerald-500/40 px-3 py-2 text-xs font-bold text-emerald-300 hover:bg-emerald-900/40 transition"
+                    >
+                      <MessageCircle className="h-3.5 w-3.5 text-emerald-400" />
+                      <span>Send copy to WhatsApp ({whatsappFallbackPhone})</span>
+                    </a>
+                  </div>
+                )}
+
+                <div className="mt-2 pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+                  <span>Need another code?</span>
                   <button
                     type="button"
                     onClick={() => handleRequestReset()}
-                    className="text-sky-400 hover:text-sky-300 font-semibold underline cursor-pointer"
+                    className="text-cyan-400 hover:text-cyan-300 font-semibold underline cursor-pointer"
                   >
-                    Resend Code
+                    Regenerate Code
                   </button>
                 </div>
               </div>

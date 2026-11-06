@@ -79,7 +79,8 @@ import {
   getStaffAccessCodes,
   updateStaffAccessCode,
   addStaffAccessCode,
-  deleteStaffAccessCode
+  deleteStaffAccessCode,
+  purgeAllAccountsExceptFounder
 } from '../services/auth';
 import {
   getAuditLogs,
@@ -352,6 +353,28 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         showToast(`Account ${u.email} permanently removed.`);
       }
     }
+  };
+
+  const handlePurgeNonFounder = () => {
+    const confirmed = window.confirm(
+      "CONFIRM ACCOUNT PURGE:\n\nAre you sure you want to remove ALL accounts except the founder account (Thomas, Access Code 2011)?\n\nThis will permanently purge all test, dummy, and non-founder accounts from the platform."
+    );
+    if (!confirmed) return;
+
+    purgeAllAccountsExceptFounder();
+    reloadUsers();
+    logAuditEvent({
+      actorName: currentUser.name || (currentUser.role === 'founder' ? 'Thomas (Founder)' : 'Administrator'),
+      actorRole: (currentUser.role as any) || 'admin',
+      actorEmail: currentUser.email,
+      action: 'USER_DELETED',
+      actionLabel: 'Purged All Accounts Except Founder',
+      targetType: 'system',
+      targetLabel: 'User Accounts Directory',
+      details: 'Purged all accounts from database except the Founder account (Thomas, Code 2011).'
+    });
+    reloadAuditLogs();
+    showToast("Successfully purged all accounts. Only Founder Thomas (Code 2011) remains active.");
   };
 
   const handleApproveAll = () => {
@@ -1222,6 +1245,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             >
               <UserPlus className="h-4 w-4" />
               <span>Pre-Approve Account</span>
+            </button>
+
+            <button
+              onClick={handlePurgeNonFounder}
+              className="flex items-center gap-1.5 rounded-xl border border-rose-500/40 bg-rose-950/30 px-3.5 py-2 text-xs font-bold text-rose-300 hover:bg-rose-900/40 hover:text-white transition cursor-pointer"
+              title="Remove all accounts except Founder Thomas (Code 2011)"
+            >
+              <Trash2 className="h-4 w-4" />
+              <span>Reset to Founder Only (2011)</span>
             </button>
           </div>
         </div>

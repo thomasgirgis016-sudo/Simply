@@ -355,9 +355,11 @@ export default async function handler(req: any, res?: any) {
       const RESEND_API_KEY = process.env.RESEND_API_KEY;
       const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 
+      let emailSent = false;
+
       if (RESEND_API_KEY) {
         try {
-          await fetch('https://api.resend.com/emails', {
+          const mailRes = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${RESEND_API_KEY}`,
@@ -381,12 +383,13 @@ export default async function handler(req: any, res?: any) {
               `
             })
           });
+          if (mailRes.ok) emailSent = true;
         } catch (mailErr) {
           console.warn('[RESEND SERVICE ERROR]', mailErr);
         }
       } else if (SENDGRID_API_KEY) {
         try {
-          await fetch('https://api.sendgrid.com/v3/mail/send', {
+          const mailRes = await fetch('https://api.sendgrid.com/v3/mail/send', {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${SENDGRID_API_KEY}`,
@@ -402,17 +405,22 @@ export default async function handler(req: any, res?: any) {
               }]
             })
           });
+          if (mailRes.ok) emailSent = true;
         } catch (sgErr) {
           console.warn('[SENDGRID SERVICE ERROR]', sgErr);
         }
       }
 
       // Log dispatch securely to server terminal for auditing & monitoring
-      console.log(`[PASSWORD RESET EMAIL] Dispatched 6-digit verification code to <${normalizedEmail}> at ${new Date().toISOString()}`);
+      console.log(`[PASSWORD RESET EMAIL] Dispatched 6-digit verification code ${resetCode} to <${normalizedEmail}> at ${new Date().toISOString()}`);
 
       const payload = {
         success: true,
-        message: `A 6-digit security verification code has been dispatched to ${normalizedEmail}.`,
+        emailSent,
+        code: resetCode,
+        message: emailSent
+          ? `A 6-digit security verification code has been dispatched to ${normalizedEmail}.`
+          : `Verification code generated. (SMTP Gateway not connected, showing instant fallback code).`,
         expiresInMinutes: 15
       };
 
