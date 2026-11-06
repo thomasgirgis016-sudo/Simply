@@ -128,6 +128,8 @@ export const getMistakeNotebook = (): MistakeItem[] => {
   }
 };
 
+export const getMistakeItems = getMistakeNotebook;
+
 export const saveMistakeNotebook = (items: MistakeItem[]): void => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));

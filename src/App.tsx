@@ -63,7 +63,8 @@ import { initPwaListener } from './services/pwaService';
 import { AppSidebar } from './components/AppSidebar';
 import { AppHeader } from './components/AppHeader';
 import { SimplyLogo } from './components/SimplyLogo';
-import { getActiveUser, setActiveUser, grantUserProSubscription, hasActiveSubscription, updateUserAccount, validateActiveSession, validateActiveSessionAsync, logoutUser } from './services/auth';
+import { getActiveUser, setActiveUser, grantUserProSubscription, hasActiveSubscription, updateUserAccount, validateActiveSession, validateActiveSessionAsync, logoutUser, getAllUsers } from './services/auth';
+import { getAutoSchedulerConfig, runAutomatedWeeklyDispatch } from './services/whatsappService';
 import {
   Camera,
   Layers,
@@ -458,7 +459,9 @@ export function App() {
         'predicted'
       ];
 
-      if (tabParam === 'classroom' || tabParam === 'analytics') {
+      if (tabParam === 'report') {
+        setIsParentReportOpen(true);
+      } else if (tabParam === 'classroom' || tabParam === 'analytics') {
         setActiveTab('analytics');
       } else if (tabParam && validTabs.includes(tabParam as ActiveTab)) {
         setActiveTab(tabParam as ActiveTab);
@@ -476,6 +479,28 @@ export function App() {
       }
     } catch (e) {
       console.warn('URL routing read bypassed:', e);
+    }
+  }, []);
+
+  // Automated Weekly WhatsApp Dispatch Background Scheduler
+  useEffect(() => {
+    try {
+      const config = getAutoSchedulerConfig();
+      if (!config.enabled) return;
+
+      const lastRun = config.lastRunTimestamp ? new Date(config.lastRunTimestamp).getTime() : 0;
+      const oneDayMs = 24 * 60 * 60 * 1000;
+      // If never run or more than 24 hours since last automated check
+      if (Date.now() - lastRun >= oneDayMs) {
+        const allUsers = getAllUsers();
+        runAutomatedWeeklyDispatch(allUsers, IGCSE_SUBJECTS).then((result) => {
+          if (result.totalDispatched > 0) {
+            console.log(`[Auto-Scheduler] Automatically dispatched ${result.totalDispatched} weekly parent WhatsApp reports.`);
+          }
+        });
+      }
+    } catch (e) {
+      console.warn('Auto-scheduler background runner error:', e);
     }
   }, []);
 

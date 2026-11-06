@@ -124,6 +124,8 @@ import {
   OFFICIAL_INSTAPAY_IPA
 } from '../services/paymentAutomation';
 import { resetAllCohortsAndAssignments } from '../services/teacherAnalytics';
+import { WhatsAppTestingDashboard } from './WhatsAppTestingDashboard';
+import { isWeeklyReportDue } from '../services/whatsappService';
 
 interface AdminDashboardProps {
   currentUser: UserAccount;
@@ -367,8 +369,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   // CMS & Admin Sections State
-  const [adminActiveTab, setAdminActiveTab] = useState<'accounts' | 'cms' | 'payments' | 'pricing' | 'enquiries' | 'qa' | 'classroom' | 'access-codes' | 'audit'>('accounts');
+  const [adminActiveTab, setAdminActiveTab] = useState<'accounts' | 'cms' | 'payments' | 'pricing' | 'enquiries' | 'qa' | 'classroom' | 'access-codes' | 'audit' | 'whatsapp'>('accounts');
   const [cmsSection, setCmsSection] = useState<'flashcards' | 'pastpapers'>('flashcards');
+
+  const reportsDueCount = useMemo(() => users.filter(u => isWeeklyReportDue(u)).length, [users]);
 
   // Staff & Founder Access Codes State
   const [staffCodes, setStaffCodes] = useState<StaffAccessCode[]>(() => getStaffAccessCodes());
@@ -1237,6 +1241,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <span>Student Accounts & Access</span>
           <span className="rounded-full bg-slate-950/60 px-2 py-0.5 text-[10px] text-slate-300">
             {metrics.total}
+          </span>
+        </button>
+
+        <button
+          onClick={() => setAdminActiveTab('whatsapp')}
+          className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
+            adminActiveTab === 'whatsapp'
+              ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30'
+              : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
+          }`}
+        >
+          <Smartphone className="h-4 w-4" />
+          <span>WhatsApp Testing & Auto-Dispatch</span>
+          <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+            reportsDueCount > 0 ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse' : 'bg-slate-950/60 text-slate-300'
+          }`}>
+            {reportsDueCount > 0 ? `${reportsDueCount} Due` : 'Ready'}
           </span>
         </button>
 
@@ -3944,6 +3965,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             )}
           </div>
         </div>
+      )}
+
+      {/* WhatsApp Cloud API Testing & Automated Dispatch Dashboard */}
+      {adminActiveTab === 'whatsapp' && (
+        <WhatsAppTestingDashboard
+          students={users}
+          subjects={IGCSE_SUBJECTS}
+          onRefreshStudents={reloadUsers}
+        />
       )}
 
       {/* Edit Staff / Founder Access Code Modal */}
