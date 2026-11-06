@@ -90,6 +90,9 @@ export const WhatsAppTestingDashboard: React.FC<WhatsAppTestingDashboardProps> =
   // Roster Search
   const [rosterSearch, setRosterSearch] = useState('');
   const [webhookUrlInput, setWebhookUrlInput] = useState(autoConfig.webhookUrl || '');
+  const [callmebotKeyInput, setCallmebotKeyInput] = useState(autoConfig.callmebotApiKey || '');
+  const [greenInstanceInput, setGreenInstanceInput] = useState(autoConfig.greenApiInstanceId || '');
+  const [greenTokenInput, setGreenTokenInput] = useState(autoConfig.greenApiToken || '');
   const [isGatewaySettingsOpen, setIsGatewaySettingsOpen] = useState(false);
 
   // Reload logs periodically
@@ -659,32 +662,124 @@ export const WhatsAppTestingDashboard: React.FC<WhatsAppTestingDashboardProps> =
             </div>
 
             {isGatewaySettingsOpen && (
-              <div className="mt-4 pt-3 border-t border-slate-800 space-y-3 animate-fadeIn">
-                <p className="text-[11px] text-slate-300 leading-relaxed">
-                  Connect any live WhatsApp HTTP Webhook gateway (e.g. <strong>CallMeBot</strong>, <strong>Green API</strong>, <strong>UltraMsg</strong>, <strong>Twilio</strong>, or <strong>Make/Zapier</strong>). When the automated background engine runs, it automatically dispatches HTTP POST payloads to your gateway.
-                </p>
+              <div className="mt-4 pt-3 border-t border-slate-800 space-y-4 animate-fadeIn">
+                {/* 1. FREE PERSONAL TESTING VIA CALLMEBOT */}
+                <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-3.5 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-emerald-300">Option 1: Free Personal WhatsApp Delivery (CallMeBot)</span>
+                      <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold">100% Free • 30 Seconds</span>
+                    </div>
+                  </div>
 
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <input
-                    type="url"
-                    placeholder="https://api.ultramsg.com/instance/messages/chat or your webhook URL..."
-                    value={webhookUrlInput}
-                    onChange={(e) => setWebhookUrlInput(e.target.value)}
-                    className="flex-1 rounded-xl border border-slate-700 bg-slate-950 px-3.5 py-2 text-xs font-mono text-white placeholder-slate-500 focus:border-cyan-400 focus:outline-none"
-                  />
-                  <button
-                    onClick={() => {
-                      const next = saveAutoSchedulerConfig({ webhookUrl: webhookUrlInput.trim() });
-                      setAutoConfig(next);
-                      showToast('✓ Outbound WhatsApp Gateway Webhook URL saved successfully!');
-                    }}
-                    className="rounded-xl bg-cyan-600 hover:bg-cyan-500 px-4 py-2 text-xs font-bold text-white transition cursor-pointer"
-                  >
-                    Save Webhook URL
-                  </button>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    Receive live automated reports on your own WhatsApp phone immediately. How to activate:
+                    <br />
+                    1. Save this phone number in your WhatsApp contacts: <strong className="text-emerald-400 font-mono">+34 644 60 48 30</strong> (Name: CallMeBot).
+                    <br />
+                    2. Send this exact message to it on WhatsApp: <code className="bg-slate-950 text-cyan-300 px-1.5 py-0.5 rounded font-mono">I allow callmebot to send me messages</code>
+                    <br />
+                    3. The bot will instantly reply with your personal <strong>API key</strong>. Paste it below:
+                  </p>
+
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      type="text"
+                      placeholder="Paste CallMeBot API key (e.g. 123456)..."
+                      value={callmebotKeyInput}
+                      onChange={(e) => setCallmebotKeyInput(e.target.value)}
+                      className="flex-1 rounded-xl border border-slate-700 bg-slate-950 px-3.5 py-2 text-xs font-mono text-white placeholder-slate-500 focus:border-emerald-400 focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const next = saveAutoSchedulerConfig({ callmebotApiKey: callmebotKeyInput.trim() });
+                        setAutoConfig(next);
+                        showToast('✓ CallMeBot API Key saved! Live automated WhatsApp delivery is active.');
+                      }}
+                      className="rounded-xl bg-emerald-600 hover:bg-emerald-500 px-4 py-2 text-xs font-bold text-white transition cursor-pointer"
+                    >
+                      Save CallMeBot Key
+                    </button>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2 pt-1">
+                {/* 2. PRODUCTION MULTI-PARENT DISPATCH VIA GREEN API */}
+                <div className="rounded-xl border border-blue-500/30 bg-blue-950/20 p-3.5 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-blue-300">Option 2: Multi-Parent Production Gateway (Green API / UltraMsg)</span>
+                      <span className="text-[10px] bg-blue-500/20 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded-full font-bold">Sends to All Parents</span>
+                    </div>
+                  </div>
+
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    Connect your WhatsApp via QR code at <a href="https://green-api.com" target="_blank" rel="noopener noreferrer" className="text-cyan-400 underline font-semibold">green-api.com</a> to dispatch automated reports to <strong>any parent number</strong> from your own WhatsApp.
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <input
+                      type="text"
+                      placeholder="Green API Instance ID (e.g. 1101823456)..."
+                      value={greenInstanceInput}
+                      onChange={(e) => setGreenInstanceInput(e.target.value)}
+                      className="rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-xs font-mono text-white placeholder-slate-500 focus:border-blue-400 focus:outline-none"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Green API Token (e.g. 5d89f4b...)..."
+                      value={greenTokenInput}
+                      onChange={(e) => setGreenTokenInput(e.target.value)}
+                      className="rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-xs font-mono text-white placeholder-slate-500 focus:border-blue-400 focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const next = saveAutoSchedulerConfig({
+                          greenApiInstanceId: greenInstanceInput.trim(),
+                          greenApiToken: greenTokenInput.trim()
+                        });
+                        setAutoConfig(next);
+                        showToast('✓ Green API credentials saved! Ready for multi-parent dispatch.');
+                      }}
+                      className="rounded-xl bg-blue-600 hover:bg-blue-500 px-4 py-1.5 text-xs font-bold text-white transition cursor-pointer"
+                    >
+                      Save Green API Credentials
+                    </button>
+                  </div>
+                </div>
+
+                {/* 3. CUSTOM WEBHOOK URL */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-slate-300 block">
+                    Option 3: Generic Custom Webhook URL (UltraMsg, Twilio, Make.com, Zapier):
+                  </label>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      type="url"
+                      placeholder="https://api.ultramsg.com/instance/messages/chat or custom webhook..."
+                      value={webhookUrlInput}
+                      onChange={(e) => setWebhookUrlInput(e.target.value)}
+                      className="flex-1 rounded-xl border border-slate-700 bg-slate-950 px-3.5 py-2 text-xs font-mono text-white placeholder-slate-500 focus:border-cyan-400 focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const next = saveAutoSchedulerConfig({ webhookUrl: webhookUrlInput.trim() });
+                        setAutoConfig(next);
+                        showToast('✓ Outbound WhatsApp Gateway Webhook URL saved successfully!');
+                      }}
+                      className="rounded-xl bg-cyan-600 hover:bg-cyan-500 px-4 py-2 text-xs font-bold text-white transition cursor-pointer"
+                    >
+                      Save Webhook URL
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 pt-1 border-t border-slate-800/80">
                   <input
                     type="checkbox"
                     id="autoOpenWebCheck"
@@ -697,7 +792,7 @@ export const WhatsAppTestingDashboard: React.FC<WhatsAppTestingDashboardProps> =
                     className="rounded border-slate-700 bg-slate-950 text-emerald-500 focus:ring-0 cursor-pointer"
                   />
                   <label htmlFor="autoOpenWebCheck" className="text-xs text-slate-300 cursor-pointer select-none">
-                    Automatically launch WhatsApp Web / App (wa.me) when dispatching individual reports
+                    Also open WhatsApp Web / App (wa.me) whenever an individual report is sent
                   </label>
                 </div>
               </div>

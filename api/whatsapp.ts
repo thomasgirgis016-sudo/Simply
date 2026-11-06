@@ -10,6 +10,9 @@ interface WhatsAppPayload {
   messageBody: string;
   mode?: 'automated_api' | 'wa_web';
   webhookUrl?: string;
+  callmebotApiKey?: string;
+  greenApiInstanceId?: string;
+  greenApiToken?: string;
 }
 
 const SERVER_LOGS_FILE = path.join(
@@ -76,7 +79,10 @@ export default async function handler(req: any, res?: any) {
       templateType = 'weekly_report',
       messageBody,
       mode = 'automated_api',
-      webhookUrl
+      webhookUrl,
+      callmebotApiKey,
+      greenApiInstanceId,
+      greenApiToken
     } = body || {};
 
     if (!recipientPhone || !recipientPhone.trim()) {
@@ -85,18 +91,68 @@ export default async function handler(req: any, res?: any) {
       return new Response(JSON.stringify(payload), { status: 400, headers });
     }
 
-    const cleanPhone = recipientPhone.replace(/[^\d]/g, '');
+    let cleanPhone = recipientPhone.replace(/[^\d]/g, '');
+    // Auto-normalize Egyptian local numbers (010, 011, 012, 015) to international 201...
+    if (cleanPhone.length === 11 && cleanPhone.startsWith('01')) {
+      cleanPhone = '20' + cleanPhone.slice(1);
+    } else if (cleanPhone.length === 10 && (cleanPhone.startsWith('10') || cleanPhone.startsWith('11') || cleanPhone.startsWith('12') || cleanPhone.startsWith('15'))) {
+      cleanPhone = '20' + cleanPhone;
+    }
+
     const dispatchId = `WA-SRV-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
     const timestamp = new Date().toISOString();
 
-    let webhookResponse: any = null;
-    let delivered = true;
+    let outboundResult: any = null;
+    let gatewayType = 'internal_simulation';
 
-    // Optional outbound webhook dispatch (supports CallMeBot, Green API, UltraMsg, Zapier, Make)
-    const activeWebhook = webhookUrl || process.env.WHATSAPP_WEBHOOK_URL;
-    if (activeWebhook && activeWebhook.trim()) {
+    // 1. Check for CallMeBot direct integration
+    const cmbKey = callmebotApiKey || process.env.CALLMEBOT_API_KEY;
+    if (cmbKey && cmbKey.trim()) {
+      gatewayType = 'callmebot';
       try {
-        const fetchRes = await fetch(activeWebhook.trim(), {
+        const cmbUrl = `https://api.callmebot.com/whatsapp.php?phone=+${cleanPhone}&text=${encodeURIComponent(messageBody)}&apikey=${encodeURIComponent(cmbKey.trim())}`;
+        const cmbRes = await fetch(cmbUrl);
+        const cmbText = await cmbRes.text();
+        outboundResult = {
+          gateway: 'callmebot',
+          status: cmbRes.status,
+          response: cmbText.slice(0, 200)
+        };
+      } catch (e: any) {
+        console.warn('CallMeBot dispatch warning:', e);
+        outboundResult = { gateway: 'callmebot', error: e.message };
+      }
+    }
+    // 2. Check for Green API integration
+    else if (greenApiInstanceId && greenApiToken) {
+      gatewayType = 'green_api';
+      try {
+        const greenUrl = `https://api.green-api.com/waInstance${greenApiInstanceId.trim()}/sendMessage/${greenApiToken.trim()}`;
+        const greenRes = await fetch(greenUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chatId: `${cleanPhone}@c.us`,
+            message: messageBody
+          })
+        });
+        const greenData = await greenRes.json();
+        outboundResult = {
+          gateway: 'green_api',
+          status: greenRes.status,
+          response: greenData
+        };
+      } catch (e: any) {
+        console.warn('Green API dispatch warning:', e);
+        outboundResult = { gateway: 'green_api', error: e.message };
+      }
+    }
+    // 3. Generic Custom Webhook (UltraMsg, Twilio, Make, Zapier)
+    else if (webhookUrl || process.env.WHATSAPP_WEBHOOK_URL) {
+      const activeWebhook = (webhookUrl || process.env.WHATSAPP_WEBHOOK_URL)!.trim();
+      gatewayType = 'custom_webhook';
+      try {
+        const fetchRes = await fetch(activeWebhook, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -110,13 +166,14 @@ export default async function handler(req: any, res?: any) {
             timestamp
           })
         });
-        webhookResponse = {
+        outboundResult = {
+          gateway: 'custom_webhook',
           status: fetchRes.status,
           statusText: fetchRes.statusText
         };
       } catch (webhookErr: any) {
         console.warn('Outbound WhatsApp webhook dispatch warning:', webhookErr);
-        webhookResponse = { error: webhookErr?.message };
+        outboundResult = { gateway: 'custom_webhook', error: webhookErr?.message };
       }
     }
 
@@ -127,10 +184,10 @@ export default async function handler(req: any, res?: any) {
       recipientName: recipientName || 'Student Parent',
       studentId,
       templateType,
-      status: 'delivered',
+      status: outboundResult?.error ? 'failed' : 'delivered',
       mode,
-      webhookDelivered: Boolean(activeWebhook),
-      webhookResponse,
+      gatewayType,
+      outboundResult,
       preview: messageBody ? messageBody.slice(0, 140) + '...' : ''
     };
 
@@ -138,14 +195,15 @@ export default async function handler(req: any, res?: any) {
     savePersistedLogs([logEntry, ...currentLogs]);
 
     const payload = {
-      success: true,
+      success: !outboundResult?.error,
       dispatchId,
-      status: 'delivered',
+      status: outboundResult?.error ? 'failed' : 'delivered',
       recipientPhone: cleanPhone,
       recipientName,
       templateType,
+      gatewayType,
       directWaUrl: `https://wa.me/${cleanPhone}?text=${encodeURIComponent(messageBody || '')}`,
-      webhookResult: webhookResponse
+      outboundResult
     };
 
     if (res?.status) return res.status(200).json(payload);

@@ -36,7 +36,10 @@ export interface AutoSchedulerConfig {
   frequencyDays: number;
   lastRunTimestamp?: string;
   autoDispatchHourUtc: number; // e.g. 17 for 5pm UTC (7pm Cairo time)
-  webhookUrl?: string; // Optional custom outbound webhook (UltraMsg, GreenAPI, Twilio, CallMeBot)
+  webhookUrl?: string; // Optional custom outbound webhook (UltraMsg, Twilio, Make, Zapier)
+  callmebotApiKey?: string; // Free 10-second personal WhatsApp API key from CallMeBot
+  greenApiInstanceId?: string; // Green API instance ID for sending to any parent
+  greenApiToken?: string; // Green API token
   autoOpenWebLink?: boolean; // When testing, launch wa.me directly
 }
 
@@ -307,7 +310,10 @@ export async function sendWhatsAppMessage(options: {
             templateType: options.templateType,
             messageBody: options.messageBody,
             mode: 'automated_api',
-            webhookUrl: config.webhookUrl
+            webhookUrl: config.webhookUrl,
+            callmebotApiKey: config.callmebotApiKey,
+            greenApiInstanceId: config.greenApiInstanceId,
+            greenApiToken: config.greenApiToken
           })
         });
 
