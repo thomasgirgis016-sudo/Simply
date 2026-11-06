@@ -49,10 +49,22 @@ const DEFAULT_AUTOSCHEDULER: AutoSchedulerConfig = {
 
 /**
  * Clean phone number to digits only with leading plus if international
+ * Automatically normalizes local Egyptian numbers (010, 011, 012, 015) to international format (201...)
  */
 export function sanitizeWhatsAppPhone(phone: string): { clean: string; valid: boolean } {
-  const digits = phone.replace(/[^\d]/g, '');
-  // Valid phone usually has 10 to 14 digits
+  let digits = phone.replace(/[^\d]/g, '');
+
+  // Auto-normalize Egyptian local numbers (010, 011, 012, 015) to international 201...
+  if (digits.length === 11 && digits.startsWith('01')) {
+    digits = '20' + digits.slice(1);
+  } else if (digits.length === 10 && (digits.startsWith('10') || digits.startsWith('11') || digits.startsWith('12') || digits.startsWith('15'))) {
+    digits = '20' + digits;
+  } else if (digits.length === 9 && digits.startsWith('5')) {
+    // Saudi / Gulf 9-digit format
+    digits = '966' + digits;
+  }
+
+  // Valid international phone usually has 10 to 15 digits
   const valid = digits.length >= 10 && digits.length <= 15;
   return { clean: digits, valid };
 }
@@ -231,7 +243,14 @@ export function openWhatsAppWeb(phone: string, messageText: string): void {
   const { clean } = sanitizeWhatsAppPhone(phone);
   const encoded = encodeURIComponent(messageText);
   const url = clean ? `https://wa.me/${clean}?text=${encoded}` : `https://wa.me/?text=${encoded}`;
-  window.open(url, '_blank');
+  try {
+    const win = window.open(url, '_blank');
+    if (!win || win.closed || typeof win.closed === 'undefined') {
+      window.location.href = url;
+    }
+  } catch {
+    window.location.href = url;
+  }
 }
 
 /**
