@@ -76,70 +76,70 @@ export const ExamCountdownWidget: React.FC<ExamCountdownWidgetProps> = ({
   };
 
   return (
-    <div className="rounded-2xl sm:rounded-3xl border border-slate-800/90 bg-gradient-to-br from-slate-900/90 via-slate-900 to-indigo-950/20 p-4 sm:p-6 shadow-xl">
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+    <div className="rounded-2xl sm:rounded-3xl border border-slate-800/90 bg-gradient-to-br from-slate-900/90 via-slate-900 to-indigo-950/20 p-3.5 sm:p-6 shadow-xl">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         {/* Left: Paper info and countdown ticker */}
-        <div className="space-y-2">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-800 px-2.5 py-0.5 text-xs font-bold text-slate-300 border border-slate-700">
-              <Calendar className="h-3.5 w-3.5 text-indigo-400" />
-              <span>May/June 2026 Series</span>
+        <div className="space-y-1.5 sm:space-y-2">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <span className="inline-flex items-center gap-1 rounded-full bg-slate-800 px-2 sm:px-2.5 py-0.5 text-[10px] sm:text-xs font-bold text-slate-300 border border-slate-700">
+              <Calendar className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-indigo-400" />
+              <span>May/June 2026</span>
             </span>
 
-            <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold border ${getUrgencyBadge()}`}>
-              <Clock className="h-3.5 w-3.5" />
-              <span>{daysRemaining} Days Until Exam</span>
+            <span className={`inline-flex items-center gap-1 rounded-full px-2 sm:px-2.5 py-0.5 text-[10px] sm:text-xs font-bold border ${getUrgencyBadge()}`}>
+              <Clock className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+              <span>{daysRemaining}d to Exam</span>
             </span>
           </div>
 
           <div>
-            <h3 className="text-base sm:text-lg font-black text-white tracking-tight flex items-center gap-2">
+            <h3 className="text-sm sm:text-lg font-black text-white tracking-tight flex items-center gap-2">
               <span>{targetPaper.paperCode} • {targetPaper.paperTitle}</span>
             </h3>
-            <p className="text-xs text-slate-400">
-              Exam Date: <strong className="text-slate-200">{targetPaper.examDate}</strong> ({targetPaper.timeOfDay} Session • {targetPaper.durationMinutes} mins)
+            <p className="text-[11px] sm:text-xs text-slate-400">
+              Exam: <strong className="text-slate-200">{targetPaper.examDate}</strong> ({targetPaper.timeOfDay} Session)
             </p>
           </div>
         </div>
 
-        {/* Center: Countdown Digits Box */}
-        <div className="flex items-center gap-1.5 sm:gap-2 self-start lg:self-center">
-          <div className="flex flex-col items-center justify-center rounded-xl border border-slate-800 bg-slate-950 px-2.5 sm:px-3 py-1.5 sm:py-2 min-w-[50px] sm:min-w-[58px]">
-            <span className="text-lg sm:text-2xl font-black font-mono text-white leading-none">
+        {/* Right: Countdown Digits Box */}
+        <div className="flex items-center gap-1 sm:gap-2 self-start sm:self-auto">
+          <div className="flex flex-col items-center justify-center rounded-xl border border-slate-800 bg-slate-950 px-2 sm:px-3 py-1 sm:py-1.5 min-w-[44px] sm:min-w-[58px]">
+            <span className="text-base sm:text-2xl font-black font-mono text-white leading-none">
               {daysRemaining}
             </span>
-            <span className="text-[9px] uppercase font-bold text-slate-500 mt-0.5">Days</span>
+            <span className="text-[8px] sm:text-[9px] uppercase font-bold text-slate-500 mt-0.5">Days</span>
           </div>
 
-          <span className="text-base font-mono text-slate-600">:</span>
+          <span className="text-xs sm:text-base font-mono text-slate-600">:</span>
 
-          <div className="flex flex-col items-center justify-center rounded-xl border border-slate-800 bg-slate-950 px-2.5 sm:px-3 py-1.5 sm:py-2 min-w-[50px] sm:min-w-[58px]">
-            <span className="text-lg sm:text-2xl font-black font-mono text-indigo-300 leading-none">
+          <div className="flex flex-col items-center justify-center rounded-xl border border-slate-800 bg-slate-950 px-2 sm:px-3 py-1 sm:py-1.5 min-w-[44px] sm:min-w-[58px]">
+            <span className="text-base sm:text-2xl font-black font-mono text-indigo-300 leading-none">
               {hoursRemaining}
             </span>
-            <span className="text-[9px] uppercase font-bold text-slate-500 mt-0.5">Hours</span>
+            <span className="text-[8px] sm:text-[9px] uppercase font-bold text-slate-500 mt-0.5">Hours</span>
           </div>
 
-          <span className="text-base font-mono text-slate-600">:</span>
+          <span className="text-xs sm:text-base font-mono text-slate-600">:</span>
 
-          <div className="flex flex-col items-center justify-center rounded-xl border border-slate-800 bg-slate-950 px-2.5 sm:px-3 py-1.5 sm:py-2 min-w-[50px] sm:min-w-[58px]">
-            <span className="text-lg sm:text-2xl font-black font-mono text-amber-300 leading-none">
+          <div className="flex flex-col items-center justify-center rounded-xl border border-slate-800 bg-slate-950 px-2 sm:px-3 py-1 sm:py-1.5 min-w-[44px] sm:min-w-[58px]">
+            <span className="text-base sm:text-2xl font-black font-mono text-amber-300 leading-none">
               {minutesRemaining}
             </span>
-            <span className="text-[9px] uppercase font-bold text-slate-500 mt-0.5">Mins</span>
+            <span className="text-[8px] sm:text-[9px] uppercase font-bold text-slate-500 mt-0.5">Mins</span>
           </div>
         </div>
       </div>
 
       {/* Daily Study Quota Checklist */}
-      <div className="mt-4 pt-4 border-t border-slate-800/80">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2.5">
+      <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-slate-800/80">
+        <div className="flex items-center justify-between gap-2 mb-2">
           <div className="flex items-center gap-1.5 text-xs font-bold text-slate-200">
             <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
-            <span>Today's Grade 9 Daily Revision Quota:</span>
+            <span>Daily Revision Quota</span>
           </div>
-          <span className="text-[11px] text-slate-400">
-            Check off daily to build comprehensive syllabus readiness
+          <span className="hidden sm:inline text-[11px] text-slate-400">
+            Check off daily for syllabus readiness
           </span>
         </div>
 

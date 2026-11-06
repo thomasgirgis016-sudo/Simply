@@ -560,39 +560,42 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
       {/* ─────────────────────────────────────────────────────────────
           1. WEB ACTION BAR & TOOLBAR (Hidden in Print)
       ───────────────────────────────────────────────────────────── */}
-      <div className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur border-b border-slate-800 px-4 py-3 shadow-md no-print">
-        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-4">
+      {/* ─────────────────────────────────────────────────────────────
+          1. WEB ACTION BAR & TOOLBAR (Hidden in Print)
+      ───────────────────────────────────────────────────────────── */}
+      <div className="relative sm:sticky sm:top-14 z-30 bg-slate-900/95 backdrop-blur border-b border-slate-800 px-3 py-2 sm:px-4 sm:py-3 shadow-md no-print">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
           {/* Left: Title & Chapter badge */}
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
-              <BookOpen className="h-5 w-5" />
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+            <div className="p-2 sm:p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 shrink-0">
+              <BookOpen className="h-4 w-4 sm:h-5 sm:w-5" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-white text-sm md:text-base">
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="font-bold text-white text-xs sm:text-base truncate">
                   {config.subject.code} • {activeChapter.title}
                 </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                <span className="text-[9px] sm:text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 shrink-0">
                   {activeChapter.id}
                 </span>
               </div>
-              <p className="text-xs text-slate-400 hidden sm:block">
+              <p className="text-[11px] text-slate-400 hidden sm:block">
                 Topical Past Paper Compilation • Series {config.selectedYears.join(', ')} • {config.tier} Tier
               </p>
             </div>
           </div>
 
-          {/* Center: Live Metrics */}
-          <div className="flex items-center gap-2 text-xs">
-            <div className="px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 flex items-center gap-1.5">
+          {/* Center: Live Metrics (Desktop only to prevent mobile crowding) */}
+          <div className="hidden sm:flex items-center gap-2 text-xs">
+            <div className="px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 flex items-center gap-1.5">
               <span className="text-slate-400">Questions:</span>
               <span className="font-bold text-white">{finalQuestions.length}</span>
             </div>
-            <div className="px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 flex items-center gap-1.5">
+            <div className="px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 flex items-center gap-1.5">
               <span className="text-slate-400">Total Marks:</span>
               <span className="font-bold text-amber-400">{totalMarks}</span>
             </div>
-            <div className="px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 hidden md:flex items-center gap-1.5">
+            <div className="px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 hidden md:flex items-center gap-1.5">
               <Clock className="h-3.5 w-3.5 text-slate-400" />
               <span className="text-slate-400">Time:</span>
               <span className="font-bold text-emerald-400">{durationFormatted}</span>
@@ -600,66 +603,70 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
           </div>
 
           {/* Right: Actions */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             <button
               onClick={() => setIsConfigDrawerOpen(true)}
-              className="px-3.5 py-2 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white flex items-center gap-2 transition cursor-pointer"
+              className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white flex items-center gap-1.5 transition cursor-pointer"
             >
-              <Sliders className="h-4 w-4 text-indigo-400" />
-              <span className="hidden sm:inline">Configure Booklet</span>
+              <Sliders className="h-3.5 w-3.5 text-indigo-400" />
+              <span className="hidden sm:inline">Configure</span>
             </button>
 
             <button
               onClick={handlePrint}
-              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white flex items-center gap-2 shadow-lg shadow-indigo-600/30 transition cursor-pointer"
+              className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white flex items-center gap-1.5 shadow-md shadow-indigo-600/30 transition cursor-pointer"
             >
-              <Printer className="h-4 w-4" />
-              <span>Print Booklet (PDF)</span>
+              <Printer className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Print Booklet (PDF)</span>
+              <span className="sm:hidden">Print</span>
             </button>
           </div>
         </div>
 
         {/* Sub-bar: 3 View Modes (Worksheet / Solve Online / Mark Scheme) */}
-        <div className="max-w-6xl mx-auto mt-2.5 pt-2.5 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="max-w-6xl mx-auto mt-2 pt-2 border-t border-slate-800/80 flex items-center justify-between gap-2 text-xs">
           {/* Main Primary View Switcher */}
-          <div className="inline-flex rounded-xl bg-slate-950 p-1 border border-slate-800 shadow-inner">
+          <div className="inline-flex rounded-xl bg-slate-950 p-1 border border-slate-800 shadow-inner w-full sm:w-auto justify-between sm:justify-start">
             <button
               onClick={() => setViewTab('worksheet')}
-              className={`px-3.5 py-1.5 rounded-lg font-bold text-xs flex items-center gap-2 transition cursor-pointer ${
+              className={`flex-1 sm:flex-initial px-2.5 sm:px-3.5 py-1.5 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer ${
                 viewTab === 'worksheet'
                   ? 'bg-indigo-600 text-white shadow-md'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
               <FileText className="h-3.5 w-3.5" />
-              <span>Worksheet (Print / PDF)</span>
+              <span>Booklet</span>
+              <span className="hidden sm:inline"> (Print / PDF)</span>
             </button>
+
             <button
               onClick={() => setViewTab('online-solver')}
-              className={`px-3.5 py-1.5 rounded-lg font-bold text-xs flex items-center gap-2 transition cursor-pointer ${
+              className={`flex-1 sm:flex-initial px-2.5 sm:px-3.5 py-1.5 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer ${
                 viewTab === 'online-solver'
                   ? 'bg-emerald-600 text-white shadow-md'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
               <Sparkles className="h-3.5 w-3.5 text-amber-300" />
-              <span>Solve Online (Interactive)</span>
+              <span>Solve Online</span>
               {attemptedSubpartsCount > 0 && (
-                <span className="px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-200 text-[10px]">
+                <span className="ml-1 px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-200 text-[10px]">
                   {attemptedSubpartsCount}/{totalSubpartsCount}
                 </span>
               )}
             </button>
+
             <button
               onClick={() => setViewTab('mark-scheme')}
-              className={`px-3.5 py-1.5 rounded-lg font-bold text-xs flex items-center gap-2 transition cursor-pointer ${
+              className={`flex-1 sm:flex-initial px-2.5 sm:px-3.5 py-1.5 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer ${
                 viewTab === 'mark-scheme'
-                  ? 'bg-slate-800 text-white shadow-md'
+                  ? 'bg-amber-600 text-white shadow-md'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
               <Award className="h-3.5 w-3.5" />
-              <span>Mark Scheme View</span>
+              <span>Mark Scheme</span>
             </button>
           </div>
 

@@ -199,32 +199,32 @@ export const HomeView: React.FC<HomeViewProps> = ({
   }, [searchQuery, subjects]);
 
   return (
-    <div className="space-y-6 sm:space-y-8 animate-fadeIn max-w-7xl mx-auto w-full">
+    <div className="space-y-4 sm:space-y-8 animate-fadeIn max-w-7xl mx-auto w-full">
       {/* 1. Academic Header & Greeting Card */}
-      <section className="rounded-2xl sm:rounded-3xl border border-slate-800/90 bg-gradient-to-br from-slate-900 via-slate-900/90 to-indigo-950/30 p-4 sm:p-7 shadow-xl">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1.5">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-500/15 px-2.5 py-0.5 text-xs font-bold text-indigo-300 border border-indigo-500/30">
+      <section className="rounded-2xl sm:rounded-3xl border border-slate-800/90 bg-gradient-to-br from-slate-900 via-slate-900/90 to-indigo-950/30 p-3.5 sm:p-7 shadow-xl">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
+          <div className="space-y-1 sm:space-y-1.5">
+            <div className="flex items-center gap-2">
+              <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-indigo-500/15 px-2.5 py-0.5 text-xs font-bold text-indigo-300 border border-indigo-500/30">
                 <ShieldCheck className="h-3.5 w-3.5 text-indigo-400" />
                 IGCSE Examination & Revision Workspace
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-xs font-bold text-emerald-300 border border-emerald-500/30">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-[11px] sm:text-xs font-bold text-emerald-300 border border-emerald-500/30">
                 <Award className="h-3.5 w-3.5 text-emerald-400" />
-                Target: {profile.targetGrade}
+                Target Grade: {profile.targetGrade}
               </span>
             </div>
 
-            <h1 className="text-xl sm:text-3xl font-black text-white tracking-tight">
+            <h1 className="text-lg sm:text-3xl font-black text-white tracking-tight">
               {currentUser ? `Welcome back, ${currentUser.name}` : `Welcome to Simply IGCSE`}
             </h1>
-            <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
+            <p className="hidden sm:block text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
               Official past paper vault, line-by-line mark scheme solver, and personal mistake tracking engineered for Grade 9 candidates.
             </p>
           </div>
 
-          {/* Quick Enrolled Subject Selector Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 max-w-full self-start md:self-center">
+          {/* Desktop Enrolled Subject Selector Pills */}
+          <div className="hidden md:flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 max-w-full self-start md:self-center">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-0.5">
               Syllabus:
             </span>
@@ -343,34 +343,36 @@ export const HomeView: React.FC<HomeViewProps> = ({
           )}
         </div>
 
-        {/* Quick Launch Action Pills */}
-        <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-slate-800/60">
+        {/* Quick Launch Action Pills (Horizontal scrollable track on mobile) */}
+        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-800/60 overflow-x-auto no-scrollbar flex-nowrap pb-0.5">
           {onOpenExamHud && (
             <button
               onClick={onOpenExamHud}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-indigo-500/40 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 text-xs font-bold transition active:scale-95 cursor-pointer shadow-sm"
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-indigo-500/40 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 text-xs font-bold transition active:scale-95 cursor-pointer shadow-sm shrink-0 whitespace-nowrap"
               title="Open Periodic Table & Cambridge Formula Reference HUD"
             >
               <Atom className="h-3.5 w-3.5 text-indigo-400" />
-              <span>Reference HUD & Periodic Table</span>
+              <span>Periodic Table</span>
+              <span className="hidden sm:inline">& Formula HUD</span>
             </button>
           )}
 
           {onOpenRevisionKit && (
             <button
               onClick={onOpenRevisionKit}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs font-bold transition active:scale-95 cursor-pointer shadow-sm"
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs font-bold transition active:scale-95 cursor-pointer shadow-sm shrink-0 whitespace-nowrap"
               title="Generate Official Cambridge Formula & Data Booklet PDF"
             >
               <Download className="h-3.5 w-3.5 text-rose-400" />
-              <span>Formula & Data Booklet (PDF)</span>
+              <span>Formula Booklet</span>
+              <span className="hidden sm:inline"> (PDF)</span>
             </button>
           )}
 
           {onOpenPwaModal && (
             <button
               onClick={onOpenPwaModal}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 text-xs font-bold transition active:scale-95 cursor-pointer shadow-sm"
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 text-xs font-bold transition active:scale-95 cursor-pointer shadow-sm shrink-0 whitespace-nowrap"
               title="Install Simply IGCSE to your home screen"
             >
               <Smartphone className="h-3.5 w-3.5 text-emerald-400" />

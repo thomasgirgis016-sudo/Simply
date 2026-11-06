@@ -289,23 +289,23 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-800/90 bg-slate-900/90 p-6 md:p-8 shadow-xl">
+      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-800/90 bg-slate-900/90 p-3.5 sm:p-7 shadow-xl">
         <div className="relative z-10 max-w-3xl">
-          <div className="inline-flex items-center gap-2 rounded-full bg-blue-950/80 px-3 py-1 text-xs font-semibold text-blue-300 border border-blue-800/50 mb-3">
-            <Calculator className="h-3.5 w-3.5" />
-            <span>Official Mark Scheme & Examiner Engine</span>
+          <div className="inline-flex items-center gap-2 rounded-full bg-blue-950/80 px-2.5 py-0.5 sm:px-3 sm:py-1 text-[11px] sm:text-xs font-semibold text-blue-300 border border-blue-800/50 mb-2 sm:mb-3">
+            <Calculator className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+            <span>Mark Scheme & Examiner Engine</span>
           </div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-white tracking-tight">
             Mark Scheme Step-by-Step Solver
           </h1>
-          <p className="mt-2 text-sm text-slate-300 leading-relaxed">
+          <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-slate-300 leading-relaxed hidden sm:block">
             Upload or type any Cambridge past paper question to view complete line-by-line mark scheme workings ([M], [A], [B] marks) and examiner report guidance.
           </p>
         </div>
 
         {/* Quick Sample Selector */}
-        <div className="mt-6 border-t border-slate-800/80 pt-4">
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2.5 flex items-center gap-1.5">
+        <div className="mt-4 sm:mt-6 border-t border-slate-800/80 pt-3 sm:pt-4">
+          <p className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-1.5">
             <FileQuestion className="h-3.5 w-3.5 text-blue-400" />
             Try an IGCSE Past Paper Question:
           </p>
@@ -315,7 +315,7 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
                 key={idx}
                 type="button"
                 onClick={() => loadSampleQuestion(s)}
-                className="shrink-0 rounded-lg border border-slate-700/70 bg-slate-800/60 px-3 py-1.5 text-xs text-slate-200 hover:border-blue-500 hover:bg-slate-800 hover:text-white transition cursor-pointer"
+                className="shrink-0 rounded-lg border border-slate-700/70 bg-slate-800/60 px-2.5 py-1 sm:px-3 sm:py-1.5 text-[11px] sm:text-xs text-slate-200 hover:border-blue-500 hover:bg-slate-800 hover:text-white transition cursor-pointer"
               >
                 {s.title}
               </button>
@@ -325,21 +325,22 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
       </div>
 
       {/* Mode Switcher */}
-      <div className="flex flex-wrap rounded-2xl bg-slate-900/90 p-1.5 border border-slate-800 gap-1">
+      <div className="flex rounded-xl sm:rounded-2xl bg-slate-900/90 p-1 sm:p-1.5 border border-slate-800 gap-1">
         <button
           type="button"
           onClick={() => {
             setSolverMode('solve');
             setErrorMessage(null);
           }}
-          className={`flex-1 min-w-[140px] flex items-center justify-center gap-2 rounded-xl py-2.5 px-3 text-xs font-bold transition cursor-pointer ${
+          className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 rounded-lg sm:rounded-xl py-2 sm:py-2.5 px-2 sm:px-3 text-xs font-bold transition cursor-pointer text-center ${
             solverMode === 'solve'
               ? 'bg-blue-600 text-white shadow-sm'
               : 'text-slate-400 hover:text-white'
           }`}
         >
-          <Calculator className="h-4 w-4" />
-          <span>Solve Question / Photo</span>
+          <Calculator className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+          <span className="hidden sm:inline">Solve Question / Photo</span>
+          <span className="sm:hidden">Solve</span>
         </button>
         <button
           type="button"
@@ -347,14 +348,15 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
             setSolverMode('exam-lookup');
             setErrorMessage(null);
           }}
-          className={`flex-1 min-w-[170px] flex items-center justify-center gap-2 rounded-xl py-2.5 px-3 text-xs font-bold transition cursor-pointer ${
+          className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 rounded-lg sm:rounded-xl py-2 sm:py-2.5 px-2 sm:px-3 text-xs font-bold transition cursor-pointer text-center ${
             solverMode === 'exam-lookup'
               ? 'bg-blue-600 text-white shadow-sm'
               : 'text-slate-400 hover:text-white'
           }`}
         >
-          <BookOpen className="h-4 w-4" />
-          <span>Search by Exam Code & Q#</span>
+          <BookOpen className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+          <span className="hidden sm:inline">Search by Exam Code & Q#</span>
+          <span className="sm:hidden">Exam Code</span>
         </button>
         <button
           type="button"
@@ -362,19 +364,20 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
             setSolverMode('handwritten');
             setErrorMessage(null);
           }}
-          className={`flex-1 min-w-[140px] flex items-center justify-center gap-2 rounded-xl py-2.5 px-3 text-xs font-bold transition cursor-pointer ${
+          className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 rounded-lg sm:rounded-xl py-2 sm:py-2.5 px-2 sm:px-3 text-xs font-bold transition cursor-pointer text-center ${
             solverMode === 'handwritten'
               ? 'bg-blue-600 text-white shadow-sm'
               : 'text-slate-400 hover:text-white'
           }`}
         >
-          <PenTool className="h-4 w-4" />
-          <span>Grade Handwritten ($M1, A1$)</span>
+          <PenTool className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+          <span className="hidden sm:inline">Grade Handwritten (M1, A1)</span>
+          <span className="sm:hidden">Handwritten</span>
         </button>
       </div>
 
       {/* Academic Engine Rubric Card */}
-      <div className="rounded-2xl border border-slate-700/60 bg-slate-800/80 p-4 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <div className="hidden sm:flex rounded-2xl border border-slate-700/60 bg-slate-800/80 p-4 shadow-sm items-start sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="h-9 w-9 rounded-xl bg-blue-950/80 border border-blue-800/50 flex items-center justify-center shrink-0">
             <ShieldCheck className="h-5 w-5 text-blue-300" />
