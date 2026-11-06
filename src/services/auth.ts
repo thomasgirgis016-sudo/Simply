@@ -47,7 +47,7 @@ export const FOUNDER_ACCOUNT: UserAccount = {
 
 export const STORAGE_PURGED_FLAG = 'simply_purged_non_founder_accounts_2011_v3';
 
-// Helper to purge all accounts except the founder account (Thomas, Access Code 2011)
+// Helper to purge all accounts except the founder account (Thomas, Access Code 2011) - ONLY called on explicit admin action
 export function purgeAllAccountsExceptFounder(): UserAccount[] {
   const users = [{ ...FOUNDER_ACCOUNT }];
   saveAllUsers(users);
@@ -95,6 +95,13 @@ export async function syncUsersWithServer(): Promise<UserAccount[]> {
         }
       }
 
+      // If there are local accounts that the server does not have yet, upload them to the server!
+      for (const u of localUsers) {
+        if (u && u.role !== 'founder' && !serverUsers.some(su => (su.email || su.id).toLowerCase() === (u.email || u.id).toLowerCase())) {
+          syncUserToServer(u);
+        }
+      }
+
       // Always ensure founder
       if (!map.has('thomas@simplyigcse.com')) {
         map.set('thomas@simplyigcse.com', { ...FOUNDER_ACCOUNT });
@@ -126,19 +133,16 @@ export function syncUserToServer(user: UserAccount): void {
 // Get all registered accounts
 export function getAllUsers(): UserAccount[] {
   try {
-    const hasPurged = typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_PURGED_FLAG) : null;
-    if (!hasPurged && typeof localStorage !== 'undefined') {
-      return purgeAllAccountsExceptFounder();
-    }
-
     const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_USERS_KEY) : null;
     let users: UserAccount[] = raw ? JSON.parse(raw) : [];
 
-    // Ensure founder account is always present
+    // Ensure founder account is always present and never removed
     const hasFounder = users.some(u => u.role === 'founder' || u.id === 'founder_thomas' || (u.email && u.email.toLowerCase() === 'thomas@simplyigcse.com'));
     if (!hasFounder) {
       users.unshift({ ...FOUNDER_ACCOUNT });
-      saveAllUsers(users);
+      try {
+        localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(users));
+      } catch {}
     }
 
     // Ensure backwards compatibility with older user models
@@ -155,7 +159,9 @@ export function getAllUsers(): UserAccount[] {
     }
 
     if (modified) {
-      saveAllUsers(users);
+      try {
+        localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(users));
+      } catch {}
     }
 
     return users;

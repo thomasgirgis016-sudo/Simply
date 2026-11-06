@@ -202,6 +202,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setTimeout(() => setActionSuccessMsg(''), 4000);
   };
 
+  const handleManualRefresh = async () => {
+    showToast("Syncing accounts from server and connected clients...");
+    await reloadUsers();
+    const count = getAllUsers().length;
+    showToast(`Sync complete! ${count} total account${count === 1 ? '' : 's'} loaded.`);
+  };
+
   const handleSetUserPlan = (userId: string, plan: SubscriptionPlan, cycle: BillingCycle = 'monthly') => {
     const target = users.find(u => u.id === userId);
     const res = updateUserSubscriptionPlan(userId, plan, cycle);
@@ -1264,12 +1271,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </button>
 
             <button
-              onClick={reloadUsers}
+              onClick={handleManualRefresh}
               className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800/80 px-3.5 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition cursor-pointer"
-              title="Refresh list"
+              title="Refresh and sync all accounts from server database"
             >
               <RefreshCw className="h-3.5 w-3.5" />
-              <span>Refresh</span>
+              <span>Refresh & Sync</span>
             </button>
 
             <button
@@ -1307,6 +1314,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <span className="rounded-full bg-slate-950/60 px-2 py-0.5 text-[10px] text-slate-300">
             {metrics.total}
           </span>
+          {metrics.pending > 0 && (
+            <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-black text-amber-300 border border-amber-500/30 animate-pulse">
+              {metrics.pending} Pending
+            </span>
+          )}
         </button>
 
         <button
@@ -1588,13 +1600,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <button
                 key={st}
                 onClick={() => setStatusFilter(st)}
-                className={`rounded-lg px-2.5 py-1 text-xs font-semibold capitalize transition cursor-pointer shrink-0 ${
+                className={`rounded-lg px-2.5 py-1 text-xs font-semibold capitalize transition cursor-pointer shrink-0 inline-flex items-center gap-1 ${
                   statusFilter === st
                     ? 'bg-indigo-600 text-white shadow-sm'
                     : 'bg-slate-800 text-slate-400 hover:text-white'
                 }`}
               >
-                {st === 'all' ? 'All' : st}
+                <span>{st === 'all' ? 'All' : st}</span>
+                {st === 'pending' && metrics.pending > 0 && (
+                  <span className="rounded-full bg-amber-500/30 px-1.5 py-0.2 text-[10px] font-black text-amber-200 border border-amber-400/30">
+                    {metrics.pending}
+                  </span>
+                )}
               </button>
             ))}
           </div>

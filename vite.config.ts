@@ -60,12 +60,18 @@ function apiDevPlugin(): Plugin {
               } catch {
                 (req as any).body = {};
               }
-              await authHandler(req, res);
+              try {
+                const handlerMod = await import('./api/auth.ts');
+                await (handlerMod.default || authHandler)(req, res);
+              } catch (handlerErr) {
+                await authHandler(req, res);
+              }
             });
             return;
           }
 
-          await authHandler(req, res);
+          const handlerMod = await import('./api/auth.ts');
+          await (handlerMod.default || authHandler)(req, res);
         } catch (err) {
           next(err);
         }
