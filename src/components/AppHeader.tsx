@@ -106,29 +106,29 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       {/* Top Row: Brand & Main Navigation Controls */}
       <div className="flex h-14 sm:h-16 w-full items-center justify-between px-3.5 sm:px-6 relative z-10">
         {/* 1. Mobile Left: Brand Logo / Desktop Left: Breadcrumb Title */}
-        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
           {/* Mobile: Brand Logo (Always visible, clean, non-colliding) */}
           <div className="md:hidden flex items-center shrink-0">
             <SimplyLogo size="sm" showText={true} />
           </div>
 
-          {/* Desktop Breadcrumbs */}
-          <div className="hidden md:block">
-            <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+          {/* Desktop Breadcrumbs & Page Title (Single line, no awkward vertical wrapping) */}
+          <div className="hidden md:flex flex-col min-w-0">
+            <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap truncate">
               <span>Platform</span>
-              <span>/</span>
-              <span className="text-indigo-400 font-mono">{activeSubject.code}</span>
-              <span>/</span>
-              <span className="text-slate-400">{activeSubject.name}</span>
+              <span className="text-slate-600">/</span>
+              <span className="text-indigo-400 font-mono font-bold shrink-0">{activeSubject.code}</span>
+              <span className="text-slate-600">/</span>
+              <span className="text-slate-400 truncate max-w-[220px]">{activeSubject.name}</span>
             </div>
-            <h2 className="text-base font-black text-white tracking-tight">
+            <h1 className="text-sm sm:text-base font-black text-white tracking-tight truncate whitespace-nowrap">
               {getPageTitle(activeTab)}
-            </h2>
+            </h1>
           </div>
         </div>
 
         {/* 2. Desktop Center: Active Subject Selector */}
-        <div className="hidden md:flex items-center justify-center">
+        <div className="hidden md:flex items-center justify-center shrink-0 px-3">
           <div className="relative">
             <select
               value={activeSubject.id}
@@ -136,7 +136,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 const found = subjects.find((s) => s.id === e.target.value);
                 if (found) onSelectSubject(found);
               }}
-              className="appearance-none rounded-full border border-indigo-500/35 bg-slate-900/90 py-1 pl-3.5 pr-8 text-xs font-mono font-bold text-indigo-200 shadow-sm hover:border-indigo-400 focus:outline-none cursor-pointer max-w-[260px] truncate"
+              className="appearance-none rounded-full border border-indigo-500/35 bg-slate-900/90 py-1.5 pl-3.5 pr-8 text-xs font-mono font-bold text-indigo-200 shadow-sm hover:border-indigo-400 focus:outline-none cursor-pointer max-w-[260px] truncate"
             >
               {subjects.map((s) => (
                 <option key={s.id} value={s.id} className="bg-slate-900 text-white font-sans">
@@ -148,141 +148,81 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           </div>
         </div>
 
-        {/* 3. Right Controls: Streak, Tools, Profile & Mobile Hamburger */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-        {/* Exam Reference HUD Button (Periodic Table & Formulas) - SUBSCRIBERS ONLY */}
-        {isSubscribed && onOpenExamHud && (
-          <button
-            onClick={onOpenExamHud}
-            className="hidden sm:flex h-9 items-center justify-center gap-1.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 px-2.5 text-xs font-semibold text-indigo-300 transition cursor-pointer"
-            title="Open Interactive Periodic Table & Cambridge Formulas Reference HUD"
+        {/* 3. Right Controls: Essential status items only (Tools are neatly in Sidebar) */}
+        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+          {/* Daily Streak Flame Pill */}
+          <div
+            className="flex items-center gap-1 sm:gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-black text-amber-300 shadow-sm cursor-default"
+            title={`${streak.currentStreak} Day Study Streak`}
           >
-            <Atom className="h-4 w-4 text-indigo-400" />
-            <span className="hidden xl:inline text-[11px]">Reference HUD</span>
-          </button>
-        )}
+            <Flame className="h-3.5 w-3.5 text-amber-400 fill-amber-400 animate-pulse" />
+            <span className="font-mono text-xs">{streak.currentStreak}d</span>
+          </div>
 
-        {/* 1-Click Revision Kit Button - SUBSCRIBERS ONLY */}
-        {isSubscribed && onOpenRevisionKit && (
-          <button
-            onClick={onOpenRevisionKit}
-            className="hidden md:flex h-9 items-center justify-center gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 px-2.5 text-xs font-semibold text-amber-300 transition cursor-pointer"
-            title="Export Official Formula & Data Booklet (PDF)"
-          >
-            <Download className="h-4 w-4 text-amber-400" />
-            <span className="hidden xl:inline text-[11px]">Formula & Data Booklet</span>
-          </button>
-        )}
+          {/* Pro Upgrade / Status Pill */}
+          {onOpenPayment && (
+            <button
+              onClick={onOpenPayment}
+              className={`flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-xs font-bold transition cursor-pointer ${
+                currentUser?.isPro
+                  ? 'border border-amber-500/40 bg-amber-500/10 text-amber-300'
+                  : 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black shadow-md'
+              }`}
+            >
+              <Crown className="h-3.5 w-3.5" />
+              <span>{currentUser?.isPro ? 'PRO' : 'Get Pro'}</span>
+            </button>
+          )}
 
-        {/* Calculator Button (Desktop / Tablet) - SUBSCRIBERS ONLY */}
-        {isSubscribed && onOpenCalculator && (
-          <button
-            onClick={onOpenCalculator}
-            className="hidden sm:flex h-9 items-center justify-center gap-1.5 rounded-xl border border-slate-800 bg-slate-900 px-2.5 text-xs font-semibold text-slate-300 hover:border-amber-500/40 hover:text-amber-300 transition cursor-pointer"
-            title="IGCSE Scientific Calculator"
-          >
-            <Calculator className="h-4 w-4 text-amber-400" />
-            <span className="hidden lg:inline text-[11px]">Calculator</span>
-          </button>
-        )}
+          {/* Compact UI Theme Switcher (Liquid Glass vs Classic Solid) */}
+          {isSubscribed && onToggleDesignTheme && (
+            <button
+              onClick={onToggleDesignTheme}
+              className={`h-8 w-8 flex items-center justify-center rounded-xl border transition cursor-pointer text-sm ${
+                designTheme === 'liquid'
+                  ? 'border-cyan-400/40 bg-cyan-500/15 text-cyan-200 hover:bg-cyan-500/25 shadow-sm shadow-cyan-500/10'
+                  : 'border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700'
+              }`}
+              title={
+                designTheme === 'liquid'
+                  ? 'Currently in Liquid Glass UI. Click to switch to Classic Solid UI.'
+                  : 'Currently in Classic Solid UI. Click to switch to Liquid Glass UI.'
+              }
+            >
+              {designTheme === 'liquid' ? '✨' : '🛡️'}
+            </button>
+          )}
 
-        {/* Daily Streak Flame Pill (Mobile & Desktop) */}
-        <div
-          className="flex items-center gap-1 sm:gap-1.5 rounded-full sm:rounded-xl border border-amber-500/30 bg-amber-500/10 px-2 sm:px-2.5 py-1 text-xs font-black text-amber-300 shadow-sm cursor-default"
-          title={`${streak.currentStreak} Day Study Streak`}
-        >
-          <Flame className="h-3.5 w-3.5 text-amber-400 fill-amber-400 animate-pulse" />
-          <span className="font-mono text-[11px] sm:text-xs">{streak.currentStreak}d</span>
+          {/* Profile Avatar / Sign In */}
+          {currentUser ? (
+            <button
+              onClick={onOpenProfile}
+              className="h-8 w-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 flex items-center justify-center text-xs font-black text-white shadow-sm transition cursor-pointer"
+              title={`${currentUser.name} (${profile.targetGrade})`}
+            >
+              {currentUser.name.charAt(0).toUpperCase()}
+            </button>
+          ) : (
+            <button
+              onClick={() => onOpenAuth('signin')}
+              className="rounded-xl border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-bold text-slate-200 hover:text-white transition cursor-pointer"
+            >
+              Sign In
+            </button>
+          )}
+
+          {/* Mobile Sidebar Hamburger Toggle */}
+          {onOpenMobileSidebar && (
+            <button
+              onClick={onOpenMobileSidebar}
+              className="md:hidden flex h-8 w-8 items-center justify-center rounded-xl border border-slate-800 bg-slate-900 p-1.5 text-slate-300 hover:text-white transition cursor-pointer"
+              aria-label="Open Navigation Menu"
+            >
+              <Menu className="h-4 w-4 text-amber-400" />
+            </button>
+          )}
         </div>
-
-        {/* Scan Paper Camera Button (Desktop / Tablet) */}
-        {onOpenHandwritingScanner && (
-          <button
-            onClick={onOpenHandwritingScanner}
-            className="hidden sm:flex items-center gap-1.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 px-3 py-1.5 text-xs font-bold text-indigo-300 transition cursor-pointer"
-          >
-            <Scan className="h-3.5 w-3.5" />
-            <span>Scan Paper</span>
-          </button>
-        )}
-
-        {/* Pro Upgrade Pill (Desktop) */}
-        {onOpenPayment && (
-          <button
-            onClick={onOpenPayment}
-            className={`hidden sm:flex items-center gap-1.5 rounded-xl px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs font-bold transition cursor-pointer ${
-              currentUser?.isPro
-                ? 'border border-amber-500/40 bg-amber-500/10 text-amber-300'
-                : 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black shadow-md'
-            }`}
-          >
-            <Crown className="h-3.5 w-3.5" />
-            <span>{currentUser?.isPro ? 'PRO' : 'Get Pro'}</span>
-          </button>
-        )}
-
-        {/* Profile Avatar / Sign In */}
-        {currentUser ? (
-          <button
-            onClick={onOpenProfile}
-            className="h-8 w-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 flex items-center justify-center text-xs font-black text-white shadow-sm transition cursor-pointer"
-            title={`${currentUser.name} (${profile.targetGrade})`}
-          >
-            {currentUser.name.charAt(0).toUpperCase()}
-          </button>
-        ) : (
-          <button
-            onClick={() => onOpenAuth('signin')}
-            className="rounded-xl border border-slate-700 bg-slate-800 px-2.5 py-1 text-[11px] sm:text-xs font-bold text-slate-200 hover:text-white transition cursor-pointer"
-          >
-            Sign In
-          </button>
-        )}
-
-        {/* Design Theme Switcher (Liquid vs Classic Solid with 1-click fallback) - SUBSCRIBERS ONLY */}
-        {isSubscribed && onToggleDesignTheme && (
-          <button
-            onClick={onToggleDesignTheme}
-            className={`flex items-center gap-1.5 rounded-xl border px-2 sm:px-2.5 py-1 text-xs font-bold transition cursor-pointer ${
-              designTheme === 'liquid'
-                ? 'border-cyan-400/40 bg-cyan-500/15 text-cyan-200 hover:bg-cyan-500/25 shadow-sm shadow-cyan-500/10'
-                : 'border-slate-700 bg-slate-800/90 text-slate-300 hover:bg-slate-700'
-            }`}
-            title={
-              designTheme === 'liquid'
-                ? 'Currently in Liquid Glass UI. Click to revert back to Classic Solid UI.'
-                : 'Currently in Classic Solid UI. Click to switch to Liquid Glass UI.'
-            }
-          >
-            {designTheme === 'liquid' ? (
-              <>
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
-                </span>
-                <span className="text-[11px] font-semibold hidden md:inline">Liquid Glass</span>
-              </>
-            ) : (
-              <>
-                <span className="text-slate-400">🛡️</span>
-                <span className="text-[11px] font-semibold hidden md:inline">Classic Solid</span>
-              </>
-            )}
-          </button>
-        )}
-
-        {/* Mobile Sidebar Hamburger Toggle */}
-        {onOpenMobileSidebar && (
-          <button
-            onClick={onOpenMobileSidebar}
-            className="md:hidden flex h-8 w-8 items-center justify-center rounded-xl border border-slate-800 bg-slate-900 p-1.5 text-slate-300 hover:text-white transition cursor-pointer"
-            aria-label="Open Navigation Menu"
-          >
-            <Menu className="h-4 w-4 text-amber-400" />
-          </button>
-        )}
       </div>
-    </div>
 
     {/* Dedicated Mobile-Only Syllabus Bar (Zero brand overlap on 360px-430px) */}
     <div className="md:hidden border-t border-slate-800/80 bg-slate-900/60 px-3.5 py-1.5 flex items-center justify-between gap-2">
