@@ -1,3 +1,6 @@
+import fs from 'fs';
+import path from 'path';
+
 // Global in-memory dynamic staff codes table
 const DYNAMIC_STAFF_CODES: Record<string, any> = {
   '2011': {
@@ -7,6 +10,50 @@ const DYNAMIC_STAFF_CODES: Record<string, any> = {
     title: 'Founder & Head of Platform'
   }
 };
+
+// Global active device sessions table: key is normalized userId or email
+interface DeviceSessionEntry {
+  userId: string;
+  email: string;
+  sessionToken: string;
+  updatedAt: number;
+}
+
+const GLOBAL_ACTIVE_SESSIONS: Map<string, DeviceSessionEntry> = new Map();
+const SESSIONS_TMP_FILE = path.join(
+  process.platform === 'win32' ? process.env.TEMP || 'C:\\Windows\\Temp' : '/tmp',
+  'simply_device_sessions.json'
+);
+
+function loadPersistedSessions() {
+  try {
+    if (fs.existsSync(SESSIONS_TMP_FILE)) {
+      const data = JSON.parse(fs.readFileSync(SESSIONS_TMP_FILE, 'utf-8'));
+      if (typeof data === 'object' && data !== null) {
+        for (const [k, v] of Object.entries(data)) {
+          GLOBAL_ACTIVE_SESSIONS.set(k, v as DeviceSessionEntry);
+        }
+      }
+    }
+  } catch {
+    // ignore
+  }
+}
+
+function savePersistedSessions() {
+  try {
+    const obj: Record<string, any> = {};
+    for (const [k, v] of GLOBAL_ACTIVE_SESSIONS.entries()) {
+      obj[k] = v;
+    }
+    fs.writeFileSync(SESSIONS_TMP_FILE, JSON.stringify(obj), 'utf-8');
+  } catch {
+    // ignore
+  }
+}
+
+// Initial hydration
+loadPersistedSessions();
 
 export default async function handler(req: any, res?: any) {
   // CORS Headers
@@ -42,6 +89,94 @@ export default async function handler(req: any, res?: any) {
 
     const normalizedEmail = String(email).trim().toLowerCase();
     const cleanCode = String(code).trim();
+
+    // 0a. Cross-Device Single Session: Register Active Device Session (Invalidating Previous Devices)
+    if (action === 'register_session') {
+      const { userId = '', email: userEmail = '', sessionToken = '' } = body;
+      const cleanUserId = String(userId || '').trim().toLowerCase();
+      const cleanUserEmail = String(userEmail || '').trim().toLowerCase();
+      const cleanToken = String(sessionToken || '').trim();
+
+      if (!cleanToken || (!cleanUserId && !cleanUserEmail)) {
+        const payload = { success: false, error: 'User identifier and session token are required.' };
+        if (res?.status) return res.status(400).json(payload);
+        return new Response(JSON.stringify(payload), { status: 400, headers });
+      }
+
+      loadPersistedSessions();
+      const entry: DeviceSessionEntry = {
+        userId: cleanUserId,
+        email: cleanUserEmail,
+        sessionToken: cleanToken,
+        updatedAt: Date.now()
+      };
+
+      if (cleanUserId) GLOBAL_ACTIVE_SESSIONS.set(cleanUserId, entry);
+      if (cleanUserEmail) GLOBAL_ACTIVE_SESSIONS.set(cleanUserEmail, entry);
+      savePersistedSessions();
+
+      const payload = {
+        success: true,
+        message: 'Active device session registered. Any prior device session is now invalidated.',
+        activeToken: cleanToken
+      };
+      if (res?.status) return res.status(200).json(payload);
+      return new Response(JSON.stringify(payload), { status: 200, headers });
+    }
+
+    // 0b. Cross-Device Single Session: Heartbeat Verification
+    if (action === 'validate_session') {
+      const { userId = '', email: userEmail = '', sessionToken = '' } = body;
+      const cleanUserId = String(userId || '').trim().toLowerCase();
+      const cleanUserEmail = String(userEmail || '').trim().toLowerCase();
+      const cleanToken = String(sessionToken || '').trim();
+
+      loadPersistedSessions();
+      const stored = (cleanUserId && GLOBAL_ACTIVE_SESSIONS.get(cleanUserId)) ||
+                     (cleanUserEmail && GLOBAL_ACTIVE_SESSIONS.get(cleanUserEmail));
+
+      if (stored && stored.sessionToken && cleanToken && stored.sessionToken !== cleanToken) {
+        const payload = {
+          valid: false,
+          reason: 'You have been logged out because this account was logged into from another device. Only 1 active device is permitted per account.'
+        };
+        if (res?.status) return res.status(200).json(payload);
+        return new Response(JSON.stringify(payload), { status: 200, headers });
+      }
+
+      // If no session registered yet, seed this active token
+      if (!stored && cleanToken && (cleanUserId || cleanUserEmail)) {
+        const entry: DeviceSessionEntry = {
+          userId: cleanUserId,
+          email: cleanUserEmail,
+          sessionToken: cleanToken,
+          updatedAt: Date.now()
+        };
+        if (cleanUserId) GLOBAL_ACTIVE_SESSIONS.set(cleanUserId, entry);
+        if (cleanUserEmail) GLOBAL_ACTIVE_SESSIONS.set(cleanUserEmail, entry);
+        savePersistedSessions();
+      }
+
+      const payload = { valid: true };
+      if (res?.status) return res.status(200).json(payload);
+      return new Response(JSON.stringify(payload), { status: 200, headers });
+    }
+
+    // 0c. Clean Device Logout
+    if (action === 'logout_session') {
+      const { userId = '', email: userEmail = '' } = body;
+      const cleanUserId = String(userId || '').trim().toLowerCase();
+      const cleanUserEmail = String(userEmail || '').trim().toLowerCase();
+
+      loadPersistedSessions();
+      if (cleanUserId) GLOBAL_ACTIVE_SESSIONS.delete(cleanUserId);
+      if (cleanUserEmail) GLOBAL_ACTIVE_SESSIONS.delete(cleanUserEmail);
+      savePersistedSessions();
+
+      const payload = { success: true };
+      if (res?.status) return res.status(200).json(payload);
+      return new Response(JSON.stringify(payload), { status: 200, headers });
+    }
 
     // 1. Check if email matches configured admin email
     if (action === 'is_admin_email') {
@@ -131,6 +266,16 @@ export default async function handler(req: any, res?: any) {
           createdAt: '2026-01-01T00:00:00.000Z'
         };
 
+        const sessionEntry = {
+          userId: staffUser.id.toLowerCase(),
+          email: staffUser.email.toLowerCase(),
+          sessionToken: staffUser.currentSessionToken,
+          updatedAt: Date.now()
+        };
+        GLOBAL_ACTIVE_SESSIONS.set(staffUser.id.toLowerCase(), sessionEntry);
+        GLOBAL_ACTIVE_SESSIONS.set(staffUser.email.toLowerCase(), sessionEntry);
+        savePersistedSessions();
+
         const payload = {
           success: true,
           isFounder: isFounderUser,
@@ -167,6 +312,16 @@ export default async function handler(req: any, res?: any) {
             lastActiveAt: new Date().toISOString(),
             createdAt: new Date().toISOString()
           };
+
+          const sessionEntry = {
+            userId: staffUser.id.toLowerCase(),
+            email: staffUser.email.toLowerCase(),
+            sessionToken: staffUser.currentSessionToken,
+            updatedAt: Date.now()
+          };
+          GLOBAL_ACTIVE_SESSIONS.set(staffUser.id.toLowerCase(), sessionEntry);
+          GLOBAL_ACTIVE_SESSIONS.set(staffUser.email.toLowerCase(), sessionEntry);
+          savePersistedSessions();
 
           const payload = {
             success: true,
@@ -299,6 +454,16 @@ export default async function handler(req: any, res?: any) {
         lastActiveAt: new Date().toISOString(),
         createdAt: new Date().toISOString()
       };
+
+      const sessionEntry = {
+        userId: adminUser.id.toLowerCase(),
+        email: adminUser.email.toLowerCase(),
+        sessionToken: adminUser.currentSessionToken,
+        updatedAt: Date.now()
+      };
+      GLOBAL_ACTIVE_SESSIONS.set(adminUser.id.toLowerCase(), sessionEntry);
+      GLOBAL_ACTIVE_SESSIONS.set(adminUser.email.toLowerCase(), sessionEntry);
+      savePersistedSessions();
 
       const payload = {
         success: true,

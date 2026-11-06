@@ -175,6 +175,10 @@ export async function registerStudent(params: {
   localStorage.setItem('simply_device_session_token', newUser.currentSessionToken || '');
   setActiveUser(newUser);
 
+  if (newUser.currentSessionToken) {
+    notifyServerOfSession(newUser, newUser.currentSessionToken);
+  }
+
   return {
     success: true,
     user: newUser,
@@ -213,6 +217,9 @@ export async function loginStudent(email: string, password: string): Promise<{ s
         saveAllUsers(users);
         setActiveUser(adminUser);
         localStorage.setItem('simply_device_session_token', adminUser.currentSessionToken || '');
+        if (adminUser.currentSessionToken) {
+          notifyServerOfSession(adminUser, adminUser.currentSessionToken);
+        }
         return { success: true, user: adminUser };
       }
 
@@ -250,6 +257,7 @@ export async function loginStudent(email: string, password: string): Promise<{ s
   localStorage.setItem('simply_device_session_token', newSessionToken);
 
   setActiveUser(user);
+  notifyServerOfSession(user, newSessionToken);
   return { success: true, user };
 }
 
@@ -420,6 +428,7 @@ export async function loginWithAccessCode(code: string): Promise<{ success: bool
     saveAllUsers(users);
     setActiveUser(userToSet);
     localStorage.setItem('simply_device_session_token', sessionToken);
+    notifyServerOfSession(userToSet, sessionToken);
     return { success: true, user: userToSet };
   }
 
@@ -450,6 +459,9 @@ export async function loginWithAccessCode(code: string): Promise<{ success: bool
       saveAllUsers(users);
       setActiveUser(matched);
       localStorage.setItem('simply_device_session_token', matched.currentSessionToken || '');
+      if (matched.currentSessionToken) {
+        notifyServerOfSession(matched, matched.currentSessionToken);
+      }
       return { success: true, user: matched };
     }
   } catch {
@@ -913,10 +925,87 @@ export function validateActiveSession(currentUser: UserAccount | null): { valid:
 }
 
 /**
+ * Synchronizes the freshly generated session token with the central server session registry.
+ * Any other device currently using this account will be invalidated on their next heartbeat.
+ */
+export async function notifyServerOfSession(user: { id: string; email: string }, sessionToken: string): Promise<void> {
+  try {
+    await fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'register_session',
+        userId: user.id,
+        email: user.email,
+        sessionToken
+      })
+    });
+  } catch (err) {
+    console.warn('Could not register server session token:', err);
+  }
+}
+
+/**
+ * Validates active session both locally and with the central server registry.
+ * If another device has logged into this account, immediately signals invalidation so the past device logs out.
+ */
+export async function validateActiveSessionAsync(currentUser: UserAccount | null): Promise<{ valid: boolean; reason?: string }> {
+  if (!currentUser) return { valid: true };
+  const localToken = localStorage.getItem(DEVICE_SESSION_STORAGE_KEY);
+  if (!localToken) return { valid: true };
+
+  // 1. Instant check against local storage (for multi-tab / same browser windows)
+  const localCheck = validateActiveSession(currentUser);
+  if (!localCheck.valid) {
+    return localCheck;
+  }
+
+  // 2. Cross-device check against server registry
+  try {
+    const res = await fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'validate_session',
+        userId: currentUser.id,
+        email: currentUser.email,
+        sessionToken: localToken
+      })
+    });
+
+    if (res.ok) {
+      const data = await res.json().catch(() => ({}));
+      if (data && data.valid === false) {
+        return {
+          valid: false,
+          reason: data.reason || 'You have been logged out because this account was logged into from another device. Only 1 active device is permitted per account.'
+        };
+      }
+    }
+  } catch {
+    // Offline or network lag: fallback gracefully to local check
+  }
+
+  return { valid: true };
+}
+
+/**
  * Cleanly logs out the user and clears this device's session token.
  */
-export function logoutUser(): void {
+export function logoutUser(currentUser?: UserAccount | null): void {
   try {
+    const targetUser = currentUser || getActiveUser();
+    if (targetUser) {
+      fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'logout_session',
+          userId: targetUser.id,
+          email: targetUser.email
+        })
+      }).catch(() => {});
+    }
     localStorage.removeItem(STORAGE_ACTIVE_USER_ID);
     localStorage.removeItem(DEVICE_SESSION_STORAGE_KEY);
   } catch (e) {

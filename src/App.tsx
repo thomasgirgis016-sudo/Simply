@@ -63,7 +63,7 @@ import { initPwaListener } from './services/pwaService';
 import { AppSidebar } from './components/AppSidebar';
 import { AppHeader } from './components/AppHeader';
 import { SimplyLogo } from './components/SimplyLogo';
-import { getActiveUser, setActiveUser, grantUserProSubscription, hasActiveSubscription, updateUserAccount, validateActiveSession, logoutUser } from './services/auth';
+import { getActiveUser, setActiveUser, grantUserProSubscription, hasActiveSubscription, updateUserAccount, validateActiveSession, validateActiveSessionAsync, logoutUser } from './services/auth';
 import {
   Camera,
   Layers,
@@ -372,22 +372,39 @@ export function App() {
     localStorage.setItem('simply_igcse_revision', JSON.stringify(revisionNotes));
   }, [revisionNotes]);
 
-  // Single Device Enforcement Heartbeat: logs out if logged in elsewhere
+  // Cross-Device Single Active Session Enforcement Heartbeat
   useEffect(() => {
     if (!currentUser) return;
 
-    const checkSessionIntegrity = () => {
-      const validation = validateActiveSession(currentUser);
-      if (!validation.valid) {
-        setDeviceConflictAlert(
-          validation.reason ||
-          'You have been logged out because this account was logged into from another device. Only 1 device is allowed at a time.'
-        );
-        handleLogout();
+    let isChecking = false;
+    const checkSessionIntegrity = async () => {
+      if (isChecking) return;
+      isChecking = true;
+      try {
+        const validation = await validateActiveSessionAsync(currentUser);
+        if (!validation.valid) {
+          setDeviceConflictAlert(
+            validation.reason ||
+            'You have been logged out because this account was logged into from another device. Only 1 device is allowed at a time.'
+          );
+          handleLogout();
+        }
+      } catch {
+        // Fallback local check
+        const localValidation = validateActiveSession(currentUser);
+        if (!localValidation.valid) {
+          setDeviceConflictAlert(localValidation.reason || 'You have been logged out because this account was logged into elsewhere.');
+          handleLogout();
+        }
+      } finally {
+        isChecking = false;
       }
     };
 
-    const interval = setInterval(checkSessionIntegrity, 4000);
+    // Immediate check
+    checkSessionIntegrity();
+
+    const interval = setInterval(checkSessionIntegrity, 3000);
     window.addEventListener('focus', checkSessionIntegrity);
     window.addEventListener('storage', checkSessionIntegrity);
 

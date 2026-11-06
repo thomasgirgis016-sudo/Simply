@@ -17,6 +17,7 @@ import { ActiveTab } from './Navbar';
 import { SimplyLogo } from './SimplyLogo';
 import { getDailyStreak } from '../services/dailyStreak';
 import { handleLiquidMouseMove } from '../utils/liquidGlare';
+import { hasActiveSubscription } from '../services/auth';
 
 interface AppHeaderProps {
   activeTab: ActiveTab;
@@ -58,6 +59,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   onToggleDesignTheme,
 }) => {
   const streak = getDailyStreak();
+  const isSubscribed = Boolean(currentUser && hasActiveSubscription(currentUser));
 
   const getPageTitle = (tab: ActiveTab) => {
     switch (tab) {
@@ -148,8 +150,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
 
         {/* 3. Right Controls: Streak, Tools, Profile & Mobile Hamburger */}
         <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-        {/* Exam Reference HUD Button (Periodic Table & Formulas) */}
-        {onOpenExamHud && (
+        {/* Exam Reference HUD Button (Periodic Table & Formulas) - SUBSCRIBERS ONLY */}
+        {isSubscribed && onOpenExamHud && (
           <button
             onClick={onOpenExamHud}
             className="hidden sm:flex h-9 items-center justify-center gap-1.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 px-2.5 text-xs font-semibold text-indigo-300 transition cursor-pointer"
@@ -160,8 +162,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           </button>
         )}
 
-        {/* 1-Click Revision Kit Button */}
-        {onOpenRevisionKit && (
+        {/* 1-Click Revision Kit Button - SUBSCRIBERS ONLY */}
+        {isSubscribed && onOpenRevisionKit && (
           <button
             onClick={onOpenRevisionKit}
             className="hidden md:flex h-9 items-center justify-center gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 px-2.5 text-xs font-semibold text-amber-300 transition cursor-pointer"
@@ -172,8 +174,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           </button>
         )}
 
-        {/* Calculator Button (Desktop / Tablet) */}
-        {onOpenCalculator && (
+        {/* Calculator Button (Desktop / Tablet) - SUBSCRIBERS ONLY */}
+        {isSubscribed && onOpenCalculator && (
           <button
             onClick={onOpenCalculator}
             className="hidden sm:flex h-9 items-center justify-center gap-1.5 rounded-xl border border-slate-800 bg-slate-900 px-2.5 text-xs font-semibold text-slate-300 hover:border-amber-500/40 hover:text-amber-300 transition cursor-pointer"
@@ -237,8 +239,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           </button>
         )}
 
-        {/* Design Theme Switcher (Liquid vs Classic Solid with 1-click fallback) */}
-        {onToggleDesignTheme && (
+        {/* Design Theme Switcher (Liquid vs Classic Solid with 1-click fallback) - SUBSCRIBERS ONLY */}
+        {isSubscribed && onToggleDesignTheme && (
           <button
             onClick={onToggleDesignTheme}
             className={`flex items-center gap-1.5 rounded-xl border px-2 sm:px-2.5 py-1 text-xs font-bold transition cursor-pointer ${

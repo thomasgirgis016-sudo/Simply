@@ -53,6 +53,7 @@ import { Subject, UserProfile, UserAccount } from '../types';
 import { ActiveTab } from './Navbar';
 import { SimplyLogo } from './SimplyLogo';
 import { handleLiquidMouseMove } from '../utils/liquidGlare';
+import { hasActiveSubscription } from '../services/auth';
 
 interface AppSidebarProps {
   activeTab: ActiveTab;
@@ -166,6 +167,8 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
     onSelectTab(id);
     onCloseMobile();
   };
+
+  const isSubscribed = Boolean(currentUser && hasActiveSubscription(currentUser));
 
   const sidebarContent = (
     <div
@@ -314,97 +317,115 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
 
       {/* 3. Bottom Profile & System Footer */}
       <div className="space-y-2 p-3 border-t border-slate-800/80 bg-slate-950/90">
-        {/* Quick Exam Utilities */}
-        <div className="space-y-1">
-          {onOpenExamHud && (
-            <button
-              onClick={() => {
-                onOpenExamHud();
-                onCloseMobile();
-              }}
-              className="w-full flex items-center gap-2.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 px-2.5 py-1.5 text-xs font-semibold text-indigo-300 transition cursor-pointer"
-              title="Open Periodic Table & Formula Reference HUD"
-            >
-              <Atom className="h-4 w-4 text-indigo-400 shrink-0" />
-              {!isCollapsed && <span>Reference HUD (Formulas)</span>}
-            </button>
-          )}
+        {/* Quick Exam Utilities - STRICTLY restricted to active subscribers & admins */}
+        {isSubscribed ? (
+          <div className="space-y-1">
+            {onOpenExamHud && (
+              <button
+                onClick={() => {
+                  onOpenExamHud();
+                  onCloseMobile();
+                }}
+                className="w-full flex items-center gap-2.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 px-2.5 py-1.5 text-xs font-semibold text-indigo-300 transition cursor-pointer"
+                title="Open Periodic Table & Formula Reference HUD"
+              >
+                <Atom className="h-4 w-4 text-indigo-400 shrink-0" />
+                {!isCollapsed && <span>Reference HUD (Formulas)</span>}
+              </button>
+            )}
 
-          {onOpenRevisionKit && (
-            <button
-              onClick={() => {
-                onOpenRevisionKit();
-                onCloseMobile();
-              }}
-              className="w-full flex items-center gap-2.5 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 px-2.5 py-1.5 text-xs font-semibold text-rose-300 transition cursor-pointer"
-              title="1-Click Complete Revision Kit PDF Booklet"
-            >
-              <Download className="h-4 w-4 text-rose-400 shrink-0" />
-              {!isCollapsed && <span>1-Click Revision Kit (PDF)</span>}
-            </button>
-          )}
+            {onOpenRevisionKit && (
+              <button
+                onClick={() => {
+                  onOpenRevisionKit();
+                  onCloseMobile();
+                }}
+                className="w-full flex items-center gap-2.5 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 px-2.5 py-1.5 text-xs font-semibold text-rose-300 transition cursor-pointer"
+                title="1-Click Complete Revision Kit PDF Booklet"
+              >
+                <Download className="h-4 w-4 text-rose-400 shrink-0" />
+                {!isCollapsed && <span>1-Click Revision Kit (PDF)</span>}
+              </button>
+            )}
 
-          {onOpenPwaModal && (
-            <button
-              onClick={() => {
-                onOpenPwaModal();
-                onCloseMobile();
-              }}
-              className="w-full flex items-center gap-2.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 px-2.5 py-1.5 text-xs font-semibold text-emerald-300 transition cursor-pointer"
-              title="Install Simply IGCSE App"
-            >
-              <Smartphone className="h-4 w-4 text-emerald-400 shrink-0" />
-              {!isCollapsed && <span>Install Mobile App</span>}
-            </button>
-          )}
+            {onOpenPwaModal && (
+              <button
+                onClick={() => {
+                  onOpenPwaModal();
+                  onCloseMobile();
+                }}
+                className="w-full flex items-center gap-2.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 px-2.5 py-1.5 text-xs font-semibold text-emerald-300 transition cursor-pointer"
+                title="Install Simply IGCSE App"
+              >
+                <Smartphone className="h-4 w-4 text-emerald-400 shrink-0" />
+                {!isCollapsed && <span>Install Mobile App</span>}
+              </button>
+            )}
 
-          {/* Scientific Calculator Quick Action */}
-          {onOpenCalculator && (
-            <button
-              onClick={() => {
-                onOpenCalculator();
-                onCloseMobile();
-              }}
-              className="w-full flex items-center gap-2.5 rounded-xl border border-slate-800 bg-slate-900/70 hover:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-amber-300 transition cursor-pointer"
-            >
-              <Calculator className="h-4 w-4 text-amber-400 shrink-0" />
-              {!isCollapsed && <span>Scientific Calculator</span>}
-            </button>
-          )}
+            {/* Scientific Calculator Quick Action */}
+            {onOpenCalculator && (
+              <button
+                onClick={() => {
+                  onOpenCalculator();
+                  onCloseMobile();
+                }}
+                className="w-full flex items-center gap-2.5 rounded-xl border border-slate-800 bg-slate-900/70 hover:bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-amber-300 transition cursor-pointer"
+              >
+                <Calculator className="h-4 w-4 text-amber-400 shrink-0" />
+                {!isCollapsed && <span>Scientific Calculator</span>}
+              </button>
+            )}
 
-          {/* Liquid vs Classic Solid Fallback Switcher */}
-          {onToggleDesignTheme && (
-            <button
-              onClick={onToggleDesignTheme}
-              onMouseMove={designTheme === 'liquid' ? handleLiquidMouseMove : undefined}
-              className={`group relative w-full flex items-center justify-between rounded-xl border px-2.5 py-1.5 text-xs font-semibold transition cursor-pointer overflow-hidden ${
-                designTheme === 'liquid'
-                  ? 'border-cyan-400/40 bg-cyan-950/40 text-cyan-200 hover:bg-cyan-900/50'
-                  : 'border-slate-800 bg-slate-900/70 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
-              }`}
-              title={
-                designTheme === 'liquid'
-                  ? 'Currently in Liquid Glass UI. Click here to revert back to Classic Solid UI anytime.'
-                  : 'Currently in Classic Solid UI. Click here to switch to Liquid Glass UI.'
-              }
-            >
-              {designTheme === 'liquid' && <div className="liquid-glare" />}
-              <span className="flex items-center gap-2 relative z-10">
-                <span className="text-sm shrink-0">{designTheme === 'liquid' ? '✨' : '🛡️'}</span>
+            {/* Liquid vs Classic Solid Fallback Switcher */}
+            {onToggleDesignTheme && (
+              <button
+                onClick={onToggleDesignTheme}
+                onMouseMove={designTheme === 'liquid' ? handleLiquidMouseMove : undefined}
+                className={`group relative w-full flex items-center justify-between rounded-xl border px-2.5 py-1.5 text-xs font-semibold transition cursor-pointer overflow-hidden ${
+                  designTheme === 'liquid'
+                    ? 'border-cyan-400/40 bg-cyan-950/40 text-cyan-200 hover:bg-cyan-900/50'
+                    : 'border-slate-800 bg-slate-900/70 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                }`}
+                title={
+                  designTheme === 'liquid'
+                    ? 'Currently in Liquid Glass UI. Click here to revert back to Classic Solid UI anytime.'
+                    : 'Currently in Classic Solid UI. Click here to switch to Liquid Glass UI.'
+                }
+              >
+                {designTheme === 'liquid' && <div className="liquid-glare" />}
+                <span className="flex items-center gap-2 relative z-10">
+                  <span className="text-sm shrink-0">{designTheme === 'liquid' ? '✨' : '🛡️'}</span>
+                  {!isCollapsed && (
+                    <span className="text-[11px] truncate">
+                      {designTheme === 'liquid' ? 'Liquid Glass UI' : 'Classic Solid UI'}
+                    </span>
+                  )}
+                </span>
                 {!isCollapsed && (
-                  <span className="text-[11px] truncate">
-                    {designTheme === 'liquid' ? 'Liquid Glass UI' : 'Classic Solid UI'}
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-white/10 uppercase tracking-wider relative z-10">
+                    {designTheme === 'liquid' ? 'Active' : 'Revert'}
                   </span>
                 )}
-              </span>
-              {!isCollapsed && (
-                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-white/10 uppercase tracking-wider relative z-10">
-                  {designTheme === 'liquid' ? 'Active' : 'Revert'}
-                </span>
-              )}
-            </button>
-          )}
-        </div>
+              </button>
+            )}
+          </div>
+        ) : (
+          currentUser && onOpenPayment && (
+            <div className="space-y-1">
+              <button
+                onClick={() => {
+                  onOpenPayment();
+                  onCloseMobile();
+                }}
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 py-2 px-3 text-xs font-black text-slate-950 shadow-md hover:brightness-110 transition cursor-pointer"
+                title="Subscribe to Simply IGCSE Pro to unlock full platform"
+              >
+                <Crown className="h-3.5 w-3.5 text-slate-950 fill-slate-950" />
+                {!isCollapsed && <span>Subscribe to Unlock</span>}
+              </button>
+            </div>
+          )
+        )}
 
         {/* User Card */}
         {currentUser ? (

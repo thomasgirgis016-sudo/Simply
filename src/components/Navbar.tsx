@@ -50,6 +50,7 @@ import { UserProfile, Subject, UserAccount } from '../types';
 import { SimplyLogo } from './SimplyLogo';
 import { getDailyStreak, DailyStreakState } from '../services/dailyStreak';
 import { handleLiquidMouseMove } from '../utils/liquidGlare';
+import { hasActiveSubscription } from '../services/auth';
 
 export type ActiveTab =
   | 'home'
@@ -131,6 +132,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   designTheme = 'liquid',
   onToggleDesignTheme,
 }) => {
+  const isSubscribed = Boolean(currentUser && hasActiveSubscription(currentUser));
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const [streakState, setStreakState] = useState<DailyStreakState>(() => getDailyStreak());
 
@@ -407,8 +409,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             )}
 
-            {/* Liquid vs Classic Solid Design Switcher */}
-            {onToggleDesignTheme && (
+            {/* Liquid vs Classic Solid Design Switcher - SUBSCRIBERS ONLY */}
+            {isSubscribed && onToggleDesignTheme && (
               <button
                 onClick={onToggleDesignTheme}
                 className={`flex items-center gap-1.5 rounded-xl border px-2.5 py-1.5 text-xs font-semibold transition cursor-pointer ${
@@ -749,7 +751,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 )}
               </div>
 
-              {onToggleDesignTheme && (
+              {isSubscribed && onToggleDesignTheme && (
                 <button
                   onClick={() => {
                     onToggleDesignTheme();
