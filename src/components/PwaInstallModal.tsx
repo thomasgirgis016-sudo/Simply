@@ -24,21 +24,37 @@ export const PwaInstallModal: React.FC<PwaInstallModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  const [canPrompt, setCanPrompt] = useState(isPwaInstallable());
+  const [canPrompt, setCanPrompt] = useState(() => {
+    try {
+      return isPwaInstallable();
+    } catch {
+      return false;
+    }
+  });
   const [isIOS, setIsIOS] = useState(false);
-  const [isInstalled, setIsInstalled] = useState(isRunningStandalone());
+  const [isInstalled, setIsInstalled] = useState(() => {
+    try {
+      return isRunningStandalone();
+    } catch {
+      return false;
+    }
+  });
 
   useEffect(() => {
-    const userAgent = window.navigator.userAgent.toLowerCase();
-    const isIosDevice = /iphone|ipad|ipod/.test(userAgent);
-    setIsIOS(isIosDevice);
-    setIsInstalled(isRunningStandalone());
+    try {
+      const userAgent = (typeof window !== 'undefined' && window.navigator?.userAgent ? window.navigator.userAgent : '').toLowerCase();
+      const isIosDevice = /iphone|ipad|ipod/.test(userAgent);
+      setIsIOS(isIosDevice);
+      setIsInstalled(isRunningStandalone());
 
-    const handleInstallable = (e: any) => {
-      setCanPrompt(e.detail);
-    };
-    window.addEventListener('simply_pwa_installable', handleInstallable);
-    return () => window.removeEventListener('simply_pwa_installable', handleInstallable);
+      const handleInstallable = (e: any) => {
+        setCanPrompt(e.detail);
+      };
+      window.addEventListener('simply_pwa_installable', handleInstallable);
+      return () => window.removeEventListener('simply_pwa_installable', handleInstallable);
+    } catch (err) {
+      console.warn('PWA initialization error:', err);
+    }
   }, []);
 
   if (!isOpen) return null;

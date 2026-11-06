@@ -23,7 +23,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   </head>
   <body class="bg-[#090d16] text-slate-100 antialiased font-['Plus_Jakarta_Sans',sans-serif] overscroll-none">
-    <div id="root"></div>
+    <div id="root">
+      <div id="simply-preloader" style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;color:#94a3b8;background:#090d16;padding:24px;text-align:center;">
+        <div style="width:44px;height:44px;border:3px solid rgba(255,255,255,0.08);border-top-color:#6366f1;border-right-color:#ec4899;border-radius:50%;animation:simply-spin 0.9s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite;margin-bottom:18px;"></div>
+        <div style="font-weight:800;font-size:18px;color:#f8fafc;letter-spacing:-0.02em;">Simply IGCSE</div>
+        <div id="simply-preloader-hint" style="font-size:12px;margin-top:6px;max-width:320px;color:#64748b;">Loading study suite...</div>
+        <style>@keyframes simply-spin{to{transform:rotate(360deg)}}</style>
+        <script>
+          setTimeout(function() {
+            var hint = document.getElementById('simply-preloader-hint');
+            if (hint) {
+              hint.innerHTML = '<span style="color:#fbbf24;">Taking longer than expected?</span><br/><button onclick="try{localStorage.clear();sessionStorage.clear();}catch(e){}if(\'serviceWorker\' in navigator){navigator.serviceWorker.getRegistrations().then(function(regs){for(var r of regs)r.unregister();location.reload(true);});}else{location.reload(true);}" style="margin-top:12px;display:inline-block;padding:9px 18px;background:linear-gradient(135deg,#6366f1,#4f46e5);color:white;border:none;border-radius:10px;font-weight:800;font-size:12px;cursor:pointer;box-shadow:0 4px 14px rgba(79,70,229,0.4);">Reset Cache & Reload</button>';
+            }
+          }, 3500);
+        </script>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

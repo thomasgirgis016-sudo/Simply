@@ -32,8 +32,12 @@ export const promptPwaInstall = async (): Promise<boolean> => {
 };
 
 export const isRunningStandalone = (): boolean => {
-  return (
-    window.matchMedia('(display-mode: standalone)').matches ||
-    (window.navigator as any).standalone === true
-  );
+  try {
+    if (typeof window === 'undefined') return false;
+    const matchMediaStandalone = window.matchMedia ? window.matchMedia('(display-mode: standalone)').matches : false;
+    const navStandalone = (typeof window.navigator !== 'undefined' && (window.navigator as any)?.standalone === true);
+    return Boolean(matchMediaStandalone || navStandalone);
+  } catch {
+    return false;
+  }
 };
