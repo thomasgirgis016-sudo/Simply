@@ -90,8 +90,9 @@ export async function syncUsersWithServer(): Promise<UserAccount[]> {
           if (!existing) {
             map.set(key, u);
           } else {
-            // Merge with server version, keeping updated attributes
-            map.set(key, { ...existing, ...u });
+            // Merge with server version while preserving local active session token to prevent false logout
+            const activeLocalSession = existing.currentSessionToken;
+            map.set(key, { ...existing, ...u, currentSessionToken: activeLocalSession || u.currentSessionToken });
           }
         }
       }
@@ -1015,6 +1016,10 @@ export const DEVICE_SESSION_STORAGE_KEY = 'simply_device_session_token';
  */
 export function validateActiveSession(currentUser: UserAccount | null): { valid: boolean; reason?: string } {
   if (!currentUser) return { valid: true };
+  // Founder and Administrator accounts have permanent multi-device access and are never kicked out
+  if (currentUser.role === 'founder' || currentUser.role === 'admin' || currentUser.id === 'founder_thomas') {
+    return { valid: true };
+  }
   try {
     const localToken = localStorage.getItem(DEVICE_SESSION_STORAGE_KEY);
     const allUsers = getAllUsers();
@@ -1022,6 +1027,10 @@ export function validateActiveSession(currentUser: UserAccount | null): { valid:
 
     if (!freshUser) {
       return { valid: false, reason: 'User account record no longer exists.' };
+    }
+
+    if (freshUser.role === 'founder' || freshUser.role === 'admin') {
+      return { valid: true };
     }
 
     // If the account has an active session token and this device's token doesn't match:
@@ -1075,6 +1084,9 @@ export async function notifyServerOfSession(user: { id: string; email: string },
  */
 export async function validateActiveSessionAsync(currentUser: UserAccount | null): Promise<{ valid: boolean; reason?: string }> {
   if (!currentUser) return { valid: true };
+  if (currentUser.role === 'founder' || currentUser.role === 'admin' || currentUser.id === 'founder_thomas') {
+    return { valid: true };
+  }
   const localToken = localStorage.getItem(DEVICE_SESSION_STORAGE_KEY);
   if (!localToken) return { valid: true };
 

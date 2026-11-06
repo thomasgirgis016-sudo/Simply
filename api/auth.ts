@@ -265,6 +265,13 @@ export default async function handler(req: any, res?: any) {
       const cleanUserEmail = String(userEmail || '').trim().toLowerCase();
       const cleanToken = String(sessionToken || '').trim();
 
+      // Founder and Admin accounts have unlimited multi-device access
+      if (cleanUserId === 'founder_thomas' || cleanUserEmail === 'thomas@simplyigcse.com' || cleanUserId.includes('founder') || cleanUserId.includes('admin')) {
+        const payload = { valid: true };
+        if (res?.status) return res.status(200).json(payload);
+        return new Response(JSON.stringify(payload), { status: 200, headers });
+      }
+
       loadPersistedSessions();
       const stored = (cleanUserId && GLOBAL_ACTIVE_SESSIONS.get(cleanUserId)) ||
                      (cleanUserEmail && GLOBAL_ACTIVE_SESSIONS.get(cleanUserEmail));

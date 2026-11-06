@@ -395,7 +395,10 @@ export function App() {
 
   // Cross-Device Single Active Session Enforcement Heartbeat
   useEffect(() => {
-    if (!currentUser) return;
+    // Founder and Admin accounts have permanent multi-device access and are never kicked out
+    if (!currentUser || currentUser.role === 'founder' || currentUser.role === 'admin' || currentUser.id === 'founder_thomas') {
+      return;
+    }
 
     let isChecking = false;
     const checkSessionIntegrity = async () => {
