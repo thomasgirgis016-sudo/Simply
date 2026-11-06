@@ -152,18 +152,43 @@ export function App() {
     initPwaListener();
   }, []);
 
-  // 4b. Executive Design System & Theme
-  const [designTheme, setDesignTheme] = useState<'executive'>('executive');
+  // 4b. Liquid vs Executive Design System & Theme
+  const [designTheme, setDesignTheme] = useState<'liquid' | 'executive'>(() => {
+    try {
+      const saved = localStorage.getItem('simply_design_theme');
+      if (saved === 'executive' || saved === 'liquid') return saved;
+    } catch {
+      // fallback
+    }
+    return 'liquid'; // Default to user requested Liquid Glass UI
+  });
+
+  const handleToggleDesignTheme = () => {
+    setDesignTheme((prev) => {
+      const next = prev === 'liquid' ? 'executive' : 'liquid';
+      try {
+        localStorage.setItem('simply_design_theme', next);
+      } catch {
+        // fallback
+      }
+      return next;
+    });
+  };
 
   useEffect(() => {
     try {
-      localStorage.setItem('simply_design_theme', 'executive');
-      document.documentElement.classList.add('executive');
-      document.documentElement.classList.remove('classic');
+      localStorage.setItem('simply_design_theme', designTheme);
+      if (designTheme === 'liquid') {
+        document.documentElement.classList.add('liquid-theme');
+        document.documentElement.classList.remove('executive-theme');
+      } else {
+        document.documentElement.classList.add('executive-theme');
+        document.documentElement.classList.remove('liquid-theme');
+      }
     } catch (e) {
       console.warn('Design theme sync error:', e);
     }
-  }, []);
+  }, [designTheme]);
 
   // 4c. Theme & Accessibility State
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
@@ -624,6 +649,8 @@ export function App() {
         onOpenPwaModal={() => setIsPwaModalOpen(true)}
         isMobileOpen={isMobileSidebarOpen}
         onCloseMobile={() => setIsMobileSidebarOpen(false)}
+        designTheme={designTheme}
+        onToggleDesignTheme={handleToggleDesignTheme}
       />
 
       {/* Main App Canvas */}
@@ -635,6 +662,8 @@ export function App() {
           onSelectSubject={setActiveSubject}
           profile={profile}
           currentUser={currentUser}
+          designTheme={designTheme}
+          onToggleDesignTheme={handleToggleDesignTheme}
           onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)}
           onOpenProfile={() => setIsProfileOpen(true)}
           onOpenPayment={() => setIsPaymentOpen(true)}

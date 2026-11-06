@@ -16,6 +16,7 @@ import { Subject, UserProfile, UserAccount } from '../types';
 import { ActiveTab } from './Navbar';
 import { SimplyLogo } from './SimplyLogo';
 import { getDailyStreak } from '../services/dailyStreak';
+import { handleLiquidMouseMove } from '../utils/liquidGlare';
 
 interface AppHeaderProps {
   activeTab: ActiveTab;
@@ -33,6 +34,8 @@ interface AppHeaderProps {
   onOpenRevisionKit?: () => void;
   onOpenPwaModal?: () => void;
   onOpenAuth: (mode?: 'signin' | 'signup') => void;
+  designTheme?: 'liquid' | 'executive';
+  onToggleDesignTheme?: () => void;
 }
 
 export const AppHeader: React.FC<AppHeaderProps> = ({
@@ -51,6 +54,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   onOpenRevisionKit,
   onOpenPwaModal,
   onOpenAuth,
+  designTheme = 'liquid',
+  onToggleDesignTheme,
 }) => {
   const streak = getDailyStreak();
 
@@ -87,9 +92,17 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-30 w-full border-b border-slate-800/80 bg-slate-950/95 backdrop-blur-xl">
+    <header
+      onMouseMove={designTheme === 'liquid' ? handleLiquidMouseMove : undefined}
+      className={`sticky top-0 z-30 w-full border-b transition-all duration-300 relative overflow-hidden ${
+        designTheme === 'liquid'
+          ? 'liquid-nav bg-slate-950/75 backdrop-blur-2xl border-white/10 shadow-2xl'
+          : 'border-slate-800/80 bg-slate-950/95 backdrop-blur-xl'
+      }`}
+    >
+      {designTheme === 'liquid' && <div className="liquid-glare" />}
       {/* Top Row: Brand & Main Navigation Controls */}
-      <div className="flex h-14 sm:h-16 w-full items-center justify-between px-3.5 sm:px-6">
+      <div className="flex h-14 sm:h-16 w-full items-center justify-between px-3.5 sm:px-6 relative z-10">
         {/* 1. Mobile Left: Brand Logo / Desktop Left: Breadcrumb Title */}
         <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
           {/* Mobile: Brand Logo (Always visible, clean, non-colliding) */}
@@ -221,6 +234,38 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             className="rounded-xl border border-slate-700 bg-slate-800 px-2.5 py-1 text-[11px] sm:text-xs font-bold text-slate-200 hover:text-white transition cursor-pointer"
           >
             Sign In
+          </button>
+        )}
+
+        {/* Design Theme Switcher (Liquid vs Classic Solid with 1-click fallback) */}
+        {onToggleDesignTheme && (
+          <button
+            onClick={onToggleDesignTheme}
+            className={`flex items-center gap-1.5 rounded-xl border px-2 sm:px-2.5 py-1 text-xs font-bold transition cursor-pointer ${
+              designTheme === 'liquid'
+                ? 'border-cyan-400/40 bg-cyan-500/15 text-cyan-200 hover:bg-cyan-500/25 shadow-sm shadow-cyan-500/10'
+                : 'border-slate-700 bg-slate-800/90 text-slate-300 hover:bg-slate-700'
+            }`}
+            title={
+              designTheme === 'liquid'
+                ? 'Currently in Liquid Glass UI. Click to revert back to Classic Solid UI.'
+                : 'Currently in Classic Solid UI. Click to switch to Liquid Glass UI.'
+            }
+          >
+            {designTheme === 'liquid' ? (
+              <>
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                </span>
+                <span className="text-[11px] font-semibold hidden md:inline">Liquid Glass</span>
+              </>
+            ) : (
+              <>
+                <span className="text-slate-400">🛡️</span>
+                <span className="text-[11px] font-semibold hidden md:inline">Classic Solid</span>
+              </>
+            )}
           </button>
         )}
 

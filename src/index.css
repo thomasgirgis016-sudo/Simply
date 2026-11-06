@@ -592,5 +592,71 @@ html.executive .shadow-xl {
   }
 }
 
+/* =========================================================================
+   LIQUID GLASS & SPOTLIGHT GLARE THEME
+   ========================================================================= */
+:root {
+  --glare-color: rgba(255, 255, 255, 0.32);
+  --x: 50%;
+  --y: 50%;
+}
+
+.liquid-glare {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(circle 90px at var(--x, 50%) var(--y, 50%), var(--glare-color, rgba(255, 255, 255, 0.32)), transparent 100%);
+  mix-blend-mode: overlay;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 10;
+}
+
+.liquid-nav:hover .liquid-glare,
+.liquid-item:hover .liquid-glare,
+.liquid-card:hover .liquid-glare,
+.liquid-btn:hover .liquid-glare {
+  opacity: 1;
+}
+
+/* Liquid Theme Overrides (When Liquid UI is Active) */
+.liquid-theme .liquid-nav {
+  position: relative;
+  background: rgba(10, 15, 30, 0.72) !important;
+  backdrop-filter: blur(24px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.14) !important;
+}
+
+.liquid-theme .liquid-sidebar {
+  background: rgba(8, 12, 24, 0.82) !important;
+  backdrop-filter: blur(28px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(200%) !important;
+  border-right-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 4px 0 30px rgba(0, 0, 0, 0.5) !important;
+}
+
+.liquid-theme .liquid-item {
+  position: relative;
+  border-radius: 12px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.liquid-theme .liquid-item:hover {
+  background: rgba(255, 255, 255, 0.07) !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+}
+
+.liquid-theme .liquid-card {
+  position: relative;
+  background: rgba(13, 19, 36, 0.68) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 1px 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
 
 

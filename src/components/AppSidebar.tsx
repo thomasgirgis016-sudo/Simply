@@ -52,6 +52,7 @@ import {
 import { Subject, UserProfile, UserAccount } from '../types';
 import { ActiveTab } from './Navbar';
 import { SimplyLogo } from './SimplyLogo';
+import { handleLiquidMouseMove } from '../utils/liquidGlare';
 
 interface AppSidebarProps {
   activeTab: ActiveTab;
@@ -74,6 +75,8 @@ interface AppSidebarProps {
   onOpenPwaModal?: () => void;
   isMobileOpen: boolean;
   onCloseMobile: () => void;
+  designTheme?: 'liquid' | 'executive';
+  onToggleDesignTheme?: () => void;
 }
 
 export const AppSidebar: React.FC<AppSidebarProps> = ({
@@ -97,6 +100,8 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   onOpenPwaModal,
   isMobileOpen,
   onCloseMobile,
+  designTheme = 'liquid',
+  onToggleDesignTheme,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -163,7 +168,15 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   };
 
   const sidebarContent = (
-    <div className="flex h-full flex-col justify-between overflow-y-auto no-scrollbar bg-slate-950 border-r border-slate-800/90 text-slate-300">
+    <div
+      onMouseMove={designTheme === 'liquid' ? handleLiquidMouseMove : undefined}
+      className={`flex h-full flex-col justify-between overflow-y-auto no-scrollbar relative transition-all duration-300 ${
+        designTheme === 'liquid'
+          ? 'liquid-sidebar bg-slate-950/80 backdrop-blur-2xl border-r border-white/10 text-slate-200 shadow-2xl'
+          : 'bg-slate-950 border-r border-slate-800/90 text-slate-300'
+      }`}
+    >
+      {designTheme === 'liquid' && <div className="liquid-glare" />}
       {/* 1. Top Section: Logo, Subject Picker, Collapse Toggle */}
       <div className="space-y-4 p-4 border-b border-slate-800/80">
         <div className="flex items-center justify-between">
@@ -246,19 +259,23 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                 <button
                   key={item.id}
                   onClick={() => handleItemClick(item.id as ActiveTab)}
-                  className={`group relative flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-xs font-semibold transition cursor-pointer ${
+                  onMouseMove={designTheme === 'liquid' ? handleLiquidMouseMove : undefined}
+                  className={`group relative flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-xs font-semibold transition cursor-pointer overflow-hidden ${
+                    designTheme === 'liquid' ? 'liquid-item' : ''
+                  } ${
                     isActive
-                      ? 'bg-indigo-600/20 text-white border border-indigo-500/40 shadow-sm'
+                      ? 'bg-indigo-600/25 text-white border border-indigo-400/40 shadow-sm'
                       : 'text-slate-400 hover:bg-slate-900/80 hover:text-slate-200'
                   }`}
                   title={item.label}
                 >
-                  <Icon className={`h-4 w-4 shrink-0 ${isActive ? item.color : 'text-slate-400 group-hover:text-slate-200'}`} />
+                  {designTheme === 'liquid' && <div className="liquid-glare" />}
+                  <Icon className={`h-4 w-4 shrink-0 relative z-10 ${isActive ? item.color : 'text-slate-400 group-hover:text-slate-200'}`} />
                   {!isCollapsed && (
-                    <span className="truncate">{item.label}</span>
+                    <span className="truncate relative z-10">{item.label}</span>
                   )}
                   {isActive && !isCollapsed && (
-                    <span className="ml-auto h-1.5 w-1.5 rounded-full bg-indigo-400 shadow-sm shadow-indigo-400" />
+                    <span className="ml-auto h-1.5 w-1.5 rounded-full bg-indigo-400 shadow-sm shadow-indigo-400 relative z-10" />
                   )}
                 </button>
               );
@@ -276,15 +293,19 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             )}
             <button
               onClick={() => handleItemClick('admin')}
-              className={`flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-xs font-bold transition cursor-pointer ${
+              onMouseMove={designTheme === 'liquid' ? handleLiquidMouseMove : undefined}
+              className={`group relative flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-xs font-bold transition cursor-pointer overflow-hidden ${
+                designTheme === 'liquid' ? 'liquid-item' : ''
+              } ${
                 activeTab === 'admin'
                   ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
                   : 'text-amber-400/80 hover:bg-slate-900 hover:text-amber-300'
               }`}
             >
-              <Crown className="h-4 w-4 shrink-0 text-amber-400 fill-amber-400" />
+              {designTheme === 'liquid' && <div className="liquid-glare" />}
+              <Crown className="h-4 w-4 shrink-0 text-amber-400 fill-amber-400 relative z-10" />
               {!isCollapsed && (
-                <span>{currentUser.role === 'founder' ? 'Founder Console' : 'Admin Console'}</span>
+                <span className="relative z-10">{currentUser.role === 'founder' ? 'Founder Console' : 'Admin Console'}</span>
               )}
             </button>
           </div>
@@ -348,6 +369,39 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             >
               <Calculator className="h-4 w-4 text-amber-400 shrink-0" />
               {!isCollapsed && <span>Scientific Calculator</span>}
+            </button>
+          )}
+
+          {/* Liquid vs Classic Solid Fallback Switcher */}
+          {onToggleDesignTheme && (
+            <button
+              onClick={onToggleDesignTheme}
+              onMouseMove={designTheme === 'liquid' ? handleLiquidMouseMove : undefined}
+              className={`group relative w-full flex items-center justify-between rounded-xl border px-2.5 py-1.5 text-xs font-semibold transition cursor-pointer overflow-hidden ${
+                designTheme === 'liquid'
+                  ? 'border-cyan-400/40 bg-cyan-950/40 text-cyan-200 hover:bg-cyan-900/50'
+                  : 'border-slate-800 bg-slate-900/70 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+              }`}
+              title={
+                designTheme === 'liquid'
+                  ? 'Currently in Liquid Glass UI. Click here to revert back to Classic Solid UI anytime.'
+                  : 'Currently in Classic Solid UI. Click here to switch to Liquid Glass UI.'
+              }
+            >
+              {designTheme === 'liquid' && <div className="liquid-glare" />}
+              <span className="flex items-center gap-2 relative z-10">
+                <span className="text-sm shrink-0">{designTheme === 'liquid' ? '✨' : '🛡️'}</span>
+                {!isCollapsed && (
+                  <span className="text-[11px] truncate">
+                    {designTheme === 'liquid' ? 'Liquid Glass UI' : 'Classic Solid UI'}
+                  </span>
+                )}
+              </span>
+              {!isCollapsed && (
+                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-white/10 uppercase tracking-wider relative z-10">
+                  {designTheme === 'liquid' ? 'Active' : 'Revert'}
+                </span>
+              )}
             </button>
           )}
         </div>

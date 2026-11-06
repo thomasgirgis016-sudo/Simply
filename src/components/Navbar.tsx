@@ -49,6 +49,7 @@ import {
 import { UserProfile, Subject, UserAccount } from '../types';
 import { SimplyLogo } from './SimplyLogo';
 import { getDailyStreak, DailyStreakState } from '../services/dailyStreak';
+import { handleLiquidMouseMove } from '../utils/liquidGlare';
 
 export type ActiveTab =
   | 'home'
@@ -102,7 +103,7 @@ interface NavbarProps {
   onOpenStudyDuel?: () => void;
   onOpenHandwritingScanner?: () => void;
   onOpenAbout?: () => void;
-  designTheme?: 'executive' | 'classic';
+  designTheme?: 'liquid' | 'executive';
   onToggleDesignTheme?: () => void;
 }
 
@@ -127,7 +128,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenStudyDuel,
   onOpenHandwritingScanner,
   onOpenAbout,
-  designTheme = 'executive',
+  designTheme = 'liquid',
   onToggleDesignTheme,
 }) => {
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
@@ -225,8 +226,16 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full border-b border-slate-800/80 bg-slate-950/85 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-3.5 py-2.5 sm:px-6 sm:py-3">
+      <header
+        onMouseMove={designTheme === 'liquid' ? handleLiquidMouseMove : undefined}
+        className={`sticky top-0 z-40 w-full border-b transition-all duration-300 relative overflow-hidden ${
+          designTheme === 'liquid'
+            ? 'liquid-nav bg-slate-950/75 backdrop-blur-2xl border-white/10 shadow-2xl'
+            : 'border-slate-800/80 bg-slate-950/85 backdrop-blur-md'
+        }`}
+      >
+        {designTheme === 'liquid' && <div className="liquid-glare" />}
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-3.5 py-2.5 sm:px-6 sm:py-3 relative z-10">
           {/* Brand / Logo */}
           <button
             onClick={handleLogoClick}
@@ -398,23 +407,35 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             )}
 
-            {/* Executive vs Classic Design Switcher */}
+            {/* Liquid vs Classic Solid Design Switcher */}
             {onToggleDesignTheme && (
               <button
                 onClick={onToggleDesignTheme}
                 className={`flex items-center gap-1.5 rounded-xl border px-2.5 py-1.5 text-xs font-semibold transition cursor-pointer ${
-                  designTheme === 'executive'
-                    ? 'border-indigo-500/40 bg-indigo-500/15 text-indigo-200 hover:bg-indigo-500/25'
+                  designTheme === 'liquid'
+                    ? 'border-cyan-400/40 bg-cyan-500/15 text-cyan-200 hover:bg-cyan-500/25 shadow-sm shadow-cyan-500/10'
                     : 'border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700'
                 }`}
                 title={
-                  designTheme === 'executive'
-                    ? 'Currently in Modern Executive Academic Layout. Click to revert to Classic Layout.'
-                    : 'Currently in Classic Layout. Click to switch to Modern Executive Academic Layout.'
+                  designTheme === 'liquid'
+                    ? 'Currently in Liquid Glass UI. Click to revert to Classic Solid UI.'
+                    : 'Currently in Classic Solid UI. Click to switch to Liquid Glass UI.'
                 }
               >
-                <Palette className="h-3.5 w-3.5 text-indigo-400" />
-                <span className="hidden lg:inline">{designTheme === 'executive' ? 'Executive' : 'Classic'}</span>
+                {designTheme === 'liquid' ? (
+                  <>
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                    </span>
+                    <span className="hidden lg:inline text-[11px] font-bold">Liquid Glass</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-slate-400">🛡️</span>
+                    <span className="hidden lg:inline text-[11px] font-bold">Classic Solid</span>
+                  </>
+                )}
               </button>
             )}
 
@@ -734,14 +755,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                     onToggleDesignTheme();
                   }}
                   className={`w-full flex items-center justify-center gap-2 rounded-xl border py-2 text-xs font-semibold transition cursor-pointer ${
-                    designTheme === 'executive'
-                      ? 'border-indigo-500/40 bg-indigo-500/15 text-indigo-200'
+                    designTheme === 'liquid'
+                      ? 'border-cyan-400/40 bg-cyan-500/15 text-cyan-200'
                       : 'border-slate-800 bg-slate-900/60 text-slate-300'
                   }`}
                 >
-                  <Palette className="h-3.5 w-3.5 text-indigo-400" />
+                  <span>{designTheme === 'liquid' ? '✨' : '🛡️'}</span>
                   <span>
-                    Design: {designTheme === 'executive' ? 'Executive Academic (Active)' : 'Classic Layout (Active)'}
+                    UI: {designTheme === 'liquid' ? 'Liquid Glass (Active - Tap to Revert)' : 'Classic Solid (Active)'}
                   </span>
                 </button>
               )}
