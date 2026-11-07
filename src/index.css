@@ -658,5 +658,90 @@ html.executive .shadow-xl {
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 1px 1px 0 rgba(255, 255, 255, 0.1) !important;
 }
 
+/* ==========================================================================
+   SIMPLY — HUMAN-CENTRED DESIGN SYSTEM TOKENS & UTILITIES
+   ========================================================================== */
+:root {
+  --simply-brand-coral: #FF5B37;
+  --simply-brand-amber: #FFA63A;
+  --simply-brand-ochre: #F59E0B;
+  --simply-cambridge-blue: #0284C7;
+  --simply-edexcel-violet: #8B5CF6;
+  --simply-ink-bg: #0B0F17;
+  --simply-ink-surface: #111723;
+  --simply-ink-elevated: #162030;
+  --simply-border-subtle: rgba(255, 255, 255, 0.08);
+  --simply-border-strong: rgba(255, 255, 255, 0.16);
+}
+
+.font-editorial {
+  font-family: 'Newsreader', Georgia, 'Times New Roman', serif;
+}
+
+.font-sans-ui {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.font-mono-code {
+  font-family: 'JetBrains Mono', Menlo, Monaco, Consolas, monospace;
+}
+
+/* Tactile buttons without generic AI glow */
+.btn-brand-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: #FF5B37;
+  color: #ffffff;
+  font-weight: 700;
+  border-radius: 0.75rem;
+  padding: 0.625rem 1.25rem;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+}
+.btn-brand-primary:hover {
+  background-color: #E84E2A;
+  transform: translateY(-1px);
+}
+.btn-brand-primary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-brand-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: #162030;
+  color: #f1f5f9;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.625rem 1.25rem;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+.btn-brand-secondary:hover {
+  background-color: #1E2B40;
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+.btn-brand-secondary:active {
+  transform: scale(0.98);
+}
+
+/* Tactile paper surface */
+.surface-study {
+  background-color: #111723;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+.surface-study:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
 
 

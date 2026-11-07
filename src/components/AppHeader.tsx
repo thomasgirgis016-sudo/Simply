@@ -109,14 +109,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
 
   return (
     <header
-      onMouseMove={designTheme === 'liquid' ? handleLiquidMouseMove : undefined}
-      className={`sticky top-0 z-30 w-full border-b transition-all duration-300 relative overflow-hidden ${
-        designTheme === 'liquid'
-          ? 'liquid-nav bg-slate-950/75 backdrop-blur-2xl border-white/10 shadow-2xl'
-          : 'border-slate-800/80 bg-slate-950/95 backdrop-blur-xl'
-      }`}
+      className="sticky top-0 z-30 w-full border-b border-white/[0.08] bg-[#0B0F17]/95 backdrop-blur-xl transition-all duration-300"
     >
-      {designTheme === 'liquid' && <div className="liquid-glare" />}
       {/* Single Clean Header Row: Brand, Active Subject & Essential Status */}
       <div className="flex h-13 sm:h-16 w-full items-center justify-between px-2.5 sm:px-6 relative z-10 gap-1.5 sm:gap-2">
         {/* 1. Brand Logo & Desktop Breadcrumbs */}
@@ -126,9 +120,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           {/* Desktop Breadcrumbs & Page Title */}
           <div className="hidden md:flex flex-col min-w-0">
             <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap truncate">
-              <span>Platform</span>
+              <span>Simply</span>
               <span className="text-slate-600">/</span>
-              <span className="text-indigo-400 font-mono font-bold shrink-0">{activeSubject.code}</span>
+              <span className="text-[#FFA63A] font-mono font-bold shrink-0">{activeSubject.code}</span>
               <span className="text-slate-600">/</span>
               <span className="text-slate-400 truncate max-w-[200px]">{activeSubject.name}</span>
             </div>
@@ -148,15 +142,15 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 const found = subjects.find((s) => s.id === e.target.value);
                 if (found) onSelectSubject(found);
               }}
-              className="appearance-none rounded-xl border border-indigo-500/35 bg-slate-900/90 py-1 sm:py-1.5 pl-2 sm:pl-2.5 pr-5 sm:pr-8 text-[11px] sm:text-xs font-mono font-bold text-indigo-200 shadow-sm hover:border-indigo-400 focus:outline-none cursor-pointer max-w-[85px] sm:max-w-[260px] truncate"
+              className="appearance-none rounded-xl border border-white/[0.1] bg-[#121824] py-1 sm:py-1.5 pl-2 sm:pl-2.5 pr-5 sm:pr-8 text-[11px] sm:text-xs font-mono font-bold text-slate-200 shadow-sm hover:border-white/[0.2] focus:border-[#FF5B37] focus:outline-none cursor-pointer max-w-[85px] sm:max-w-[260px] truncate"
             >
               {subjects.map((s) => (
-                <option key={s.id} value={s.id} className="bg-slate-900 text-white font-sans">
+                <option key={s.id} value={s.id} className="bg-[#121824] text-white font-sans">
                   {s.code} • {s.name}
                 </option>
               ))}
             </select>
-            <ChevronDown className="pointer-events-none absolute right-1.5 sm:right-2.5 top-1/2 -translate-y-1/2 h-3 w-3 sm:h-3.5 sm:w-3.5 text-indigo-400" />
+            <ChevronDown className="pointer-events-none absolute right-1.5 sm:right-2.5 top-1/2 -translate-y-1/2 h-3 w-3 sm:h-3.5 sm:w-3.5 text-slate-400" />
           </div>
 
           {/* Daily Streak Flame Pill */}

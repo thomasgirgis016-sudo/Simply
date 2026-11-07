@@ -141,29 +141,29 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
       `}</style>
 
       {/* Top Banner */}
-      <div className="no-print rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg backdrop-blur-sm">
+      <div className="no-print rounded-3xl border border-white/[0.08] bg-[#0E1420] p-4 sm:p-6 shadow-xl">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <span className="inline-block rounded-md bg-blue-950/80 px-2.5 py-0.5 text-xs font-semibold text-blue-300 border border-blue-800/50">
-              {subject.code} • High-Yield Syllabus Summaries
+          <div className="space-y-1">
+            <span className="inline-block rounded-md bg-[#FF5B37]/15 px-2.5 py-0.5 text-xs font-mono font-bold text-[#FFA63A] border border-[#FF5B37]/30">
+              {subject.code} • High-Yield Revision Summaries
             </span>
-            <h2 className="text-xl font-bold text-white mt-1">High-Yield Syllabus Summaries</h2>
-            <p className="text-xs text-slate-400">High-yield marks: Key definitions, formula sheets & examiner traps</p>
+            <h2 className="text-xl sm:text-2xl font-black text-white">Syllabus Revision Notes</h2>
+            <p className="text-xs text-slate-400">Compulsory definitions, key formulas, chemical equations & Chief Examiner warnings</p>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={() => window.print()}
-              className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition cursor-pointer shadow-sm active:scale-95"
+              className="flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-[#121824] hover:bg-[#1A2333] px-3.5 py-2 text-xs font-bold text-slate-200 transition cursor-pointer shadow-sm active:scale-95"
               title="1-Click export printable revision cheat sheet"
             >
-              <Printer className="h-4 w-4 text-blue-400" />
-              <span>1-Click Summary Sheet Export (PDF)</span>
+              <Printer className="h-4 w-4 text-amber-400" />
+              <span>Print / Export PDF</span>
             </button>
 
             <button
               onClick={() => setIsAiModalOpen(true)}
-              className="flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 px-4 py-2 text-xs font-semibold text-white shadow-sm transition cursor-pointer active:scale-95"
+              className="flex items-center gap-2 rounded-xl bg-[#FF5B37] hover:bg-[#E84E2A] px-4 py-2 text-xs font-bold text-white shadow-sm transition cursor-pointer active:scale-95"
             >
               <BookOpen className="h-4 w-4" />
               <span>Custom Topic Sheet</span>
@@ -172,17 +172,17 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
         </div>
 
         {/* Fast Chapter Notes Workflow */}
-        <div className="mt-4 rounded-xl border border-slate-800 bg-slate-950/70 p-3.5 flex flex-wrap items-center justify-between gap-3">
+        <div className="mt-4 rounded-xl border border-white/[0.08] bg-[#121824] p-3.5 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="flex h-2 w-2 rounded-full bg-blue-400 animate-pulse" />
-            <span className="text-xs font-bold text-slate-300">Chapter Revision Generator:</span>
+            <span className="flex h-2 w-2 rounded-full bg-[#FF5B37]" />
+            <span className="text-xs font-bold text-slate-200">Generate Chapter Summary:</span>
           </div>
 
           <div className="flex flex-1 items-center gap-2 min-w-[260px] max-w-md">
             <select
               value={selectedChapterToGenerate}
               onChange={(e) => setSelectedChapterToGenerate(e.target.value)}
-              className="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs text-slate-200 focus:border-blue-500 focus:outline-none cursor-pointer"
+              className="w-full rounded-xl border border-white/[0.1] bg-[#0E1420] px-3 py-1.5 text-xs text-slate-200 focus:border-[#FF5B37] focus:outline-none cursor-pointer"
             >
               {subject.topics.map((t) => (
                 <option key={t} value={t}>
@@ -194,7 +194,7 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
             <button
               onClick={() => handleQuickGenerateChapter(selectedChapterToGenerate || subject.topics[0])}
               disabled={isGeneratingChapter}
-              className="shrink-0 flex items-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm transition cursor-pointer disabled:opacity-50"
+              className="shrink-0 flex items-center gap-1.5 rounded-xl bg-[#1A2333] hover:bg-[#232F45] border border-white/[0.12] px-3.5 py-1.5 text-xs font-bold text-white transition cursor-pointer disabled:opacity-50"
             >
               <FileText className={`h-3.5 w-3.5 ${isGeneratingChapter ? 'animate-spin' : ''}`} />
               <span>{isGeneratingChapter ? 'Generating...' : 'Generate Notes'}</span>
@@ -210,10 +210,10 @@ export const RevisionNotesView: React.FC<RevisionNotesViewProps> = ({
               <button
                 key={note.id}
                 onClick={() => setSelectedTopicId(note.id)}
-                className={`rounded-lg px-3.5 py-1.5 text-xs font-semibold transition shrink-0 ${
+                className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition shrink-0 ${
                   isActive
-                    ? 'bg-cyan-600 text-white shadow-sm'
-                    : 'bg-slate-800 text-slate-400 hover:text-white'
+                    ? 'bg-[#FF5B37] text-white shadow-sm'
+                    : 'bg-[#121824] text-slate-400 hover:text-white border border-white/[0.08]'
                 }`}
               >
                 {note.title}

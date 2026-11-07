@@ -875,8 +875,8 @@ export function App() {
               featureName={getTabFeatureName('admin')}
             />
           )
-        ) : !canAccessTools ? (
-          /* Mandatory Account & Waitlist Access Gate for all visitors and pending accounts */
+        ) : (activeTab !== 'home' && !canAccessTools) ? (
+          /* Mandatory Account & Waitlist Access Gate for protected tools */
           <AccountGate
             currentUser={currentUser}
             onOpenAuth={(mode) => {

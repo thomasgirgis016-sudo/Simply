@@ -190,16 +190,10 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
 
   const sidebarContent = (
     <div
-      onMouseMove={designTheme === 'liquid' ? handleLiquidMouseMove : undefined}
-      className={`flex h-full flex-col justify-between overflow-y-auto no-scrollbar relative transition-all duration-300 ${
-        designTheme === 'liquid'
-          ? 'liquid-sidebar bg-slate-950/80 backdrop-blur-2xl border-r border-white/10 text-slate-200 shadow-2xl'
-          : 'bg-slate-950 border-r border-slate-800/90 text-slate-300'
-      }`}
+      className="flex h-full flex-col justify-between overflow-y-auto no-scrollbar relative bg-[#0B0F17] border-r border-white/[0.08] text-slate-300"
     >
-      {designTheme === 'liquid' && <div className="liquid-glare" />}
       {/* 1. Top Section: Logo, Subject Picker, Collapse Toggle */}
-      <div className="space-y-4 p-4 border-b border-slate-800/80">
+      <div className="space-y-4 p-4 border-b border-white/[0.08]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => handleItemClick('home')}>
             <SimplyLogo size="sm" showText={!isCollapsed} />
@@ -208,7 +202,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
           {/* Desktop Collapse / Mobile Close */}
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="hidden md:flex h-8 w-8 items-center justify-center rounded-lg border border-slate-800 bg-slate-900 text-slate-400 hover:text-white transition cursor-pointer"
+            className="hidden md:flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.08] bg-[#121824] text-slate-400 hover:text-white transition cursor-pointer"
             title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             {isCollapsed ? <PanelLeft className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
@@ -216,7 +210,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
 
           <button
             onClick={onCloseMobile}
-            className="md:hidden h-8 w-8 flex items-center justify-center rounded-lg bg-slate-900 text-slate-400 hover:text-white"
+            className="md:hidden h-8 w-8 flex items-center justify-center rounded-lg bg-[#121824] text-slate-400 hover:text-white"
           >
             <X className="h-5 w-5" />
           </button>
@@ -235,15 +229,15 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                   const found = subjects.find((s) => s.id === e.target.value);
                   if (found) onSelectSubject(found);
                 }}
-                className="w-full appearance-none rounded-xl border border-indigo-500/30 bg-slate-900/90 py-2 pl-3 pr-8 text-xs font-bold text-white shadow-sm focus:border-indigo-500 focus:outline-none cursor-pointer truncate"
+                className="w-full appearance-none rounded-xl border border-white/[0.1] bg-[#121824] py-2 pl-3 pr-8 text-xs font-bold text-white shadow-sm focus:border-[#FF5B37] focus:outline-none cursor-pointer truncate"
               >
                 {subjects.map((s) => (
-                  <option key={s.id} value={s.id} className="bg-slate-900 text-white">
+                  <option key={s.id} value={s.id} className="bg-[#121824] text-white">
                     {s.code} • {s.name}
                   </option>
                 ))}
               </select>
-              <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-indigo-400" />
+              <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
             </div>
           </div>
         )}
@@ -282,21 +276,18 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                   onClick={() => handleItemClick(item.id as ActiveTab)}
                   onMouseMove={designTheme === 'liquid' ? handleLiquidMouseMove : undefined}
                   className={`group relative flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-xs font-semibold transition cursor-pointer overflow-hidden ${
-                    designTheme === 'liquid' ? 'liquid-item' : ''
-                  } ${
                     isActive
-                      ? 'bg-indigo-600/25 text-white border border-indigo-400/40 shadow-sm'
-                      : 'text-slate-400 hover:bg-slate-900/80 hover:text-slate-200'
+                      ? 'bg-[#FF5B37]/15 text-white border border-[#FF5B37]/40 shadow-sm'
+                      : 'text-slate-400 hover:bg-[#121824] hover:text-slate-200'
                   }`}
                   title={item.label}
                 >
-                  {designTheme === 'liquid' && <div className="liquid-glare" />}
                   <Icon className={`h-4 w-4 shrink-0 relative z-10 ${isActive ? item.color : 'text-slate-400 group-hover:text-slate-200'}`} />
                   {!isCollapsed && (
                     <span className="truncate relative z-10">{item.label}</span>
                   )}
                   {isActive && !isCollapsed && (
-                    <span className="ml-auto h-1.5 w-1.5 rounded-full bg-indigo-400 shadow-sm shadow-indigo-400 relative z-10" />
+                    <span className="ml-auto h-1.5 w-1.5 rounded-full bg-[#FF5B37] shadow-sm shadow-[#FF5B37]/50 relative z-10" />
                   )}
                 </button>
               );

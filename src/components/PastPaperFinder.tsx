@@ -749,50 +749,48 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
   return (
     <div className="mx-auto max-w-6xl space-y-6 animate-fadeIn pb-16">
       {/* Top Banner */}
-      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900/90 to-sky-950/30 p-3.5 sm:p-7 shadow-xl">
-        <div className="relative z-10 max-w-3xl">
-          <div className="inline-flex items-center gap-2 rounded-full bg-sky-500/10 px-2.5 py-0.5 text-[11px] sm:text-xs font-semibold text-sky-300 border border-sky-500/20 mb-2">
-            <Search className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-            <span>Complete Exam Archive: 2010–2026 Series • 85,000+ Questions</span>
+      <div className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0E1420] p-4 sm:p-7 shadow-xl">
+        <div className="relative z-10 max-w-3xl space-y-2">
+          <div className="inline-flex items-center gap-2 rounded-full bg-[#FF5B37]/10 px-3 py-0.5 text-xs font-semibold text-[#FFA63A] border border-[#FF5B37]/20">
+            <Search className="h-3.5 w-3.5 text-[#FF5B37]" />
+            <span>Complete Exam Archive • 2010–2026 Series • {OFFICIAL_PAST_PAPER_PDFS.length.toLocaleString()}+ Verified Papers</span>
           </div>
-          <h1 className="text-lg sm:text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-xl sm:text-3xl font-black text-white tracking-tight">
             Cambridge & Edexcel Past Paper Vault
           </h1>
-          <p className="hidden sm:block mt-2 text-sm text-slate-300 leading-relaxed">
-            Instant 1-click access to {OFFICIAL_PAST_PAPER_PDFS.length.toLocaleString()}+ authentic past examination papers and 85,000+ questions across <strong>2010 to 2025 administered series and 2026 specimen papers</strong>.
+          <p className="hidden sm:block text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Synchronized Question Papers, Mark Schemes, and Examiner Reports. Fast filtering by subject syllabus, examination series, paper component, and question number.
           </p>
         </div>
 
         {/* View Switcher Tabs */}
-        <div className="mt-3 sm:mt-6 flex items-center gap-1.5 sm:gap-2 border-t border-slate-800/80 pt-3 sm:pt-4">
+        <div className="mt-4 sm:mt-6 flex items-center gap-2 border-t border-white/[0.08] pt-3 sm:pt-4">
           <button
             onClick={() => setActiveTab('pdf-library')}
-            className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 rounded-xl px-2.5 sm:px-4 py-2 sm:py-2.5 text-xs font-bold transition cursor-pointer ${
+            className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition cursor-pointer ${
               activeTab === 'pdf-library'
-                ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/25 ring-1 ring-sky-400'
-                : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700/60'
+                ? 'bg-[#FF5B37] text-white shadow-md shadow-[#FF5B37]/20 ring-1 ring-white/20'
+                : 'bg-[#121824] text-slate-300 hover:text-white border border-white/[0.08] hover:border-white/[0.16]'
             }`}
           >
-            <FileDown className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            <span>Paper PDFs</span>
-            <span className="hidden sm:inline">& Multi-Year Archive</span>
-            <span className="hidden sm:inline rounded-full bg-sky-950/80 px-2 py-0.5 text-[10px] font-mono text-sky-200 border border-sky-400/30">
+            <FileDown className="h-4 w-4" />
+            <span>Official Paper PDFs</span>
+            <span className="rounded-full bg-black/30 px-2 py-0.5 text-[10px] font-mono text-amber-300">
               {OFFICIAL_PAST_PAPER_PDFS.length}+
             </span>
           </button>
 
           <button
             onClick={() => setActiveTab('questions')}
-            className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 rounded-xl px-2.5 sm:px-4 py-2 sm:py-2.5 text-xs font-bold transition cursor-pointer ${
+            className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition cursor-pointer ${
               activeTab === 'questions'
-                ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/25 ring-1 ring-sky-400'
-                : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700/60'
+                ? 'bg-[#FF5B37] text-white shadow-md shadow-[#FF5B37]/20 ring-1 ring-white/20'
+                : 'bg-[#121824] text-slate-300 hover:text-white border border-white/[0.08] hover:border-white/[0.16]'
             }`}
           >
-            <Search className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            <span>Question Finder</span>
-            <span className="hidden sm:inline">& Topics</span>
-            <span className="hidden sm:inline rounded-full bg-slate-900 px-2 py-0.5 text-[10px] font-mono text-sky-400 border border-slate-700">
+            <Search className="h-4 w-4" />
+            <span>Question & Mark Scheme Finder</span>
+            <span className="rounded-full bg-black/30 px-2 py-0.5 text-[10px] font-mono text-sky-300">
               85,000+
             </span>
           </button>
