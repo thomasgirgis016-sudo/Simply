@@ -84,7 +84,7 @@ export const PwaInstallModal: React.FC<PwaInstallModalProps> = ({
           <SimplyLogo size="md" showText={false} />
           <div>
             <h3 className="text-base sm:text-lg font-black text-white tracking-tight">
-              Install Simply IGCSE App
+              Install Fahemny IGCSE App
             </h3>
             <span className="text-[11px] font-bold text-indigo-400">
               Offline Revision & Native Mobile Shell
@@ -146,7 +146,7 @@ export const PwaInstallModal: React.FC<PwaInstallModalProps> = ({
           <div className="space-y-2 rounded-2xl border border-slate-800 bg-slate-950/80 p-3.5 text-xs text-slate-300">
             <p className="font-semibold text-white">To install on Desktop or Chrome:</p>
             <p className="text-[11px] text-slate-400">
-              Click the install icon (<Download className="h-3.5 w-3.5 inline text-indigo-400" />) in your browser’s URL bar, or click your browser menu (⋮) and choose <strong>"Install Simply IGCSE"</strong>.
+              Click the install icon (<Download className="h-3.5 w-3.5 inline text-indigo-400" />) in your browser’s URL bar, or click your browser menu (⋮) and choose <strong>"Install Fahemny IGCSE"</strong>.
             </p>
           </div>
         )}

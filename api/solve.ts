@@ -276,7 +276,7 @@ Output STRICTLY JSON:
 }`;
     } else if (action === 'ai_tutor') {
       responseMimeType = 'text/plain';
-      systemInstruction = `You are "Simply IGCSE Co-Pilot", a senior Cambridge examiner and private tutor for ${examBoard} ${subjectName}.
+      systemInstruction = `You are "Fahemny IGCSE Co-Pilot", a senior Cambridge examiner and private tutor for ${examBoard} ${subjectName}.
 Tone: Encouraging, rigorous, mark-scheme focused. Point out [M] method marks, [A] accuracy marks, and [B] independent marks. Use LaTeX ($...$ or $$...$$) for math and chemical formulas.
 If the student provides an exam code and question number (e.g. 0580/42 Q6, 0620/42 Q7, 0625/41 Q2):
 - Retrieve the question, full mark scheme breakdown ([M1], [A1], [B1]), and final answer.

@@ -179,7 +179,7 @@ export const NightBeforeCheatSheets: React.FC<NightBeforeCheatSheetsProps> = ({
 
           <div className="text-left sm:text-right text-[11px] text-slate-400 print:text-gray-700 font-mono">
             <div>{currentSheet.lastUpdated}</div>
-            <div className="text-amber-400 font-bold print:text-black">Simply IGCSE Verified</div>
+            <div className="text-amber-400 font-bold print:text-black">Fahemny IGCSE Verified</div>
           </div>
         </div>
 

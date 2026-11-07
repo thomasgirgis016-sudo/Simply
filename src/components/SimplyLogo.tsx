@@ -30,7 +30,7 @@ export const SimplyLogo: React.FC<SimplyLogoProps> = ({
       <div className={`inline-flex items-center select-none ${className}`}>
         <img
           src="/simply-full-white.png"
-          alt="Simply IGCSE"
+          alt="Fahemny IGCSE"
           className={`${currentSize.img} h-auto object-contain drop-shadow-lg`}
           onError={() => setImgError(true)}
         />
@@ -40,12 +40,12 @@ export const SimplyLogo: React.FC<SimplyLogoProps> = ({
 
   return (
     <div className={`inline-flex items-center gap-2 sm:gap-3 select-none ${className}`}>
-      {/* Official Graduation Cap "S" Icon with Background Removed */}
+      {/* Official Graduation Cap Icon with Background Removed */}
       <div className="relative shrink-0 flex items-center justify-center">
         {!imgError ? (
           <img
             src="/simply-logo.png"
-            alt="Simply IGCSE"
+            alt="Fahemny IGCSE"
             className={`${currentSize.img} object-contain drop-shadow-md transition-transform hover:scale-105 duration-200`}
             onError={() => setImgError(true)}
           />
@@ -104,14 +104,14 @@ export const SimplyLogo: React.FC<SimplyLogoProps> = ({
         )}
       </div>
 
-      {/* Typography: "Simply" */}
+      {/* Typography: "Fahemny" */}
       {showText && variant === 'full' && (
         <div className="flex flex-col leading-none justify-center">
           <div className="flex items-center gap-1.5 sm:gap-2">
             <span
               className={`font-black tracking-tight text-white ${currentSize.text} font-['Plus_Jakarta_Sans',sans-serif]`}
             >
-              Simply
+              Fahemny
             </span>
             <span className="rounded-md bg-gradient-to-r from-[#FF5E62] to-[#FFA63A] px-1.5 py-0.5 sm:px-2 sm:py-0.5 text-[9px] sm:text-xs font-black uppercase tracking-wider text-slate-950 shadow-md">
               IGCSE

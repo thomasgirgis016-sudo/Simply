@@ -38,7 +38,7 @@ export const AccountGate: React.FC<AccountGateProps> = ({
   onRefreshStatus,
   onLogout,
   onOpenPayment,
-  featureName = 'Simply IGCSE study tools',
+  featureName = 'Fahemny IGCSE study tools',
 }) => {
   const [inlineCode, setInlineCode] = useState('');
   const [inlineError, setInlineError] = useState('');
@@ -383,7 +383,7 @@ export const AccountGate: React.FC<AccountGateProps> = ({
         </span>
 
         <h2 className="text-xl sm:text-3xl font-black text-white tracking-tight">
-          Welcome to Simply IGCSE
+          Welcome to Fahemny IGCSE
         </h2>
 
         <p className="mt-2 sm:mt-3 text-xs sm:text-sm text-slate-300 leading-relaxed max-w-md mx-auto">

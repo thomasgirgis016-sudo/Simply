@@ -1,6 +1,6 @@
 {
-  "name": "Simply IGCSE — AI Study & Exam Co-Pilot",
-  "short_name": "Simply IGCSE",
+  "name": "Fahemny IGCSE — Exam Preparation & Revision Workspace",
+  "short_name": "Fahemny",
   "description": "AI-integrated study platform for Cambridge (CIE) and Pearson Edexcel IGCSE students. Question solver, flashcards, past paper finder, and speaking simulator.",
   "start_url": "/",
   "display": "standalone",

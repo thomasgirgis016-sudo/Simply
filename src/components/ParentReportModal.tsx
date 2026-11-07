@@ -190,7 +190,7 @@ export const ParentReportModal: React.FC<ParentReportModalProps> = ({
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <span className="text-2xl font-black tracking-tight text-white print:text-black">
-                  SIMPLY<span className="text-indigo-400 print:text-indigo-800"> IGCSE</span>
+                  FAHEMNY<span className="text-indigo-400 print:text-indigo-800"> IGCSE</span>
                 </span>
                 <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 print:border-black print:text-black">
                   Official Audit
@@ -353,7 +353,7 @@ export const ParentReportModal: React.FC<ParentReportModalProps> = ({
           <div className="pt-6 border-t border-slate-800 print:border-gray-300 flex flex-col sm:flex-row sm:items-center justify-between text-[11px] text-slate-500 print:text-gray-600 gap-3">
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-400 print:text-black" />
-              <span>Electronically verified via Simply IGCSE Assessment Engine</span>
+              <span>Electronically verified via Fahemny IGCSE Assessment Engine</span>
             </div>
             <div className="font-mono">
               Cambridge International Standards • London & Cairo

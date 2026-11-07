@@ -2439,7 +2439,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     </span>
                   </h3>
                   <p className="text-xs text-slate-300">
-                    Follow this 60-second setup on your iPhone to forward BDC bank alert SMS automatically to Simply.
+                    Follow this 60-second setup on your iPhone to forward BDC bank alert SMS automatically to Fahemny.
                   </p>
                 </div>
               </div>
@@ -3820,7 +3820,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </div>
                 <h2 className="text-xl sm:text-2xl font-black text-white">Platform Activity & Change History</h2>
                 <p className="text-xs sm:text-sm text-slate-300 max-w-2xl">
-                  Inspect who made changes to any account, access code, subscription plan, pricing rule, or system configuration across Simply IGCSE.
+                  Inspect who made changes to any account, access code, subscription plan, pricing rule, or system configuration across Fahemny IGCSE.
                 </p>
               </div>
 

@@ -380,7 +380,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             onClick={() => { onOpenAbout(); onCloseMobile(); }}
             className="w-full text-center text-[10px] text-zinc-500 hover:text-zinc-300 pt-2 transition"
           >
-            About Simply
+            About Fahemny
           </button>
         )}
       </div>

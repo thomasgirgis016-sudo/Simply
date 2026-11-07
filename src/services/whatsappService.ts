@@ -167,7 +167,7 @@ export function buildTemplateMessage(
         return formatWeeklyReportWhatsAppMessage(params.detailedReport, params.webReportUrl);
       }
       return (
-        `🎓 *SIMPLY IGCSE — WEEKLY PROGRESS AUDIT*\n` +
+        `🎓 *FAHEMNY IGCSE — WEEKLY PROGRESS AUDIT*\n` +
         `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
         `👤 *Candidate:* ${params.studentName}\n` +
         `🎯 *Target Grade:* ${params.targetGrade || '9 / A*'}\n` +
@@ -176,43 +176,43 @@ export function buildTemplateMessage(
         `🔥 *Active Study Streak:* ${params.streakDays || 7} Days\n\n` +
         `View complete breakdown & download official PDF:\n` +
         `👉 ${params.webReportUrl || 'https://simply-igcse.com/?tab=report'}\n\n` +
-        `_Simply IGCSE Academic Assessment Portal._`
+        `_Fahemny IGCSE Academic Assessment Portal._`
       );
     }
 
     case 'payment_receipt': {
       const date = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
       return (
-        `✅ *SIMPLY IGCSE — PAYMENT & ACCESS CONFIRMATION*\n` +
+        `✅ *FAHEMNY IGCSE — PAYMENT & ACCESS CONFIRMATION*\n` +
         `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
         `👤 *Student:* ${params.studentName}\n` +
-        `💳 *Plan Activated:* ${params.planName || 'Simply IGCSE Pro Term Plan'}\n` +
+        `💳 *Plan Activated:* ${params.planName || 'Fahemny IGCSE Pro Term Plan'}\n` +
         `💵 *Amount Verified:* ${params.amountPaid || 'EGP 420.00'}\n` +
         `📅 *Transaction Date:* ${date}\n` +
         `🏛️ *Settlement Gateway:* Banque du Caire (BDC) Instant Inbound\n` +
         `🔐 *Access Status:* 🟢 ACTIVE — Unlimited Past Papers & Step-by-Step Mark Scheme Engine\n\n` +
-        `Thank you for enrolling in Simply IGCSE. Your complete syllabus revision kit is now ready.\n` +
+        `Thank you for enrolling in Fahemny IGCSE. Your complete syllabus revision kit is now ready.\n` +
         `👉 https://simply-igcse.com`
       );
     }
 
     case 'diagnostic_alert': {
       return (
-        `⚠️ *SIMPLY IGCSE — DIAGNOSTIC EXAM WEAK SPOT ALERT*\n` +
+        `⚠️ *FAHEMNY IGCSE — DIAGNOSTIC EXAM WEAK SPOT ALERT*\n` +
         `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
         `👤 *Student:* ${params.studentName}\n` +
         `📌 *Flagged Syllabus Area:* *${params.weakTopic || 'Paper 4 Extended Calculations'}*\n` +
         `🔍 *Examiner Diagnostic:* Student lost marks on 3 consecutive problems in this chapter due to unit conversion slips.\n` +
-        `🎯 *Recommended Immediate Action:* Complete the 5-question targeted diagnostic drill on Simply IGCSE co-pilot before tomorrow's revision session.\n\n` +
+        `🎯 *Recommended Immediate Action:* Complete the 5-question targeted diagnostic drill on Fahemny IGCSE co-pilot before tomorrow's revision session.\n\n` +
         `👉 https://simply-igcse.com/?tab=mistakes`
       );
     }
 
     case 'streak_reminder': {
       return (
-        `🔥 *SIMPLY IGCSE — DAILY REVISION REMINDER*\n` +
+        `🔥 *FAHEMNY IGCSE — DAILY REVISION REMINDER*\n` +
         `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-        `Hey ${params.studentName}! You are on an active *${params.streakDays || 5}-Day Study Streak* on Simply IGCSE.\n` +
+        `Hey ${params.studentName}! You are on an active *${params.streakDays || 5}-Day Study Streak* on Fahemny IGCSE.\n` +
         `⏳ Only 58 days remaining until the Cambridge & Edexcel examination series.\n` +
         `Solve 3 quick past paper questions today to keep your momentum towards Grade 9 (A*)!\n\n` +
         `👉 https://simply-igcse.com/?tab=solver`
@@ -221,9 +221,9 @@ export function buildTemplateMessage(
 
     case 'school_seat_invite': {
       return (
-        `🏫 *SIMPLY IGCSE — SCHOOL CLASSROOM ACCESS GRANTED*\n` +
+        `🏫 *FAHEMNY IGCSE — SCHOOL CLASSROOM ACCESS GRANTED*\n` +
         `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-        `Welcome ${params.studentName}! Your school coordinator has enrolled your class in Simply IGCSE.\n` +
+        `Welcome ${params.studentName}! Your school coordinator has enrolled your class in Fahemny IGCSE.\n` +
         `All 5 Cambridge & Pearson Edexcel subjects, classifieds, and model mark schemes have been activated on your account.\n\n` +
         `Sign in here: https://simply-igcse.com`
       );
@@ -233,7 +233,7 @@ export function buildTemplateMessage(
     default: {
       return (
         params.customText ||
-        `Hello ${params.studentName}, here is an update from your Simply IGCSE academic co-pilot: https://simply-igcse.com`
+        `Hello ${params.studentName}, here is an update from your Fahemny IGCSE academic co-pilot: https://simply-igcse.com`
       );
     }
   }

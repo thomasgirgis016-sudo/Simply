@@ -56,7 +56,7 @@ export const AboutSimplyModal: React.FC<AboutSimplyModalProps> = ({
               </span>
             </div>
             <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight mt-1">
-              About Simply IGCSE: What It Is & What It Does
+              About Fahemny IGCSE: What It Is &amp; What It Does
             </h2>
           </div>
         </div>
@@ -68,7 +68,7 @@ export const AboutSimplyModal: React.FC<AboutSimplyModalProps> = ({
             Executive Summary
           </h3>
           <p className="text-sm sm:text-base text-slate-200 leading-relaxed font-sans">
-            <strong className="text-white font-bold">Simply IGCSE</strong> is the definitive IGCSE Examination & Revision Workspace engineered specifically for Cambridge Assessment International Education (<strong className="text-indigo-300">CAIE</strong>) and Pearson <strong className="text-indigo-300">Edexcel</strong> IGCSE candidates, tutors, and schools worldwide.
+            <strong className="text-white font-bold">Fahemny IGCSE</strong> is the definitive IGCSE Examination &amp; Revision Workspace engineered specifically for Cambridge Assessment International Education (<strong className="text-indigo-300">CAIE</strong>) and Pearson <strong className="text-indigo-300">Edexcel</strong> IGCSE candidates, tutors, and schools worldwide.
           </p>
           <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mt-2.5">
             Founded by <span className="text-amber-400 font-semibold">Thomas</span>, the platform bridges the gap between chaotic PDF past paper folders and generic chatbots by enforcing strict, line-by-line mark scheme verification, official examiner report feedback, and structured diagnostics designed to maximize student examination performance.

@@ -272,13 +272,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 background: '#0d131f',
                 boxShadow: '5px 5px 12px #06090e, -5px -5px 12px #182335'
               }}
-              title="Simply IGCSE"
+              title="Fahemny IGCSE"
             >
               <GraduationCap className="h-6 w-6" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-xl font-black text-white tracking-wide">Simply IGCSE</h2>
+                <h2 className="text-xl font-black text-white tracking-wide">Fahemny IGCSE</h2>
                 <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-cyan-950/60 border border-cyan-800/50 text-cyan-400">
                   Account
                 </span>
@@ -795,7 +795,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 {whatsappFallbackPhone && (
                   <div className="mt-3 pt-2.5 border-t border-slate-800/80">
                     <a
-                      href={`https://wa.me/${whatsappFallbackPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Simply IGCSE Security: Your password reset verification code is: ${dispatchedCode}`)}`}
+                      href={`https://wa.me/${whatsappFallbackPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Fahemny IGCSE Security: Your password reset verification code is: ${dispatchedCode}`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-center gap-2 rounded-xl bg-emerald-950/60 border border-emerald-500/40 px-3 py-2 text-xs font-bold text-emerald-300 hover:bg-emerald-900/40 transition"

@@ -91,7 +91,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       case 'boundaries': return 'Grade Boundaries';
       case 'admin': return currentUser?.role === 'founder' ? 'Founder Console' : 'Admin Console';
       case 'analytics': return 'Teacher Classroom';
-      default: return 'Simply IGCSE';
+      default: return 'Fahemny IGCSE';
     }
   };
 

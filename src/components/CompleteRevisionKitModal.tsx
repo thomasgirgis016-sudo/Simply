@@ -159,7 +159,7 @@ export const CompleteRevisionKitModal: React.FC<CompleteRevisionKitModalProps> =
             <div className="flex items-start justify-between border-b-2 border-indigo-500/40 pb-4">
               <div>
                 <div className="text-[10px] uppercase font-black tracking-widest text-indigo-400 print:text-indigo-700">
-                  Simply IGCSE • Emergency Exam Revision Kit • Section 1
+                  Fahemny IGCSE • Emergency Exam Revision Kit • Section 1
                 </div>
                 <h1 className="text-xl sm:text-2xl font-black text-white print:text-black tracking-tight mt-1">
                   {sheet.subjectCode} — {sheet.subjectName}
@@ -234,7 +234,7 @@ export const CompleteRevisionKitModal: React.FC<CompleteRevisionKitModalProps> =
             <div className="flex items-start justify-between border-b-2 border-rose-500/40 pb-4">
               <div>
                 <div className="text-[10px] uppercase font-black tracking-widest text-rose-400 print:text-rose-700">
-                  Simply IGCSE • Personal Diagnostic Error Log • Section 2
+                  Fahemny IGCSE • Personal Diagnostic Error Log • Section 2
                 </div>
                 <h2 className="text-xl sm:text-2xl font-black text-white print:text-black tracking-tight mt-1">
                   Personal Error & Mistake Log — Unmastered Questions ({unmasteredMistakes.length})
@@ -312,7 +312,7 @@ export const CompleteRevisionKitModal: React.FC<CompleteRevisionKitModalProps> =
             <div className="flex items-start justify-between border-b-2 border-teal-500/40 pb-4">
               <div>
                 <div className="text-[10px] uppercase font-black tracking-widest text-teal-400 print:text-teal-700">
-                  Simply IGCSE • Cambridge Examiner Synthesis • Section 3
+                  Fahemny IGCSE • Cambridge Examiner Synthesis • Section 3
                 </div>
                 <h2 className="text-xl sm:text-2xl font-black text-white print:text-black tracking-tight mt-1">
                   Principal Examiner Pitfalls & Official Formulas ({selectedSubject.code})

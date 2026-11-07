@@ -78,7 +78,7 @@ console.log(`  ✓ Diagnostic Error Categories (${report.mistakeBreakdown.length
 console.log('\n--- 2. WhatsApp Message Formatting (Markdown, Emojis, PDF/Web Link) ---');
 const waMessage = formatWeeklyReportWhatsAppMessage(report);
 
-if (!waMessage.includes('SIMPLY IGCSE — OFFICIAL WEEKLY PROGRESS AUDIT')) {
+if (!waMessage.includes('FAHEMNY IGCSE — OFFICIAL WEEKLY PROGRESS AUDIT')) {
   console.error('❌ Failed: Missing report header in WhatsApp message');
   process.exit(1);
 }

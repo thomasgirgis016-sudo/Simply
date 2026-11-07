@@ -1185,7 +1185,7 @@ export function App() {
           <div className="flex flex-col gap-1 text-center md:text-left">
             <div className="flex items-center justify-center md:justify-start gap-2.5">
               <SimplyLogo size="sm" showText={false} />
-              <span className="font-bold text-slate-200">Simply IGCSE Platform</span>
+              <span className="font-bold text-slate-200">Fahemny IGCSE Platform</span>
               <span className="text-slate-600">|</span>
               <span>Cambridge (CIE) & Pearson Edexcel Curriculum</span>
             </div>

@@ -92,7 +92,7 @@ export class ErrorBoundary extends Component<Props, State> {
             </h1>
 
             <p className="mt-2 text-xs text-slate-300 leading-relaxed">
-              Simply encountered an unexpected display issue. Your saved progress is safe.
+              Fahemny encountered an unexpected display issue. Your saved progress is safe.
             </p>
 
             {this.state.error && (
@@ -107,7 +107,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 className="w-full flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-indigo-500 transition cursor-pointer shadow-md"
               >
                 <RefreshCw className="h-4 w-4" />
-                <span>Reload Simply</span>
+                <span>Reload Fahemny</span>
               </button>
 
               <button

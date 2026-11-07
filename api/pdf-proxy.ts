@@ -427,7 +427,7 @@ function generateRescueHtml(title: string, safeQuery: string, originalUrl: strin
 </head>
 <body>
   <div class="card">
-    <div class="badge">Simply Mirror Rescue</div>
+    <div class="badge">Fahemny Mirror Rescue</div>
     <h1>${title}</h1>
     <p>The primary PDF stream archive is momentarily experiencing rate-limiting or origin protections. You can access this paper instantly across verified mirror repositories below:</p>
 
@@ -455,7 +455,7 @@ function generateRescueHtml(title: string, safeQuery: string, originalUrl: strin
     </div>
 
     <div class="footer">
-      <span>Simply IGCSE Platform</span>
+      <span>Fahemny IGCSE Platform</span>
       <a href="javascript:window.history.back()" class="btn-subtle">← Go Back</a>
     </div>
   </div>

@@ -344,7 +344,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 Crafted for how students actually study
               </h2>
               <p className="text-xs sm:text-sm text-slate-400">
-                Click each feature below to preview how Simply tackles the real pain points of IGCSE exam prep.
+                Click each feature below to preview how Fahemny tackles the real pain points of IGCSE exam prep.
               </p>
             </div>
 
@@ -525,7 +525,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
                   <div className="max-w-md mx-auto rounded-2xl bg-[#0B141A] p-4 border border-emerald-500/30 space-y-2 text-xs">
                     <div className="rounded-xl bg-[#005C4B] p-3 text-slate-100 space-y-1 text-[11px] leading-relaxed">
-                      <div className="font-bold text-white">📊 SIMPLY IGCSE — Weekly Academic Statement</div>
+                      <div className="font-bold text-white">📊 FAHEMNY IGCSE — Weekly Academic Statement</div>
                       <div>Candidate: <strong>Thomas</strong> (Target: Grade 9 / A*)</div>
                       <div>Syllabus: Cambridge Mathematics (0580) & Physics (0625)</div>
                       <div className="pt-1 text-slate-200">
@@ -564,7 +564,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 </div>
                 <h3 className="text-base font-bold text-white">The Command Word Trap</h3>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Writing a description when the question says <em>"Explain"</em> costs 2 to 3 marks every single time. Simply highlights command words across all papers and flags the exact expected structure.
+                  Writing a description when the question says <em>"Explain"</em> costs 2 to 3 marks every single time. Fahemny highlights command words across all papers and flags the exact expected structure.
                 </p>
               </div>
 
@@ -584,7 +584,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 </div>
                 <h3 className="text-base font-bold text-white">Chaotic PDF Juggling</h3>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Searching 3 different websites to find whether variant 2 or variant 3 has the mark scheme wastes 45 minutes of revision every day. Simply synchronizes question papers and mark schemes side by side.
+                  Searching 3 different websites to find whether variant 2 or variant 3 has the mark scheme wastes 45 minutes of revision every day. Fahemny synchronizes question papers and mark schemes side by side.
                 </p>
               </div>
             </div>
@@ -691,12 +691,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
               </div>
               <div>
                 <h4 className="text-sm sm:text-base font-bold text-white">A Note from Thomas</h4>
-                <p className="text-xs text-slate-400">Founder of Simply & IGCSE Candidate</p>
+                <p className="text-xs text-slate-400">Founder of Fahemny &amp; IGCSE Candidate</p>
               </div>
             </div>
 
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-editorial italic text-base sm:text-lg">
-              "I built Simply because during my own exam preparation, I was exhausted from digging through chaotic Google Drives and listening to generic YouTube tutorials that skipped the mark scheme. Simply gives you what actually matters in the exam hall: clarity, speed, and exact examiner expectations."
+              "I built Fahemny because during my own exam preparation, I was exhausted from digging through chaotic Google Drives and listening to generic YouTube tutorials that skipped the mark scheme. Fahemny gives you what actually matters in the exam hall: clarity, speed, and exact examiner expectations."
             </p>
           </section>
 
@@ -716,7 +716,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
 
             <p className="text-[11px] text-slate-500 leading-relaxed">
-              Cambridge Assessment International Education (CAIE) and Pearson Edexcel are registered trademarks. Simply is an independent academic revision suite created to help students master examination technique.
+              Cambridge Assessment International Education (CAIE) and Pearson Edexcel are registered trademarks. Fahemny is an independent academic revision suite created to help students master examination technique.
             </p>
           </footer>
         </div>

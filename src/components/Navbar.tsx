@@ -645,7 +645,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-indigo-300 hover:bg-slate-900 transition"
                   >
                     <Info className="h-4 w-4 text-indigo-400" />
-                    <span>About Simply IGCSE (Briefing)</span>
+                    <span>About Fahemny IGCSE (Briefing)</span>
                   </button>
                 )}
               </div>
@@ -793,7 +793,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
 
               <div className="flex items-center justify-between pt-3 px-1 text-[11px] text-slate-500 border-t border-slate-800/40">
-                <span>Simply IGCSE v2.6</span>
+                <span>Fahemny IGCSE v2.6</span>
                 {onOpenSecretAdmin && (
                   <button
                     onClick={() => {

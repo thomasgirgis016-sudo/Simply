@@ -277,7 +277,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h2 className="text-xl font-black text-white">Unlock Simply IGCSE Access</h2>
+              <h2 className="text-xl font-black text-white">Unlock Fahemny IGCSE Access</h2>
               <span className="rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold text-emerald-300 border border-emerald-500/30">
                 BDC Live Inbound
               </span>

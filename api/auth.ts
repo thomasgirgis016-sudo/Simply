@@ -507,19 +507,19 @@ export default async function handler(req: any, res?: any) {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              from: 'Simply IGCSE Security <security@simplyigcse.com>',
+              from: 'Fahemny IGCSE Security <security@simplyigcse.com>',
               to: [normalizedEmail],
-              subject: 'Your 6-Digit Password Reset Code - Simply IGCSE',
+              subject: 'Your 6-Digit Password Reset Code - Fahemny IGCSE',
               html: `
                 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px; background: #0b0f19; color: #f1f5f9; border-radius: 16px;">
-                  <h2 style="color: #6366f1; margin-bottom: 12px;">Simply IGCSE Security</h2>
+                  <h2 style="color: #6366f1; margin-bottom: 12px;">Fahemny IGCSE Security</h2>
                   <p style="font-size: 15px; color: #cbd5e1; line-height: 1.6;">You recently requested to reset the password for your student account associated with <strong>${normalizedEmail}</strong>.</p>
                   <div style="margin: 24px 0; padding: 16px; background: #1e1b4b; border: 1px solid #6366f1; border-radius: 12px; text-align: center;">
                     <span style="font-size: 32px; font-weight: 800; letter-spacing: 6px; color: #38bdf8; font-family: monospace;">${resetCode}</span>
                   </div>
                   <p style="font-size: 13px; color: #94a3b8; line-height: 1.5;">This 6-digit code will expire in <strong>15 minutes</strong>. If you did not request this password reset, you can safely ignore this email.</p>
                   <hr style="border: none; border-top: 1px solid #1e293b; margin: 24px 0;" />
-                  <p style="font-size: 11px; color: #64748b;">Simply IGCSE • The Cambridge & Edexcel Revision Co-Pilot</p>
+                  <p style="font-size: 11px; color: #64748b;">Fahemny IGCSE • The Cambridge & Edexcel Revision Co-Pilot</p>
                 </div>
               `
             })
@@ -538,11 +538,11 @@ export default async function handler(req: any, res?: any) {
             },
             body: JSON.stringify({
               personalizations: [{ to: [{ email: normalizedEmail }] }],
-              from: { email: 'security@simplyigcse.com', name: 'Simply IGCSE Security' },
-              subject: 'Your 6-Digit Password Reset Code - Simply IGCSE',
+              from: { email: 'security@simplyigcse.com', name: 'Fahemny IGCSE Security' },
+              subject: 'Your 6-Digit Password Reset Code - Fahemny IGCSE',
               content: [{
                 type: 'text/html',
-                value: `<div style="font-family: sans-serif; padding: 20px;"><h2>Simply IGCSE Security</h2><p>Your password reset code is: <strong>${resetCode}</strong></p></div>`
+                value: `<div style="font-family: sans-serif; padding: 20px;"><h2>Fahemny IGCSE Security</h2><p>Your password reset code is: <strong>${resetCode}</strong></p></div>`
               }]
             })
           });
@@ -587,7 +587,7 @@ export default async function handler(req: any, res?: any) {
 
       const adminUser = {
         id: 'admin_root',
-        name: 'Simply IGCSE Administrator',
+        name: 'Fahemny IGCSE Administrator',
         email: ADMIN_EMAIL,
         role: 'admin',
         title: 'Platform Administrator',

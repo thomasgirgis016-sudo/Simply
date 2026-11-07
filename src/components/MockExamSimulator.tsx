@@ -253,7 +253,7 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
               </div>
 
               <div className="text-left sm:text-right font-mono text-xs text-slate-400 space-y-1 bg-slate-950/80 p-3 rounded-2xl border border-slate-800">
-                <div>CENTER: <span className="text-white font-bold">EG998 / SIMPLY</span></div>
+                <div>CENTER: <span className="text-white font-bold">EG998 / FAHEMNY</span></div>
                 <div>CANDIDATE: <span className="text-amber-300 font-bold">{profile.name}</span></div>
                 <div>TARGET: <span className="text-emerald-400 font-bold">{profile.targetGrade}</span></div>
               </div>

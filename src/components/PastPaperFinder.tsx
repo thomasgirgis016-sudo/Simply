@@ -2772,7 +2772,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                         </div>
 
                         <p className="text-[11px] text-slate-500 pt-2 border-t border-slate-800/80">
-                          Simply IGCSE Platform • Fast, Verified Exam Preparation
+                          Fahemny IGCSE Platform • Fast, Verified Exam Preparation
                         </p>
                       </div>
                     </div>

@@ -1318,7 +1318,7 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
 
             {/* Running Print Footer (Printed on every page via CSS @media print) */}
             <div className="print-running-footer hidden print:flex">
-              <span>© Simply IGCSE Classified Series 2026</span>
+              <span>© Fahemny IGCSE Classified Series 2026</span>
               <span>[Turn over]</span>
             </div>
 
@@ -1342,7 +1342,7 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                   </div>
                   <div className="flex items-center gap-2">
                     <SimplyLogo size="sm" showText={false} />
-                    <span className="text-xs font-bold text-slate-900 tracking-wider uppercase">Simply IGCSE</span>
+                    <span className="text-xs font-bold text-slate-900 tracking-wider uppercase">Fahemny IGCSE</span>
                   </div>
                 </div>
 
