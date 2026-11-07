@@ -289,24 +289,24 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-800/90 bg-slate-900/90 p-3.5 sm:p-7 shadow-xl">
+      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-white/[0.06] bg-[#18181B] p-4 sm:p-7 shadow-sm">
         <div className="relative z-10 max-w-3xl">
-          <div className="inline-flex items-center gap-2 rounded-full bg-blue-950/80 px-2.5 py-0.5 sm:px-3 sm:py-1 text-[11px] sm:text-xs font-semibold text-blue-300 border border-blue-800/50 mb-2 sm:mb-3">
+          <div className="inline-flex items-center gap-2 rounded-full bg-[#FF5B37]/10 px-2.5 py-0.5 sm:px-3 sm:py-1 text-[11px] sm:text-xs font-semibold text-[#FF5B37] border border-[#FF5B37]/20 mb-2 sm:mb-3">
             <Calculator className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-            <span>Mark Scheme & Examiner Engine</span>
+            <span>Mark Scheme &amp; Examiner Engine</span>
           </div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-zinc-100 tracking-tight">
             Mark Scheme Step-by-Step Solver
           </h1>
-          <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-slate-300 leading-relaxed hidden sm:block">
+          <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-zinc-400 leading-relaxed hidden sm:block">
             Upload or type any Cambridge past paper question to view complete line-by-line mark scheme workings ([M], [A], [B] marks) and examiner report guidance.
           </p>
         </div>
 
         {/* Quick Sample Selector */}
-        <div className="mt-4 sm:mt-6 border-t border-slate-800/80 pt-3 sm:pt-4">
-          <p className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-1.5">
-            <FileQuestion className="h-3.5 w-3.5 text-blue-400" />
+        <div className="mt-4 sm:mt-6 border-t border-white/[0.06] pt-3 sm:pt-4">
+          <p className="text-[11px] sm:text-xs font-medium uppercase tracking-wider text-zinc-400 mb-2 flex items-center gap-1.5">
+            <FileQuestion className="h-3.5 w-3.5 text-[#FF5B37]" />
             Try an IGCSE Past Paper Question:
           </p>
           <div className="flex flex-nowrap sm:flex-wrap gap-2 overflow-x-auto pb-1 no-scrollbar">
@@ -315,7 +315,7 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
                 key={idx}
                 type="button"
                 onClick={() => loadSampleQuestion(s)}
-                className="shrink-0 rounded-lg border border-slate-700/70 bg-slate-800/60 px-2.5 py-1 sm:px-3 sm:py-1.5 text-[11px] sm:text-xs text-slate-200 hover:border-blue-500 hover:bg-slate-800 hover:text-white transition cursor-pointer"
+                className="shrink-0 rounded-lg border border-white/[0.06] bg-white/[0.03] px-2.5 py-1 sm:px-3 sm:py-1.5 text-[11px] sm:text-xs text-zinc-300 hover:border-[#FF5B37]/40 hover:bg-white/[0.06] hover:text-white transition cursor-pointer"
               >
                 {s.title}
               </button>
@@ -325,17 +325,17 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
       </div>
 
       {/* Mode Switcher */}
-      <div className="flex rounded-xl sm:rounded-2xl bg-slate-900/90 p-1 sm:p-1.5 border border-slate-800 gap-1">
+      <div className="flex rounded-xl sm:rounded-2xl bg-[#18181B] p-1 sm:p-1.5 border border-white/[0.06] gap-1">
         <button
           type="button"
           onClick={() => {
             setSolverMode('solve');
             setErrorMessage(null);
           }}
-          className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 rounded-lg sm:rounded-xl py-2 sm:py-2.5 px-2 sm:px-3 text-xs font-bold transition cursor-pointer text-center ${
+          className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 rounded-lg sm:rounded-xl py-2 sm:py-2.5 px-2 sm:px-3 text-xs font-semibold transition cursor-pointer text-center ${
             solverMode === 'solve'
-              ? 'bg-blue-600 text-white shadow-sm'
-              : 'text-slate-400 hover:text-white'
+              ? 'bg-[#FF5B37] text-white shadow-sm'
+              : 'text-zinc-400 hover:text-white'
           }`}
         >
           <Calculator className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
@@ -348,14 +348,14 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
             setSolverMode('exam-lookup');
             setErrorMessage(null);
           }}
-          className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 rounded-lg sm:rounded-xl py-2 sm:py-2.5 px-2 sm:px-3 text-xs font-bold transition cursor-pointer text-center ${
+          className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 rounded-lg sm:rounded-xl py-2 sm:py-2.5 px-2 sm:px-3 text-xs font-semibold transition cursor-pointer text-center ${
             solverMode === 'exam-lookup'
-              ? 'bg-blue-600 text-white shadow-sm'
-              : 'text-slate-400 hover:text-white'
+              ? 'bg-[#FF5B37] text-white shadow-sm'
+              : 'text-zinc-400 hover:text-white'
           }`}
         >
           <BookOpen className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
-          <span className="hidden sm:inline">Search by Exam Code & Q#</span>
+          <span className="hidden sm:inline">Search by Exam Code &amp; Q#</span>
           <span className="sm:hidden">Exam Code</span>
         </button>
         <button
@@ -364,10 +364,10 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
             setSolverMode('handwritten');
             setErrorMessage(null);
           }}
-          className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 rounded-lg sm:rounded-xl py-2 sm:py-2.5 px-2 sm:px-3 text-xs font-bold transition cursor-pointer text-center ${
+          className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 rounded-lg sm:rounded-xl py-2 sm:py-2.5 px-2 sm:px-3 text-xs font-semibold transition cursor-pointer text-center ${
             solverMode === 'handwritten'
-              ? 'bg-blue-600 text-white shadow-sm'
-              : 'text-slate-400 hover:text-white'
+              ? 'bg-[#FF5B37] text-white shadow-sm'
+              : 'text-zinc-400 hover:text-white'
           }`}
         >
           <PenTool className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
@@ -377,37 +377,37 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
       </div>
 
       {/* Academic Engine Rubric Card */}
-      <div className="hidden sm:flex rounded-2xl border border-slate-700/60 bg-slate-800/80 p-4 shadow-sm items-start sm:items-center justify-between gap-3">
+      <div className="hidden sm:flex rounded-2xl border border-white/[0.06] bg-[#18181B] p-4 shadow-sm items-start sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-xl bg-blue-950/80 border border-blue-800/50 flex items-center justify-center shrink-0">
-            <ShieldCheck className="h-5 w-5 text-blue-300" />
+          <div className="h-9 w-9 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center shrink-0">
+            <ShieldCheck className="h-5 w-5 text-[#FF5B37]" />
           </div>
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-bold text-white">Official Cambridge & Edexcel Mark Scheme Rubrics</span>
-              <span className="inline-block rounded-full bg-blue-950/80 px-2.5 py-0.5 text-[10px] font-semibold text-blue-300 border border-blue-800/50">
-                Cambridge 0580, 0620, 0625, 0610 & 0510 Guidance
+              <span className="text-xs font-semibold text-zinc-100">Official Cambridge &amp; Edexcel Mark Scheme Rubrics</span>
+              <span className="inline-block rounded-full bg-white/[0.04] px-2.5 py-0.5 text-[10px] font-medium text-zinc-300 border border-white/[0.06]">
+                Cambridge 0580, 0620, 0625, 0610 &amp; 0510 Guidance
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 mt-0.5">
+            <p className="text-[11px] text-zinc-400 mt-0.5">
               Full step-by-step method [M], accuracy [A], and independent [B] mark evaluation for {subject.name} ({subject.code}).
             </p>
           </div>
         </div>
       </div>
 
-        {/* Input Section */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-          <div className="md:col-span-12 rounded-2xl border border-slate-800 bg-slate-900/80 p-4 sm:p-5 shadow-lg backdrop-blur-sm space-y-4">
-            {/* Image Upload Guidelines Helper */}
-            <div className="flex items-center gap-2.5 rounded-xl bg-indigo-950/50 border border-indigo-500/25 px-3.5 py-2.5 text-xs text-indigo-200">
-              <Camera className="h-4 w-4 text-indigo-400 shrink-0" />
-              <p className="leading-snug">
-                <span className="font-bold text-indigo-300">Tip:</span> Crop tightly around the diagram, keep text upright, and ensure the mark allocation (e.g. [3]) in the margin is visible.
-              </p>
-            </div>
+      {/* Input Section */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        <div className="md:col-span-12 rounded-2xl border border-white/[0.06] bg-[#18181B] p-4 sm:p-5 shadow-sm space-y-4">
+          {/* Image Upload Guidelines Helper */}
+          <div className="flex items-center gap-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] px-3.5 py-2.5 text-xs text-zinc-300">
+            <Camera className="h-4 w-4 text-[#FF5B37] shrink-0" />
+            <p className="leading-snug">
+              <span className="font-semibold text-zinc-200">Tip:</span> Crop tightly around the diagram, keep text upright, and ensure mark allocation (e.g. [3]) in the margin is visible.
+            </p>
+          </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/[0.06] pb-3">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
                   Subject Context:

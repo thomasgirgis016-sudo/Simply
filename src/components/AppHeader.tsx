@@ -2,21 +2,16 @@ import React from 'react';
 import {
   Menu,
   Flame,
-  Scan,
   Crown,
-  Search,
   ChevronDown,
-  UserCheck,
-  Calculator,
+  User,
   ShieldCheck,
-  Atom,
-  Download
+  Smartphone
 } from 'lucide-react';
 import { Subject, UserProfile, UserAccount } from '../types';
 import { ActiveTab } from './Navbar';
 import { SimplyLogo } from './SimplyLogo';
 import { getDailyStreak } from '../services/dailyStreak';
-import { handleLiquidMouseMove } from '../utils/liquidGlare';
 import { hasActiveSubscription } from '../services/auth';
 
 interface AppHeaderProps {
@@ -51,16 +46,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   onOpenMobileSidebar,
   onOpenProfile,
   onOpenPayment,
-  onOpenHandwritingScanner,
-  onOpenCalculator,
-  onOpenExamHud,
-  onOpenRevisionKit,
-  onOpenPwaModal,
   onOpenParentReport,
   onOpenAuth,
   onNavigateTab,
-  designTheme = 'liquid',
-  onToggleDesignTheme,
 }) => {
   const streak = getDailyStreak();
   const isSubscribed = Boolean(currentUser && hasActiveSubscription(currentUser));
@@ -84,21 +72,21 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       case 'predicted': return '2026 Predicted Papers';
       case 'worksheet': return 'Worksheet Builder';
       case 'classifieds': return 'Topic Classifieds';
-      case 'solver': return 'Mark Scheme Step-by-Step Solver';
-      case 'chat': return 'Examiner Walkthrough Co-Pilot';
+      case 'solver': return 'Step-by-Step Solver';
+      case 'chat': return 'Examiner Co-Pilot';
       case 'esl-speaking': return 'ESL Speaking Simulator';
-      case 'listening': return 'Multi-Board Listening Simulator';
+      case 'listening': return 'Listening Simulator';
       case 'atp': return 'Paper 6 ATP Lab Master';
       case 'pitfalls': return 'Examiner Pitfall Heatmap';
-      case 'mistakes': return 'Personal Error & Mistake Log';
+      case 'mistakes': return 'Error Notebook';
       case 'traps': return 'Command Words Traps';
-      case 'blitz': return 'Topic Classified Drills';
-      case 'revision': return 'High-Yield Syllabus Summaries';
-      case 'flashcards': return 'Topic Active Recall Decks';
-      case 'cheatsheets': return 'Night Before Cheat Sheets';
-      case 'formulas': return 'Formulas Dictionary';
-      case 'formula-quiz': return 'Formula Recall Memory Quizzer';
-      case 'tanzim': return 'Egyptian University Tanzim Calculator';
+      case 'blitz': return 'Topic Drills';
+      case 'revision': return 'Syllabus Notes';
+      case 'flashcards': return 'Active Recall Decks';
+      case 'cheatsheets': return 'Cheat Sheets';
+      case 'formulas': return 'Formula Dictionary';
+      case 'formula-quiz': return 'Formula Quizzer';
+      case 'tanzim': return 'Tanzim Calculator';
       case 'checklist': return 'Syllabus Tracker';
       case 'boundaries': return 'Grade Boundaries';
       case 'admin': return currentUser?.role === 'founder' ? 'Founder Console' : 'Admin Console';
@@ -108,138 +96,120 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   };
 
   return (
-    <header
-      className="sticky top-0 z-30 w-full border-b border-white/[0.08] bg-[#0B0F17]/95 backdrop-blur-xl transition-all duration-300"
-    >
-      {/* Single Clean Header Row: Brand, Active Subject & Essential Status */}
-      <div className="flex h-13 sm:h-16 w-full items-center justify-between px-2.5 sm:px-6 relative z-10 gap-1.5 sm:gap-2">
-        {/* 1. Brand Logo & Desktop Breadcrumbs */}
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0 shrink-0">
-          <SimplyLogo size="sm" showText={true} />
+    <header className="sticky top-0 z-30 w-full border-b border-white/[0.06] bg-[#111113]/95 backdrop-blur-md transition-colors">
+      <div className="flex h-14 sm:h-16 w-full items-center justify-between px-3 sm:px-6 gap-2">
+        {/* 1. Left: Hamburger (mobile only) + Logo + Desktop Breadcrumb */}
+        <div className="flex items-center gap-2.5 sm:gap-4 min-w-0 shrink-0">
+          {/* Mobile Menu Trigger */}
+          <button
+            type="button"
+            onClick={onOpenMobileSidebar}
+            className="md:hidden flex h-9 w-9 items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-white/[0.04] transition active:scale-95 cursor-pointer"
+            aria-label="Open Navigation Menu"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
 
-          {/* Desktop Breadcrumbs & Page Title */}
-          <div className="hidden md:flex flex-col min-w-0">
-            <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap truncate">
-              <span>Simply</span>
-              <span className="text-slate-600">/</span>
-              <span className="text-[#FFA63A] font-mono font-bold shrink-0">{activeSubject.code}</span>
-              <span className="text-slate-600">/</span>
-              <span className="text-slate-400 truncate max-w-[200px]">{activeSubject.name}</span>
-            </div>
-            <h1 className="text-sm sm:text-base font-black text-white tracking-tight truncate whitespace-nowrap">
-              {getPageTitle(activeTab)}
-            </h1>
+          {/* Logo & Simply Brand Name */}
+          <div
+            onClick={() => onNavigateTab && onNavigateTab('home')}
+            className="flex items-center cursor-pointer select-none"
+          >
+            <SimplyLogo size="sm" showText={true} />
+          </div>
+
+          {/* Desktop Breadcrumbs (Hidden on Mobile) */}
+          <div className="hidden lg:flex items-center gap-2 text-xs text-zinc-500 pl-2 border-l border-white/[0.08]">
+            <span className="font-mono text-zinc-300 font-semibold">{activeSubject.code}</span>
+            <span>/</span>
+            <span className="text-zinc-200 font-medium truncate max-w-[220px]">{getPageTitle(activeTab)}</span>
           </div>
         </div>
 
-        {/* 2. Center/Right Controls: Subject Selector, Streak, Profile */}
-        <div className="flex items-center gap-1 sm:gap-2 min-w-0 shrink-0">
-          {/* Active Subject Selector Pill (Compact on Mobile, Full on Desktop) */}
-          <div className="relative">
+        {/* 2. Center/Right: Compact Syllabus Selector & Desktop Secondary Actions */}
+        <div className="flex items-center gap-2 min-w-0">
+          {/* Compact Syllabus Selector */}
+          <div className="relative shrink-0">
             <select
               value={activeSubject.id}
               onChange={(e) => {
                 const found = subjects.find((s) => s.id === e.target.value);
                 if (found) onSelectSubject(found);
               }}
-              className="appearance-none rounded-xl border border-white/[0.1] bg-[#121824] py-1 sm:py-1.5 pl-2 sm:pl-2.5 pr-5 sm:pr-8 text-[11px] sm:text-xs font-mono font-bold text-slate-200 shadow-sm hover:border-white/[0.2] focus:border-[#FF5B37] focus:outline-none cursor-pointer max-w-[85px] sm:max-w-[260px] truncate"
+              className="appearance-none rounded-lg border border-white/[0.08] bg-[#18181B] py-1.5 pl-2.5 pr-7 text-xs font-mono font-medium text-zinc-200 hover:border-white/[0.16] hover:bg-[#202024] focus:border-[#FF5B37] focus:outline-none transition cursor-pointer max-w-[130px] sm:max-w-[240px] truncate"
             >
               {subjects.map((s) => (
-                <option key={s.id} value={s.id} className="bg-[#121824] text-white font-sans">
+                <option key={s.id} value={s.id} className="bg-[#18181B] text-zinc-200 font-sans">
                   {s.code} • {s.name}
                 </option>
               ))}
             </select>
-            <ChevronDown className="pointer-events-none absolute right-1.5 sm:right-2.5 top-1/2 -translate-y-1/2 h-3 w-3 sm:h-3.5 sm:w-3.5 text-slate-400" />
+            <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400" />
           </div>
 
-          {/* Daily Streak Flame Pill */}
-          <div
-            className="flex items-center gap-1 sm:gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 px-1.5 sm:px-2.5 py-1 text-[11px] sm:text-xs font-black text-amber-300 shadow-sm cursor-default shrink-0"
-            title={`${streak.currentStreak} Day Study Streak`}
-          >
-            <Flame className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-amber-400 fill-amber-400 animate-pulse" />
-            <span className="font-mono text-[11px] sm:text-xs">{streak.currentStreak}d</span>
+          {/* Desktop-Only Secondary Actions */}
+          <div className="hidden sm:flex items-center gap-2">
+            {/* Daily Streak Flame */}
+            <div
+              className="flex items-center gap-1.5 rounded-lg bg-zinc-900 border border-white/[0.06] px-2.5 py-1 text-xs text-zinc-300 cursor-default"
+              title={`${streak.currentStreak} Day Study Streak`}
+            >
+              <Flame className="h-3.5 w-3.5 text-[#FF5B37] fill-[#FF5B37]" />
+              <span className="font-mono font-semibold">{streak.currentStreak}d</span>
+            </div>
+
+            {/* Parent WhatsApp Report Button */}
+            {onOpenParentReport && (
+              <button
+                onClick={onOpenParentReport}
+                className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium border transition cursor-pointer ${
+                  isWeeklyReportDue
+                    ? 'border-emerald-500/40 bg-emerald-950/30 text-emerald-300'
+                    : 'border-white/[0.06] bg-zinc-900 text-zinc-400 hover:text-white hover:border-white/[0.12]'
+                }`}
+                title="Send Weekly Progress Report to Parent via WhatsApp"
+              >
+                <Smartphone className="h-3.5 w-3.5" />
+                <span>{isWeeklyReportDue ? 'Report Due' : 'Report'}</span>
+              </button>
+            )}
+
+            {/* Pro Upgrade Pill */}
+            {onOpenPayment && (
+              <button
+                onClick={onOpenPayment}
+                className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
+                  currentUser?.isPro
+                    ? 'border border-amber-500/30 bg-amber-950/20 text-amber-300'
+                    : 'bg-[#FF5B37] text-white hover:bg-[#F97316]'
+                }`}
+              >
+                <Crown className="h-3.5 w-3.5" />
+                <span>{currentUser?.isPro ? 'Pro' : 'Get Pro'}</span>
+              </button>
+            )}
+
+            {/* Founder / Admin Pill */}
+            {(currentUser?.role === 'founder' || currentUser?.role === 'admin') && onNavigateTab && (
+              <button
+                onClick={() => onNavigateTab('admin')}
+                className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
+                  activeTab === 'admin'
+                    ? 'border-amber-500/60 bg-amber-500/20 text-amber-300'
+                    : 'border-white/[0.08] bg-zinc-900 text-amber-400/90 hover:text-amber-300'
+                }`}
+              >
+                <Crown className="h-3.5 w-3.5 text-amber-400" />
+                <span>Console</span>
+              </button>
+            )}
           </div>
-
-          {/* Desktop-Only: Parent Weekly WhatsApp Report Button */}
-          {onOpenParentReport && (
-            <button
-              onClick={onOpenParentReport}
-              className={`hidden md:flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-xs font-semibold border transition cursor-pointer shrink-0 ${
-                isWeeklyReportDue
-                  ? 'border-emerald-500/50 bg-emerald-500/20 text-emerald-300 shadow-sm shadow-emerald-500/10'
-                  : 'border-slate-800 bg-slate-900/90 text-slate-400 hover:text-white hover:border-slate-700'
-              }`}
-              title={
-                isWeeklyReportDue
-                  ? 'Weekly Parent WhatsApp Report is ready to send!'
-                  : 'Send Weekly Progress Report to Parent via WhatsApp'
-              }
-            >
-              <span className="text-xs">📱</span>
-              <span className="font-bold">
-                {isWeeklyReportDue ? 'Parent Report Due' : 'Parent Report'}
-              </span>
-            </button>
-          )}
-
-          {/* Desktop-Only: Pro Upgrade / Status Pill */}
-          {onOpenPayment && (
-            <button
-              onClick={onOpenPayment}
-              className={`hidden sm:flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-xs font-bold transition cursor-pointer shrink-0 ${
-                currentUser?.isPro
-                  ? 'border border-amber-500/40 bg-amber-500/10 text-amber-300'
-                  : 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black shadow-md'
-              }`}
-            >
-              <Crown className="h-3.5 w-3.5" />
-              <span>{currentUser?.isPro ? 'PRO' : 'Get Pro'}</span>
-            </button>
-          )}
-
-          {/* Founder / Administrator Console Direct Access Pill */}
-          {(currentUser?.role === 'founder' || currentUser?.role === 'admin') && onNavigateTab && (
-            <button
-              onClick={() => onNavigateTab('admin')}
-              className={`flex items-center gap-1.5 rounded-xl border px-2.5 sm:px-3 py-1 text-xs font-black transition cursor-pointer shrink-0 shadow-sm ${
-                activeTab === 'admin'
-                  ? 'border-amber-400 bg-amber-500 text-slate-950 shadow-amber-500/30'
-                  : 'border-amber-500/50 bg-amber-500/15 text-amber-300 hover:bg-amber-500/25 shadow-amber-500/10'
-              }`}
-              title="Open Founder & Administrator Management Console"
-            >
-              <Crown className="h-3.5 w-3.5 text-amber-400" />
-              <span className="hidden sm:inline">Founder Console</span>
-              <span className="sm:hidden">Console</span>
-            </button>
-          )}
-
-          {/* Desktop-Only: Compact UI Theme Switcher */}
-          {isSubscribed && onToggleDesignTheme && (
-            <button
-              onClick={onToggleDesignTheme}
-              className={`hidden lg:flex h-8 w-8 items-center justify-center rounded-xl border transition cursor-pointer text-sm shrink-0 ${
-                designTheme === 'liquid'
-                  ? 'border-cyan-400/40 bg-cyan-500/15 text-cyan-200 hover:bg-cyan-500/25 shadow-sm shadow-cyan-500/10'
-                  : 'border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700'
-              }`}
-              title={
-                designTheme === 'liquid'
-                  ? 'Currently in Liquid Glass UI. Click to switch to Classic Solid UI.'
-                  : 'Currently in Classic Solid UI. Click to switch to Liquid Glass UI.'
-              }
-            >
-              {designTheme === 'liquid' ? '✨' : '🛡️'}
-            </button>
-          )}
 
           {/* Profile Avatar / Sign In */}
           {currentUser ? (
             <button
               onClick={onOpenProfile}
-              className="h-8 w-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 flex items-center justify-center text-xs font-black text-white shadow-sm transition cursor-pointer shrink-0"
+              className="h-8 w-8 rounded-lg bg-[#27272A] hover:bg-[#323236] border border-white/[0.08] flex items-center justify-center text-xs font-bold text-white transition cursor-pointer shrink-0"
               title={`${currentUser.name} (${profile.targetGrade})`}
             >
               {currentUser.name.charAt(0).toUpperCase()}
@@ -247,7 +217,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           ) : (
             <button
               onClick={() => onOpenAuth('signin')}
-              className="rounded-xl border border-slate-700 bg-slate-800 px-2 sm:px-2.5 py-1 text-[11px] sm:text-xs font-bold text-slate-200 hover:text-white transition cursor-pointer shrink-0 whitespace-nowrap"
+              className="rounded-lg bg-[#FF5B37] hover:bg-[#F97316] text-white px-3 py-1.5 text-xs font-semibold transition cursor-pointer shrink-0 whitespace-nowrap"
             >
               Sign In
             </button>

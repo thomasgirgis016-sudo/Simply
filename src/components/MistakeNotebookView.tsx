@@ -194,26 +194,24 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-16 animate-fadeIn">
       {/* 1. Header Banner */}
-      <div className="rounded-2xl sm:rounded-3xl border border-rose-500/30 bg-gradient-to-br from-rose-950/40 via-slate-900 to-slate-950 p-3.5 sm:p-8 shadow-2xl relative overflow-hidden">
-        <div className="absolute -top-20 -right-20 h-52 w-52 rounded-full bg-rose-500/10 blur-3xl pointer-events-none" />
-
+      <div className="rounded-2xl sm:rounded-3xl border border-white/[0.06] bg-[#18181B] p-4 sm:p-7 shadow-sm relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
           <div className="space-y-1.5 sm:space-y-2">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-500/20 px-2.5 py-0.5 sm:px-3 sm:py-1 text-[11px] sm:text-xs font-black text-rose-300 border border-rose-500/40">
-                <BookMarked className="h-3.5 w-3.5 text-rose-400" />
-                <span>Personal Error & Mistake Log</span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FF5B37]/10 px-2.5 py-0.5 sm:px-3 sm:py-1 text-[11px] sm:text-xs font-semibold text-[#FF5B37] border border-[#FF5B37]/20">
+                <BookMarked className="h-3.5 w-3.5 text-[#FF5B37]" />
+                <span>Personal Error &amp; Mistake Log</span>
               </span>
-              <span className="rounded-md bg-amber-500/15 px-2 py-0.5 text-[10px] sm:text-xs font-bold text-amber-300 border border-amber-500/30 font-mono">
+              <span className="rounded-md bg-white/[0.04] px-2 py-0.5 text-[10px] sm:text-xs font-medium text-zinc-300 border border-white/[0.08] font-mono">
                 Grade 9 Recovery System
               </span>
             </div>
 
-            <h1 className="text-xl sm:text-3xl font-black text-white tracking-tight">
-              Personal Error Notebook & Rematch Engine
+            <h1 className="text-xl sm:text-3xl font-bold text-zinc-100 tracking-tight">
+              Personal Error Notebook &amp; Rematch Engine
             </h1>
-            <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed hidden sm:block">
-              Top Cambridge candidates never repeat the same error twice. Log every question you lost marks on, diagnose the exact reason, and replay them in <strong className="text-rose-300">Rematch Mode</strong> until 100% mastered.
+            <p className="text-xs sm:text-sm text-zinc-400 max-w-2xl leading-relaxed hidden sm:block">
+              Top Cambridge candidates never repeat the same error twice. Log every question you lost marks on, diagnose the exact reason, and replay them in <strong className="text-zinc-200">Rematch Mode</strong> until 100% mastered.
             </p>
           </div>
 
@@ -222,10 +220,10 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
             <button
               onClick={handleStartRematch}
               disabled={rematchPool.length === 0}
-              className={`flex-1 sm:flex-initial rounded-xl sm:rounded-2xl px-3.5 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-black shadow-xl transition flex items-center justify-center gap-2 cursor-pointer ${
+              className={`flex-1 sm:flex-initial rounded-xl sm:rounded-2xl px-3.5 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold shadow-sm transition flex items-center justify-center gap-2 cursor-pointer ${
                 rematchPool.length > 0
-                  ? 'bg-gradient-to-r from-rose-500 via-rose-600 to-amber-600 text-white hover:brightness-110 active:scale-95'
-                  : 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed opacity-60'
+                  ? 'bg-[#FF5B37] hover:bg-[#e04825] text-white'
+                  : 'bg-white/[0.03] text-zinc-600 border border-white/[0.06] cursor-not-allowed opacity-60'
               }`}
             >
               <Play className="h-3.5 w-3.5 sm:h-4 sm:w-4 fill-current" />
@@ -234,15 +232,15 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
 
             <button
               onClick={handleOpenAddModal}
-              className="flex-1 sm:flex-initial rounded-xl sm:rounded-2xl border border-slate-700 bg-slate-800/90 hover:bg-slate-700 px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-bold text-white transition flex items-center justify-center gap-2 cursor-pointer"
+              className="flex-1 sm:flex-initial rounded-xl sm:rounded-2xl border border-white/[0.08] bg-[#1E1E22] hover:bg-white/[0.08] px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-zinc-200 hover:text-white transition flex items-center justify-center gap-2 cursor-pointer"
             >
-              <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-rose-400" />
+              <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#FF5B37]" />
               <span>Log Mistake</span>
             </button>
 
             <button
               onClick={() => window.print()}
-              className="hidden sm:flex rounded-2xl border border-slate-800 bg-slate-900/80 hover:bg-slate-800 p-3 text-slate-300 hover:text-white transition"
+              className="hidden sm:flex rounded-2xl border border-white/[0.08] bg-[#1E1E22] hover:bg-white/[0.08] p-3 text-zinc-400 hover:text-white transition cursor-pointer"
               title="Print Mistake Log for Revision"
             >
               <Printer className="h-4.5 w-4.5" />
@@ -251,50 +249,50 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
         </div>
 
         {/* 2. Key Analytics Counters */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-3.5 sm:pt-6 mt-3.5 sm:mt-6 border-t border-slate-800/80">
-          <div className="rounded-xl sm:rounded-2xl border border-slate-800 bg-slate-950/70 p-2.5 sm:p-3.5 text-center">
-            <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Logged</span>
-            <div className="text-lg sm:text-2xl font-black font-mono text-white mt-0.5">{stats.total}</div>
-            <span className="text-[9px] sm:text-[10px] text-slate-500 hidden sm:block">Historical slips</span>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-3.5 sm:pt-6 mt-3.5 sm:mt-6 border-t border-white/[0.06]">
+          <div className="rounded-xl sm:rounded-2xl border border-white/[0.06] bg-[#111113] p-2.5 sm:p-3.5 text-center">
+            <span className="text-[9px] sm:text-[10px] font-medium uppercase tracking-wider text-zinc-400">Total Logged</span>
+            <div className="text-lg sm:text-2xl font-bold font-mono text-zinc-100 mt-0.5">{stats.total}</div>
+            <span className="text-[9px] sm:text-[10px] text-zinc-500 hidden sm:block">Historical slips</span>
           </div>
 
-          <div className="rounded-xl sm:rounded-2xl border border-rose-500/30 bg-rose-950/20 p-2.5 sm:p-3.5 text-center">
-            <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-rose-400">Unresolved Slips</span>
-            <div className="text-lg sm:text-2xl font-black font-mono text-rose-300 mt-0.5">{stats.unresolved}</div>
-            <span className="text-[9px] sm:text-[10px] text-rose-400/80 font-bold hidden sm:block">Needs rematch</span>
+          <div className="rounded-xl sm:rounded-2xl border border-white/[0.06] bg-[#111113] p-2.5 sm:p-3.5 text-center">
+            <span className="text-[9px] sm:text-[10px] font-medium uppercase tracking-wider text-[#FF5B37]">Unresolved Slips</span>
+            <div className="text-lg sm:text-2xl font-bold font-mono text-[#FF5B37] mt-0.5">{stats.unresolved}</div>
+            <span className="text-[9px] sm:text-[10px] text-zinc-500 hidden sm:block">Needs rematch</span>
           </div>
 
-          <div className="rounded-xl sm:rounded-2xl border border-emerald-500/30 bg-emerald-950/20 p-2.5 sm:p-3.5 text-center">
-            <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-emerald-400">Mastered</span>
-            <div className="text-lg sm:text-2xl font-black font-mono text-emerald-300 mt-0.5">{stats.mastered}</div>
-            <span className="text-[9px] sm:text-[10px] text-emerald-400 font-bold">{stats.masteryPercent}% Mastery</span>
+          <div className="rounded-xl sm:rounded-2xl border border-white/[0.06] bg-[#111113] p-2.5 sm:p-3.5 text-center">
+            <span className="text-[9px] sm:text-[10px] font-medium uppercase tracking-wider text-emerald-400">Mastered</span>
+            <div className="text-lg sm:text-2xl font-bold font-mono text-emerald-300 mt-0.5">{stats.mastered}</div>
+            <span className="text-[9px] sm:text-[10px] text-emerald-400/80 font-medium">{stats.masteryPercent}% Mastery</span>
           </div>
 
-          <div className="rounded-xl sm:rounded-2xl border border-amber-500/30 bg-amber-950/20 p-2.5 sm:p-3.5 text-center">
-            <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-amber-400">Recoverable</span>
-            <div className="text-lg sm:text-2xl font-black font-mono text-amber-300 mt-0.5">+{stats.recoverableMarks}</div>
-            <span className="text-[9px] sm:text-[10px] text-amber-400/80 font-bold hidden sm:block">Boost to Grade 9</span>
+          <div className="rounded-xl sm:rounded-2xl border border-white/[0.06] bg-[#111113] p-2.5 sm:p-3.5 text-center">
+            <span className="text-[9px] sm:text-[10px] font-medium uppercase tracking-wider text-amber-400">Recoverable</span>
+            <div className="text-lg sm:text-2xl font-bold font-mono text-amber-300 mt-0.5">+{stats.recoverableMarks}</div>
+            <span className="text-[9px] sm:text-[10px] text-zinc-500 hidden sm:block">Boost to Grade 9</span>
           </div>
         </div>
       </div>
 
       {/* 3. Filter Bar & Search */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 space-y-3">
+      <div className="rounded-2xl border border-white/[0.06] bg-[#18181B] p-4 space-y-3">
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
           {/* Search Bar */}
           <div className="relative flex-1">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search mistakes by topic, paper code (e.g. 0580/42), or prompt keyword..."
-              className="w-full rounded-xl border border-slate-700 bg-slate-950 py-2.5 pl-10 pr-4 text-xs sm:text-sm text-white placeholder-slate-500 focus:border-rose-500 focus:outline-none"
+              className="w-full rounded-xl border border-white/[0.08] bg-[#111113] py-2.5 pl-10 pr-4 text-xs sm:text-sm text-zinc-100 placeholder-zinc-500 focus:border-[#FF5B37] focus:outline-none transition-colors"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-white"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zinc-400 hover:text-white"
               >
                 Clear
               </button>
@@ -302,15 +300,15 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
           </div>
 
           {/* Status Tabs */}
-          <div className="flex items-center rounded-xl border border-slate-800 bg-slate-950 p-1 self-start sm:self-auto shrink-0">
+          <div className="flex items-center rounded-xl border border-white/[0.08] bg-[#111113] p-1 self-start sm:self-auto shrink-0">
             {(['unresolved', 'mastered', 'all'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setStatusFilter(tab)}
-                className={`rounded-lg px-3 py-1.5 text-xs font-bold transition cursor-pointer capitalize ${
+                className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition cursor-pointer capitalize ${
                   statusFilter === tab
-                    ? 'bg-rose-600 text-white shadow'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-[#FF5B37] text-white shadow-sm'
+                    : 'text-zinc-400 hover:text-zinc-200'
                 }`}
               >
                 {tab === 'unresolved' ? `Unresolved (${stats.unresolved})` : tab === 'mastered' ? `Mastered (${stats.mastered})` : `All (${stats.total})`}
@@ -321,7 +319,7 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
 
         {/* Reason Pill Filter */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
-          <span className="text-[11px] font-bold text-slate-500 shrink-0 mr-1 flex items-center gap-1">
+          <span className="text-[11px] font-medium text-zinc-500 shrink-0 mr-1 flex items-center gap-1">
             <Filter className="h-3 w-3" /> Error Reason:
           </span>
           {[
@@ -336,10 +334,10 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
             <button
               key={pill.id}
               onClick={() => setReasonFilter(pill.id)}
-              className={`shrink-0 rounded-xl px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
+              className={`shrink-0 rounded-xl px-2.5 py-1 text-xs font-medium transition cursor-pointer ${
                 reasonFilter === pill.id
-                  ? 'bg-slate-700 text-white border border-slate-600'
-                  : 'bg-slate-950/60 text-slate-400 border border-slate-800 hover:bg-slate-800 hover:text-slate-200'
+                  ? 'bg-[#FF5B37] text-white'
+                  : 'bg-white/[0.03] text-zinc-300 border border-white/[0.06] hover:bg-white/[0.06] hover:text-white'
               }`}
             >
               {pill.label}
@@ -378,51 +376,51 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
             return (
               <div
                 key={mistake.id}
-                className={`rounded-2xl border p-5 transition shadow-lg relative ${
+                className={`rounded-2xl border p-5 transition shadow-sm relative ${
                   mistake.isMastered
-                    ? 'border-emerald-500/40 bg-slate-900/40 opacity-85'
-                    : 'border-slate-800 bg-slate-900/80 hover:border-rose-500/40'
+                    ? 'border-emerald-500/25 bg-[#18181B]/70 opacity-90'
+                    : 'border-white/[0.06] bg-[#18181B] hover:border-white/[0.12]'
                 }`}
               >
                 {/* Card Top: Badges & Action */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="rounded-md bg-indigo-500/15 px-2 py-0.5 text-xs font-mono font-bold text-indigo-300 border border-indigo-500/30">
+                    <span className="rounded-md bg-white/[0.04] px-2 py-0.5 text-xs font-mono font-medium text-zinc-300 border border-white/[0.08]">
                       {mistake.subjectCode}
                     </span>
                     {mistake.paperCode && (
-                      <span className="rounded-md bg-slate-800 px-2 py-0.5 text-[11px] font-mono text-slate-300 border border-slate-700">
+                      <span className="rounded-md bg-[#111113] px-2 py-0.5 text-[11px] font-mono text-zinc-400 border border-white/[0.06]">
                         {mistake.paperCode} {mistake.questionNumber && `• ${mistake.questionNumber}`}
                       </span>
                     )}
-                    <span className={`rounded-md px-2 py-0.5 text-[10px] font-bold border ${meta.color}`}>
+                    <span className={`rounded-md px-2 py-0.5 text-[10px] font-medium border ${meta.color}`}>
                       {meta.iconText} {meta.label}
                     </span>
-                    <span className="text-xs font-bold text-slate-300">
+                    <span className="text-xs font-medium text-zinc-300">
                       {mistake.topic}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-2 self-end sm:self-auto">
-                    <span className="text-xs font-bold font-mono text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20">
+                    <span className="text-xs font-medium font-mono text-[#FF5B37] bg-[#FF5B37]/10 px-2 py-0.5 rounded border border-[#FF5B37]/20">
                       Lost: -{mistake.marksLost} / {mistake.totalMarks} Marks
                     </span>
 
                     <button
                       onClick={() => markMistakeMastered(mistake.id, !mistake.isMastered)}
-                      className={`rounded-lg px-2.5 py-1 text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                      className={`rounded-lg px-2.5 py-1 text-xs font-medium transition cursor-pointer flex items-center gap-1.5 ${
                         mistake.isMastered
-                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/30'
-                          : 'bg-slate-800 text-slate-300 border border-slate-700 hover:text-white hover:border-emerald-500/40'
+                          ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/25'
+                          : 'bg-[#111113] text-zinc-300 border border-white/[0.08] hover:text-white hover:bg-white/[0.06]'
                       }`}
                     >
-                      <CheckCircle className={`h-3.5 w-3.5 ${mistake.isMastered ? 'text-emerald-400' : 'text-slate-400'}`} />
+                      <CheckCircle className={`h-3.5 w-3.5 ${mistake.isMastered ? 'text-emerald-400' : 'text-zinc-500'}`} />
                       <span>{mistake.isMastered ? 'Mastered' : 'Mark Mastered'}</span>
                     </button>
 
                     <button
                       onClick={() => deleteMistakeItem(mistake.id)}
-                      className="rounded-lg p-1 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition"
+                      className="rounded-lg p-1 text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 transition"
                       title="Delete from log"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
@@ -431,8 +429,8 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
                 </div>
 
                 {/* Question Prompt */}
-                <div className="rounded-xl bg-slate-950/80 p-3.5 text-xs sm:text-sm text-slate-100 border border-slate-800/80 font-sans leading-relaxed mb-3">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+                <div className="rounded-xl bg-[#111113] p-3.5 text-xs sm:text-sm text-zinc-100 border border-white/[0.06] font-sans leading-relaxed mb-3">
+                  <div className="text-[10px] font-medium uppercase tracking-wider text-zinc-500 mb-1">
                     Question Prompt:
                   </div>
                   <MathRenderer content={mistake.questionPrompt} />
@@ -440,18 +438,18 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
 
                 {/* Side-by-Side: What I Wrote vs Official Mark Scheme */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                  <div className="rounded-xl border border-rose-500/25 bg-rose-950/20 p-3">
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-rose-400 flex items-center gap-1 mb-1">
-                      <span>❌ My Past Slip / What I Wrote:</span>
+                  <div className="rounded-xl border border-rose-500/20 bg-rose-500/5 p-3">
+                    <div className="text-[10px] font-semibold uppercase tracking-wider text-rose-400 flex items-center gap-1 mb-1">
+                      <span>Past Slip / What I Wrote:</span>
                     </div>
                     <div className="text-xs text-rose-200/90 leading-relaxed font-mono">
                       <MathRenderer content={mistake.myMistakeAnswer} />
                     </div>
                   </div>
 
-                  <div className="rounded-xl border border-emerald-500/25 bg-emerald-950/20 p-3">
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1 mb-1">
-                      <span>✅ Official Mark Scheme Solution:</span>
+                  <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3">
+                    <div className="text-[10px] font-semibold uppercase tracking-wider text-emerald-400 flex items-center gap-1 mb-1">
+                      <span>Official Mark Scheme Solution:</span>
                     </div>
                     <div className="text-xs text-emerald-200/90 leading-relaxed font-mono">
                       <MathRenderer content={mistake.markSchemeAnswer} />
@@ -461,10 +459,10 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
 
                 {/* Examiner Report Warning / Advice */}
                 {mistake.examinerTip && (
-                  <div className="rounded-xl border border-amber-500/30 bg-amber-950/20 p-2.5 flex items-start gap-2 text-xs text-amber-200/90">
-                    <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+                  <div className="rounded-xl border border-white/[0.08] bg-[#111113] p-2.5 flex items-start gap-2 text-xs text-zinc-300">
+                    <AlertTriangle className="h-4 w-4 text-[#FF5B37] shrink-0 mt-0.5" />
                     <div>
-                      <strong className="text-amber-300 font-bold block mb-0.5">Cambridge Examiner Insight:</strong>
+                      <strong className="text-zinc-200 font-semibold block mb-0.5">Examiner Insight:</strong>
                       <span>{mistake.examinerTip}</span>
                     </div>
                   </div>

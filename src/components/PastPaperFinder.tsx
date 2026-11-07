@@ -749,57 +749,57 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
   return (
     <div className="mx-auto max-w-6xl space-y-6 animate-fadeIn pb-16">
       {/* Top Banner */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0E1420] p-4 sm:p-7 shadow-xl">
+      <div className="relative overflow-hidden rounded-3xl border border-white/[0.06] bg-[#18181B] p-4 sm:p-7 shadow-sm">
         <div className="relative z-10 max-w-3xl space-y-2">
-          <div className="inline-flex items-center gap-2 rounded-full bg-[#FF5B37]/10 px-3 py-0.5 text-xs font-semibold text-[#FFA63A] border border-[#FF5B37]/20">
+          <div className="inline-flex items-center gap-2 rounded-full bg-[#FF5B37]/10 px-3 py-0.5 text-xs font-semibold text-[#FF5B37] border border-[#FF5B37]/20">
             <Search className="h-3.5 w-3.5 text-[#FF5B37]" />
             <span>Complete Exam Archive • 2010–2026 Series • {OFFICIAL_PAST_PAPER_PDFS.length.toLocaleString()}+ Verified Papers</span>
           </div>
-          <h1 className="text-xl sm:text-3xl font-black text-white tracking-tight">
-            Cambridge & Edexcel Past Paper Vault
+          <h1 className="text-xl sm:text-3xl font-bold text-zinc-100 tracking-tight">
+            Cambridge &amp; Edexcel Past Paper Vault
           </h1>
-          <p className="hidden sm:block text-xs sm:text-sm text-slate-300 leading-relaxed">
+          <p className="hidden sm:block text-xs sm:text-sm text-zinc-400 leading-relaxed">
             Synchronized Question Papers, Mark Schemes, and Examiner Reports. Fast filtering by subject syllabus, examination series, paper component, and question number.
           </p>
         </div>
 
         {/* View Switcher Tabs */}
-        <div className="mt-4 sm:mt-6 flex items-center gap-2 border-t border-white/[0.08] pt-3 sm:pt-4">
+        <div className="mt-4 sm:mt-6 flex items-center gap-2 border-t border-white/[0.06] pt-3 sm:pt-4">
           <button
             onClick={() => setActiveTab('pdf-library')}
-            className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition cursor-pointer ${
+            className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition cursor-pointer ${
               activeTab === 'pdf-library'
-                ? 'bg-[#FF5B37] text-white shadow-md shadow-[#FF5B37]/20 ring-1 ring-white/20'
-                : 'bg-[#121824] text-slate-300 hover:text-white border border-white/[0.08] hover:border-white/[0.16]'
+                ? 'bg-[#FF5B37] text-white shadow-sm'
+                : 'bg-[#111113] text-zinc-300 hover:text-white border border-white/[0.08] hover:border-white/[0.16]'
             }`}
           >
             <FileDown className="h-4 w-4" />
             <span>Official Paper PDFs</span>
-            <span className="rounded-full bg-black/30 px-2 py-0.5 text-[10px] font-mono text-amber-300">
+            <span className="rounded-full bg-black/25 px-2 py-0.5 text-[10px] font-mono text-zinc-300">
               {OFFICIAL_PAST_PAPER_PDFS.length}+
             </span>
           </button>
 
           <button
             onClick={() => setActiveTab('questions')}
-            className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition cursor-pointer ${
+            className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition cursor-pointer ${
               activeTab === 'questions'
-                ? 'bg-[#FF5B37] text-white shadow-md shadow-[#FF5B37]/20 ring-1 ring-white/20'
-                : 'bg-[#121824] text-slate-300 hover:text-white border border-white/[0.08] hover:border-white/[0.16]'
+                ? 'bg-[#FF5B37] text-white shadow-sm'
+                : 'bg-[#111113] text-zinc-300 hover:text-white border border-white/[0.08] hover:border-white/[0.16]'
             }`}
           >
             <Search className="h-4 w-4" />
-            <span>Question & Mark Scheme Finder</span>
-            <span className="rounded-full bg-black/30 px-2 py-0.5 text-[10px] font-mono text-sky-300">
+            <span>Question &amp; Mark Scheme Finder</span>
+            <span className="rounded-full bg-black/25 px-2 py-0.5 text-[10px] font-mono text-zinc-300">
               85,000+
             </span>
           </button>
         </div>
 
         {/* Quick Suggestion Pills */}
-        <div className="mt-4 pt-3 border-t border-slate-800/50">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-1.5">
-            <BookOpen className="h-3 w-3 text-sky-400" />
+        <div className="mt-4 pt-3 border-t border-white/[0.06]">
+          <p className="text-[11px] font-medium text-zinc-400 mb-2 flex items-center gap-1.5">
+            <BookOpen className="h-3 w-3 text-[#FF5B37]" />
             Popular Exam Papers:
           </p>
           <div className="flex flex-wrap gap-1.5">
@@ -808,7 +808,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                 key={idx}
                 type="button"
                 onClick={() => setSearchQuery(s)}
-                className="rounded-lg border border-slate-700/80 bg-slate-800/60 px-2.5 py-1 text-[11px] text-slate-300 hover:border-sky-500 hover:bg-sky-950/40 hover:text-white transition cursor-pointer"
+                className="rounded-lg border border-white/[0.06] bg-white/[0.03] px-2.5 py-1 text-[11px] text-zinc-300 hover:border-[#FF5B37]/40 hover:text-white transition cursor-pointer"
               >
                 "{s}"
               </button>
@@ -818,20 +818,20 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
       </div>
 
       {/* Comprehensive Search & Multi-Filter Bar with Year, Paper, Variant */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4 sm:p-5 shadow-xl space-y-4">
+      <div className="rounded-2xl border border-white/[0.06] bg-[#18181B] p-4 sm:p-5 shadow-sm space-y-4">
         {/* Dual Search Mode Switcher (Active on Questions Tab) */}
         {activeTab === 'questions' && (
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.06] pb-3">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-slate-400">Search Engine Mode:</span>
-              <div className="flex items-center rounded-xl bg-slate-950 p-1 border border-slate-800">
+              <span className="text-xs font-medium text-zinc-400">Search Engine Mode:</span>
+              <div className="flex items-center rounded-xl bg-[#111113] p-1 border border-white/[0.06]">
                 <button
                   type="button"
                   onClick={() => setSearchMode('modeA')}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                  className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
                     searchMode === 'modeA'
-                      ? 'bg-sky-500 text-white shadow-md'
-                      : 'text-slate-400 hover:text-white'
+                      ? 'bg-[#FF5B37] text-white shadow-sm'
+                      : 'text-zinc-400 hover:text-white'
                   }`}
                 >
                   <Search className="h-3.5 w-3.5" />
@@ -840,10 +840,10 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                 <button
                   type="button"
                   onClick={() => setSearchMode('modeB')}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                  className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
                     searchMode === 'modeB'
-                      ? 'bg-sky-500 text-white shadow-md'
-                      : 'text-slate-400 hover:text-white'
+                      ? 'bg-[#FF5B37] text-white shadow-sm'
+                      : 'text-zinc-400 hover:text-white'
                   }`}
                 >
                   <Filter className="h-3.5 w-3.5" />
@@ -852,7 +852,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               </div>
             </div>
 
-            <span className="text-[11px] text-slate-400">
+            <span className="text-[11px] text-zinc-400">
               {searchMode === 'modeA'
                 ? 'Type full exam code (e.g. 0580/42/M/J/23 Q4(b))'
                 : 'Select Subject, Year, Variant, Series & Question Pills'}
@@ -864,7 +864,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
         {(activeTab === 'pdf-library' || searchMode === 'modeA') && (
           <div className="space-y-2">
             <div className="relative">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
               <input
                 type="text"
                 value={searchQuery}
@@ -874,12 +874,12 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                     ? "Search paper code (0580/42), subject name, session (May/June 2023), variant..."
                     : "Enter exam code: e.g. 0580/42/M/J/23 Q4(b) or 0625/21/O/N/22 Q12 or 0620/41/M/J/21 Q3(a)..."
                 }
-                className="w-full rounded-xl border border-slate-700 bg-slate-950 py-3 pl-10 pr-10 text-sm text-white placeholder-slate-500 font-mono focus:border-sky-500 focus:outline-none"
+                className="w-full rounded-xl border border-white/[0.08] bg-[#111113] py-3 pl-10 pr-10 text-sm text-zinc-100 placeholder-zinc-500 font-mono focus:border-[#FF5B37] focus:outline-none transition-colors"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-white"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-zinc-400 hover:text-white"
                 >
                   ✕
                 </button>
@@ -888,38 +888,38 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
             {/* Mode A Real-time Parsed Exam Code Breakdown Chips */}
             {activeTab === 'questions' && searchMode === 'modeA' && parsedExamCode && parsedExamCode.confidence >= 0.4 && (
-              <div className="flex flex-wrap items-center gap-1.5 p-2.5 rounded-xl border border-sky-500/30 bg-sky-950/40 text-xs animate-fadeIn">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-sky-400 mr-1 flex items-center gap-1">
+              <div className="flex flex-wrap items-center gap-1.5 p-2.5 rounded-xl border border-white/[0.08] bg-[#111113] text-xs animate-fadeIn">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-[#FF5B37] mr-1 flex items-center gap-1">
                   <CheckCircle className="h-3 w-3" />
                   Code Parsed:
                 </span>
                 {parsedExamCode.subjectCode && (
-                  <span className="rounded-md bg-indigo-500/20 px-2 py-0.5 font-mono font-bold text-indigo-300 border border-indigo-500/30">
+                  <span className="rounded-md bg-white/[0.04] px-2 py-0.5 font-mono font-medium text-zinc-200 border border-white/[0.08]">
                     Subject: {parsedExamCode.subjectCode}
                   </span>
                 )}
                 {parsedExamCode.paperNumber && (
-                  <span className="rounded-md bg-sky-500/20 px-2 py-0.5 font-mono font-bold text-sky-300 border border-sky-500/30">
+                  <span className="rounded-md bg-white/[0.04] px-2 py-0.5 font-mono font-medium text-zinc-200 border border-white/[0.08]">
                     Paper {parsedExamCode.paperNumber}{parsedExamCode.variant ? ` (Var ${parsedExamCode.variant})` : ''}
                   </span>
                 )}
                 {parsedExamCode.seasonCode && (
-                  <span className="rounded-md bg-purple-500/20 px-2 py-0.5 font-mono font-bold text-purple-300 border border-purple-500/30">
+                  <span className="rounded-md bg-white/[0.04] px-2 py-0.5 font-mono font-medium text-zinc-200 border border-white/[0.08]">
                     Series: {parsedExamCode.seasonCode} ({parsedExamCode.sessionName})
                   </span>
                 )}
                 {parsedExamCode.year && (
-                  <span className="rounded-md bg-amber-500/20 px-2 py-0.5 font-mono font-bold text-amber-300 border border-amber-500/30">
+                  <span className="rounded-md bg-white/[0.04] px-2 py-0.5 font-mono font-medium text-zinc-200 border border-white/[0.08]">
                     Year: {parsedExamCode.year}
                   </span>
                 )}
                 {parsedExamCode.questionNumber && (
-                  <span className="rounded-md bg-emerald-500/20 px-2 py-0.5 font-mono font-bold text-emerald-300 border border-emerald-500/30">
+                  <span className="rounded-md bg-white/[0.04] px-2 py-0.5 font-mono font-medium text-zinc-200 border border-white/[0.08]">
                     Target: {parsedExamCode.questionNumber}
                   </span>
                 )}
                 {parsedExamCode.isMultipleChoice && (
-                  <span className="rounded-md bg-pink-500/20 px-2 py-0.5 text-[10px] font-bold text-pink-300 border border-pink-500/30">
+                  <span className="rounded-md bg-white/[0.04] px-2 py-0.5 text-[10px] font-medium text-zinc-200 border border-white/[0.08]">
                     MCQ 40 Discrete Items
                   </span>
                 )}
@@ -929,8 +929,8 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             {/* Quick Exam Code & Q# Lookup shortcuts */}
             {activeTab === 'questions' && (
               <div className="flex flex-wrap items-center gap-1.5 pt-0.5 text-xs">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1 shrink-0">
-                  <FileText className="h-3 w-3" />
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1 shrink-0">
+                  <FileText className="h-3 w-3 text-[#FF5B37]" />
                   Sample Exam Codes:
                 </span>
                 {[
@@ -945,7 +945,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                     key={idx}
                     type="button"
                     onClick={() => setSearchQuery(shortcut.query)}
-                    className="rounded-lg border border-sky-500/30 bg-sky-950/40 px-2 py-0.5 text-[11px] text-sky-200 hover:border-sky-400 hover:bg-sky-900/60 transition cursor-pointer font-mono"
+                    className="rounded-lg border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-[11px] text-zinc-300 hover:border-[#FF5B37]/40 hover:text-white transition cursor-pointer font-mono"
                   >
                     {shortcut.label}
                   </button>
@@ -957,20 +957,20 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
         {/* Mode B: Visual Filter Layout (Horizontal Rows: Row 1 Filters + Row 2 Question Pills) */}
         {activeTab === 'questions' && searchMode === 'modeB' && (
-          <div className="space-y-4 p-4 rounded-2xl border border-sky-500/30 bg-slate-950/60">
+          <div className="space-y-4 p-4 rounded-2xl border border-white/[0.06] bg-[#111113]">
             {/* Row 1: [ Subject ] [ Year ] [ Variant (1, 2, 3) ] [ Month/Series (M/J, O/N, F/M) ] */}
             <div>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-2">
-                Row 1: Sketched Exam Filter Blocks
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-[#FF5B37] mb-2">
+                Row 1: Exam Filter Blocks
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 text-xs">
                 {/* 1. Subject */}
                 <div>
-                  <label className="text-[10px] font-bold text-slate-400 mb-1 block">Subject</label>
+                  <label className="text-[10px] font-medium text-zinc-400 mb-1 block">Subject</label>
                   <select
                     value={selectedSubjectId}
                     onChange={(e) => setSelectedSubjectId(e.target.value)}
-                    className="w-full rounded-xl border border-slate-700 bg-slate-900 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none truncate"
+                    className="w-full rounded-xl border border-white/[0.08] bg-[#18181B] p-2 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none truncate transition-colors"
                   >
                     <option value="all">All Subjects</option>
                     {subjects.map((s) => (
@@ -983,11 +983,11 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
                 {/* 2. Paper Component */}
                 <div>
-                  <label className="text-[10px] font-bold text-sky-400 mb-1 block">Paper Component</label>
+                  <label className="text-[10px] font-medium text-zinc-400 mb-1 block">Paper Component</label>
                   <select
                     value={selectedPaperNumber}
                     onChange={(e) => setSelectedPaperNumber(e.target.value)}
-                    className="w-full rounded-xl border border-sky-500/40 bg-slate-900 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none truncate"
+                    className="w-full rounded-xl border border-white/[0.08] bg-[#18181B] p-2 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none truncate transition-colors"
                   >
                     <option value="All">All Papers ({availablePapers.length})</option>
                     {availablePapers.map((p) => (
@@ -1000,11 +1000,11 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
                 {/* 3. Year */}
                 <div>
-                  <label className="text-[10px] font-bold text-slate-400 mb-1 block">Year</label>
+                  <label className="text-[10px] font-medium text-zinc-400 mb-1 block">Year</label>
                   <select
                     value={selectedYear}
                     onChange={(e) => setSelectedYear(e.target.value)}
-                    className="w-full rounded-xl border border-slate-700 bg-slate-900 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
+                    className="w-full rounded-xl border border-white/[0.08] bg-[#18181B] p-2 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
                   >
                     <option value="All">All Years (2010–2026)</option>
                     {['2026', '2025', '2024', '2023', '2022', '2021', '2020', '2019', '2018', '2017', '2016', '2015', '2014', '2013', '2012', '2011', '2010'].map((y) => (
@@ -1015,11 +1015,11 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
                 {/* 4. Variant (1, 2, 3) */}
                 <div>
-                  <label className="text-[10px] font-bold text-slate-400 mb-1 block">Variant</label>
+                  <label className="text-[10px] font-medium text-zinc-400 mb-1 block">Variant</label>
                   <select
                     value={selectedVariant}
                     onChange={(e) => setSelectedVariant(e.target.value)}
-                    className="w-full rounded-xl border border-slate-700 bg-slate-900 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
+                    className="w-full rounded-xl border border-white/[0.08] bg-[#18181B] p-2 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
                   >
                     <option value="All">All Variants (1, 2, 3)</option>
                     <option value="1">Variant 1</option>
@@ -1030,11 +1030,11 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
                 {/* 5. Month / Series */}
                 <div>
-                  <label className="text-[10px] font-bold text-slate-400 mb-1 block">Month / Series</label>
+                  <label className="text-[10px] font-medium text-zinc-400 mb-1 block">Month / Series</label>
                   <select
                     value={selectedSession}
                     onChange={(e) => setSelectedSession(e.target.value)}
-                    className="w-full rounded-xl border border-slate-700 bg-slate-900 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
+                    className="w-full rounded-xl border border-white/[0.08] bg-[#18181B] p-2 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
                   >
                     <option value="All">All Series</option>
                     <option value="May/June">May / June (M/J &amp; Edexcel June)</option>
@@ -1049,12 +1049,12 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             </div>
 
             {/* Row 2: [ Question Number ] visual pill selector */}
-            <div className="pt-2 border-t border-slate-800">
+            <div className="pt-2 border-t border-white/[0.06]">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-sky-400">
-                  Row 2: Select Question Number (Visual Grid Selector)
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+                  Select Question Number:
                 </span>
-                <span className="text-[10px] text-slate-500">
+                <span className="text-[10px] text-zinc-500">
                   {selectedPaperNumber === '1' || selectedPaperNumber === '2' ? '40 Discrete MCQ Items' : '12 Theory Questions'}
                 </span>
               </div>
@@ -1063,10 +1063,10 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                 <button
                   type="button"
                   onClick={() => setSelectedQuestionPill('All')}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
+                  className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition cursor-pointer ${
                     selectedQuestionPill === 'All'
-                      ? 'bg-sky-500 text-white shadow-sm ring-1 ring-sky-300'
-                      : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                      ? 'bg-[#FF5B37] text-white shadow-sm'
+                      : 'bg-[#18181B] text-zinc-400 hover:text-white border border-white/[0.06]'
                   }`}
                 >
                   All Questions
@@ -1080,10 +1080,10 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                       key={q}
                       type="button"
                       onClick={() => setSelectedQuestionPill(q)}
-                      className={`rounded-lg px-2.5 py-1 text-xs font-mono font-bold transition cursor-pointer ${
+                      className={`rounded-lg px-2.5 py-1 text-xs font-mono font-medium transition cursor-pointer ${
                         isSelected
-                          ? 'bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow-md ring-1 ring-sky-400'
-                          : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
+                          ? 'bg-[#FF5B37] text-white shadow-sm'
+                          : 'bg-[#18181B] text-zinc-300 hover:bg-white/[0.06] border border-white/[0.06]'
                       }`}
                     >
                       {q}
@@ -1099,13 +1099,13 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 text-xs">
           {/* 1. Exam Board */}
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 block">
+            <label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mb-1 block">
               Exam Board
             </label>
             <select
               value={selectedBoard}
               onChange={(e) => setSelectedBoard(e.target.value as any)}
-              className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
+              className="w-full rounded-xl border border-white/[0.08] bg-[#111113] p-2.5 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
             >
               <option value="All">All Boards (Cambridge, Edexcel, OxfordAQA)</option>
               <option value="CIE">Cambridge (CIE)</option>
@@ -1116,13 +1116,13 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
           {/* 2. Subject Filter */}
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 block">
+            <label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mb-1 block">
               Subject
             </label>
             <select
               value={selectedSubjectId}
               onChange={(e) => setSelectedSubjectId(e.target.value)}
-              className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none truncate"
+              className="w-full rounded-xl border border-white/[0.08] bg-[#111113] p-2.5 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none truncate transition-colors"
             >
               <option value="all">All Subjects</option>
               {subjects.map((s) => (
@@ -1135,17 +1135,17 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
           {/* 3. Year Filter (2010 - 2026) */}
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center justify-between">
+            <label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mb-1 flex items-center justify-between">
               <span>Exam Year</span>
-              {selectedYear !== 'All' && <span className="text-[9px] text-sky-300">Active</span>}
+              {selectedYear !== 'All' && <span className="text-[9px] text-[#FF5B37] font-semibold">Active</span>}
             </label>
             <select
               value={selectedYear}
               onChange={(e) => setSelectedYear(e.target.value)}
-              className="w-full rounded-xl border border-sky-500/40 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
+              className="w-full rounded-xl border border-white/[0.08] bg-[#111113] p-2.5 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
             >
-              <option value="All">All Years (2010–2026 Archive)</option>
-              <option value="2026">2026 (Specimen &amp; Forecast Series)</option>
+              <option value="All">All Years (2010–2026)</option>
+              <option value="2026">2026 (Specimen &amp; Forecast)</option>
               <option value="2025">2025 Series</option>
               <option value="2024">2024 Series</option>
               <option value="2023">2023 Series</option>
@@ -1167,13 +1167,13 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
           {/* 4. Session / Series Filter */}
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 block">
+            <label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mb-1 block">
               Exam Series
             </label>
             <select
               value={selectedSession}
               onChange={(e) => setSelectedSession(e.target.value)}
-              className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
+              className="w-full rounded-xl border border-white/[0.08] bg-[#111113] p-2.5 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
             >
               <option value="All">All Series</option>
               <option value="May/June">May / June (Summer - s &amp; Edexcel June)</option>
@@ -1190,14 +1190,14 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             <>
               {/* 5. Paper Component Filter (Paper 1, 2, 3, 4, 5, 6) */}
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center justify-between">
+                <label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mb-1 flex items-center justify-between">
                   <span>Paper Number</span>
-                  {selectedPaperNumber !== 'All' && <span className="text-[9px] text-sky-300">Active</span>}
+                  {selectedPaperNumber !== 'All' && <span className="text-[9px] text-[#FF5B37] font-semibold">Active</span>}
                 </label>
                 <select
                   value={selectedPaperNumber}
                   onChange={(e) => setSelectedPaperNumber(e.target.value)}
-                  className="w-full rounded-xl border border-sky-500/40 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
+                  className="w-full rounded-xl border border-white/[0.08] bg-[#111113] p-2.5 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
                 >
                   <option value="All">All Papers ({availablePapers.length} Components)</option>
                   {availablePapers.map((p) => (
@@ -1210,16 +1210,16 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
               {/* 6. Variant Filter (1, 2, 3 & Regional) */}
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center justify-between">
+                <label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mb-1 flex items-center justify-between">
                   <span>Variant</span>
-                  {selectedVariant !== 'All' && <span className="text-[9px] text-sky-300">Active</span>}
+                  {selectedVariant !== 'All' && <span className="text-[9px] text-[#FF5B37] font-semibold">Active</span>}
                 </label>
                 <select
                   value={selectedVariant}
                   onChange={(e) => setSelectedVariant(e.target.value)}
-                  className="w-full rounded-xl border border-sky-500/40 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
+                  className="w-full rounded-xl border border-white/[0.08] bg-[#111113] p-2.5 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
                 >
-                  <option value="All">All Variants (1, 2, 3 & Regional)</option>
+                  <option value="All">All Variants (1, 2, 3)</option>
                   <option value="1">Variant 1 (e.g. 11, 21, 41 / Standard)</option>
                   <option value="2">Variant 2 (e.g. 12, 22, 42 / Regional "R")</option>
                   <option value="3">Variant 3 (e.g. 13, 23, 43)</option>
@@ -1230,14 +1230,14 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             <>
               {/* 5. Classified Topic Filter */}
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center justify-between">
-                  <span>Classified Topic</span>
-                  {selectedTopic !== 'All' && <span className="text-[9px] text-sky-300">Active</span>}
+                <label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mb-1 flex items-center justify-between">
+                  <span>Topic</span>
+                  {selectedTopic !== 'All' && <span className="text-[9px] text-[#FF5B37] font-semibold">Active</span>}
                 </label>
                 <select
                   value={selectedTopic}
                   onChange={(e) => setSelectedTopic(e.target.value)}
-                  className="w-full rounded-xl border border-sky-500/40 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
+                  className="w-full rounded-xl border border-white/[0.08] bg-[#111113] p-2.5 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
                 >
                   <option value="All">All Topics ({availableTopics.length})</option>
                   {availableTopics.map((topic) => (
@@ -1250,14 +1250,14 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
               {/* 6. Difficulty Tier Filter */}
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center justify-between">
+                <label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mb-1 flex items-center justify-between">
                   <span>Difficulty Tier</span>
-                  {selectedTier !== 'All' && <span className="text-[9px] text-sky-300">Active</span>}
+                  {selectedTier !== 'All' && <span className="text-[9px] text-[#FF5B37] font-semibold">Active</span>}
                 </label>
                 <select
                   value={selectedTier}
                   onChange={(e) => setSelectedTier(e.target.value)}
-                  className="w-full rounded-xl border border-sky-500/40 bg-slate-950 p-2 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none"
+                  className="w-full rounded-xl border border-white/[0.08] bg-[#111113] p-2.5 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
                 >
                   <option value="All">All Difficulty Tiers</option>
                   <option value="Grade 9 Challenge">Grade 9 Challenge / Hard</option>
@@ -1271,11 +1271,11 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
         </div>
 
         {/* Row 2 Filter Controls: Question Number & Sub-Part */}
-        <div className="rounded-2xl border border-sky-500/30 bg-slate-950/70 p-3 sm:p-4 space-y-2.5 animate-fadeIn">
+        <div className="rounded-2xl border border-white/[0.06] bg-[#111113] p-3 sm:p-4 space-y-2.5 animate-fadeIn">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
-              <Filter className="h-3.5 w-3.5 text-sky-400" />
-              <span>Row 2: Question Number & Sub-Part Precision Filter</span>
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+              <Filter className="h-3.5 w-3.5 text-[#FF5B37]" />
+              <span>Question Number &amp; Sub-Part Precision Filter</span>
             </span>
             {(selectedQuestionFilter !== 'All' || selectedSubPartFilter !== 'All') && (
               <button
@@ -1284,7 +1284,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                   setSelectedQuestionFilter('All');
                   setSelectedSubPartFilter('All');
                 }}
-                className="text-[11px] text-sky-400 hover:text-sky-300 underline font-medium cursor-pointer"
+                className="text-[11px] text-[#FF5B37] hover:text-[#FFA63A] underline font-medium cursor-pointer"
               >
                 Reset Row 2
               </button>
@@ -1295,11 +1295,11 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             {/* Question Number Selector */}
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className="text-[10px] font-bold text-slate-300">
+                <label className="text-[10px] font-medium text-zinc-400">
                   Question Number
                 </label>
                 {selectedQuestionFilter !== 'All' && (
-                  <span className="rounded bg-sky-500/20 px-1.5 py-0.2 text-[10px] font-mono text-sky-300">
+                  <span className="rounded bg-[#FF5B37]/15 px-1.5 py-0.2 text-[10px] font-mono text-[#FF5B37]">
                     Active: {selectedQuestionFilter}
                   </span>
                 )}
@@ -1307,7 +1307,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               <select
                 value={selectedQuestionFilter}
                 onChange={(e) => setSelectedQuestionFilter(e.target.value)}
-                className="w-full rounded-xl border border-slate-700 bg-slate-900 p-2.5 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none font-mono"
+                className="w-full rounded-xl border border-white/[0.08] bg-[#18181B] p-2.5 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none font-mono transition-colors"
               >
                 <option value="All">All Question Numbers (Q1 – Q40)</option>
                 {Array.from({ length: 40 }, (_, i) => `Q${i + 1}`).map((q) => (
@@ -1321,11 +1321,11 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             {/* Sub-Part Selector */}
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className="text-[10px] font-bold text-slate-300">
+                <label className="text-[10px] font-medium text-zinc-400">
                   Sub-Part (a, b, c, i, ii)
                 </label>
                 {selectedSubPartFilter !== 'All' && (
-                  <span className="rounded bg-sky-500/20 px-1.5 py-0.2 text-[10px] font-mono text-sky-300">
+                  <span className="rounded bg-[#FF5B37]/15 px-1.5 py-0.2 text-[10px] font-mono text-[#FF5B37]">
                     Active: Part {selectedSubPartFilter}
                   </span>
                 )}
@@ -1333,9 +1333,9 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               <select
                 value={selectedSubPartFilter}
                 onChange={(e) => setSelectedSubPartFilter(e.target.value)}
-                className="w-full rounded-xl border border-slate-700 bg-slate-900 p-2.5 text-white text-xs cursor-pointer focus:border-sky-500 focus:outline-none font-mono"
+                className="w-full rounded-xl border border-white/[0.08] bg-[#18181B] p-2.5 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none font-mono transition-colors"
               >
-                <option value="All">All Sub-Parts (Complete Question & All Parts)</option>
+                <option value="All">All Sub-Parts (Complete Question &amp; All Parts)</option>
                 <option value="(a)">Part (a)</option>
                 <option value="(b)">Part (b)</option>
                 <option value="(c)">Part (c)</option>
@@ -1350,17 +1350,17 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
         {/* Quick Topic Pills Bar (when viewing Classified Question Finder) */}
         {activeTab === 'questions' && availableTopics.length > 0 && (
-          <div className="pt-3 border-t border-slate-800/80">
+          <div className="pt-3 border-t border-white/[0.06]">
             <div className="flex items-center justify-between gap-2 mb-2">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                <Tag className="h-3.5 w-3.5 text-sky-400" />
-                Quick Filter by Topic ({availableTopics.length} topics):
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+                <Tag className="h-3.5 w-3.5 text-[#FF5B37]" />
+                Filter by Topic ({availableTopics.length} topics):
               </span>
               {selectedTopic !== 'All' && (
                 <button
                   type="button"
                   onClick={() => setSelectedTopic('All')}
-                  className="text-[11px] text-sky-400 hover:text-sky-300 underline font-medium cursor-pointer"
+                  className="text-[11px] text-[#FF5B37] hover:text-[#FFA63A] underline font-medium cursor-pointer"
                 >
                   Clear topic filter
                 </button>
@@ -1372,12 +1372,12 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                 onClick={() => setSelectedTopic('All')}
                 className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
                   selectedTopic === 'All'
-                    ? 'bg-sky-500 text-white shadow-sm ring-1 ring-sky-400'
-                    : 'bg-slate-800/70 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700/60'
+                    ? 'bg-[#FF5B37] text-white shadow-sm'
+                    : 'bg-white/[0.03] text-zinc-300 hover:bg-white/[0.06] hover:text-white border border-white/[0.06]'
                 }`}
               >
                 <span>All Topics</span>
-                <span className={`rounded-full px-1.5 py-0.2 text-[10px] font-mono ${selectedTopic === 'All' ? 'bg-sky-900/90 text-sky-100' : 'bg-slate-900 text-slate-400'}`}>
+                <span className={`rounded-full px-1.5 py-0.2 text-[10px] font-mono ${selectedTopic === 'All' ? 'bg-black/25 text-white' : 'bg-black/20 text-zinc-400'}`}>
                   {getAllPastPapers().filter((p) => {
                     if (selectedBoard !== 'All' && p.board !== selectedBoard) return false;
                     if (selectedSubjectId !== 'all') {
@@ -1403,14 +1403,14 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                     onClick={() => setSelectedTopic(isSelected ? 'All' : top)}
                     className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
                       isSelected
-                        ? 'bg-sky-500 text-white shadow-sm ring-1 ring-sky-400'
-                        : 'bg-slate-800/70 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700/60'
+                        ? 'bg-[#FF5B37] text-white shadow-sm'
+                        : 'bg-white/[0.03] text-zinc-300 hover:bg-white/[0.06] hover:text-white border border-white/[0.06]'
                     }`}
                   >
                     <span>{top}</span>
                     <span
                       className={`rounded-full px-1.5 py-0.2 text-[10px] font-mono ${
-                        isSelected ? 'bg-sky-900/90 text-sky-100' : 'bg-slate-900 text-slate-400'
+                        isSelected ? 'bg-black/25 text-white' : 'bg-black/20 text-zinc-400'
                       }`}
                     >
                       {count}
@@ -1424,20 +1424,20 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
         {/* Subject Exam Paper Structure Banner */}
         {currentSubjectSpec && (
-          <div className="rounded-2xl border border-sky-500/30 bg-gradient-to-r from-sky-950/40 via-slate-900 to-indigo-950/40 p-3.5 space-y-3">
+          <div className="rounded-2xl border border-white/[0.06] bg-[#111113] p-3.5 space-y-3">
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <div className="flex items-center gap-2.5">
-                <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-sky-500/20 text-sky-400 font-black text-xs border border-sky-500/30">
+                <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-white/[0.06] text-zinc-300 font-bold text-xs border border-white/[0.08]">
                   📋
                 </div>
                 <div>
-                  <h4 className="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
+                  <h4 className="text-xs font-bold text-zinc-100 uppercase tracking-wider flex items-center gap-2">
                     <span>{currentSubjectSpec.subjectName} ({currentSubjectSpec.subjectCode})</span>
-                    <span className="rounded bg-sky-500/20 px-1.5 py-0.2 text-[9px] font-bold text-sky-300 border border-sky-500/30">
+                    <span className="rounded bg-white/[0.06] px-1.5 py-0.2 text-[9px] font-semibold text-zinc-300 border border-white/[0.08]">
                       {currentSubjectSpec.board} Exam Structure
                     </span>
                   </h4>
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-[11px] text-zinc-400">
                     Required components: {currentSubjectSpec.totalPapersRequired}
                   </p>
                 </div>
@@ -1447,7 +1447,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                 <button
                   type="button"
                   onClick={() => setSelectedPaperNumber('All')}
-                  className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-300 hover:text-white bg-sky-500/10 hover:bg-sky-500/20 px-2.5 py-1 rounded-lg border border-sky-500/30 transition cursor-pointer"
+                  className="inline-flex items-center gap-1 text-[11px] font-medium text-zinc-300 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] px-2.5 py-1 rounded-lg border border-white/[0.08] transition cursor-pointer"
                 >
                   <RotateCcw className="h-3 w-3" />
                   <span>Show All Papers ({currentSubjectSpec.papers.length})</span>
@@ -1465,48 +1465,48 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                     onClick={() => setSelectedPaperNumber(isSelected ? 'All' : String(p.paperNumber))}
                     className={`text-left p-3 rounded-xl border transition cursor-pointer flex flex-col justify-between group ${
                       isSelected
-                        ? 'bg-sky-500/25 border-sky-400 text-white shadow-md shadow-sky-500/10 ring-1 ring-sky-400'
-                        : 'bg-slate-950/70 border-slate-800/80 hover:border-sky-500/40 text-slate-300 hover:bg-slate-900'
+                        ? 'bg-[#FF5B37]/15 border-[#FF5B37] text-white shadow-sm ring-1 ring-[#FF5B37]'
+                        : 'bg-[#18181B] border-white/[0.06] hover:border-white/[0.12] text-zinc-300 hover:bg-[#1E1E22]'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2 mb-1.5">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-black text-sky-300 group-hover:text-sky-200">
+                        <span className={`text-xs font-bold ${isSelected ? 'text-[#FF5B37]' : 'text-zinc-200'}`}>
                           {typeof p.paperNumber === 'number' ? `Paper ${p.paperNumber}` : p.paperNumber}
                         </span>
                         {p.codeSuffix && (
-                          <span className="text-[10px] font-mono text-slate-500">
+                          <span className="text-[10px] font-mono text-zinc-500">
                             (/{p.codeSuffix})
                           </span>
                         )}
                       </div>
                       <div className="flex items-center gap-1.5">
                         {p.isListening && (
-                          <span className="rounded bg-sky-500/20 px-1.5 py-0.5 text-[9px] font-bold text-sky-300 border border-sky-500/30 flex items-center gap-1">
-                            <Headphones className="h-2.5 w-2.5 animate-pulse" /> Audio Track
+                          <span className="rounded bg-white/[0.06] px-1.5 py-0.5 text-[9px] font-semibold text-zinc-300 border border-white/[0.08] flex items-center gap-1">
+                            <Headphones className="h-2.5 w-2.5" /> Audio
                           </span>
                         )}
                         {p.weightPercent && (
-                          <span className="text-[10px] font-bold text-slate-400">
+                          <span className="text-[10px] font-medium text-zinc-400">
                             {p.weightPercent}%
                           </span>
                         )}
                       </div>
                     </div>
 
-                    <div className="text-xs font-extrabold text-white mb-1.5 line-clamp-1">
+                    <div className="text-xs font-semibold text-zinc-100 mb-1.5 line-clamp-1">
                       {p.name}
                     </div>
 
-                    <div className="text-[10px] text-slate-400 flex items-center gap-1.5 flex-wrap">
-                      <span className="font-semibold text-slate-300">{p.marks} Marks</span>
+                    <div className="text-[10px] text-zinc-400 flex items-center gap-1.5 flex-wrap">
+                      <span className="font-medium text-zinc-300">{p.marks} Marks</span>
                       <span>•</span>
                       <span>{p.duration}</span>
                       <span>•</span>
-                      <span className="text-sky-400/90">{p.tier}</span>
+                      <span className="text-zinc-400">{p.tier}</span>
                     </div>
 
-                    <p className="text-[10px] text-slate-400/90 mt-2 line-clamp-2 leading-relaxed border-t border-slate-800/60 pt-1.5">
+                    <p className="text-[10px] text-zinc-400 mt-2 line-clamp-2 leading-relaxed border-t border-white/[0.06] pt-1.5">
                       {p.description}
                     </p>
                   </button>
@@ -1517,27 +1517,27 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
         )}
 
         {/* Action & Results count bar */}
-        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-800 text-xs">
-          <div className="flex items-center gap-2 text-slate-400 flex-wrap">
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/[0.06] text-xs">
+          <div className="flex items-center gap-2 text-zinc-400 flex-wrap">
             {activeTab === 'pdf-library' ? (
               <span>
-                Found <strong className="text-white">{filteredPdfs.length}</strong> past paper PDFs across 2010–2026
+                Found <strong className="text-zinc-100 font-semibold">{filteredPdfs.length}</strong> past paper PDFs across 2010–2026
                 {filteredPdfs.length > displayedPdfs.length && (
-                  <span className="text-sky-400 ml-1.5">(Showing first {displayedPdfs.length})</span>
+                  <span className="text-zinc-400 ml-1.5">(Showing first {displayedPdfs.length})</span>
                 )}
               </span>
             ) : (
               <span>
-                Showing <strong className="text-white">{filteredPapers.length}</strong> official past paper questions
+                Showing <strong className="text-zinc-100 font-semibold">{filteredPapers.length}</strong> official past paper questions
                 {selectedTopic !== 'All' && (
-                  <span className="ml-1 text-sky-400 font-medium">in topic "{selectedTopic}"</span>
+                  <span className="ml-1 text-[#FF5B37] font-medium">in topic "{selectedTopic}"</span>
                 )}
               </span>
             )}
             {(selectedBoard !== 'All' || selectedSubjectId !== 'all' || selectedTopic !== 'All' || selectedYear !== 'All' || selectedSession !== 'All' || selectedPaperNumber !== 'All' || selectedVariant !== 'All' || selectedTier !== 'All' || searchQuery) && (
               <button
                 onClick={handleResetFilters}
-                className="flex items-center gap-1 text-sky-400 hover:text-sky-300 font-semibold cursor-pointer underline ml-2"
+                className="flex items-center gap-1 text-[#FF5B37] hover:text-[#FFA63A] font-medium cursor-pointer underline ml-2"
               >
                 <RotateCcw className="h-3 w-3" /> Reset Filters
               </button>
@@ -1547,13 +1547,13 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
           <div className="flex items-center gap-2">
             {activeTab === 'questions' && (
               /* View Mode Toggle: Stacked vs Side-by-Side */
-              <div className="hidden sm:flex items-center rounded-lg border border-slate-800 bg-slate-950 p-0.5">
+              <div className="hidden sm:flex items-center rounded-lg border border-white/[0.08] bg-[#111113] p-0.5">
                 <button
                   onClick={() => setViewMode('stacked')}
                   className={`rounded px-2.5 py-1 text-[11px] font-semibold transition cursor-pointer ${
                     viewMode === 'stacked'
-                      ? 'bg-sky-600 text-white'
-                      : 'text-slate-400 hover:text-white'
+                      ? 'bg-[#FF5B37] text-white shadow-sm'
+                      : 'text-zinc-400 hover:text-white'
                   }`}
                 >
                   Stacked View
@@ -1562,8 +1562,8 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                   onClick={() => setViewMode('side-by-side')}
                   className={`rounded px-2.5 py-1 text-[11px] font-semibold transition cursor-pointer ${
                     viewMode === 'side-by-side'
-                      ? 'bg-sky-600 text-white'
-                      : 'text-slate-400 hover:text-white'
+                      ? 'bg-[#FF5B37] text-white shadow-sm'
+                      : 'text-zinc-400 hover:text-white'
                   }`}
                 >
                   Side-by-Side (QP + MS)
@@ -1573,10 +1573,10 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
             <button
               onClick={handlePrintPaper}
-              className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition cursor-pointer"
+              className="flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-[#18181B] px-3 py-1.5 text-xs font-medium text-zinc-200 hover:bg-[#222227] hover:text-white transition cursor-pointer"
               title="Print Question Paper & Mark Scheme Handout"
             >
-              <Printer className="h-3.5 w-3.5 text-slate-400" />
+              <Printer className="h-3.5 w-3.5 text-zinc-400" />
               <span>Print Handout</span>
             </button>
           </div>
@@ -1589,41 +1589,41 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
       {activeTab === 'pdf-library' && (
         <div className="space-y-4">
           {/* Information callout banner */}
-          <div className="rounded-2xl border border-sky-500/30 bg-gradient-to-r from-sky-950/40 to-slate-900/60 p-4 flex items-center justify-between flex-wrap gap-3">
+          <div className="rounded-2xl border border-white/[0.06] bg-[#18181B] p-4 flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-sky-500/20 text-sky-300 shrink-0">
+              <div className="p-2 rounded-xl bg-white/[0.04] text-[#FF5B37] border border-white/[0.06] shrink-0">
                 <FileDown className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs font-bold text-white">Full Exam Library: 2010 to 2026 (All Subjects, All Papers & All Variants)</p>
-                <p className="text-[11px] text-slate-400">
-                  Click <strong>Open Fullscreen</strong> to open in native viewer, or <strong>View</strong> to inspect in-app with Google Docs & direct mirrors.
+                <p className="text-xs font-semibold text-zinc-100">Full Exam Library: 2010 to 2026 (All Subjects, All Papers &amp; All Variants)</p>
+                <p className="text-[11px] text-zinc-400">
+                  Select <strong className="text-zinc-300">View</strong> for in-app preview with annotations, or <strong className="text-zinc-300">Download</strong> for direct PDF save.
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2 text-xs">
-              <span className="rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-1 font-semibold flex items-center gap-1">
-                <CheckCircle className="h-3.5 w-3.5" /> QP + MS Paired
+              <span className="rounded-lg bg-white/[0.04] text-zinc-300 border border-white/[0.06] px-2 py-1 font-medium flex items-center gap-1">
+                <CheckCircle className="h-3.5 w-3.5 text-emerald-400" /> QP + MS Paired
               </span>
-              <span className="rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-1 font-semibold flex items-center gap-1">
-                <Award className="h-3.5 w-3.5" /> Examiner Reports
+              <span className="rounded-lg bg-white/[0.04] text-zinc-300 border border-white/[0.06] px-2 py-1 font-medium flex items-center gap-1">
+                <Award className="h-3.5 w-3.5 text-[#FF5B37]" /> Examiner Reports
               </span>
-              <span className="rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2 py-1 font-semibold flex items-center gap-1">
-                <TrendingUp className="h-3.5 w-3.5" /> Grade Thresholds
+              <span className="rounded-lg bg-white/[0.04] text-zinc-300 border border-white/[0.06] px-2 py-1 font-medium flex items-center gap-1">
+                <TrendingUp className="h-3.5 w-3.5 text-zinc-400" /> Grade Thresholds
               </span>
             </div>
           </div>
 
           {filteredPdfs.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-slate-800 bg-slate-900/40 p-10 text-center text-slate-400">
-              <FileText className="mx-auto h-12 w-12 text-slate-600 mb-3" />
-              <h4 className="text-base font-bold text-slate-300">No past paper PDFs match your current filters.</h4>
-              <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+            <div className="rounded-2xl border border-dashed border-white/[0.08] bg-[#18181B]/40 p-10 text-center text-zinc-400">
+              <FileText className="mx-auto h-12 w-12 text-zinc-600 mb-3" />
+              <h4 className="text-base font-semibold text-zinc-200">No past paper PDFs match your current filters.</h4>
+              <p className="text-xs text-zinc-500 mt-1 max-w-md mx-auto">
                 Try setting Exam Board to "All Boards", setting Variant or Paper Number to "All", or resetting filters.
               </p>
               <button
                 onClick={handleResetFilters}
-                className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-sky-600 px-4 py-2 text-xs font-bold text-white hover:bg-sky-500 transition cursor-pointer"
+                className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-[#FF5B37] hover:bg-[#e04825] px-4 py-2 text-xs font-semibold text-white transition cursor-pointer shadow-sm"
               >
                 <RotateCcw className="h-3.5 w-3.5" />
                 Reset All Filters
@@ -1650,329 +1650,307 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                   return (
                     <div
                       key={pdf.id}
-                      className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl hover:border-slate-700 transition flex flex-col justify-between"
+                      className="rounded-2xl border border-white/[0.06] bg-[#18181B] hover:border-white/[0.12] p-5 transition flex flex-col justify-between group shadow-sm"
                     >
                       <div>
-                        {/* Top Badges */}
-                        <div className="flex items-center justify-between gap-2 flex-wrap mb-3">
+                        {/* Header: Syllabus Code, Board, Variant & Year */}
+                        <div className="flex items-center justify-between gap-2 flex-wrap pb-2.5 border-b border-white/[0.06] mb-3 text-xs">
                           <div className="flex items-center gap-2">
-                            <span
-                              className={`rounded-lg px-2 py-0.5 text-[10px] font-bold border uppercase tracking-wider ${
-                                isCie
-                                  ? 'bg-sky-500/15 text-sky-300 border-sky-500/30'
-                                  : 'bg-amber-500/15 text-amber-300 border-amber-500/30'
-                              }`}
-                            >
-                              {pdf.board}
-                            </span>
-                            <span className="rounded-lg bg-slate-800 px-2 py-0.5 text-[10px] font-mono font-bold text-white border border-slate-700">
-                              {pdf.paperCode}
+                            <span className="font-mono font-semibold text-zinc-200">
+                              {pdf.board} • {pdf.paperCode}
                             </span>
                             {pdf.variant && (
-                              <span className="rounded-lg bg-sky-950/60 text-sky-300 px-2 py-0.5 text-[10px] font-semibold border border-sky-500/30">
-                                Variant {pdf.variant}
+                              <span className="text-zinc-400 font-mono text-[11px]">
+                                Var {pdf.variant}
                               </span>
                             )}
                             {Boolean(pdf.isUnavailable) && (
-                              <span className="rounded-lg bg-rose-950/80 text-rose-300 px-2 py-0.5 text-[10px] font-semibold border border-rose-500/40 flex items-center gap-1">
-                                Unavailable / Not Administered
-                              </span>
-                            )}
-                            {Boolean(pdf.isPortal || !pdf.qpPdfUrl?.endsWith('.pdf') || pdf.board === 'Edexcel' || pdf.board === 'OxfordAQA') && !pdf.isUnavailable && (
-                              <span className="rounded-lg bg-amber-950/80 text-amber-300 px-2 py-0.5 text-[10px] font-semibold border border-amber-500/40 flex items-center gap-1">
-                                <ExternalLink className="h-2.5 w-2.5 text-amber-400" />
-                                Official Board Hub
+                              <span className="text-rose-400 text-[11px] font-medium">
+                                • Not Administered
                               </span>
                             )}
                             {isListeningPaper && !pdf.isUnavailable && (
-                              <span className="rounded-lg bg-indigo-950/80 text-indigo-300 px-2 py-0.5 text-[10px] font-bold border border-indigo-500/40 flex items-center gap-1">
-                                <Headphones className="h-2.5 w-2.5 animate-pulse text-indigo-400" />
-                                Audio Track
+                              <span className="text-[#FF5B37] text-[11px] font-medium flex items-center gap-1">
+                                • <Headphones className="h-3 w-3 inline" /> Audio
                               </span>
                             )}
                           </div>
 
-                          <div className="flex items-center gap-1.5">
-                            <span className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold border ${getTierBadge(pdf.tier)}`}>
+                          <div className="flex items-center gap-2 text-xs">
+                            <span className="text-zinc-400 font-medium">
                               {pdf.tier}
                             </span>
-                            <span className="text-[10px] text-slate-400 font-mono">
+                            <span className="text-zinc-600">•</span>
+                            <span className="font-mono text-zinc-300 font-semibold">
                               {pdf.year}
                             </span>
                           </div>
                         </div>
 
-                        {/* Title & Component */}
-                        <h3 className="text-base font-extrabold text-white flex items-center gap-2">
+                        {/* Title & Subject Code */}
+                        <h3 className="text-base font-bold text-zinc-100 flex items-center gap-2 tracking-tight">
                           <span>{pdf.subjectName}</span>
-                          <span className="text-xs text-slate-400 font-normal">({pdf.subjectCode})</span>
+                          <span className="text-xs font-mono font-normal text-zinc-400">({pdf.subjectCode})</span>
                         </h3>
-                        <p className="text-xs text-sky-300 font-semibold mt-1">
+                        <p className="text-xs font-semibold text-[#FF5B37] mt-0.5">
                           {pdf.session}
                         </p>
-                        <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                        <p className="text-xs text-zinc-400 mt-1 leading-relaxed line-clamp-2">
                           {pdf.paperComponent}
                         </p>
+
+                        {/* Official Examination Notices */}
                         {Boolean(pdf.isUnavailable) && (
-                          <div className="mt-2.5 flex items-start gap-1.5 rounded-lg bg-rose-950/40 border border-rose-500/30 p-2 text-[11px] text-rose-200/90 leading-snug">
-                            <Info className="h-3.5 w-3.5 text-rose-400 shrink-0 mt-0.5" />
+                          <div className="mt-3 flex items-start gap-2 rounded-xl bg-rose-500/10 border border-rose-500/20 p-2.5 text-xs text-rose-300 leading-snug">
+                            <Info className="h-4 w-4 text-rose-400 shrink-0 mt-0.5" />
                             <span>
-                              <strong>Official Examination Record:</strong> {pdf.unavailableReason || 'This variant was not administered or published by Cambridge for this examination series.'}
+                              <strong>Official Examination Record:</strong> {pdf.unavailableReason || 'This variant was not administered or published by Cambridge for this series.'}
                             </span>
                           </div>
                         )}
                         {(pdf.qpUnavailableReason || pdf.msUnavailableReason) && !pdf.isUnavailable && (
-                          <div className="mt-2.5 flex items-start gap-1.5 rounded-lg bg-amber-950/40 border border-amber-500/30 p-2 text-[11px] text-amber-200/90 leading-snug">
-                            <Info className="h-3.5 w-3.5 text-amber-400 shrink-0 mt-0.5" />
+                          <div className="mt-3 flex items-start gap-2 rounded-xl bg-white/[0.03] border border-white/[0.08] p-2.5 text-xs text-zinc-300 leading-snug">
+                            <Info className="h-4 w-4 text-[#FF5B37] shrink-0 mt-0.5" />
                             <span>
-                              <strong>Examination Series Record:</strong> {pdf.qpUnavailableReason ? `${pdf.qpUnavailableReason}. ` : ''}{pdf.msUnavailableReason ? `${pdf.msUnavailableReason}.` : ''}
+                              <strong>Series Record:</strong> {pdf.qpUnavailableReason ? `${pdf.qpUnavailableReason}. ` : ''}{pdf.msUnavailableReason ? `${pdf.msUnavailableReason}.` : ''}
                             </span>
                           </div>
                         )}
                         {Boolean(pdf.isPortal) && !pdf.isUnavailable && (
-                          <div className="mt-2.5 flex items-start gap-1.5 rounded-lg bg-amber-950/40 border border-amber-500/30 p-2 text-[11px] text-amber-200/90 leading-snug">
-                            <Info className="h-3.5 w-3.5 text-amber-400 shrink-0 mt-0.5" />
+                          <div className="mt-3 flex items-start gap-2 rounded-xl bg-white/[0.03] border border-white/[0.08] p-2.5 text-xs text-zinc-300 leading-snug">
+                            <Info className="h-4 w-4 text-zinc-400 shrink-0 mt-0.5" />
                             <span>
-                              <strong>Publisher Material:</strong> Direct in-app PDF preview is unavailable for this external board entry. Access through the official {pdf.board} qualification hub or search archive packs below.
+                              <strong>Board Material:</strong> Access through official {pdf.board} qualification materials.
                             </span>
                           </div>
                         )}
                       </div>
 
                       {/* Action Buttons: Audio, QP, MS, ER, GT */}
-                      <div className="mt-5 pt-4 border-t border-slate-800/80 space-y-2">
+                      <div className="mt-5 pt-3.5 border-t border-white/[0.06] space-y-2">
                         {pdf.isUnavailable ? (
-                          <div className="rounded-xl border border-dashed border-rose-500/30 bg-rose-950/20 p-3 text-center text-xs text-rose-300 font-medium">
-                            <span className="font-bold">Variant Not Administered:</span> Cambridge did not administer or publish this variant for this series.
+                          <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-3 text-center text-xs text-zinc-400 font-medium">
+                            <span className="text-zinc-200 font-semibold">Variant Not Administered:</span> Not published for this examination series.
                           </div>
                         ) : (
                           <>
-                        {/* Listening Audio Track Stream & Download Box */}
-                        {isListeningPaper && audioUrls && (
-                          <div className="bg-gradient-to-r from-sky-950/70 via-indigo-950/50 to-slate-950/80 rounded-xl p-3 border border-sky-500/30 space-y-2 mb-2">
-                            <div className="flex items-center justify-between gap-2">
-                              <div className="flex items-center gap-2 text-xs font-bold text-sky-300">
-                                <Headphones className="h-4 w-4 text-sky-400 shrink-0 animate-pulse" />
-                                <span>Official Examination Listening Track</span>
+                            {/* Listening Audio Track Stream & Download Box */}
+                            {isListeningPaper && audioUrls && (
+                              <div className="bg-[#111113] rounded-xl p-3 border border-white/[0.08] space-y-2 mb-2">
+                                <div className="flex items-center justify-between gap-2">
+                                  <div className="flex items-center gap-2 text-xs font-semibold text-zinc-200">
+                                    <Headphones className="h-3.5 w-3.5 text-[#FF5B37] shrink-0" />
+                                    <span>Examination Listening Track</span>
+                                  </div>
+                                  <a
+                                    href={audioUrls.downloadUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    download
+                                    className="inline-flex items-center gap-1 text-[11px] text-zinc-300 hover:text-white font-medium bg-white/[0.04] hover:bg-white/[0.08] px-2 py-1 rounded-md border border-white/[0.08] transition"
+                                    title="Download official listening exam MP3 track"
+                                  >
+                                    <Download className="h-3 w-3" />
+                                    <span>MP3</span>
+                                  </a>
+                                </div>
+
+                                <audio
+                                  controls
+                                  preload="none"
+                                  src={audioUrls.streamUrl}
+                                  className="w-full h-8 rounded-lg"
+                                />
                               </div>
-                              <span className="text-[9px] font-bold text-sky-400 uppercase tracking-wider bg-sky-950 px-2 py-0.5 rounded border border-sky-500/30">
-                                MP3 Audio
-                              </span>
-                            </div>
-
-                            <audio
-                              controls
-                              preload="none"
-                              src={audioUrls.streamUrl}
-                              className="w-full h-8 rounded-lg"
-                            />
-
-                            <div className="flex items-center justify-between gap-2 pt-0.5 text-[11px]">
-                              <span className="text-slate-400 text-[10px]">
-                                Full recording with pauses & repetitions
-                              </span>
-                              <a
-                                href={audioUrls.downloadUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                download
-                                className="inline-flex items-center gap-1 text-[11px] text-sky-300 hover:text-white font-bold bg-sky-500/20 hover:bg-sky-500/30 px-2 py-1 rounded-md border border-sky-500/40 transition"
-                                title="Download official listening exam MP3 track"
-                              >
-                                <Download className="h-3 w-3" />
-                                <span>Download MP3</span>
-                              </a>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Question Paper Row */}
-                        <div className="flex items-center justify-between gap-2 bg-slate-950/60 rounded-xl p-2.5 border border-slate-800">
-                          <div className="flex items-center gap-2 text-xs font-bold text-slate-200">
-                            <FileText className="h-4 w-4 text-sky-400 shrink-0" />
-                            <span>Question Paper (QP)</span>
-                          </div>
-                          {pdf.qpPdfUrl ? (
-                            <div className="flex items-center gap-1.5">
-                              {Boolean(pdf.isPortal) ? (
-                                <span className="text-[11px] text-amber-300/80 font-medium px-1">External Board Resource</span>
-                              ) : (
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    handleOpenPdf(
-                                      pdf.qpPdfUrl,
-                                      `${pdf.paperCode} Question Paper`,
-                                      `${pdf.subjectName} • ${pdf.session}`,
-                                      pdf.backupQpUrl,
-                                      'qp',
-                                      pdf.board,
-                                      pdf.paperCode,
-                                      isListeningPaper && audioUrls ? {
-                                        hasAudio: true,
-                                        audioStreamUrl: audioUrls.streamUrl,
-                                        audioDownloadUrl: audioUrls.downloadUrl
-                                      } : undefined
-                                    )
-                                  }
-                                  className="inline-flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-800 px-2 py-1 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition cursor-pointer"
-                                  title="Preview in-app viewer"
-                                >
-                                  <Eye className="h-3.5 w-3.5 text-sky-400" />
-                                  <span className="hidden sm:inline">View</span>
-                                </button>
-                              )}
-                              {(() => {
-                                const isPortalPaper = Boolean(pdf.isPortal) ||
-                                  (!pdf.qpPdfUrl.endsWith('.pdf') && !pdf.qpPdfUrl.includes('.pdf?')) ||
-                                  pdf.qpPdfUrl.includes('qualifications.pearson.com') ||
-                                  pdf.qpPdfUrl.includes('oxfordaqa.com');
-                                const portalHubLabel = pdf.board === 'Edexcel' ? 'Pearson Hub' : pdf.board === 'OxfordAQA' ? 'Oxford Hub' : 'Board Hub';
-                                return (
-                                  <>
-                                    <a
-                                      href={isPortalPaper ? pdf.qpPdfUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.qpPdfUrl)}${pdf.backupQpUrl ? `&fallback=${encodeURIComponent(pdf.backupQpUrl)}` : ''}`}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="inline-flex items-center gap-1 rounded-lg border border-sky-500/40 bg-sky-500/10 px-2 py-1 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition"
-                                      title={isPortalPaper ? `Open official ${pdf.board} qualification materials hub` : "Open PDF directly in verified viewer"}
-                                    >
-                                      <ExternalLink className="h-3.5 w-3.5" />
-                                      <span className="hidden sm:inline">{isPortalPaper ? portalHubLabel : 'Open'}</span>
-                                    </a>
-                                    <a
-                                      href={isPortalPaper && pdf.backupQpUrl ? pdf.backupQpUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.qpPdfUrl)}${pdf.backupQpUrl ? `&fallback=${encodeURIComponent(pdf.backupQpUrl)}` : ''}&download=true`}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="inline-flex items-center gap-1 rounded-lg bg-sky-600 px-2.5 py-1 text-xs font-bold text-white hover:bg-sky-500 transition shadow-sm"
-                                      title={isPortalPaper ? `Search verified archive pack for ${pdf.paperCode}` : "Download official Question Paper PDF"}
-                                    >
-                                      <Download className="h-3.5 w-3.5" />
-                                      <span>{isPortalPaper ? 'Search Archive' : 'Download'}</span>
-                                    </a>
-                                  </>
-                                );
-                              })()}
-                            </div>
-                          ) : (
-                            <span className="text-[11px] text-amber-300/90 font-medium px-2 py-0.5 rounded bg-amber-950/40 border border-amber-500/30">
-                              {pdf.qpUnavailableReason || 'QP Not Published'}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Mark Scheme Row */}
-                        <div className={`flex items-center justify-between gap-2 rounded-xl p-2.5 border ${pdf.msPdfUrl ? 'bg-emerald-950/20 border-emerald-500/20' : 'bg-slate-950/60 border-slate-800'}`}>
-                          <div className={`flex items-center gap-2 text-xs font-bold ${pdf.msPdfUrl ? 'text-emerald-300' : 'text-slate-400'}`}>
-                            <CheckCircle className={`h-4 w-4 shrink-0 ${pdf.msPdfUrl ? 'text-emerald-400' : 'text-slate-500'}`} />
-                            <span>Mark Scheme (MS)</span>
-                          </div>
-                          {pdf.msPdfUrl ? (
-                            <div className="flex items-center gap-1.5">
-                              {Boolean(pdf.isPortal) ? (
-                                <span className="text-[11px] text-amber-300/80 font-medium px-1">External Board Resource</span>
-                              ) : (
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    handleOpenPdf(
-                                      pdf.msPdfUrl!,
-                                      `${pdf.paperCode} Mark Scheme`,
-                                      `${pdf.subjectName} • ${pdf.session}`,
-                                      pdf.backupMsUrl,
-                                      'ms',
-                                      pdf.board,
-                                      pdf.paperCode
-                                    )
-                                  }
-                                  className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-950/40 px-2 py-1 text-xs font-semibold text-emerald-300 hover:bg-emerald-900/60 transition cursor-pointer"
-                                  title="Preview Mark Scheme in-app"
-                                >
-                                  <Eye className="h-3.5 w-3.5 text-emerald-400" />
-                                  <span className="hidden sm:inline">View</span>
-                                </button>
-                              )}
-                              {(() => {
-                                const isPortalPaper = Boolean(pdf.isPortal) ||
-                                  (!pdf.msPdfUrl!.endsWith('.pdf') && !pdf.msPdfUrl!.includes('.pdf?')) ||
-                                  pdf.msPdfUrl!.includes('qualifications.pearson.com') ||
-                                  pdf.msPdfUrl!.includes('oxfordaqa.com');
-                                const portalHubLabel = pdf.board === 'Edexcel' ? 'Pearson Hub' : pdf.board === 'OxfordAQA' ? 'Oxford Hub' : 'Board Hub';
-                                return (
-                                  <>
-                                    <a
-                                      href={isPortalPaper ? pdf.msPdfUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.msPdfUrl!)}${pdf.backupMsUrl ? `&fallback=${encodeURIComponent(pdf.backupMsUrl)}` : ''}`}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20 transition"
-                                      title={isPortalPaper ? `Open official ${pdf.board} qualification materials hub` : "Open Mark Scheme in verified viewer"}
-                                    >
-                                      <ExternalLink className="h-3.5 w-3.5" />
-                                      <span className="hidden sm:inline">{isPortalPaper ? portalHubLabel : 'Open'}</span>
-                                    </a>
-                                    <a
-                                      href={isPortalPaper && pdf.backupMsUrl ? pdf.backupMsUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.msPdfUrl!)}${pdf.backupMsUrl ? `&fallback=${encodeURIComponent(pdf.backupMsUrl)}` : ''}&download=true`}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-2.5 py-1 text-xs font-bold text-white hover:bg-emerald-500 transition shadow-sm"
-                                      title={isPortalPaper ? `Search verified archive pack for ${pdf.paperCode} Mark Scheme` : "Download official Mark Scheme PDF"}
-                                    >
-                                      <Download className="h-3.5 w-3.5" />
-                                      <span>{isPortalPaper ? 'Search Archive' : 'Download'}</span>
-                                    </a>
-                                  </>
-                                );
-                              })()}
-                            </div>
-                          ) : (
-                            <span className="text-[11px] text-amber-300/90 font-medium px-2 py-0.5 rounded bg-amber-950/40 border border-amber-500/30">
-                              {pdf.msUnavailableReason || 'MS Not Published'}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Extra Session Materials: Examiner Report & Grade Thresholds */}
-                        {(pdf.examinerReportUrl || pdf.gradeThresholdsUrl) && (
-                          <div className="flex items-center justify-between gap-2 pt-1 text-[11px]">
-                            {pdf.examinerReportUrl && (
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleOpenPdf(
-                                    pdf.examinerReportUrl!,
-                                    `${pdf.subjectName} (${pdf.subjectCode}) Examiner Report`,
-                                    `${pdf.session} • Cambridge Principal Examiner Report`,
-                                    undefined,
-                                    'er'
-                                  )
-                                }
-                                className="text-indigo-400 hover:text-indigo-300 hover:underline flex items-center gap-1 cursor-pointer font-semibold"
-                              >
-                                <Award className="h-3.5 w-3.5" />
-                                <span>Examiner Report</span>
-                              </button>
                             )}
-                            {pdf.gradeThresholdsUrl && (
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleOpenPdf(
-                                    pdf.gradeThresholdsUrl!,
-                                    `${pdf.subjectName} (${pdf.subjectCode}) Grade Thresholds`,
-                                    `${pdf.session} • Official Grade Boundaries`,
-                                    undefined,
-                                    'gt'
-                                  )
-                                }
-                                className="text-purple-400 hover:text-purple-300 hover:underline flex items-center gap-1 cursor-pointer font-semibold ml-auto"
-                              >
-                                <TrendingUp className="h-3.5 w-3.5" />
-                                <span>Grade Thresholds</span>
-                              </button>
+
+                            {/* Question Paper Row */}
+                            <div className="flex items-center justify-between gap-2 bg-[#111113] rounded-xl p-2.5 border border-white/[0.06]">
+                              <div className="flex items-center gap-2 text-xs font-medium text-zinc-200">
+                                <FileText className="h-4 w-4 text-zinc-400 shrink-0" />
+                                <span>Question Paper (QP)</span>
+                              </div>
+                              {pdf.qpPdfUrl ? (
+                                <div className="flex items-center gap-1.5">
+                                  {Boolean(pdf.isPortal) ? (
+                                    <span className="text-[11px] text-zinc-400 font-medium px-1">Board Hub</span>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        handleOpenPdf(
+                                          pdf.qpPdfUrl,
+                                          `${pdf.paperCode} Question Paper`,
+                                          `${pdf.subjectName} • ${pdf.session}`,
+                                          pdf.backupQpUrl,
+                                          'qp',
+                                          pdf.board,
+                                          pdf.paperCode,
+                                          isListeningPaper && audioUrls ? {
+                                            hasAudio: true,
+                                            audioStreamUrl: audioUrls.streamUrl,
+                                            audioDownloadUrl: audioUrls.downloadUrl
+                                          } : undefined
+                                        )
+                                      }
+                                      className="inline-flex items-center gap-1 rounded-lg border border-white/[0.08] bg-[#1E1E22] px-2 py-1 text-xs font-medium text-zinc-200 hover:bg-white/[0.08] hover:text-white transition cursor-pointer"
+                                      title="Preview in-app viewer"
+                                    >
+                                      <Eye className="h-3.5 w-3.5 text-zinc-400" />
+                                      <span className="hidden sm:inline">View</span>
+                                    </button>
+                                  )}
+                                  {(() => {
+                                    const isPortalPaper = Boolean(pdf.isPortal) ||
+                                      (!pdf.qpPdfUrl.endsWith('.pdf') && !pdf.qpPdfUrl.includes('.pdf?')) ||
+                                      pdf.qpPdfUrl.includes('qualifications.pearson.com') ||
+                                      pdf.qpPdfUrl.includes('oxfordaqa.com');
+                                    const portalHubLabel = pdf.board === 'Edexcel' ? 'Pearson Hub' : pdf.board === 'OxfordAQA' ? 'Oxford Hub' : 'Board Hub';
+                                    return (
+                                      <>
+                                        <a
+                                          href={isPortalPaper ? pdf.qpPdfUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.qpPdfUrl)}${pdf.backupQpUrl ? `&fallback=${encodeURIComponent(pdf.backupQpUrl)}` : ''}`}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="inline-flex items-center gap-1 rounded-lg border border-white/[0.08] bg-[#1E1E22] px-2 py-1 text-xs font-medium text-zinc-200 hover:bg-white/[0.08] hover:text-white transition"
+                                          title={isPortalPaper ? `Open official ${pdf.board} qualification materials hub` : "Open PDF directly in verified viewer"}
+                                        >
+                                          <ExternalLink className="h-3.5 w-3.5 text-zinc-400" />
+                                          <span className="hidden sm:inline">{isPortalPaper ? portalHubLabel : 'Open'}</span>
+                                        </a>
+                                        <a
+                                          href={isPortalPaper && pdf.backupQpUrl ? pdf.backupQpUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.qpPdfUrl)}${pdf.backupQpUrl ? `&fallback=${encodeURIComponent(pdf.backupQpUrl)}` : ''}&download=true`}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="inline-flex items-center gap-1 rounded-lg bg-[#FF5B37] hover:bg-[#e04825] px-2.5 py-1 text-xs font-semibold text-white transition shadow-sm"
+                                          title={isPortalPaper ? `Search verified archive pack for ${pdf.paperCode}` : "Download official Question Paper PDF"}
+                                        >
+                                          <Download className="h-3.5 w-3.5" />
+                                          <span>{isPortalPaper ? 'Archive' : 'Download'}</span>
+                                        </a>
+                                      </>
+                                    );
+                                  })()}
+                                </div>
+                              ) : (
+                                <span className="text-[11px] text-zinc-400 font-medium px-2 py-0.5 rounded bg-white/[0.04]">
+                                  {pdf.qpUnavailableReason || 'QP Not Published'}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Mark Scheme Row */}
+                            <div className="flex items-center justify-between gap-2 bg-[#111113] rounded-xl p-2.5 border border-white/[0.06]">
+                              <div className="flex items-center gap-2 text-xs font-medium text-zinc-200">
+                                <CheckCircle className={`h-4 w-4 shrink-0 ${pdf.msPdfUrl ? 'text-emerald-400/90' : 'text-zinc-500'}`} />
+                                <span>Mark Scheme (MS)</span>
+                              </div>
+                              {pdf.msPdfUrl ? (
+                                <div className="flex items-center gap-1.5">
+                                  {Boolean(pdf.isPortal) ? (
+                                    <span className="text-[11px] text-zinc-400 font-medium px-1">Board Hub</span>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        handleOpenPdf(
+                                          pdf.msPdfUrl!,
+                                          `${pdf.paperCode} Mark Scheme`,
+                                          `${pdf.subjectName} • ${pdf.session}`,
+                                          pdf.backupMsUrl,
+                                          'ms',
+                                          pdf.board,
+                                          pdf.paperCode
+                                        )
+                                      }
+                                      className="inline-flex items-center gap-1 rounded-lg border border-white/[0.08] bg-[#1E1E22] px-2 py-1 text-xs font-medium text-zinc-200 hover:bg-white/[0.08] hover:text-white transition cursor-pointer"
+                                      title="Preview Mark Scheme in-app"
+                                    >
+                                      <Eye className="h-3.5 w-3.5 text-zinc-400" />
+                                      <span className="hidden sm:inline">View</span>
+                                    </button>
+                                  )}
+                                  {(() => {
+                                    const isPortalPaper = Boolean(pdf.isPortal) ||
+                                      (!pdf.msPdfUrl!.endsWith('.pdf') && !pdf.msPdfUrl!.includes('.pdf?')) ||
+                                      pdf.msPdfUrl!.includes('qualifications.pearson.com') ||
+                                      pdf.msPdfUrl!.includes('oxfordaqa.com');
+                                    const portalHubLabel = pdf.board === 'Edexcel' ? 'Pearson Hub' : pdf.board === 'OxfordAQA' ? 'Oxford Hub' : 'Board Hub';
+                                    return (
+                                      <>
+                                        <a
+                                          href={isPortalPaper ? pdf.msPdfUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.msPdfUrl!)}${pdf.backupMsUrl ? `&fallback=${encodeURIComponent(pdf.backupMsUrl)}` : ''}`}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="inline-flex items-center gap-1 rounded-lg border border-white/[0.08] bg-[#1E1E22] px-2 py-1 text-xs font-medium text-zinc-200 hover:bg-white/[0.08] hover:text-white transition"
+                                          title={isPortalPaper ? `Open official ${pdf.board} qualification materials hub` : "Open Mark Scheme in verified viewer"}
+                                        >
+                                          <ExternalLink className="h-3.5 w-3.5 text-zinc-400" />
+                                          <span className="hidden sm:inline">{isPortalPaper ? portalHubLabel : 'Open'}</span>
+                                        </a>
+                                        <a
+                                          href={isPortalPaper && pdf.backupMsUrl ? pdf.backupMsUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.msPdfUrl!)}${pdf.backupMsUrl ? `&fallback=${encodeURIComponent(pdf.backupMsUrl)}` : ''}&download=true`}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/15 hover:bg-emerald-500/25 px-2.5 py-1 text-xs font-semibold text-emerald-300 transition"
+                                          title={isPortalPaper ? `Search verified archive pack for ${pdf.paperCode} Mark Scheme` : "Download official Mark Scheme PDF"}
+                                        >
+                                          <Download className="h-3.5 w-3.5" />
+                                          <span>{isPortalPaper ? 'Archive' : 'Download'}</span>
+                                        </a>
+                                      </>
+                                    );
+                                  })()}
+                                </div>
+                              ) : (
+                                <span className="text-[11px] text-zinc-400 font-medium px-2 py-0.5 rounded bg-white/[0.04]">
+                                  {pdf.msUnavailableReason || 'MS Not Published'}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Extra Session Materials: Examiner Report & Grade Thresholds */}
+                            {(pdf.examinerReportUrl || pdf.gradeThresholdsUrl) && (
+                              <div className="flex items-center justify-between gap-2 pt-1 text-[11px]">
+                                {pdf.examinerReportUrl && (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleOpenPdf(
+                                        pdf.examinerReportUrl!,
+                                        `${pdf.subjectName} (${pdf.subjectCode}) Examiner Report`,
+                                        `${pdf.session} • Cambridge Principal Examiner Report`,
+                                        undefined,
+                                        'er'
+                                      )
+                                    }
+                                    className="text-zinc-400 hover:text-zinc-200 hover:underline flex items-center gap-1 cursor-pointer font-medium"
+                                  >
+                                    <Award className="h-3.5 w-3.5 text-[#FF5B37]" />
+                                    <span>Examiner Report</span>
+                                  </button>
+                                )}
+                                {pdf.gradeThresholdsUrl && (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleOpenPdf(
+                                        pdf.gradeThresholdsUrl!,
+                                        `${pdf.subjectName} (${pdf.subjectCode}) Grade Thresholds`,
+                                        `${pdf.session} • Official Grade Boundaries`,
+                                        undefined,
+                                        'gt'
+                                      )
+                                    }
+                                    className="text-zinc-400 hover:text-zinc-200 hover:underline flex items-center gap-1 cursor-pointer font-medium ml-auto"
+                                  >
+                                    <TrendingUp className="h-3.5 w-3.5 text-zinc-400" />
+                                    <span>Grade Thresholds</span>
+                                  </button>
+                                )}
+                              </div>
                             )}
-                          </div>
-                        )}
-                        </>
+                          </>
                         )}
                       </div>
                     </div>
@@ -1985,14 +1963,14 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                 <div className="pt-6 pb-2 text-center">
                   <button
                     onClick={() => setPageLimit((prev) => prev + 36)}
-                    className="inline-flex items-center gap-2 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-slate-700 px-6 py-3 text-xs font-bold text-white transition shadow-lg cursor-pointer"
+                    className="inline-flex items-center gap-2 rounded-2xl bg-[#18181B] hover:bg-[#222227] border border-white/[0.08] px-6 py-3 text-xs font-semibold text-zinc-200 transition shadow-sm cursor-pointer"
                   >
-                    <RefreshCw className="h-4 w-4 text-sky-400" />
+                    <RefreshCw className="h-4 w-4 text-[#FF5B37]" />
                     <span>Load More Papers (Showing {displayedPdfs.length} of {filteredPdfs.length})</span>
                   </button>
                   <button
                     onClick={() => setPageLimit(filteredPdfs.length)}
-                    className="ml-3 inline-flex items-center gap-1 rounded-2xl border border-slate-700/60 bg-slate-900/80 px-4 py-3 text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer"
+                    className="ml-3 inline-flex items-center gap-1 rounded-2xl border border-white/[0.08] bg-[#111113] px-4 py-3 text-xs font-medium text-zinc-400 hover:text-white transition cursor-pointer"
                   >
                     <span>Show All ({filteredPdfs.length})</span>
                   </button>
@@ -2045,46 +2023,46 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               return (
                 <div
                   key={paper.id}
-                  className={`rounded-2xl border transition overflow-hidden shadow-xl ${
+                  className={`rounded-2xl border transition overflow-hidden shadow-sm ${
                     paper.isExactCodeMatch
-                      ? 'border-emerald-500/60 bg-slate-900/95 ring-2 ring-emerald-500/30'
-                      : 'border-slate-800 bg-slate-900/90 hover:border-slate-700'
+                      ? 'border-[#FF5B37]/60 bg-[#18181B] ring-1 ring-[#FF5B37]/30'
+                      : 'border-white/[0.06] bg-[#18181B] hover:border-white/[0.12]'
                   }`}
                 >
                   {/* Exact Code Match Banner */}
                   {paper.isExactCodeMatch && (
-                    <div className="bg-slate-900/95 border-b border-emerald-500/40 px-4 py-2.5 flex items-center justify-between flex-wrap gap-2">
-                      <div className="flex items-center gap-2 text-xs font-bold text-emerald-300">
+                    <div className="bg-[#111113] border-b border-white/[0.06] px-4 py-2.5 flex items-center justify-between flex-wrap gap-2">
+                      <div className="flex items-center gap-2 text-xs font-semibold text-emerald-300">
                         <CheckCircle className="h-4 w-4 text-emerald-400" />
-                        <span>Exact Past Paper Question Match: {paper.paperCode} {paper.session} - {paper.questionNumber}</span>
+                        <span>Exact Question Match: {paper.paperCode} {paper.session} - {paper.questionNumber}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-mono text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                        <span className="text-[10px] font-mono text-zinc-300 bg-white/[0.04] px-2 py-0.5 rounded border border-white/[0.08]">
                           {paper.subParts?.length ? `${paper.subParts.length} Sub-Parts (${paper.marks} Marks)` : `${paper.marks} Mark Official Item`}
                         </span>
-                        <span className="text-[10px] font-mono text-sky-300 bg-sky-950/80 px-2 py-0.5 rounded border border-sky-400/30">
-                          Verified Official Cambridge Solution
+                        <span className="text-[10px] font-mono text-[#FF5B37] bg-[#FF5B37]/10 px-2 py-0.5 rounded border border-[#FF5B37]/20">
+                          Verified Cambridge Solution
                         </span>
                       </div>
                     </div>
                   )}
 
                   {/* Paper Header */}
-                  <div className="p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800/80 bg-slate-950/50">
+                  <div className="p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-white/[0.06] bg-[#111113]/40">
                     <div className="flex items-start sm:items-center gap-2.5 flex-wrap">
-                      <span className="rounded-lg bg-sky-500/15 px-2.5 py-1 text-xs font-bold text-sky-300 border border-sky-500/30 font-mono">
+                      <span className="rounded-lg bg-white/[0.04] px-2.5 py-1 text-xs font-semibold text-zinc-200 border border-white/[0.08] font-mono">
                         {paper.paperCode} • {paper.session}
                       </span>
-                      <span className="font-extrabold text-white text-sm">
+                      <span className="font-bold text-zinc-100 text-sm">
                         {paper.questionNumber} ({paper.marks} Marks)
                       </span>
-                      <span className="text-slate-500">•</span>
-                      <span className="text-xs text-slate-300 font-semibold">{paper.subjectName}</span>
-                      <span className="text-slate-500">•</span>
+                      <span className="text-zinc-600">•</span>
+                      <span className="text-xs text-zinc-300 font-medium">{paper.subjectName}</span>
+                      <span className="text-zinc-600">•</span>
                       <button
                         type="button"
                         onClick={() => setSelectedTopic(paper.topic)}
-                        className="text-xs text-sky-400 hover:text-sky-300 hover:underline font-medium transition cursor-pointer"
+                        className="text-xs text-[#FF5B37] hover:text-[#FFA63A] hover:underline font-medium transition cursor-pointer"
                         title={`Filter questions by topic: ${paper.topic}`}
                       >
                         {paper.topic}
@@ -2092,7 +2070,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                       <button
                         type="button"
                         onClick={() => setSelectedTier(paper.difficultyTier)}
-                        className={`rounded-md px-2 py-0.5 text-[10px] font-bold border cursor-pointer hover:opacity-85 transition ${getTierBadge(paper.difficultyTier)}`}
+                        className={`rounded-md px-2 py-0.5 text-[10px] font-medium border cursor-pointer hover:opacity-85 transition ${getTierBadge(paper.difficultyTier)}`}
                         title={`Filter questions by tier: ${paper.difficultyTier}`}
                       >
                         {paper.difficultyTier}
@@ -2104,10 +2082,10 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                       {/* Copy Question & Mark Scheme */}
                       <button
                         onClick={() => handleCopyQuestion(paper)}
-                        className={`p-2 rounded-xl border transition cursor-pointer flex items-center gap-1 text-xs font-semibold ${
+                        className={`p-2 rounded-xl border transition cursor-pointer flex items-center gap-1 text-xs font-medium ${
                           copiedQuestionId === paper.id
                             ? 'border-emerald-500/40 bg-emerald-500/20 text-emerald-300'
-                            : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
+                            : 'border-white/[0.08] bg-[#111113] text-zinc-400 hover:text-white'
                         }`}
                         title="Copy Question & Mark Scheme text to clipboard"
                       >
@@ -2119,7 +2097,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                         ) : (
                           <>
                             <Copy className="h-4 w-4" />
-                            <span className="hidden sm:inline text-[11px] font-semibold">Copy</span>
+                            <span className="hidden sm:inline text-[11px] font-medium">Copy</span>
                           </>
                         )}
                       </button>
@@ -2130,7 +2108,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                         className={`p-2 rounded-xl border transition cursor-pointer ${
                           isBookmarked
                             ? 'border-amber-500/40 bg-amber-500/15 text-amber-300'
-                            : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
+                            : 'border-white/[0.08] bg-[#111113] text-zinc-400 hover:text-white'
                         }`}
                         title={isBookmarked ? 'Saved to Bookmarks' : 'Bookmark this question'}
                       >
@@ -2141,7 +2119,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                       {viewMode === 'stacked' && (
                         <button
                           onClick={() => setExpandedPaperId(isExpanded ? null : paper.id)}
-                          className="rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition cursor-pointer"
+                          className="rounded-xl border border-white/[0.08] bg-[#1E1E22] px-3.5 py-1.5 text-xs font-medium text-zinc-200 hover:bg-white/[0.08] hover:text-white transition cursor-pointer"
                         >
                           {isExpanded ? 'Hide Mark Scheme' : 'Reveal Mark Scheme'}
                         </button>
@@ -2150,25 +2128,25 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                       {/* Grade My Answer Button */}
                       <button
                         onClick={() => setTestingPaperId(testingPaperId === paper.id ? null : paper.id)}
-                        className={`rounded-xl border px-3 py-1.5 text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                        className={`rounded-xl border px-3 py-1.5 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
                           testingPaperId === paper.id
                             ? 'border-emerald-500/50 bg-emerald-500/20 text-emerald-300'
-                            : 'border-slate-700 bg-slate-800/80 text-emerald-400 hover:bg-slate-700 hover:text-white'
+                            : 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20'
                         }`}
                         title="Enter your answer and get instant Cambridge marks"
                       >
                         <Award className="h-3.5 w-3.5" />
-                        <span>Grade My Answer</span>
+                        <span>Grade Answer</span>
                       </button>
 
                       {/* Step-by-Step Solver */}
                       {onOpenSolverWithQuestion && (
                         <button
                           onClick={() => onOpenSolverWithQuestion(paper.questionPrompt)}
-                          className="rounded-xl bg-blue-600 hover:bg-blue-500 px-3.5 py-1.5 text-xs font-medium text-white shadow-sm transition cursor-pointer flex items-center gap-1.5"
+                          className="rounded-xl bg-[#FF5B37] hover:bg-[#e04825] px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm transition cursor-pointer flex items-center gap-1.5"
                         >
                           <Calculator className="h-3.5 w-3.5" />
-                          <span>Step-by-Step Solver</span>
+                          <span>Step Solver</span>
                         </button>
                       )}
 
@@ -2176,10 +2154,10 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                       {onOpenSplitViewer && (
                         <button
                           onClick={() => onOpenSplitViewer(paper)}
-                          className="rounded-xl border border-sky-500/30 bg-sky-500/10 px-3 py-1.5 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition cursor-pointer flex items-center gap-1"
+                          className="rounded-xl border border-white/[0.08] bg-[#1E1E22] px-3 py-1.5 text-xs font-medium text-zinc-200 hover:bg-white/[0.08] hover:text-white transition cursor-pointer flex items-center gap-1"
                           title="Open in Timed Split-Screen Exam Mode"
                         >
-                          <Columns className="h-3.5 w-3.5" />
+                          <Columns className="h-3.5 w-3.5 text-zinc-400" />
                           <span className="hidden sm:inline">Exam Mode</span>
                         </button>
                       )}
@@ -2197,10 +2175,10 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                             paper.paperCode
                           )
                         }
-                        className="rounded-xl border border-slate-700 bg-slate-800/90 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition flex items-center gap-1.5 cursor-pointer"
+                        className="rounded-xl border border-white/[0.08] bg-[#1E1E22] px-3 py-1.5 text-xs font-medium text-zinc-200 hover:bg-white/[0.08] hover:text-white transition flex items-center gap-1.5 cursor-pointer"
                         title="Preview authentic Question Paper PDF"
                       >
-                        <Eye className="h-3.5 w-3.5 text-sky-400" />
+                        <Eye className="h-3.5 w-3.5 text-zinc-400" />
                         <span className="hidden sm:inline">View PDF</span>
                       </button>
 
@@ -2209,17 +2187,17 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                         href={paper.board === 'Edexcel' || downloadUrl.includes('pearson.com') ? downloadUrl : `/api/pdf-proxy?url=${encodeURIComponent(downloadUrl)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="rounded-xl border border-sky-500/30 bg-sky-500/10 px-3 py-1.5 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition flex items-center gap-1.5"
+                        className="rounded-xl border border-white/[0.08] bg-[#1E1E22] px-3 py-1.5 text-xs font-medium text-zinc-200 hover:bg-white/[0.08] hover:text-white transition flex items-center gap-1.5"
                         title="Open PDF directly in new window"
                       >
-                        <ExternalLink className="h-3.5 w-3.5" />
+                        <ExternalLink className="h-3.5 w-3.5 text-zinc-400" />
                         <span className="hidden sm:inline">{paper.board === 'Edexcel' || downloadUrl.includes('pearson.com') ? 'Portal' : 'Open'}</span>
                       </a>
                     </div>
                   </div>
 
                   {/* Content: Either Stacked or Side-by-Side (QP left, MS right) */}
-                  <div className={`${viewMode === 'side-by-side' ? 'grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-800' : ''}`}>
+                  <div className={`${viewMode === 'side-by-side' ? 'grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-white/[0.06]' : ''}`}>
                     {/* Question Paper Pane */}
                     <div className="p-4 sm:p-5 space-y-3">
                       <div className="flex items-center justify-between flex-wrap gap-2">
