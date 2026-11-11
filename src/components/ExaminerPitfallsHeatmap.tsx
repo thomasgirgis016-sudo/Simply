@@ -252,37 +252,36 @@ export const ExaminerPitfallsHeatmap: React.FC<{ subjects: Subject[]; profile: U
   }, [selectedSubject, selectedSeverity, searchQuery]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 animate-fadeIn">
+    <div className="max-w-7xl mx-auto px-4 py-8 space-y-6 animate-fadeIn">
       {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-rose-950/40 to-slate-900 border border-rose-500/20 p-6 sm:p-8 shadow-2xl">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl bg-[#18181b] border border-white/[0.08] p-6 sm:p-7 shadow-sm">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-semibold tracking-wide uppercase">
-              <Flame className="w-3.5 h-3.5 text-rose-400" />
+          <div className="space-y-2.5">
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-[#e5484d]/10 border border-[#e5484d]/20 text-[#e5484d] text-xs font-medium tracking-wide uppercase font-mono">
+              <Flame className="w-3.5 h-3.5 text-[#e5484d]" />
               Official Cambridge Examiner Reports (ER) Synthesis
             </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-semibold text-white tracking-tight">
               Examiner Pitfall Heatmap: "Why Students Lost Marks"
             </h1>
-            <p className="text-slate-300 text-xs sm:text-sm max-w-2xl leading-relaxed">
-              We parsed thousands of pages of official Cambridge Examiner Reports across 2018–2024. Discover the hidden traps, forbidden words, and careless slips that cost high-achieving candidates their A* grades.
+            <p className="text-zinc-400 text-xs sm:text-sm max-w-2xl leading-relaxed">
+              Synthesized from official Cambridge Examiner Reports across 2018–2024. Review the common traps, forbidden phrasing, and precision oversights that cost candidates marks.
             </p>
           </div>
 
-          <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-4 sm:p-5 flex items-center gap-4 shrink-0 shadow-lg">
-            <div className="w-12 h-12 rounded-xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-400">
-              <TrendingDown className="w-6 h-6" />
+          <div className="bg-[#141416] border border-white/[0.08] rounded-xl p-4 sm:p-4.5 flex items-center gap-3.5 shrink-0 shadow-sm">
+            <div className="w-10 h-10 rounded-lg bg-[#e5484d]/10 border border-[#e5484d]/20 flex items-center justify-center text-[#e5484d]">
+              <TrendingDown className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                Global Cambridge Average
+              <div className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">
+                Cambridge Global Average
               </div>
-              <div className="text-xl font-black text-white font-mono">
+              <div className="text-lg font-semibold text-white font-mono tabular-nums">
                 -8.4 Marks Lost
               </div>
-              <div className="text-[10px] text-rose-400 font-semibold">
-                Due to preventable candidate errors
+              <div className="text-[11px] text-[#e5484d] font-medium">
+                Due to preventable slips
               </div>
             </div>
           </div>
@@ -290,13 +289,13 @@ export const ExaminerPitfallsHeatmap: React.FC<{ subjects: Subject[]; profile: U
       </div>
 
       {/* Filter Bar */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 bg-slate-900/80 border border-slate-800 p-4 rounded-2xl backdrop-blur-md">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-[#18181b] border border-white/[0.08] p-3.5 rounded-xl">
         <div className="flex flex-wrap items-center gap-2">
           {/* Subject Filter */}
           <select
             value={selectedSubject}
             onChange={e => setSelectedSubject(e.target.value)}
-            className="bg-slate-950 border border-slate-800 text-slate-200 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-rose-500"
+            className="bg-[#141416] border border-white/[0.08] text-zinc-200 text-xs rounded-lg px-3 py-2 focus:outline-none focus:border-[#FF5B37] cursor-pointer"
           >
             <option value="all">All Cambridge Syllabuses</option>
             <option value="0580">0580 - Mathematics</option>
@@ -310,7 +309,7 @@ export const ExaminerPitfallsHeatmap: React.FC<{ subjects: Subject[]; profile: U
           <select
             value={selectedSeverity}
             onChange={e => setSelectedSeverity(e.target.value)}
-            className="bg-slate-950 border border-slate-800 text-slate-200 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-rose-500"
+            className="bg-[#141416] border border-white/[0.08] text-zinc-200 text-xs rounded-lg px-3 py-2 focus:outline-none focus:border-[#FF5B37] cursor-pointer"
           >
             <option value="all">All Pitfall Severities</option>
             <option value="critical">Critical (&gt;65% Failure)</option>
@@ -320,21 +319,21 @@ export const ExaminerPitfallsHeatmap: React.FC<{ subjects: Subject[]; profile: U
 
         {/* Search Input */}
         <div className="relative flex-1 max-w-md">
-          <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             placeholder="Search topic, formula, or examiner keyword..."
-            className="w-full bg-slate-950 border border-slate-800 text-slate-200 text-xs rounded-xl pl-9 pr-3 py-2 focus:outline-none focus:border-rose-500"
+            className="w-full bg-[#141416] border border-white/[0.08] text-zinc-200 text-xs rounded-lg pl-9 pr-3 py-2 focus:outline-none focus:border-[#FF5B37]"
           />
         </div>
       </div>
 
       {/* Pitfalls Cards Grid */}
-      <div className="space-y-4">
+      <div className="space-y-3">
         {filteredPitfalls.length === 0 ? (
-          <div className="text-center py-12 text-slate-400 text-xs bg-slate-900/60 rounded-2xl border border-slate-800">
+          <div className="text-center py-12 text-zinc-400 text-xs bg-[#18181b] rounded-xl border border-white/[0.08]">
             No examiner pitfalls found matching your filters.
           </div>
         ) : (
@@ -343,53 +342,53 @@ export const ExaminerPitfallsHeatmap: React.FC<{ subjects: Subject[]; profile: U
             return (
               <div
                 key={item.id}
-                className={`rounded-2xl border transition-all overflow-hidden ${
+                className={`rounded-xl border transition-all overflow-hidden ${
                   isExpanded
-                    ? 'bg-slate-900 border-rose-500/40 shadow-xl'
-                    : 'bg-slate-900/60 border-slate-800 hover:border-slate-700'
+                    ? 'bg-[#18181b] border-white/[0.18] shadow-md'
+                    : 'bg-[#18181b] border-white/[0.08] hover:border-white/[0.14]'
                 }`}
               >
                 {/* Summary Row */}
                 <div
                   onClick={() => setExpandedId(isExpanded ? null : item.id)}
-                  className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer select-none"
+                  className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer select-none"
                 >
                   <div className="space-y-1.5 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                      <span className="font-mono text-[11px] font-medium px-2 py-0.5 rounded bg-white/[0.06] text-zinc-200 border border-white/[0.08]">
                         {item.subjectCode}
                       </span>
-                      <span className="text-xs text-slate-400">{item.paperType}</span>
-                      <span className="text-slate-600">•</span>
-                      <span className="font-mono text-xs text-slate-300 font-semibold">
+                      <span className="text-xs text-zinc-400">{item.paperType}</span>
+                      <span className="text-zinc-600">•</span>
+                      <span className="font-mono text-xs text-zinc-300 font-medium">
                         {item.questionRef}
                       </span>
                       <span
-                        className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ml-auto sm:ml-0 ${
+                        className={`text-[10px] font-mono font-medium px-2 py-0.5 rounded uppercase tracking-wider ml-auto sm:ml-0 ${
                           item.severity === 'critical'
-                            ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                            : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                            ? 'bg-[#e5484d]/10 text-[#e5484d] border border-[#e5484d]/20'
+                            : 'bg-amber-500/10 text-amber-300 border border-amber-500/20'
                         }`}
                       >
                         {item.candidateFailureRate}
                       </span>
                     </div>
 
-                    <h3 className="text-base font-bold text-white flex items-center gap-2">
-                      <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+                    <h3 className="text-sm sm:text-base font-semibold text-white flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-[#e5484d] shrink-0" />
                       {item.topic}
                     </h3>
 
-                    <p className="text-xs text-slate-400 line-clamp-1">{item.commonError}</p>
+                    <p className="text-xs text-zinc-400 line-clamp-1">{item.commonError}</p>
                   </div>
 
                   <div className="flex items-center gap-3 shrink-0 self-end sm:self-auto">
-                    <span className="text-xs font-mono font-bold text-rose-400 bg-rose-500/10 px-2.5 py-1 rounded-xl border border-rose-500/20">
+                    <span className="text-xs font-mono font-medium text-[#e5484d] bg-[#e5484d]/10 px-2.5 py-1 rounded-lg border border-[#e5484d]/20">
                       {item.marksLostAverage}
                     </span>
                     <ChevronRight
-                      className={`w-5 h-5 text-slate-500 transition-transform ${
-                        isExpanded ? 'rotate-90 text-rose-400' : ''
+                      className={`w-4 h-4 text-zinc-400 transition-transform ${
+                        isExpanded ? 'rotate-90 text-[#FF5B37]' : ''
                       }`}
                     />
                   </div>
@@ -397,23 +396,23 @@ export const ExaminerPitfallsHeatmap: React.FC<{ subjects: Subject[]; profile: U
 
                 {/* Expanded Details: Official Examiner Quote & Correct Method */}
                 {isExpanded && (
-                  <div className="p-5 pt-0 border-t border-slate-800/80 bg-slate-950/60 space-y-4 animate-fadeIn">
+                  <div className="p-4 sm:p-5 pt-0 border-t border-white/[0.06] bg-[#141416] space-y-4 animate-fadeIn">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
                       {/* Left: What Candidates Did Wrong & Examiner Quote */}
                       <div className="space-y-3">
-                        <div className="text-xs font-bold uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
+                        <div className="text-xs font-semibold uppercase tracking-wider text-[#e5484d] flex items-center gap-1.5 font-mono">
                           <XCircle className="w-4 h-4" />
-                          What Students Wrote (Fatal Mistake)
+                          What Students Wrote (Mistake)
                         </div>
-                        <div className="p-3.5 rounded-xl bg-rose-950/20 border border-rose-500/20 text-xs text-rose-200 leading-relaxed font-medium">
+                        <div className="p-3.5 rounded-lg bg-[#e5484d]/10 border border-[#e5484d]/20 text-xs text-zinc-200 leading-relaxed font-normal">
                           {item.commonError}
                         </div>
 
-                        <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1.5">
-                          <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                            Direct Cambridge Chief Examiner Report Quote:
+                        <div className="p-3.5 rounded-lg bg-[#18181b] border border-white/[0.08] space-y-1.5">
+                          <div className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">
+                            Cambridge Chief Examiner Report Quote:
                           </div>
-                          <p className="text-xs text-slate-300 italic leading-relaxed">
+                          <p className="text-xs text-zinc-300 italic leading-relaxed">
                             {item.examinerQuote}
                           </p>
                         </div>
@@ -421,20 +420,20 @@ export const ExaminerPitfallsHeatmap: React.FC<{ subjects: Subject[]; profile: U
 
                       {/* Right: How to Secure 100% Full Marks */}
                       <div className="space-y-3">
-                        <div className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                        <div className="text-xs font-semibold uppercase tracking-wider text-[#4cc38a] flex items-center gap-1.5 font-mono">
                           <CheckCircle2 className="w-4 h-4" />
                           How to Secure Full Cambridge Marks
                         </div>
-                        <div className="p-3.5 rounded-xl bg-emerald-950/20 border border-emerald-500/20 text-xs text-emerald-200 leading-relaxed font-mono whitespace-pre-wrap">
+                        <div className="p-3.5 rounded-lg bg-[#4cc38a]/10 border border-[#4cc38a]/20 text-xs text-[#4cc38a] leading-relaxed font-mono whitespace-pre-wrap">
                           {item.correctMethod}
                         </div>
 
-                        <div className="p-3 rounded-xl bg-indigo-950/20 border border-indigo-500/20 flex items-center justify-between text-xs">
-                          <span className="text-indigo-300 font-semibold">
-                            Targeting Grade 9 (A*)?
+                        <div className="p-3 rounded-lg bg-[#18181b] border border-white/[0.08] flex items-center justify-between text-xs">
+                          <span className="text-zinc-200 font-medium">
+                            Targeting Cambridge 9 (A*)?
                           </span>
-                          <span className="text-[11px] text-slate-400">
-                            Apply this rule on every past paper
+                          <span className="text-xs text-zinc-400">
+                            Apply this rule on past paper drills
                           </span>
                         </div>
                       </div>

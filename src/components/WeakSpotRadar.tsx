@@ -92,76 +92,75 @@ export const WeakSpotRadar: React.FC<WeakSpotRadarProps> = ({
   return (
     <div className="mx-auto max-w-5xl space-y-6 animate-fadeIn pb-12">
       {/* Header Banner */}
-      <div className="rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 p-6 sm:p-8 shadow-xl relative overflow-hidden">
-        <div className="absolute -top-12 -right-12 h-44 w-44 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
+      <div className="rounded-2xl border border-white/[0.08] bg-[#18181b] p-6 sm:p-7 shadow-sm relative overflow-hidden">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-black text-emerald-300 border border-emerald-500/30">
+            <div className="inline-flex items-center gap-1.5 rounded-md bg-[#4cc38a]/10 px-2.5 py-1 text-xs font-medium text-[#4cc38a] border border-[#4cc38a]/20">
               <Activity className="h-3.5 w-3.5" />
               <span>Diagnostic Syllabus Analytics</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white">
+            <h1 className="text-xl sm:text-2xl font-semibold text-white tracking-tight">
               Weak-Spot Radar & Grade 9 Readiness
             </h1>
-            <p className="text-xs sm:text-sm text-slate-300 max-w-2xl">
-              Real-time syllabus diagnostic engine for <strong className="text-white">{subject.name} ({subject.code})</strong>. Identifies the exact bottlenecks holding your grade back from a Cambridge 9 / A*.
+            <p className="text-xs sm:text-sm text-zinc-400 max-w-2xl">
+              Real-time syllabus diagnostic engine for <strong className="text-zinc-200 font-medium">{subject.name} ({subject.code})</strong>. Pinpoints the highest mark-loss topics on Cambridge theory papers.
             </p>
           </div>
 
           {/* Readiness Meter Hero */}
-          <div className="rounded-3xl border border-emerald-500/40 bg-emerald-950/20 p-5 text-center min-w-[150px] shadow-xl shrink-0">
-            <div className="text-[10px] font-black uppercase tracking-wider text-emerald-300">Grade 9 Readiness</div>
-            <div className="text-4xl font-black font-mono text-emerald-400 my-1">
+          <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-4 text-center min-w-[140px] shrink-0">
+            <div className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Grade 9 Readiness</div>
+            <div className="text-3xl font-semibold font-mono tabular-nums text-[#4cc38a] my-1">
               {overallReadiness}%
             </div>
-            <div className="text-[11px] font-semibold text-slate-300">
-              Target: <strong className="text-amber-300">{profile.targetGrade}</strong>
+            <div className="text-xs text-zinc-400">
+              Target: <strong className="text-amber-300 font-medium">{profile.targetGrade}</strong>
             </div>
           </div>
         </div>
       </div>
 
       {/* Top 3 Grade 9 Bottlenecks Card */}
-      <div className="rounded-3xl border border-rose-500/40 bg-gradient-to-br from-rose-950/20 via-slate-900 to-slate-950 p-6 shadow-xl space-y-4">
+      <div className="rounded-2xl border border-[#e5484d]/30 bg-[#18181b] p-5 sm:p-6 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <ShieldAlert className="h-5 w-5 text-rose-400" />
-            <h2 className="text-base font-bold text-white uppercase tracking-wider">
+            <ShieldAlert className="h-4 w-4 text-[#e5484d]" />
+            <h2 className="text-xs font-semibold text-zinc-200 uppercase tracking-wider font-mono">
               Top 3 Grade 9 Bottlenecks (High Mark Loss)
             </h2>
           </div>
-          <span className="text-xs text-rose-300 font-semibold">Priority Revision Focus</span>
+          <span className="text-xs text-[#e5484d] font-medium">Priority Revision Focus</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
           {bottlenecks.map((item, idx) => (
             <div
               key={item.topic}
-              className="rounded-2xl border border-rose-500/30 bg-slate-950/80 p-4 space-y-3 flex flex-col justify-between"
+              className="rounded-xl border border-white/[0.08] bg-[#141416] p-4 space-y-3 flex flex-col justify-between"
             >
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="rounded-md bg-rose-500/20 px-2 py-0.5 text-[10px] font-black text-rose-300 border border-rose-500/30">
+                  <span className="rounded-md bg-[#e5484d]/10 px-2 py-0.5 text-[11px] font-mono font-medium text-[#e5484d] border border-[#e5484d]/20">
                     Risk #{idx + 1}
                   </span>
-                  <span className="font-mono text-xs font-bold text-rose-400">
+                  <span className="font-mono tabular-nums text-xs font-semibold text-[#e5484d]">
                     {item.masteryPercent}% Mastery
                   </span>
                 </div>
 
-                <h3 className="text-sm font-bold text-white leading-tight">
+                <h3 className="text-sm font-semibold text-zinc-100 leading-tight">
                   {item.topic}
                 </h3>
 
-                <p className="text-[11px] text-slate-400 leading-snug">
-                  <strong className="text-slate-300">Frequent Trap:</strong> {item.commonMistake}
+                <p className="text-xs text-zinc-400 leading-snug">
+                  <strong className="text-zinc-300 font-medium">Frequent Trap:</strong> {item.commonMistake}
                 </p>
               </div>
 
               <button
                 type="button"
                 onClick={() => onLaunchTopicPractice?.(item.topic)}
-                className="w-full flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-rose-500/20 to-amber-500/20 border border-rose-500/40 py-2 text-xs font-bold text-rose-200 hover:bg-rose-500/30 transition cursor-pointer"
+                className="w-full flex items-center justify-center gap-1.5 rounded-lg bg-[#FF5B37] hover:bg-[#F97316] py-2 text-xs font-semibold text-white transition cursor-pointer"
               >
                 <span>Drill Past Paper Questions</span>
                 <ChevronRight className="h-3.5 w-3.5" />
@@ -174,14 +173,14 @@ export const WeakSpotRadar: React.FC<WeakSpotRadarProps> = ({
       {/* Full Syllabus Topic Breakdown */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
-            <Layers className="h-4 w-4 text-emerald-400" />
+          <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider font-mono flex items-center gap-2">
+            <Layers className="h-4 w-4 text-[#4cc38a]" />
             <span>Complete Syllabus Mastery Heatmap ({topicMasteries.length} Topics)</span>
           </h2>
-          <span className="text-xs text-slate-400">Updated automatically from your quiz and solver attempts</span>
+          <span className="text-xs text-zinc-500">Auto-calculated from solver & test attempts</span>
         </div>
 
-        <div className="grid grid-cols-1 gap-3">
+        <div className="grid grid-cols-1 gap-2.5">
           {topicMasteries.map((tm) => {
             const isMastered = tm.status === 'mastered';
             const isCritical = tm.status === 'critical';
@@ -189,34 +188,34 @@ export const WeakSpotRadar: React.FC<WeakSpotRadarProps> = ({
             return (
               <div
                 key={tm.topic}
-                className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                className="rounded-xl border border-white/[0.08] bg-[#18181b] p-4 sm:p-4.5 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
               >
                 <div className="space-y-1.5 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm font-bold text-white">{tm.topic}</span>
-                    <span className={`rounded-full px-2 py-0.5 text-[9px] font-black uppercase ${
+                    <span className="text-sm font-medium text-zinc-100">{tm.topic}</span>
+                    <span className={`rounded-md px-2 py-0.5 text-[10px] font-mono uppercase ${
                       isMastered
-                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                        ? 'bg-[#4cc38a]/10 text-[#4cc38a] border border-[#4cc38a]/20'
                         : isCritical
-                        ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                        : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                        ? 'bg-[#e5484d]/10 text-[#e5484d] border border-[#e5484d]/20'
+                        : 'bg-amber-500/10 text-amber-300 border border-amber-500/20'
                     }`}>
                       {isMastered ? 'Mastered' : isCritical ? 'Critical Attention' : 'In Progress'}
                     </span>
-                    <span className="text-[10px] text-slate-500">• {tm.weightInExam}</span>
+                    <span className="text-xs text-zinc-500 font-mono">• {tm.weightInExam}</span>
                   </div>
 
                   {/* Progress Bar */}
                   <div className="flex items-center gap-3">
-                    <div className="h-2 flex-1 rounded-full bg-slate-950 overflow-hidden border border-slate-800">
+                    <div className="h-1.5 flex-1 rounded-full bg-[#141416] overflow-hidden border border-white/[0.06]">
                       <div
                         className={`h-full rounded-full transition-all duration-500 ${
-                          isMastered ? 'bg-emerald-400' : isCritical ? 'bg-rose-500' : 'bg-amber-400'
+                          isMastered ? 'bg-[#4cc38a]' : isCritical ? 'bg-[#e5484d]' : 'bg-amber-400'
                         }`}
                         style={{ width: `${tm.masteryPercent}%` }}
                       />
                     </div>
-                    <span className="text-xs font-bold font-mono text-slate-300 w-10 text-right">
+                    <span className="text-xs font-semibold font-mono tabular-nums text-zinc-300 w-10 text-right">
                       {tm.masteryPercent}%
                     </span>
                   </div>
@@ -226,7 +225,7 @@ export const WeakSpotRadar: React.FC<WeakSpotRadarProps> = ({
                   <button
                     type="button"
                     onClick={() => onLaunchTopicPractice?.(tm.topic)}
-                    className="flex items-center gap-1 rounded-xl border border-slate-700 bg-slate-800/80 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition cursor-pointer"
+                    className="flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-[#222225] hover:bg-white/[0.08] px-3 py-1.5 text-xs font-medium text-zinc-200 transition cursor-pointer"
                   >
                     <span>Practice Topic</span>
                     <ArrowRight className="h-3.5 w-3.5" />
