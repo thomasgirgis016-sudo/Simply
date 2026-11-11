@@ -348,13 +348,13 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
 
       {/* 4. Active Mistake Cards Grid */}
       {filteredMistakes.length === 0 ? (
-        <div className="rounded-3xl border border-dashed border-slate-800 bg-slate-900/30 p-12 text-center space-y-4">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-800/80 text-slate-400">
-            <BookMarked className="h-7 w-7 text-slate-500" />
+        <div className="rounded-2xl border border-dashed border-white/[0.08] bg-[#18181b] p-12 text-center space-y-4">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[#141416] text-white/40 border border-white/[0.06]">
+            <BookMarked className="h-6 w-6 text-white/40" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-white">No mistakes found</h3>
-            <p className="text-xs text-slate-400 mt-1 max-w-md mx-auto">
+            <h3 className="text-base font-semibold text-white">No mistakes found</h3>
+            <p className="text-xs text-white/50 mt-1 max-w-md mx-auto">
               {statusFilter === 'unresolved'
                 ? 'Terrific job! You have no unresolved mistakes under this filter. Keep completing past paper questions!'
                 : 'No mistake logs match your active filters or search terms.'}
@@ -362,7 +362,7 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
           </div>
           <button
             onClick={handleOpenAddModal}
-            className="inline-flex items-center gap-2 rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white shadow-md hover:bg-rose-500 transition cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-lg bg-[#FF5B37] hover:bg-[#F97316] px-4 py-2 text-xs font-medium text-white shadow-sm transition cursor-pointer"
           >
             <Plus className="h-4 w-4" />
             <span>Log a Mistake Manually</span>
@@ -376,33 +376,33 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
             return (
               <div
                 key={mistake.id}
-                className={`rounded-2xl border p-5 transition shadow-sm relative ${
+                className={`rounded-xl border p-5 transition shadow-sm relative ${
                   mistake.isMastered
-                    ? 'border-emerald-500/25 bg-[#18181B]/70 opacity-90'
-                    : 'border-white/[0.06] bg-[#18181B] hover:border-white/[0.12]'
+                    ? 'border-[#4cc38a]/20 bg-[#18181b]/70 opacity-90'
+                    : 'border-white/[0.06] bg-[#18181b] hover:border-white/[0.12]'
                 }`}
               >
                 {/* Card Top: Badges & Action */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="rounded-md bg-white/[0.04] px-2 py-0.5 text-xs font-mono font-medium text-zinc-300 border border-white/[0.08]">
+                    <span className="rounded-md bg-[#222225] px-2 py-0.5 text-xs font-mono font-medium text-white/80 border border-white/[0.08]">
                       {mistake.subjectCode}
                     </span>
                     {mistake.paperCode && (
-                      <span className="rounded-md bg-[#111113] px-2 py-0.5 text-[11px] font-mono text-zinc-400 border border-white/[0.06]">
+                      <span className="rounded-md bg-[#141416] px-2 py-0.5 text-[11px] font-mono text-white/60 border border-white/[0.06]">
                         {mistake.paperCode} {mistake.questionNumber && `• ${mistake.questionNumber}`}
                       </span>
                     )}
                     <span className={`rounded-md px-2 py-0.5 text-[10px] font-medium border ${meta.color}`}>
                       {meta.iconText} {meta.label}
                     </span>
-                    <span className="text-xs font-medium text-zinc-300">
+                    <span className="text-xs font-medium text-white/80">
                       {mistake.topic}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-2 self-end sm:self-auto">
-                    <span className="text-xs font-medium font-mono text-[#FF5B37] bg-[#FF5B37]/10 px-2 py-0.5 rounded border border-[#FF5B37]/20">
+                    <span className="text-xs font-mono font-semibold text-[#FF5B37] bg-[#FF5B37]/10 px-2 py-0.5 rounded border border-[#FF5B37]/20 tabular-nums">
                       Lost: -{mistake.marksLost} / {mistake.totalMarks} Marks
                     </span>
 
@@ -410,17 +410,17 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
                       onClick={() => markMistakeMastered(mistake.id, !mistake.isMastered)}
                       className={`rounded-lg px-2.5 py-1 text-xs font-medium transition cursor-pointer flex items-center gap-1.5 ${
                         mistake.isMastered
-                          ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/25'
-                          : 'bg-[#111113] text-zinc-300 border border-white/[0.08] hover:text-white hover:bg-white/[0.06]'
+                          ? 'bg-[#4cc38a]/15 text-[#4cc38a] border border-[#4cc38a]/30 hover:bg-[#4cc38a]/25'
+                          : 'bg-[#141416] text-white/70 border border-white/[0.08] hover:text-white hover:bg-[#222225]'
                       }`}
                     >
-                      <CheckCircle className={`h-3.5 w-3.5 ${mistake.isMastered ? 'text-emerald-400' : 'text-zinc-500'}`} />
+                      <CheckCircle className={`h-3.5 w-3.5 ${mistake.isMastered ? 'text-[#4cc38a]' : 'text-white/40'}`} />
                       <span>{mistake.isMastered ? 'Mastered' : 'Mark Mastered'}</span>
                     </button>
 
                     <button
                       onClick={() => deleteMistakeItem(mistake.id)}
-                      className="rounded-lg p-1 text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 transition"
+                      className="rounded-lg p-1 text-white/40 hover:text-[#e5484d] hover:bg-[#e5484d]/10 transition cursor-pointer"
                       title="Delete from log"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
@@ -429,8 +429,8 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
                 </div>
 
                 {/* Question Prompt */}
-                <div className="rounded-xl bg-[#111113] p-3.5 text-xs sm:text-sm text-zinc-100 border border-white/[0.06] font-sans leading-relaxed mb-3">
-                  <div className="text-[10px] font-medium uppercase tracking-wider text-zinc-500 mb-1">
+                <div className="rounded-lg bg-[#141416] p-3.5 text-xs sm:text-sm text-white/90 border border-white/[0.06] font-sans leading-relaxed mb-3">
+                  <div className="text-[10px] font-mono font-medium uppercase tracking-wider text-white/40 mb-1">
                     Question Prompt:
                   </div>
                   <MathRenderer content={mistake.questionPrompt} />
@@ -438,20 +438,20 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
 
                 {/* Side-by-Side: What I Wrote vs Official Mark Scheme */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                  <div className="rounded-xl border border-rose-500/20 bg-rose-500/5 p-3">
-                    <div className="text-[10px] font-semibold uppercase tracking-wider text-rose-400 flex items-center gap-1 mb-1">
+                  <div className="rounded-lg border border-[#e5484d]/20 bg-[#e5484d]/[0.03] p-3">
+                    <div className="text-[10px] font-mono font-semibold uppercase tracking-wider text-[#e5484d] flex items-center gap-1 mb-1">
                       <span>Past Slip / What I Wrote:</span>
                     </div>
-                    <div className="text-xs text-rose-200/90 leading-relaxed font-mono">
+                    <div className="text-xs text-[#e5484d] leading-relaxed font-mono">
                       <MathRenderer content={mistake.myMistakeAnswer} />
                     </div>
                   </div>
 
-                  <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3">
-                    <div className="text-[10px] font-semibold uppercase tracking-wider text-emerald-400 flex items-center gap-1 mb-1">
+                  <div className="rounded-lg border border-[#4cc38a]/20 bg-[#4cc38a]/[0.03] p-3">
+                    <div className="text-[10px] font-mono font-semibold uppercase tracking-wider text-[#4cc38a] flex items-center gap-1 mb-1">
                       <span>Official Mark Scheme Solution:</span>
                     </div>
-                    <div className="text-xs text-emerald-200/90 leading-relaxed font-mono">
+                    <div className="text-xs text-[#4cc38a] leading-relaxed font-mono">
                       <MathRenderer content={mistake.markSchemeAnswer} />
                     </div>
                   </div>
@@ -459,11 +459,11 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
 
                 {/* Examiner Report Warning / Advice */}
                 {mistake.examinerTip && (
-                  <div className="rounded-xl border border-white/[0.08] bg-[#111113] p-2.5 flex items-start gap-2 text-xs text-zinc-300">
+                  <div className="rounded-lg border border-white/[0.06] bg-[#141416] p-2.5 flex items-start gap-2 text-xs text-white/80">
                     <AlertTriangle className="h-4 w-4 text-[#FF5B37] shrink-0 mt-0.5" />
                     <div>
-                      <strong className="text-zinc-200 font-semibold block mb-0.5">Examiner Insight:</strong>
-                      <span>{mistake.examinerTip}</span>
+                      <strong className="text-white font-medium block mb-0.5 font-mono">Examiner Insight:</strong>
+                      <span className="font-sans text-white/70">{mistake.examinerTip}</span>
                     </div>
                   </div>
                 )}
@@ -475,19 +475,19 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
 
       {/* 5. Rematch Mode Modal Overlay */}
       {isRematchMode && activeRematchQuestion && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-md overflow-y-auto animate-fadeIn">
-          <div className="relative w-full max-w-3xl rounded-3xl border border-rose-500/40 bg-slate-900 shadow-2xl p-6 sm:p-8 space-y-5 text-slate-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm overflow-y-auto animate-fadeIn">
+          <div className="relative w-full max-w-3xl rounded-2xl border border-white/[0.08] bg-[#18181b] shadow-2xl p-6 sm:p-8 space-y-5 text-white/90">
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
               <div className="flex items-center gap-2">
-                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#FF5B37]/10 text-[#FF5B37] border border-[#FF5B37]/20">
                   <Play className="h-4 w-4 fill-current" />
                 </span>
                 <div>
-                  <h3 className="text-base font-bold text-white">
+                  <h3 className="text-base font-semibold text-white">
                     Rematch Sprint ({rematchIndex + 1} of {rematchPool.length})
                   </h3>
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-[11px] text-white/50 font-mono">
                     {activeRematchQuestion.subjectCode} • {activeRematchQuestion.topic} ({activeRematchQuestion.paperCode || 'Practice'})
                   </p>
                 </div>
@@ -495,18 +495,18 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
 
               <button
                 onClick={() => setIsRematchMode(false)}
-                className="rounded-xl p-2 text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
+                className="rounded-lg p-1.5 text-white/50 hover:text-white hover:bg-[#222225] transition cursor-pointer"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
             {/* Question Display */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4 space-y-1.5">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400">
+            <div className="rounded-xl border border-white/[0.06] bg-[#141416] p-4 space-y-1.5">
+              <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-[#FF5B37]">
                 Solve this problem again:
               </span>
-              <div className="text-sm sm:text-base text-white leading-relaxed">
+              <div className="text-sm sm:text-base text-white leading-relaxed font-sans">
                 <MathRenderer content={activeRematchQuestion.questionPrompt} />
               </div>
             </div>
@@ -514,7 +514,7 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
             {/* Student Working / Answer Area */}
             {!rematchShowAnswer ? (
               <div className="space-y-3">
-                <label className="text-xs font-bold text-slate-400 block">
+                <label className="text-xs font-medium text-white/70 block">
                   Your New Method & Final Answer:
                 </label>
                 <textarea
@@ -522,11 +522,11 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
                   value={rematchStudentInput}
                   onChange={(e) => setRematchStudentInput(e.target.value)}
                   placeholder="Type your working or final answer here to verify..."
-                  className="w-full rounded-xl border border-slate-700 bg-slate-950 p-3 text-xs sm:text-sm font-mono text-white placeholder-slate-600 focus:border-rose-500 focus:outline-none"
+                  className="w-full rounded-lg border border-white/[0.08] bg-[#141416] p-3 text-xs sm:text-sm font-mono text-white placeholder-white/30 focus:border-[#FF5B37] focus:outline-none"
                 />
                 <button
                   onClick={() => setRematchShowAnswer(true)}
-                  className="w-full rounded-xl bg-gradient-to-r from-rose-500 to-amber-600 py-3 text-xs sm:text-sm font-black text-white shadow-lg hover:brightness-110 transition cursor-pointer"
+                  className="w-full rounded-lg bg-[#FF5B37] hover:bg-[#F97316] py-3 text-xs sm:text-sm font-medium text-white shadow-sm transition cursor-pointer"
                 >
                   Reveal Mark Scheme & Check My Solution
                 </button>
@@ -535,29 +535,29 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
               <div className="space-y-4 animate-fadeIn">
                 {/* Comparison Card */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="rounded-xl border border-rose-500/30 bg-rose-950/20 p-3 text-xs">
-                    <span className="text-[10px] font-bold text-rose-400 uppercase tracking-wider block mb-1">
+                  <div className="rounded-lg border border-[#e5484d]/30 bg-[#e5484d]/[0.04] p-3 text-xs">
+                    <span className="text-[10px] font-mono font-semibold text-[#e5484d] uppercase tracking-wider block mb-1">
                       Your Previous Error:
                     </span>
-                    <div className="text-rose-200 font-mono">
+                    <div className="text-[#e5484d] font-mono">
                       <MathRenderer content={activeRematchQuestion.myMistakeAnswer} />
                     </div>
                   </div>
 
-                  <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-3 text-xs">
-                    <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block mb-1">
+                  <div className="rounded-lg border border-[#4cc38a]/30 bg-[#4cc38a]/[0.04] p-3 text-xs">
+                    <span className="text-[10px] font-mono font-semibold text-[#4cc38a] uppercase tracking-wider block mb-1">
                       Official Mark Scheme Steps:
                     </span>
-                    <div className="text-emerald-200 font-mono">
+                    <div className="text-[#4cc38a] font-mono">
                       <MathRenderer content={activeRematchQuestion.markSchemeAnswer} />
                     </div>
                   </div>
                 </div>
 
                 {activeRematchQuestion.examinerTip && (
-                  <div className="rounded-xl border border-amber-500/30 bg-amber-950/20 p-3 text-xs text-amber-200">
-                    <strong className="text-amber-400 block mb-0.5">Examiner Advice:</strong>
-                    <span>{activeRematchQuestion.examinerTip}</span>
+                  <div className="rounded-lg border border-amber-500/20 bg-amber-500/[0.04] p-3 text-xs text-amber-200/90">
+                    <strong className="text-amber-300 block mb-0.5 font-mono">Examiner Advice:</strong>
+                    <span className="font-sans">{activeRematchQuestion.examinerTip}</span>
                   </div>
                 )}
 
@@ -565,14 +565,14 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
                 <div className="flex items-center gap-3 pt-2">
                   <button
                     onClick={() => handleRematchNext(false)}
-                    className="flex-1 rounded-xl border border-slate-700 bg-slate-800 py-2.5 text-xs font-bold text-slate-300 hover:text-white transition cursor-pointer"
+                    className="flex-1 rounded-lg border border-white/[0.08] bg-[#141416] py-2.5 text-xs font-medium text-white/70 hover:text-white hover:bg-[#222225] transition cursor-pointer"
                   >
                     Still Needs Work (Keep Unresolved)
                   </button>
 
                   <button
                     onClick={() => handleRematchNext(true)}
-                    className="flex-1 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 py-2.5 text-xs font-black text-slate-950 shadow-md hover:brightness-110 transition cursor-pointer flex items-center justify-center gap-1.5"
+                    className="flex-1 rounded-lg bg-[#4cc38a] hover:bg-[#3fb07a] py-2.5 text-xs font-semibold text-slate-950 shadow-sm transition cursor-pointer flex items-center justify-center gap-1.5"
                   >
                     <CheckCircle className="h-4 w-4" />
                     <span>Got It Right! Mark Mastered (+25 XP)</span>
@@ -586,19 +586,19 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
 
       {/* 6. Add New Mistake Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto animate-fadeIn">
-          <div className="relative w-full max-w-2xl rounded-3xl border border-slate-700 bg-slate-900 shadow-2xl p-6 sm:p-7 space-y-4 text-slate-200">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm overflow-y-auto animate-fadeIn">
+          <div className="relative w-full max-w-2xl rounded-2xl border border-white/[0.08] bg-[#18181b] shadow-2xl p-6 sm:p-7 space-y-4 text-white/90">
+            <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
               <div className="flex items-center gap-2">
-                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#FF5B37]/10 text-[#FF5B37] border border-[#FF5B37]/20">
                   <Plus className="h-4 w-4" />
                 </span>
-                <h3 className="text-base font-bold text-white">Log a Question to Error Log</h3>
+                <h3 className="text-base font-semibold text-white">Log a Question to Error Log</h3>
               </div>
 
               <button
                 onClick={() => setIsAddModalOpen(false)}
-                className="rounded-xl p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
+                className="rounded-lg p-1.5 text-white/50 hover:text-white hover:bg-[#222225] transition cursor-pointer"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -607,11 +607,11 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
             <form onSubmit={handleAddNewSubmit} className="space-y-3.5 text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                 <div>
-                  <label className="font-bold text-slate-400 block mb-1">Subject</label>
+                  <label className="font-medium text-white/70 block mb-1">Subject</label>
                   <select
                     value={newSubjectCode}
                     onChange={(e) => setNewSubjectCode(e.target.value)}
-                    className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-xs text-white focus:border-rose-500 focus:outline-none"
+                    className="w-full rounded-lg border border-white/[0.08] bg-[#141416] p-2.5 text-xs text-white focus:border-[#FF5B37] focus:outline-none"
                   >
                     {subjects.map((s) => (
                       <option key={s.id} value={s.code}>
@@ -622,73 +622,73 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-400 block mb-1">Paper Code (Optional)</label>
+                  <label className="font-medium text-white/70 block mb-1">Paper Code (Optional)</label>
                   <input
                     type="text"
                     value={newPaperCode}
                     onChange={(e) => setNewPaperCode(e.target.value)}
                     placeholder="e.g. 0580/42/M/J/23"
-                    className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-xs text-white focus:border-rose-500 focus:outline-none font-mono"
+                    className="w-full rounded-lg border border-white/[0.08] bg-[#141416] p-2.5 text-xs text-white focus:border-[#FF5B37] focus:outline-none font-mono"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-400 block mb-1">Question & Topic</label>
+                  <label className="font-medium text-white/70 block mb-1">Question & Topic</label>
                   <input
                     type="text"
                     value={newTopic}
                     onChange={(e) => setNewTopic(e.target.value)}
                     placeholder="e.g. Q4(b) - Bearings"
-                    className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-xs text-white focus:border-rose-500 focus:outline-none"
+                    className="w-full rounded-lg border border-white/[0.08] bg-[#141416] p-2.5 text-xs text-white focus:border-[#FF5B37] focus:outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="font-bold text-slate-400 block mb-1">Question Prompt *</label>
+                <label className="font-medium text-white/70 block mb-1">Question Prompt *</label>
                 <textarea
                   rows={2}
                   required
                   value={newPrompt}
                   onChange={(e) => setNewPrompt(e.target.value)}
                   placeholder="Paste the question statement (KaTeX formulas supported, e.g. $2x + 3 = 11$)..."
-                  className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-xs text-white focus:border-rose-500 focus:outline-none font-sans"
+                  className="w-full rounded-lg border border-white/[0.08] bg-[#141416] p-2.5 text-xs text-white focus:border-[#FF5B37] focus:outline-none font-sans"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <div>
-                  <label className="font-bold text-rose-400 block mb-1">What I Wrote / My Error *</label>
+                  <label className="font-medium text-[#e5484d] block mb-1 font-mono">What I Wrote / My Error *</label>
                   <textarea
                     rows={2}
                     required
                     value={newMyAnswer}
                     onChange={(e) => setNewMyAnswer(e.target.value)}
                     placeholder="e.g. Forgot to convert to seconds, wrote 15 instead of 900..."
-                    className="w-full rounded-xl border border-rose-500/30 bg-slate-950 p-2.5 text-xs text-white focus:border-rose-500 focus:outline-none font-mono"
+                    className="w-full rounded-lg border border-[#e5484d]/30 bg-[#141416] p-2.5 text-xs text-[#e5484d] focus:border-[#e5484d] focus:outline-none font-mono"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-emerald-400 block mb-1">Official Mark Scheme Solution *</label>
+                  <label className="font-medium text-[#4cc38a] block mb-1 font-mono">Official Mark Scheme Solution *</label>
                   <textarea
                     rows={2}
                     required
                     value={newMarkScheme}
                     onChange={(e) => setNewMarkScheme(e.target.value)}
                     placeholder="e.g. 900 J (M1 for 15 x 60, A1 for 900)..."
-                    className="w-full rounded-xl border border-emerald-500/30 bg-slate-950 p-2.5 text-xs text-white focus:border-emerald-500 focus:outline-none font-mono"
+                    className="w-full rounded-lg border border-[#4cc38a]/30 bg-[#141416] p-2.5 text-xs text-[#4cc38a] focus:border-[#4cc38a] focus:outline-none font-mono"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                 <div>
-                  <label className="font-bold text-slate-400 block mb-1">Primary Error Reason</label>
+                  <label className="font-medium text-white/70 block mb-1">Primary Error Reason</label>
                   <select
                     value={newReason}
                     onChange={(e) => setNewReason(e.target.value as MistakeReason)}
-                    className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-xs text-white focus:border-rose-500 focus:outline-none"
+                    className="w-full rounded-lg border border-white/[0.08] bg-[#141416] p-2.5 text-xs text-white focus:border-[#FF5B37] focus:outline-none"
                   >
                     <option value="careless_math">Careless Arithmetic / Sign Slip</option>
                     <option value="misread_command">Misread Command / Question Trap</option>
@@ -700,52 +700,52 @@ export const MistakeNotebookView: React.FC<MistakeNotebookViewProps> = ({
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-400 block mb-1">Marks Lost</label>
+                  <label className="font-medium text-white/70 block mb-1">Marks Lost</label>
                   <input
                     type="number"
                     min={1}
                     max={15}
                     value={newMarksLost}
                     onChange={(e) => setNewMarksLost(Number(e.target.value))}
-                    className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-xs text-white focus:border-rose-500 focus:outline-none"
+                    className="w-full rounded-lg border border-white/[0.08] bg-[#141416] p-2.5 text-xs text-white focus:border-[#FF5B37] focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-400 block mb-1">Total Question Marks</label>
+                  <label className="font-medium text-white/70 block mb-1">Total Question Marks</label>
                   <input
                     type="number"
                     min={1}
                     max={15}
                     value={newTotalMarks}
                     onChange={(e) => setNewTotalMarks(Number(e.target.value))}
-                    className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-xs text-white focus:border-rose-500 focus:outline-none"
+                    className="w-full rounded-lg border border-white/[0.08] bg-[#141416] p-2.5 text-xs text-white focus:border-[#FF5B37] focus:outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="font-bold text-slate-400 block mb-1">Examiner Advice (Optional)</label>
+                <label className="font-medium text-white/70 block mb-1">Examiner Advice (Optional)</label>
                 <input
                   type="text"
                   value={newExaminerTip}
                   onChange={(e) => setNewExaminerTip(e.target.value)}
                   placeholder="e.g. Always check if the question says 'Give your answer in standard form'..."
-                  className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-xs text-white focus:border-rose-500 focus:outline-none"
+                  className="w-full rounded-lg border border-white/[0.08] bg-[#141416] p-2.5 text-xs text-white focus:border-[#FF5B37] focus:outline-none"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-white/[0.06]">
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer"
+                  className="rounded-lg border border-white/[0.08] bg-[#141416] px-4 py-2 text-xs font-medium text-white/60 hover:text-white hover:bg-[#222225] transition cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="rounded-xl bg-gradient-to-r from-rose-500 to-amber-600 px-5 py-2 text-xs font-bold text-white shadow-md hover:brightness-110 transition cursor-pointer"
+                  className="rounded-lg bg-[#FF5B37] hover:bg-[#F97316] px-5 py-2 text-xs font-medium text-white shadow-sm transition cursor-pointer"
                 >
                   Save to Error Log
                 </button>

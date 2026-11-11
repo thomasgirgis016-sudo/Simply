@@ -276,19 +276,19 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
   }, [subject.id, subject.code]);
 
   return (
-    <div className="mx-auto flex h-[calc(100dvh-135px)] sm:h-[calc(100vh-180px)] max-w-4xl flex-col rounded-2xl sm:rounded-3xl border border-slate-800 bg-slate-900/90 shadow-2xl backdrop-blur-md overflow-hidden">
+    <div className="mx-auto flex h-[calc(100dvh-135px)] sm:h-[calc(100vh-180px)] max-w-4xl flex-col rounded-2xl border border-white/[0.08] bg-[#18181b] shadow-2xl backdrop-blur-md overflow-hidden">
       {/* Chat Header */}
-      <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950/70 px-4 py-3 sm:px-6 sm:py-4">
+      <div className="flex items-center justify-between border-b border-white/[0.06] bg-[#141416] px-4 py-3 sm:px-6 sm:py-3.5">
         <div className="flex items-center gap-2.5 sm:gap-3">
-          <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm">
-            <GraduationCap className="h-5 w-5" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#FF5B37]/10 text-[#FF5B37] border border-[#FF5B37]/20 shadow-sm">
+            <GraduationCap className="h-4.5 w-4.5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-bold text-white text-sm">Examiner Walkthrough Co-Pilot</h3>
-              <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+              <h3 className="font-semibold text-white text-sm">Examiner Walkthrough Co-Pilot</h3>
+              <span className="flex h-1.5 w-1.5 rounded-full bg-[#4cc38a]" />
             </div>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-white/50 font-mono">
               Personalized for {subject.code} • Target Goal: {profile.targetGrade}
             </p>
           </div>
@@ -296,7 +296,7 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
 
         <button
           onClick={handleClear}
-          className="rounded-xl border border-slate-800 bg-slate-900/80 p-2 text-slate-400 hover:bg-slate-800 hover:text-white transition"
+          className="rounded-lg border border-white/[0.08] bg-[#18181b] p-2 text-white/50 hover:bg-[#222225] hover:text-white transition cursor-pointer"
           title="Clear Conversation"
         >
           <Trash2 className="h-4 w-4" />
@@ -313,30 +313,30 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
               className={`flex items-start gap-3 ${isUser ? 'flex-row-reverse' : ''}`}
             >
               <div
-                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-xs font-bold ${
+                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-semibold ${
                   isUser
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-blue-950/80 text-blue-300 border border-blue-800/50'
+                    ? 'bg-[#FF5B37] text-white'
+                    : 'bg-[#222225] text-white/80 border border-white/[0.08]'
                 }`}
               >
                 {isUser ? <User className="h-4 w-4" /> : <GraduationCap className="h-4 w-4" />}
               </div>
 
               <div
-                className={`max-w-[85%] rounded-2xl p-4 shadow-sm ${
+                className={`max-w-[85%] rounded-xl p-3.5 shadow-sm ${
                   isUser
-                    ? 'bg-blue-600 text-white'
-                    : 'border border-slate-800 bg-slate-950/70 text-slate-200'
+                    ? 'bg-[#FF5B37] text-white'
+                    : 'border border-white/[0.06] bg-[#141416] text-white/90'
                 }`}
               >
                 {!isUser && (
-                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-blue-400 mb-1.5">
+                  <div className="flex items-center gap-1.5 text-[10px] font-mono font-semibold uppercase tracking-wider text-[#FF5B37] mb-1.5">
                     <BookOpen className="h-3 w-3" />
                     <span>Examiner Guidance</span>
                   </div>
                 )}
                 <MathRenderer content={m.content} className="text-xs sm:text-sm leading-relaxed" />
-                <p className={`mt-2 text-[10px] text-right ${isUser ? 'text-blue-100' : 'text-slate-500'}`}>
+                <p className={`mt-2 text-[10px] text-right font-mono ${isUser ? 'text-white/70' : 'text-white/40'}`}>
                   {m.timestamp}
                 </p>
               </div>
@@ -346,11 +346,11 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
 
         {loading && (
           <div className="flex items-start gap-3">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blue-950/80 text-blue-300 border border-blue-800/50">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#222225] text-white/80 border border-white/[0.08]">
               <GraduationCap className="h-4 w-4" />
             </div>
-            <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4 text-xs text-slate-400 flex items-center gap-2">
-              <RefreshCw className="h-3.5 w-3.5 animate-spin text-blue-400" />
+            <div className="rounded-xl border border-white/[0.06] bg-[#141416] p-3.5 text-xs text-white/60 flex items-center gap-2 font-mono">
+              <RefreshCw className="h-3.5 w-3.5 animate-spin text-[#FF5B37]" />
               Examiner Co-Pilot is evaluating mark scheme criteria...
             </div>
           </div>
@@ -361,8 +361,8 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
 
       {/* Exam Code & Question Quick Selector */}
       {examQuestionsForSubject.length > 0 && (
-        <div className="border-t border-slate-800/80 bg-slate-950/80 px-4 py-2 flex items-center gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-sky-400 shrink-0 flex items-center gap-1">
+        <div className="border-t border-white/[0.06] bg-[#141416] px-4 py-2 flex items-center gap-2 overflow-x-auto no-scrollbar">
+          <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-[#FF5B37] shrink-0 flex items-center gap-1">
             <BookOpen className="h-3 w-3" />
             Exam Qs & Mark Schemes:
           </span>
@@ -371,12 +371,12 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
               key={p.id}
               type="button"
               onClick={() => handleSend(`Show me ${p.paperCode} ${p.session} ${p.questionNumber} question and mark scheme`)}
-              className="shrink-0 rounded-lg border border-sky-500/30 bg-sky-950/50 px-2.5 py-1 text-[11px] text-sky-200 hover:border-sky-400 hover:bg-sky-900/60 transition cursor-pointer flex items-center gap-1"
+              className="shrink-0 rounded-lg border border-white/[0.06] bg-[#18181b] px-2.5 py-1 text-[11px] text-white/70 hover:border-[#FF5B37]/30 hover:text-white transition cursor-pointer flex items-center gap-1"
               title={`Ask Examiner Co-Pilot for ${p.paperCode} ${p.questionNumber}: ${p.topic}`}
             >
-              <span className="font-mono text-[10px] text-sky-300">{p.paperCode}</span>
-              <span className="font-bold">{p.questionNumber}</span>
-              <span className="text-[10px] text-slate-400 font-normal">({p.topic})</span>
+              <span className="font-mono text-[10px] text-[#FF5B37]">{p.paperCode}</span>
+              <span className="font-semibold">{p.questionNumber}</span>
+              <span className="text-[10px] text-white/40 font-normal">({p.topic})</span>
             </button>
           ))}
           <button
@@ -384,7 +384,7 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
             onClick={() => {
               setInput(`For ${examQuestionsForSubject[0].paperCode} ${examQuestionsForSubject[0].questionNumber}, my answer is: `);
             }}
-            className="shrink-0 rounded-lg border border-emerald-500/30 bg-emerald-950/40 px-2.5 py-1 text-[11px] text-emerald-300 hover:bg-emerald-900/50 transition cursor-pointer flex items-center gap-1"
+            className="shrink-0 rounded-lg border border-[#4cc38a]/30 bg-[#4cc38a]/10 px-2.5 py-1 text-[11px] text-[#4cc38a] hover:bg-[#4cc38a]/20 transition cursor-pointer flex items-center gap-1"
             title="Type your answer to receive line-by-line mark scheme grading"
           >
             <CheckCircle className="h-3 w-3" />
@@ -394,14 +394,14 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
       )}
 
       {/* Quick Prompts Bar */}
-      <div className="border-t border-slate-800/80 bg-slate-950/50 px-4 py-2 flex items-center gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
-        <HelpCircle className="h-3.5 w-3.5 text-blue-400 shrink-0" />
+      <div className="border-t border-white/[0.06] bg-[#141416]/80 px-4 py-2 flex items-center gap-2 overflow-x-auto no-scrollbar">
+        <HelpCircle className="h-3.5 w-3.5 text-[#FF5B37] shrink-0" />
         {quickQuestions.map((q, idx) => (
           <button
             key={idx}
             type="button"
             onClick={() => handleSend(q)}
-            className="shrink-0 rounded-lg border border-slate-800 bg-slate-900/90 px-3 py-1 text-[11px] text-slate-300 hover:border-blue-500 hover:text-white transition cursor-pointer"
+            className="shrink-0 rounded-lg border border-white/[0.06] bg-[#18181b] px-3 py-1 text-[11px] text-white/60 hover:border-white/[0.12] hover:text-white transition cursor-pointer"
           >
             {q}
           </button>
@@ -409,7 +409,7 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
       </div>
 
       {/* Input Bar */}
-      <div className="border-t border-slate-800 bg-slate-950 p-2.5 sm:p-4">
+      <div className="border-t border-white/[0.06] bg-[#141416] p-2.5 sm:p-3.5">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -422,12 +422,12 @@ export const AiTutorChat: React.FC<AiTutorChatProps> = ({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={`Ask a question or enter exam code & Q# (e.g. 0580/42 Q6 or "Grade my answer: ...")...`}
-            className="flex-1 rounded-xl sm:rounded-2xl border border-slate-700 bg-slate-900 px-3.5 sm:px-4 py-2.5 sm:py-3 text-base sm:text-sm text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+            className="flex-1 rounded-lg border border-white/[0.08] bg-[#18181b] px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder-white/30 focus:border-[#FF5B37] focus:outline-none"
           />
           <button
             type="submit"
             disabled={!input.trim() || loading}
-            className="flex h-11 w-11 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-blue-600 hover:bg-blue-500 text-white shadow-sm transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#FF5B37] hover:bg-[#F97316] text-white shadow-sm transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             <Send className="h-4 w-4" />
           </button>

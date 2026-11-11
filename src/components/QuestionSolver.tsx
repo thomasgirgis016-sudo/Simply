@@ -902,7 +902,7 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
                   type="button"
                   onClick={handleSolve}
                   disabled={loading || (!questionText.trim() && !studentTypedWorking.trim() && !selectedImage)}
-                  className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 text-xs sm:text-sm font-medium text-white shadow-sm hover:bg-blue-500 transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg bg-[#FF5B37] px-6 py-2.5 text-xs sm:text-sm font-medium text-white shadow-sm hover:bg-[#F97316] transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {loading ? (
                     <>
@@ -921,7 +921,7 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
                   type="button"
                   onClick={handleGradeHandwritten}
                   disabled={loading || (!questionText.trim() && !studentTypedWorking.trim() && !selectedImage)}
-                  className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 text-xs sm:text-sm font-medium text-white shadow-sm hover:bg-blue-500 transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg bg-[#FF5B37] px-6 py-2.5 text-xs sm:text-sm font-medium text-white shadow-sm hover:bg-[#F97316] transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {loading ? (
                     <>
@@ -1283,18 +1283,18 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
 
           {/* Examiner Walkthrough Follow-up */}
           {onOpenChatWithQuestion && (
-            <div className="flex items-center justify-between rounded-xl border border-slate-700/60 bg-slate-800/80 p-4 shadow-sm">
+            <div className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-[#141416] p-4 shadow-sm">
               <div className="flex items-center gap-3">
-                <BookOpen className="h-5 w-5 text-blue-400" />
+                <BookOpen className="h-5 w-5 text-[#FF5B37]" />
                 <div>
-                  <p className="text-xs font-bold text-white">Need a detailed walkthrough on this problem?</p>
-                  <p className="text-[11px] text-slate-400">Consult the Examiner Walkthrough Co-Pilot for step derivations or similar past paper questions.</p>
+                  <p className="text-xs font-semibold text-white">Need a detailed walkthrough on this problem?</p>
+                  <p className="text-[11px] text-white/50">Consult the Examiner Walkthrough Co-Pilot for step derivations or similar past paper questions.</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => onOpenChatWithQuestion(result.questionText)}
-                className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-xs font-medium text-white hover:bg-blue-500 transition shadow-sm cursor-pointer"
+                className="flex items-center gap-1.5 rounded-lg bg-[#FF5B37] px-4 py-2 text-xs font-medium text-white hover:bg-[#F97316] transition shadow-sm cursor-pointer"
               >
                 <span>Consult Examiner Walkthrough</span>
                 <ArrowRight className="h-3.5 w-3.5" />
@@ -1533,13 +1533,13 @@ Line 3: Final velocity v = 2.0 / 2.0 = 1.0  [Note: Student omitted units m/s]`);
                   <button
                     type="button"
                     onClick={() => setIsReportModalOpen(false)}
-                    className="rounded-xl border border-slate-800 px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white transition cursor-pointer"
+                    className="rounded-lg border border-white/[0.08] bg-[#141416] px-4 py-2 text-xs font-medium text-white/60 hover:text-white hover:bg-[#222225] transition cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 px-5 py-2 text-xs font-bold text-white hover:from-rose-500 hover:to-pink-500 transition shadow-md cursor-pointer"
+                    className="rounded-lg bg-[#FF5B37] hover:bg-[#F97316] px-5 py-2 text-xs font-medium text-white transition shadow-sm cursor-pointer"
                   >
                     Submit Report
                   </button>
