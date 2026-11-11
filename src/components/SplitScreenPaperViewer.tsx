@@ -325,43 +325,43 @@ export const SplitScreenPaperViewer: React.FC<SplitScreenPaperViewerProps> = ({
   return (
     <div className="mx-auto max-w-6xl space-y-5">
       {/* Top Controls Bar */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-4 shadow-lg backdrop-blur-md flex flex-wrap items-center justify-between gap-3">
+      <div className="rounded-2xl border border-white/[0.08] bg-[#18181b] p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
-            <Columns className="h-5 w-5" />
+          <div className="h-9 w-9 rounded-lg bg-[#FF5B37]/10 border border-[#FF5B37]/20 flex items-center justify-center text-[#FF5B37]">
+            <Columns className="h-4 w-4" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-sm sm:text-base font-bold text-white">
+              <h2 className="text-sm sm:text-base font-semibold text-white">
                 Dual-Pane Paper & Mark Scheme Practice
               </h2>
-              <span className="rounded-md bg-indigo-500/10 px-2 py-0.5 text-[10px] font-semibold text-indigo-400 border border-indigo-500/20">
+              <span className="rounded-md bg-[#222225] px-2 py-0.5 text-xs font-mono font-medium text-white/80 border border-white/[0.08]">
                 {activeSubject.code}
               </span>
             </div>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-white/50">
               Simulate actual Cambridge & Edexcel paper conditions side-by-side with official examiners' criteria.
             </p>
           </div>
         </div>
 
         {/* Pacing Timer */}
-        <div className="flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-950/80 px-3 py-1.5 shadow-sm">
-          <Clock className="h-4 w-4 text-amber-400" />
-          <span className="font-mono text-xs sm:text-sm font-bold text-white">
+        <div className="flex items-center gap-2 rounded-lg border border-white/[0.08] bg-[#141416] px-3 py-1.5 shadow-sm">
+          <Clock className="h-3.5 w-3.5 text-amber-400" />
+          <span className="font-mono text-xs sm:text-sm font-semibold text-white tabular-nums">
             {formatTimer(timerSeconds)}
           </span>
-          <span className="text-[10px] text-slate-500">/ {targetTimeMinutes}m target</span>
+          <span className="text-[10px] text-white/40 font-mono">/ {targetTimeMinutes}m target</span>
           <button
             onClick={() => setIsTimerRunning(!isTimerRunning)}
-            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            className="p-1 rounded-md text-white/60 hover:text-white hover:bg-[#222225] transition cursor-pointer"
             title={isTimerRunning ? 'Pause timer' : 'Start exam pacing timer'}
           >
-            {isTimerRunning ? <Pause className="h-3.5 w-3.5 text-amber-400" /> : <Play className="h-3.5 w-3.5 text-emerald-400" />}
+            {isTimerRunning ? <Pause className="h-3.5 w-3.5 text-amber-400" /> : <Play className="h-3.5 w-3.5 text-[#4cc38a]" />}
           </button>
           <button
             onClick={handleResetTimer}
-            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            className="p-1 rounded-md text-white/60 hover:text-white hover:bg-[#222225] transition cursor-pointer"
             title="Reset timer"
           >
             <RotateCcw className="h-3.5 w-3.5" />
@@ -371,19 +371,19 @@ export const SplitScreenPaperViewer: React.FC<SplitScreenPaperViewerProps> = ({
         {/* Mark Scheme Toggle */}
         <div className="flex items-center gap-2">
           {/* Mobile switcher */}
-          <div className="md:hidden flex rounded-xl bg-slate-950 p-1 border border-slate-800">
+          <div className="md:hidden flex rounded-lg bg-[#141416] p-0.5 border border-white/[0.06]">
             <button
               onClick={() => setMobilePane('question')}
-              className={`rounded-lg px-2.5 py-1 text-xs font-bold transition ${
-                mobilePane === 'question' ? 'bg-indigo-600 text-white' : 'text-slate-400'
+              className={`rounded-md px-2.5 py-1 text-xs font-medium transition ${
+                mobilePane === 'question' ? 'bg-[#FF5B37] text-white shadow-sm' : 'text-white/60'
               }`}
             >
               Question
             </button>
             <button
               onClick={() => setMobilePane('markscheme')}
-              className={`rounded-lg px-2.5 py-1 text-xs font-bold transition ${
-                mobilePane === 'markscheme' ? 'bg-indigo-600 text-white' : 'text-slate-400'
+              className={`rounded-md px-2.5 py-1 text-xs font-medium transition ${
+                mobilePane === 'markscheme' ? 'bg-[#FF5B37] text-white shadow-sm' : 'text-white/60'
               }`}
             >
               Mark Scheme
@@ -391,19 +391,19 @@ export const SplitScreenPaperViewer: React.FC<SplitScreenPaperViewerProps> = ({
           </div>
 
           {/* Paper View Mode Toggle */}
-          <div className="flex rounded-xl bg-slate-950 p-1 border border-slate-800">
+          <div className="flex rounded-lg bg-[#141416] p-0.5 border border-white/[0.06]">
             <button
               onClick={() => setPaperViewMode('transcribed')}
-              className={`rounded-lg px-2.5 py-1 text-xs font-bold transition cursor-pointer ${
-                paperViewMode === 'transcribed' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
+              className={`rounded-md px-2.5 py-1 text-xs font-medium transition cursor-pointer ${
+                paperViewMode === 'transcribed' ? 'bg-[#FF5B37] text-white shadow-sm' : 'text-white/60 hover:text-white'
               }`}
             >
               Transcribed
             </button>
             <button
               onClick={() => setPaperViewMode('pdf')}
-              className={`rounded-lg px-2.5 py-1 text-xs font-bold transition cursor-pointer flex items-center gap-1 ${
-                paperViewMode === 'pdf' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
+              className={`rounded-md px-2.5 py-1 text-xs font-medium transition cursor-pointer flex items-center gap-1 ${
+                paperViewMode === 'pdf' ? 'bg-[#FF5B37] text-white shadow-sm' : 'text-white/60 hover:text-white'
               }`}
             >
               <FileText className="h-3 w-3" />
@@ -413,16 +413,16 @@ export const SplitScreenPaperViewer: React.FC<SplitScreenPaperViewerProps> = ({
 
           <button
             onClick={() => setIsMarkSchemeVisible(!isMarkSchemeVisible)}
-            className="hidden md:flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800/80 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-700 transition cursor-pointer"
+            className="hidden md:flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-[#141416] hover:bg-[#222225] px-3 py-1.5 text-xs font-medium text-white/80 hover:text-white transition cursor-pointer"
           >
             {isMarkSchemeVisible ? (
               <>
-                <EyeOff className="h-3.5 w-3.5 text-slate-400" />
+                <EyeOff className="h-3.5 w-3.5 text-white/50" />
                 <span>Hide Mark Scheme (Blind Practice)</span>
               </>
             ) : (
               <>
-                <Eye className="h-3.5 w-3.5 text-emerald-400" />
+                <Eye className="h-3.5 w-3.5 text-[#4cc38a]" />
                 <span>Reveal Mark Scheme</span>
               </>
             )}
@@ -431,9 +431,9 @@ export const SplitScreenPaperViewer: React.FC<SplitScreenPaperViewerProps> = ({
       </div>
 
       {/* Question Selector Tabs */}
-      <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+      <div className="flex items-center justify-between border-b border-white/[0.06] pb-2">
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
-          <span className="text-xs font-semibold text-slate-400 shrink-0">Questions:</span>
+          <span className="text-xs font-medium text-white/40 shrink-0 font-mono">Questions:</span>
           {questions.map((q, idx) => (
             <button
               key={idx}
@@ -441,10 +441,10 @@ export const SplitScreenPaperViewer: React.FC<SplitScreenPaperViewerProps> = ({
                 setActiveQuestionIndex(idx);
                 setTimerSeconds(0);
               }}
-              className={`shrink-0 rounded-lg px-3 py-1 text-xs font-bold transition cursor-pointer ${
+              className={`shrink-0 rounded-lg px-3 py-1 text-xs font-medium transition cursor-pointer font-mono tabular-nums ${
                 activeQuestionIndex === idx
-                  ? 'bg-indigo-600 text-white shadow-md'
-                  : 'bg-slate-800 text-slate-400 hover:text-white'
+                  ? 'bg-[#FF5B37] text-white shadow-sm'
+                  : 'bg-[#141416] text-white/60 hover:text-white border border-white/[0.06] hover:bg-[#222225]'
               }`}
             >
               Q{q.number}{q.subpart} ({q.marks}m)
@@ -452,7 +452,7 @@ export const SplitScreenPaperViewer: React.FC<SplitScreenPaperViewerProps> = ({
           ))}
         </div>
 
-        <span className="hidden sm:inline-block text-[11px] text-slate-400 font-medium">
+        <span className="hidden sm:inline-block text-[11px] text-white/40 font-mono">
           Source: {currentQ.paperRef}
         </span>
       </div>
@@ -460,24 +460,24 @@ export const SplitScreenPaperViewer: React.FC<SplitScreenPaperViewerProps> = ({
       {/* Dual Pane Layout */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-5 min-h-[500px]">
         {/* LEFT PANE: Question Paper */}
-        <div className={`rounded-2xl border border-slate-800 bg-slate-900/90 p-5 sm:p-6 shadow-xl flex flex-col justify-between ${
+        <div className={`rounded-2xl border border-white/[0.08] bg-[#18181b] p-5 sm:p-6 shadow-sm flex flex-col justify-between ${
           isMarkSchemeVisible ? 'md:col-span-6' : 'md:col-span-12'
         } ${mobilePane === 'question' ? 'block' : 'hidden md:flex'}`}>
           {paperViewMode === 'pdf' ? (
             <div className="flex-1 flex flex-col space-y-3 min-h-[460px]">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
                 <div className="flex items-center gap-2">
-                  <span className="rounded-md bg-indigo-500/20 px-2 py-0.5 text-xs font-bold text-indigo-300">
+                  <span className="rounded-md bg-[#222225] px-2 py-0.5 text-xs font-mono font-medium text-white/80 border border-white/[0.08]">
                     Official Exam PDF
                   </span>
-                  <span className="text-xs font-bold text-white">{currentQ.paperRef}</span>
+                  <span className="text-xs font-medium text-white/90 font-mono">{currentQ.paperRef}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <a
                     href={officialPdfUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1 text-[11px] font-bold text-indigo-300 hover:text-white hover:bg-slate-700 transition"
+                    className="flex items-center gap-1 rounded-lg border border-white/[0.08] bg-[#141416] px-2.5 py-1 text-[11px] font-medium text-white/70 hover:text-white hover:bg-[#222225] transition"
                   >
                     <ExternalLink className="h-3 w-3" />
                     <span>Open in Tab</span>
@@ -485,7 +485,7 @@ export const SplitScreenPaperViewer: React.FC<SplitScreenPaperViewerProps> = ({
                   <a
                     href={officialPdfUrl}
                     download
-                    className="flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1 text-[11px] font-bold text-slate-300 hover:text-white hover:bg-slate-700 transition"
+                    className="flex items-center gap-1 rounded-lg border border-white/[0.08] bg-[#141416] px-2.5 py-1 text-[11px] font-medium text-white/70 hover:text-white hover:bg-[#222225] transition"
                   >
                     <Download className="h-3 w-3" />
                     <span>Download</span>
@@ -494,7 +494,7 @@ export const SplitScreenPaperViewer: React.FC<SplitScreenPaperViewerProps> = ({
               </div>
 
               {/* Embedded PDF iframe / Document Preview */}
-              <div className="flex-1 rounded-xl overflow-hidden border border-slate-800 bg-slate-950 flex flex-col min-h-[420px]">
+              <div className="flex-1 rounded-lg overflow-hidden border border-white/[0.06] bg-[#141416] flex flex-col min-h-[420px]">
                 <iframe
                   src={`${officialPdfUrl}#view=FitH&toolbar=0`}
                   title="Official Examination Paper PDF"
@@ -504,14 +504,14 @@ export const SplitScreenPaperViewer: React.FC<SplitScreenPaperViewerProps> = ({
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
                 <div className="flex items-center gap-2">
-                  <span className="rounded-md bg-indigo-500/20 px-2 py-0.5 text-xs font-bold text-indigo-300">
+                  <span className="rounded-md bg-[#222225] px-2 py-0.5 text-xs font-mono font-medium text-white/80 border border-white/[0.08]">
                     Question Paper
                   </span>
-                  <span className="text-xs font-bold text-white">Q{currentQ.number}{currentQ.subpart}</span>
+                  <span className="text-xs font-semibold text-white font-mono">Q{currentQ.number}{currentQ.subpart}</span>
                 </div>
-                <span className="rounded-full bg-slate-800 px-2.5 py-0.5 text-xs font-bold text-amber-300 border border-slate-700">
+                <span className="rounded-md bg-[#222225] px-2.5 py-0.5 text-xs font-mono font-semibold text-white/90 border border-white/[0.08] tabular-nums">
                   [{currentQ.marks} Marks]
                 </span>
               </div>
@@ -520,56 +520,56 @@ export const SplitScreenPaperViewer: React.FC<SplitScreenPaperViewerProps> = ({
               <div className="py-2">
                 <MathRenderer
                   content={currentQ.questionPrompt}
-                  className="text-sm sm:text-base text-slate-100 font-medium leading-relaxed"
+                  className="text-sm sm:text-base text-white/90 leading-relaxed font-sans"
                 />
               </div>
 
               {/* Math / Equation Box */}
               {currentQ.diagramOrMath && (
-                <div className="rounded-xl border border-slate-700/60 bg-slate-950 p-4 text-center overflow-x-auto">
-                  <MathRenderer content={`$$${currentQ.diagramOrMath}$$`} className="text-sm sm:text-base text-indigo-300 font-bold" />
+                <div className="rounded-lg border border-white/[0.06] bg-[#141416] p-4 text-center overflow-x-auto font-mono">
+                  <MathRenderer content={`$$${currentQ.diagramOrMath}$$`} className="text-sm sm:text-base text-white/90 font-semibold" />
                 </div>
               )}
             </div>
           )}
 
-          <div className="border-t border-slate-800 pt-3 mt-6 flex items-center justify-between text-xs text-slate-400">
+          <div className="border-t border-white/[0.06] pt-3 mt-6 flex items-center justify-between text-xs text-white/40 font-mono">
             <span>Standard Pacing: {targetTimeMinutes} mins</span>
-            <span className="font-semibold text-slate-300">Cambridge & Edexcel Standard</span>
+            <span className="text-white/60">Cambridge & Edexcel Standard</span>
           </div>
         </div>
 
         {/* RIGHT PANE: Mark Scheme */}
         {isMarkSchemeVisible && (
-          <div className={`rounded-2xl border border-emerald-500/25 bg-slate-900/90 p-5 sm:p-6 shadow-xl flex flex-col justify-between md:col-span-6 ${
+          <div className={`rounded-2xl border border-white/[0.08] bg-[#18181b] p-5 sm:p-6 shadow-sm flex flex-col justify-between md:col-span-6 ${
             mobilePane === 'markscheme' ? 'block' : 'hidden md:flex'
           }`}>
           <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
               <div className="flex items-center gap-2">
-                <span className="rounded-md bg-emerald-500/20 px-2 py-0.5 text-xs font-bold text-emerald-300 border border-emerald-500/30">
+                <span className="rounded-md bg-[#4cc38a]/15 px-2 py-0.5 text-xs font-mono font-medium text-[#4cc38a] border border-[#4cc38a]/30">
                   Official Mark Scheme
                 </span>
-                <span className="text-xs text-slate-400">Examiner Guidelines</span>
+                <span className="text-xs text-white/50">Examiner Guidelines</span>
               </div>
-              <span className="text-xs font-mono font-bold text-emerald-400">Total: {currentQ.marks} Marks</span>
+              <span className="text-xs font-mono font-semibold text-white/90 tabular-nums">Total: {currentQ.marks} Marks</span>
             </div>
 
             {/* Step-by-Step Mark Breakdown */}
             <div className="space-y-3">
               {currentQ.markSchemePoints.map((pt, idx) => (
-                <div key={idx} className="rounded-xl border border-slate-800 bg-slate-950/70 p-3 space-y-1">
+                <div key={idx} className="rounded-lg border border-white/[0.04] bg-[#141416] p-3 space-y-1">
                   <div className="flex items-center justify-between">
-                    <span className="inline-block rounded bg-indigo-500/15 px-1.5 py-0.5 text-[10px] font-bold text-indigo-300 border border-indigo-500/20">
+                    <span className="inline-block rounded bg-[#222225] px-1.5 py-0.5 text-[10px] font-mono font-medium text-white/90 border border-white/[0.08]">
                       {pt.markType}
                     </span>
-                    <span className="text-[10px] text-slate-500">Step {idx + 1}</span>
+                    <span className="text-[10px] text-white/40 font-mono">Step {idx + 1}</span>
                   </div>
-                  <div className="text-xs text-slate-200">
+                  <div className="text-xs text-white/80 font-sans">
                     <MathRenderer content={pt.requirement} />
                   </div>
                   {pt.guidance && (
-                    <p className="text-[10px] text-slate-400 italic pt-0.5">
+                    <p className="text-[10px] text-white/50 italic pt-0.5 font-sans">
                       Examiner Note: {pt.guidance}
                     </p>
                   )}
@@ -578,28 +578,28 @@ export const SplitScreenPaperViewer: React.FC<SplitScreenPaperViewerProps> = ({
             </div>
 
             {/* Final Answer */}
-            <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-3">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400">
+            <div className="rounded-lg border border-[#4cc38a]/30 bg-[#4cc38a]/[0.05] p-3">
+              <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-[#4cc38a]">
                 Final Required Answer:
               </span>
-              <div className="mt-1 text-sm font-bold text-white">
+              <div className="mt-1 text-sm font-semibold text-white font-mono">
                 <MathRenderer content={currentQ.finalAnswer} />
               </div>
             </div>
 
             {/* Examiner Trap */}
             {currentQ.examinerTrap && (
-              <div className="rounded-xl border border-amber-500/20 bg-amber-950/20 p-3 text-xs text-amber-200/90 leading-relaxed">
-                <div className="flex items-center gap-1.5 font-bold text-amber-300 mb-0.5 text-[11px]">
+              <div className="rounded-lg border border-[#e5484d]/30 bg-[#e5484d]/[0.04] p-3 text-xs text-[#e5484d] leading-relaxed">
+                <div className="flex items-center gap-1.5 font-semibold text-[#e5484d] mb-0.5 text-[11px]">
                   <AlertTriangle className="h-3.5 w-3.5" />
                   Official Examiner Report Warning:
                 </div>
-                {currentQ.examinerTrap}
+                <p className="font-sans text-white/80">{currentQ.examinerTrap}</p>
               </div>
             )}
           </div>
 
-          <div className="border-t border-slate-800 pt-3 mt-4 text-[11px] text-slate-500 text-right">
+          <div className="border-t border-white/[0.06] pt-3 mt-4 text-[11px] text-white/40 text-right font-mono">
             Verified with published examiner mark criteria
           </div>
         </div>
