@@ -93,21 +93,21 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-3 sm:p-4 backdrop-blur-sm overflow-y-auto">
-      <div className="relative my-auto w-full max-w-2xl rounded-2xl border border-slate-700/80 bg-slate-900/95 p-5 sm:p-6 shadow-2xl shadow-indigo-500/10 max-h-[92dvh] overflow-y-auto">
+      <div className="relative my-auto w-full max-w-2xl rounded-2xl border border-white/[0.08] bg-[#18181b] p-5 sm:p-6 shadow-2xl max-h-[92dvh] overflow-y-auto">
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white transition cursor-pointer"
+          className="absolute right-4 top-4 h-8 w-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:bg-[#222225] transition cursor-pointer"
         >
-          <X className="h-5 w-5" />
+          <X className="h-4 w-4" />
         </button>
 
         <div className="flex items-center gap-3 mb-6">
-          <div className="rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 p-2.5 text-white shadow-lg shadow-cyan-500/30">
+          <div className="rounded-lg bg-[#222225] border border-white/[0.08] p-2 text-[#FF5B37]">
             <School className="h-5 w-5" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white">Student Academic Profile</h2>
-            <p className="text-xs text-slate-400">Personalize your IGCSE curriculum, exam board & subjects</p>
+            <h2 className="text-base sm:text-lg font-medium text-[#ededed]">Student Academic Profile</h2>
+            <p className="text-xs text-[#a1a1a6]">Personalize your IGCSE curriculum, exam board & subjects</p>
           </div>
         </div>
 
@@ -115,44 +115,46 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           {/* Student Name & Parent WhatsApp */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-                Your Name / Nickname
+              <label className="block text-xs font-medium text-[#a1a1a6] mb-1.5">
+                Your name / Nickname
               </label>
               <div className="relative">
-                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500" />
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Thomas"
-                  className="w-full rounded-xl border border-slate-700 bg-slate-950/80 py-2.5 pl-10 pr-3 text-base sm:text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
+                  className="w-full rounded-lg border border-white/[0.08] bg-[#141416] py-2 pl-9 pr-3 text-xs text-[#ededed] placeholder-zinc-500 focus:border-[#FF5B37] focus:outline-none transition"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5 flex items-center justify-between">
-                <span>Parent's WhatsApp</span>
-                <span className="text-[10px] text-emerald-400 font-semibold">Weekly Report</span>
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-medium text-[#a1a1a6]">
+                  Parent's WhatsApp
+                </label>
+                <span className="text-[10px] text-[#4cc38a] font-medium font-mono">Weekly Report</span>
+              </div>
               <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm leading-none">📱</span>
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500" />
                 <input
                   type="tel"
                   value={parentWhatsapp}
                   onChange={(e) => setParentWhatsapp(e.target.value)}
                   placeholder="e.g. +20 100 123 4567"
-                  className="w-full rounded-xl border border-slate-700 bg-slate-950/80 py-2.5 pl-10 pr-3 text-base sm:text-sm text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none"
+                  className="w-full rounded-lg border border-white/[0.08] bg-[#141416] py-2 pl-9 pr-3 text-xs text-[#ededed] placeholder-zinc-500 font-mono focus:border-[#FF5B37] focus:outline-none transition"
                 />
               </div>
-              <p className="text-[10px] text-slate-400 mt-1">Automatic weekly report sent to this number</p>
+              <p className="text-[11px] text-[#85858b] mt-1">Automatic weekly report sent to this number</p>
             </div>
           </div>
 
           {/* Exam Board */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
-              Exam Board
+            <label className="block text-xs font-medium text-[#a1a1a6] mb-2">
+              Exam board
             </label>
             <div className="grid grid-cols-3 gap-2.5">
               {(['CIE', 'Edexcel', 'Both'] as ExamBoard[]).map((b) => (
@@ -160,14 +162,14 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   key={b}
                   type="button"
                   onClick={() => setBoard(b)}
-                  className={`rounded-xl border p-3 text-left transition ${
+                  className={`rounded-lg border p-3 text-left transition cursor-pointer ${
                     board === b
-                      ? 'border-indigo-500 bg-indigo-950/40 text-white ring-1 ring-indigo-500 shadow-md'
-                      : 'border-slate-800 bg-slate-950/50 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                      ? 'border-[#FF5B37] bg-[#222225] text-white shadow-sm'
+                      : 'border-white/[0.08] bg-[#141416] text-zinc-400 hover:border-white/[0.14] hover:text-[#ededed]'
                   }`}
                 >
-                  <p className="text-xs font-bold">{b === 'CIE' ? 'Cambridge (CIE)' : b === 'Edexcel' ? 'Pearson Edexcel' : 'Dual / Both'}</p>
-                  <p className="text-[10px] text-slate-400 mt-0.5">
+                  <p className="text-xs font-medium">{b === 'CIE' ? 'Cambridge (CIE)' : b === 'Edexcel' ? 'Pearson Edexcel' : 'Dual / Both'}</p>
+                  <p className="text-[10px] text-[#85858b] mt-0.5">
                     {b === 'CIE' ? '0580, 0625, 0620...' : b === 'Edexcel' ? '4MA1, 4PH1, 4CH1...' : 'All syllabus codes'}
                   </p>
                 </button>
@@ -178,13 +180,13 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           {/* Grade / Year Level */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
-                Current Year / Grade
+              <label className="block text-xs font-medium text-[#a1a1a6] mb-2">
+                Current year / Grade
               </label>
               <select
                 value={grade}
                 onChange={(e) => setGrade(e.target.value as GradeLevel)}
-                className="w-full rounded-xl border border-slate-700 bg-slate-950/80 py-2.5 px-3 text-sm text-white focus:border-indigo-500 focus:outline-none"
+                className="w-full rounded-lg border border-white/[0.08] bg-[#141416] py-2 px-3 text-xs text-[#ededed] focus:border-[#FF5B37] focus:outline-none transition cursor-pointer"
               >
                 <option value="Year 9 / Grade 8">Year 9 / Grade 8 (Foundations & Prep)</option>
                 <option value="Year 10 / Grade 9 (IGCSE Yr 1)">Year 10 / Grade 9 (IGCSE Year 1)</option>
@@ -195,8 +197,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
-                Target Grade Goal
+              <label className="block text-xs font-medium text-[#a1a1a6] mb-2">
+                Target grade goal
               </label>
               <div className="flex items-center gap-2">
                 {(['9 / A*', '8 / A*', '7 / A'] as TargetGrade[]).map((tg) => (
@@ -204,10 +206,10 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                     key={tg}
                     type="button"
                     onClick={() => setTargetGrade(tg)}
-                    className={`flex-1 rounded-xl border py-2.5 text-center text-xs font-bold transition flex items-center justify-center gap-1.5 ${
+                    className={`flex-1 rounded-lg border py-2 text-center text-xs font-mono font-medium transition flex items-center justify-center gap-1.5 cursor-pointer ${
                       targetGrade === tg
-                        ? 'border-amber-500 bg-amber-950/30 text-amber-300 ring-1 ring-amber-500 shadow-md'
-                        : 'border-slate-800 bg-slate-950/50 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                        ? 'border-[#FF5B37] bg-[#222225] text-white shadow-sm'
+                        : 'border-white/[0.08] bg-[#141416] text-zinc-400 hover:border-white/[0.14] hover:text-[#ededed]'
                     }`}
                   >
                     <Award className="h-3.5 w-3.5 text-amber-400" />
@@ -222,25 +224,25 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           <div className="space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300">
-                  Enrolled Subjects ({baseSubjectIds.length} Core Locked + {extraSubjectIds.length} Extra)
+                <label className="block text-xs font-medium text-[#a1a1a6]">
+                  Enrolled subjects ({baseSubjectIds.length} Core Locked + {extraSubjectIds.length} Extra)
                 </label>
-                <p className="text-[11px] text-slate-400">
-                  Core subjects chosen at registration are <strong className="text-indigo-400">permanently locked</strong>. Extra subjects can be added for <strong className="text-amber-400">+£{EXTRA_SUBJECT_PRICE_GBP}/month</strong>.
+                <p className="text-[11px] text-[#85858b]">
+                  Core subjects chosen at registration are <strong className="text-zinc-300 font-medium">permanently locked</strong>. Extra subjects can be added for <strong className="text-amber-400 font-medium">+£{EXTRA_SUBJECT_PRICE_GBP}/month</strong>.
                 </p>
               </div>
 
               {/* Subject Level Filter Tabs */}
-              <div className="flex items-center gap-1 rounded-xl bg-slate-950 p-1 border border-slate-800 self-start sm:self-auto">
+              <div className="flex items-center gap-1 rounded-lg bg-[#141416] p-1 border border-white/[0.06] self-start sm:self-auto">
                 {(['All', 'O Level / IGCSE', 'AS Level', 'A Level'] as const).map((lvl) => (
                   <button
                     key={lvl}
                     type="button"
                     onClick={() => setSelectedLevel(lvl)}
-                    className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition cursor-pointer ${
+                    className={`rounded-md px-2.5 py-1 text-[11px] font-medium transition cursor-pointer ${
                       selectedLevel === lvl
-                        ? 'bg-indigo-600 text-white shadow-sm'
-                        : 'text-slate-400 hover:text-white'
+                        ? 'bg-[#222225] border border-white/[0.08] text-white shadow-sm'
+                        : 'text-zinc-400 hover:text-white'
                     }`}
                   >
                     {lvl === 'All' ? 'All Levels' : lvl.split(' / ')[0]}
@@ -251,29 +253,29 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
 
             {/* Notification Banners */}
             {warningMsg && (
-              <div className="flex items-center gap-2 rounded-xl border border-amber-500/40 bg-amber-500/10 p-2.5 text-xs text-amber-300 animate-fadeIn">
+              <div className="flex items-center gap-2 rounded-lg border border-amber-500/40 bg-[#141416] p-2.5 text-xs text-amber-300 animate-fadeIn">
                 <AlertCircle className="h-4 w-4 shrink-0 text-amber-400" />
                 <span>{warningMsg}</span>
               </div>
             )}
             {successMsg && (
-              <div className="flex items-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-2.5 text-xs text-emerald-300 animate-fadeIn">
-                <Check className="h-4 w-4 shrink-0 text-emerald-400" />
+              <div className="flex items-center gap-2 rounded-lg border border-[#4cc38a]/40 bg-[#141416] p-2.5 text-xs text-[#4cc38a] animate-fadeIn">
+                <Check className="h-4 w-4 shrink-0 text-[#4cc38a]" />
                 <span>{successMsg}</span>
               </div>
             )}
 
             {/* Interactive Extra Subject Enrollment Confirmation Card */}
             {pendingExtraSubject && (
-              <div className="rounded-2xl border border-amber-500/60 bg-gradient-to-r from-amber-500/15 via-slate-900 to-amber-500/10 p-4 space-y-3 shadow-xl">
+              <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-4 space-y-3">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2">
                     <Sparkles className="h-4 w-4 text-amber-400 shrink-0" />
                     <div>
-                      <span className="font-bold text-sm text-white block">
-                        Add Extra Subject: {pendingExtraSubject.name} ({pendingExtraSubject.code})
+                      <span className="font-medium text-sm text-[#ededed] block">
+                        Add extra subject: {pendingExtraSubject.name} ({pendingExtraSubject.code})
                       </span>
-                      <span className="text-[11px] text-slate-300">
+                      <span className="text-[11px] text-[#85858b]">
                         {pendingExtraSubject.board} • {pendingExtraSubject.level || 'IGCSE / O Level'}
                       </span>
                     </div>
@@ -281,30 +283,30 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setPendingExtraSubject(null)}
-                    className="text-slate-400 hover:text-white transition cursor-pointer"
+                    className="text-zinc-500 hover:text-white transition cursor-pointer"
                   >
                     <X className="h-4 w-4" />
                   </button>
                 </div>
-                <p className="text-xs text-slate-300 leading-relaxed">
+                <p className="text-xs text-[#a1a1a6] leading-relaxed">
                   Students cannot replace their 5 core registered subjects, but you can enroll in additional syllabuses for <strong className="text-amber-300">£{EXTRA_SUBJECT_PRICE_GBP} per month</strong>. Immediate access to topical classifieds, mark schemes, and examiner AI grading is included.
                 </p>
-                <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-amber-500/20">
-                  <span className="text-xs font-mono font-bold text-amber-300 bg-amber-500/20 px-3 py-1 rounded-lg border border-amber-500/30">
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-white/[0.06]">
+                  <span className="text-xs font-mono font-medium text-amber-300 bg-[#222225] px-2.5 py-1 rounded-md border border-white/[0.08]">
                     +£{EXTRA_SUBJECT_PRICE_GBP} / month
                   </span>
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
                       onClick={() => setPendingExtraSubject(null)}
-                      className="px-3 py-1.5 rounded-xl border border-slate-700 bg-slate-800 text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer"
+                      className="px-3 py-1.5 rounded-lg border border-white/[0.08] bg-[#222225] text-xs font-medium text-zinc-300 hover:text-white transition cursor-pointer"
                     >
                       Cancel
                     </button>
                     <button
                       type="button"
                       onClick={handleConfirmExtraSubject}
-                      className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-xs font-black text-slate-950 shadow-md hover:from-amber-400 hover:to-amber-500 transition cursor-pointer"
+                      className="px-3.5 py-1.5 rounded-lg bg-[#FF5B37] hover:bg-[#F97316] text-xs font-medium text-white transition cursor-pointer"
                     >
                       Confirm & Add (+£{EXTRA_SUBJECT_PRICE_GBP}/mo)
                     </button>
@@ -322,12 +324,12 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   <div
                     key={sub.id}
                     onClick={() => handleSubjectClick(sub)}
-                    className={`flex items-center justify-between rounded-xl border p-2.5 transition select-none cursor-pointer ${
+                    className={`flex items-center justify-between rounded-lg border p-2.5 transition select-none cursor-pointer ${
                       isBase
-                        ? 'border-indigo-500 bg-indigo-950/40 text-white ring-1 ring-indigo-500/50'
+                        ? 'border-[#FF5B37]/50 bg-[#222225] text-white shadow-sm'
                         : isExtra
-                        ? 'border-amber-500/70 bg-amber-950/30 text-amber-200 ring-1 ring-amber-500/40 hover:bg-amber-950/50'
-                        : 'border-slate-800 bg-slate-950/40 text-slate-400 hover:border-amber-500/40 hover:bg-slate-900 hover:text-slate-200'
+                        ? 'border-amber-500/40 bg-[#222225] text-amber-200'
+                        : 'border-white/[0.06] bg-[#141416] text-zinc-400 hover:border-white/[0.12] hover:bg-[#1a1a1d] hover:text-[#ededed]'
                     }`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
@@ -337,25 +339,19 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                       />
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <p className="text-xs font-bold text-white leading-tight truncate">{sub.name}</p>
-                          <span className={`rounded px-1.5 py-0.2 text-[9px] font-bold border ${
-                            sub.level === 'A Level'
-                              ? 'bg-purple-500/20 text-purple-300 border-purple-500/30'
-                              : sub.level === 'AS Level'
-                              ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
-                              : 'bg-sky-500/20 text-sky-300 border-sky-500/30'
-                          }`}>
+                          <p className="text-xs font-medium text-[#ededed] leading-tight truncate">{sub.name}</p>
+                          <span className="rounded px-1.5 py-0.5 text-[9px] font-mono border border-white/[0.08] text-zinc-400">
                             {sub.level || 'O Level'}
                           </span>
                         </div>
-                        <p className="text-[10px] text-slate-400 truncate mt-0.5">{sub.code} • {sub.category}</p>
+                        <p className="text-[10px] text-[#85858b] truncate mt-0.5">{sub.code} • {sub.category}</p>
                       </div>
                     </div>
 
                     <div className="shrink-0 ml-2">
                       {isBase ? (
                         <span
-                          className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-500/20 border border-indigo-500/40 text-[10px] font-bold text-indigo-300"
+                          className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#141416] border border-white/[0.08] text-[10px] font-mono text-[#FF5B37]"
                           title="Core base subject chosen at signup (Permanently locked)"
                         >
                           <Lock className="h-3 w-3" />
@@ -363,14 +359,14 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                         </span>
                       ) : isExtra ? (
                         <span
-                          className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/20 border border-amber-500/40 text-[10px] font-bold text-amber-300 hover:bg-rose-500/20 hover:text-rose-300 hover:border-rose-500/40 transition"
+                          className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#141416] border border-amber-500/30 text-[10px] font-mono text-amber-300 hover:text-rose-300 transition"
                           title="Extra enrolled subject (+£28/mo). Click to remove."
                         >
                           <Sparkles className="h-3 w-3" />
                           <span>+£{EXTRA_SUBJECT_PRICE_GBP}/mo</span>
                         </span>
                       ) : (
-                        <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-800 border border-slate-700 text-[10px] font-medium text-slate-400 group-hover:text-amber-300">
+                        <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#222225] border border-white/[0.08] text-[10px] font-mono text-zinc-400">
                           <Plus className="h-3 w-3" />
                           <span>+£{EXTRA_SUBJECT_PRICE_GBP}</span>
                         </span>
@@ -383,18 +379,18 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           </div>
         </div>
 
-        <div className="mt-6 flex items-center justify-end gap-3 border-t border-slate-800 pt-4">
+        <div className="mt-6 flex items-center justify-end gap-3 border-t border-white/[0.06] pt-4">
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl px-4 py-2 text-xs font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition"
+            className="rounded-lg px-3.5 py-1.5 text-xs font-medium text-zinc-400 hover:text-white transition cursor-pointer"
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={handleSave}
-            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-2 text-xs font-semibold text-white shadow-lg shadow-cyan-500/25 hover:from-cyan-400 hover:to-blue-500 transition"
+            className="flex items-center gap-2 rounded-lg bg-[#FF5B37] hover:bg-[#F97316] px-4 py-2 text-xs font-medium text-white transition cursor-pointer"
           >
             <BookOpen className="h-4 w-4" />
             Save Profile & Update Dashboard

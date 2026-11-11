@@ -381,40 +381,13 @@ html.executive .shadow-xl {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   EMBOSSED / NEUMORPHIC & ELECTRIC GLOW AUTH SUITE
+   EXAMINER ARCHIVE & PRECISION NOCTURNAL DESK AUTH & MODAL SUITE
    ═══════════════════════════════════════════════════════════════ */
-@keyframes electricRotate {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
 .electric-glow-border {
   position: relative;
-  border-radius: 28px;
-  overflow: hidden;
-  padding: 2.5px;
-}
-
-.electric-glow-border::before {
-  content: '';
-  position: absolute;
-  top: -60%;
-  left: -60%;
-  width: 220%;
-  height: 220%;
-  background: conic-gradient(
-    transparent,
-    #06b6d4,
-    transparent 28%,
-    #6366f1,
-    transparent 60%,
-    #ec4899,
-    transparent 88%
-  );
-  animation: electricRotate 6s linear infinite;
-  filter: blur(10px);
-  z-index: 0;
-  opacity: 0.85;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background-color: #18181b;
 }
 
 .electric-glow-border > div {
@@ -422,28 +395,26 @@ html.executive .shadow-xl {
   z-index: 1;
 }
 
-/* Embossed Card Surface */
+/* Modal Card Surface */
 .embossed-surface {
-  background: #0d131f;
-  border-radius: 26px;
-  box-shadow: 16px 16px 36px #06090e, 
-              -16px -16px 36px #162033;
+  background: #18181b;
+  border-radius: 16px;
 }
 
-/* Inset Debossed Input Field */
+/* Examiner Inset Input Field */
 .embossed-input-field {
-  background: #090e17;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  box-shadow: inset 4px 4px 8px #04070c, 
-              inset -4px -4px 8px #131c2c;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: #141416;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: #ededed;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
 .embossed-input-field:focus {
-  border-color: rgba(99, 102, 241, 0.6);
-  box-shadow: inset 5px 5px 10px #04070c, 
-              inset -5px -5px 10px #131c2c,
-              0 0 14px rgba(99, 102, 241, 0.35);
+  border-color: #FF5B37;
+  background-color: #18181b;
+  outline: none;
+  box-shadow: 0 0 0 1px rgba(255, 91, 55, 0.25);
 }
 
 /* Raised Embossed Button */
