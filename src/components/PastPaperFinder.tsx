@@ -749,58 +749,60 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
   return (
     <div className="mx-auto max-w-6xl space-y-6 animate-fadeIn pb-16">
       {/* Top Banner */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/[0.06] bg-[#18181B] p-4 sm:p-7 shadow-sm">
+      <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#18181b] p-5 sm:p-7 shadow-sm">
         <div className="relative z-10 max-w-3xl space-y-2">
-          <div className="inline-flex items-center gap-2 rounded-full bg-[#FF5B37]/10 px-3 py-0.5 text-xs font-semibold text-[#FF5B37] border border-[#FF5B37]/20">
+          <div className="inline-flex items-center gap-2 rounded-lg bg-[#222225] px-2.5 py-1 text-xs font-mono font-medium text-zinc-300 border border-white/[0.08]">
             <Search className="h-3.5 w-3.5 text-[#FF5B37]" />
-            <span>Complete Exam Archive • 2010–2026 Series • {OFFICIAL_PAST_PAPER_PDFS.length.toLocaleString()}+ Verified Papers</span>
+            <span>Complete Exam Archive • 2010–2026 Series • <span className="tabular-nums">{OFFICIAL_PAST_PAPER_PDFS.length.toLocaleString()}</span>+ Verified Papers</span>
           </div>
-          <h1 className="text-xl sm:text-3xl font-bold text-zinc-100 tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-semibold text-[#ededed] tracking-tight">
             Cambridge &amp; Edexcel Past Paper Vault
           </h1>
-          <p className="hidden sm:block text-xs sm:text-sm text-zinc-400 leading-relaxed">
+          <p className="hidden sm:block text-xs sm:text-sm text-[#a1a1a6] leading-relaxed">
             Synchronized Question Papers, Mark Schemes, and Examiner Reports. Fast filtering by subject syllabus, examination series, paper component, and question number.
           </p>
         </div>
 
         {/* View Switcher Tabs */}
         <div className="mt-4 sm:mt-6 flex items-center gap-2 border-t border-white/[0.06] pt-3 sm:pt-4">
-          <button
-            onClick={() => setActiveTab('pdf-library')}
-            className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition cursor-pointer ${
-              activeTab === 'pdf-library'
-                ? 'bg-[#FF5B37] text-white shadow-sm'
-                : 'bg-[#111113] text-zinc-300 hover:text-white border border-white/[0.08] hover:border-white/[0.16]'
-            }`}
-          >
-            <FileDown className="h-4 w-4" />
-            <span>Official Paper PDFs</span>
-            <span className="rounded-full bg-black/25 px-2 py-0.5 text-[10px] font-mono text-zinc-300">
-              {OFFICIAL_PAST_PAPER_PDFS.length}+
-            </span>
-          </button>
+          <div className="inline-flex items-center gap-1 rounded-lg bg-[#141416] p-1 border border-white/[0.06] w-full sm:w-auto">
+            <button
+              onClick={() => setActiveTab('pdf-library')}
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 rounded-md px-3.5 py-1.5 text-xs font-medium transition cursor-pointer ${
+                activeTab === 'pdf-library'
+                  ? 'bg-[#FF5B37] text-white shadow-sm'
+                  : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              <FileDown className="h-3.5 w-3.5" />
+              <span>Official Paper PDFs</span>
+              <span className={`rounded px-1.5 py-0.5 text-[10px] font-mono tabular-nums ${activeTab === 'pdf-library' ? 'bg-black/25 text-white' : 'bg-[#222225] text-zinc-400'}`}>
+                {OFFICIAL_PAST_PAPER_PDFS.length}+
+              </span>
+            </button>
 
-          <button
-            onClick={() => setActiveTab('questions')}
-            className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition cursor-pointer ${
-              activeTab === 'questions'
-                ? 'bg-[#FF5B37] text-white shadow-sm'
-                : 'bg-[#111113] text-zinc-300 hover:text-white border border-white/[0.08] hover:border-white/[0.16]'
-            }`}
-          >
-            <Search className="h-4 w-4" />
-            <span>Question &amp; Mark Scheme Finder</span>
-            <span className="rounded-full bg-black/25 px-2 py-0.5 text-[10px] font-mono text-zinc-300">
-              85,000+
-            </span>
-          </button>
+            <button
+              onClick={() => setActiveTab('questions')}
+              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 rounded-md px-3.5 py-1.5 text-xs font-medium transition cursor-pointer ${
+                activeTab === 'questions'
+                  ? 'bg-[#FF5B37] text-white shadow-sm'
+                  : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              <Search className="h-3.5 w-3.5" />
+              <span>Question &amp; Mark Scheme Finder</span>
+              <span className={`rounded px-1.5 py-0.5 text-[10px] font-mono tabular-nums ${activeTab === 'questions' ? 'bg-black/25 text-white' : 'bg-[#222225] text-zinc-400'}`}>
+                85,000+
+              </span>
+            </button>
+          </div>
         </div>
 
         {/* Quick Suggestion Pills */}
         <div className="mt-4 pt-3 border-t border-white/[0.06]">
-          <p className="text-[11px] font-medium text-zinc-400 mb-2 flex items-center gap-1.5">
-            <BookOpen className="h-3 w-3 text-[#FF5B37]" />
-            Popular Exam Papers:
+          <p className="text-xs font-medium text-zinc-400 mb-2 flex items-center gap-1.5">
+            <BookOpen className="h-3.5 w-3.5 text-[#FF5B37]" />
+            Popular exam papers:
           </p>
           <div className="flex flex-wrap gap-1.5">
             {suggestedSearches.map((s, idx) => (
@@ -808,7 +810,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                 key={idx}
                 type="button"
                 onClick={() => setSearchQuery(s)}
-                className="rounded-lg border border-white/[0.06] bg-white/[0.03] px-2.5 py-1 text-[11px] text-zinc-300 hover:border-[#FF5B37]/40 hover:text-white transition cursor-pointer"
+                className="rounded-lg border border-white/[0.06] bg-[#141416] px-2.5 py-1 text-xs text-zinc-300 hover:border-[#FF5B37]/40 hover:text-white transition cursor-pointer font-mono"
               >
                 "{s}"
               </button>
@@ -818,17 +820,17 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
       </div>
 
       {/* Comprehensive Search & Multi-Filter Bar with Year, Paper, Variant */}
-      <div className="rounded-2xl border border-white/[0.06] bg-[#18181B] p-4 sm:p-5 shadow-sm space-y-4">
+      <div className="rounded-2xl border border-white/[0.08] bg-[#18181b] p-4 sm:p-5 shadow-sm space-y-4">
         {/* Dual Search Mode Switcher (Active on Questions Tab) */}
         {activeTab === 'questions' && (
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.06] pb-3">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-zinc-400">Search Engine Mode:</span>
-              <div className="flex items-center rounded-xl bg-[#111113] p-1 border border-white/[0.06]">
+              <span className="text-xs font-medium text-zinc-400">Search mode:</span>
+              <div className="flex items-center rounded-lg bg-[#141416] p-1 border border-white/[0.06]">
                 <button
                   type="button"
                   onClick={() => setSearchMode('modeA')}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+                  className={`rounded-md px-3 py-1 text-xs font-medium transition cursor-pointer flex items-center gap-1.5 ${
                     searchMode === 'modeA'
                       ? 'bg-[#FF5B37] text-white shadow-sm'
                       : 'text-zinc-400 hover:text-white'
@@ -840,7 +842,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                 <button
                   type="button"
                   onClick={() => setSearchMode('modeB')}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+                  className={`rounded-md px-3 py-1 text-xs font-medium transition cursor-pointer flex items-center gap-1.5 ${
                     searchMode === 'modeB'
                       ? 'bg-[#FF5B37] text-white shadow-sm'
                       : 'text-zinc-400 hover:text-white'
@@ -852,10 +854,10 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               </div>
             </div>
 
-            <span className="text-[11px] text-zinc-400">
+            <span className="text-xs text-zinc-400">
               {searchMode === 'modeA'
                 ? 'Type full exam code (e.g. 0580/42/M/J/23 Q4(b))'
-                : 'Select Subject, Year, Variant, Series & Question Pills'}
+                : 'Select subject, year, variant, series & question pills'}
             </span>
           </div>
         )}
@@ -864,7 +866,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
         {(activeTab === 'pdf-library' || searchMode === 'modeA') && (
           <div className="space-y-2">
             <div className="relative">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400" />
               <input
                 type="text"
                 value={searchQuery}
@@ -874,12 +876,12 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                     ? "Search paper code (0580/42), subject name, session (May/June 2023), variant..."
                     : "Enter exam code: e.g. 0580/42/M/J/23 Q4(b) or 0625/21/O/N/22 Q12 or 0620/41/M/J/21 Q3(a)..."
                 }
-                className="w-full rounded-xl border border-white/[0.08] bg-[#111113] py-3 pl-10 pr-10 text-sm text-zinc-100 placeholder-zinc-500 font-mono focus:border-[#FF5B37] focus:outline-none transition-colors"
+                className="w-full rounded-lg border border-white/[0.08] bg-[#141416] py-2 pl-9 pr-9 text-xs text-[#ededed] placeholder-zinc-500 font-mono focus:border-[#FF5B37] focus:outline-none transition"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-zinc-400 hover:text-white"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zinc-400 hover:text-white"
                 >
                   ✕
                 </button>
@@ -888,39 +890,39 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
             {/* Mode A Real-time Parsed Exam Code Breakdown Chips */}
             {activeTab === 'questions' && searchMode === 'modeA' && parsedExamCode && parsedExamCode.confidence >= 0.4 && (
-              <div className="flex flex-wrap items-center gap-1.5 p-2.5 rounded-xl border border-white/[0.08] bg-[#111113] text-xs animate-fadeIn">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-[#FF5B37] mr-1 flex items-center gap-1">
-                  <CheckCircle className="h-3 w-3" />
-                  Code Parsed:
+              <div className="flex flex-wrap items-center gap-1.5 p-2.5 rounded-lg border border-white/[0.08] bg-[#141416] text-xs animate-fadeIn">
+                <span className="text-xs font-medium text-[#FF5B37] mr-1 flex items-center gap-1">
+                  <CheckCircle className="h-3.5 w-3.5" />
+                  Code parsed:
                 </span>
                 {parsedExamCode.subjectCode && (
-                  <span className="rounded-md bg-white/[0.04] px-2 py-0.5 font-mono font-medium text-zinc-200 border border-white/[0.08]">
+                  <span className="rounded-md bg-[#222225] px-2 py-0.5 font-mono text-zinc-200 border border-white/[0.08]">
                     Subject: {parsedExamCode.subjectCode}
                   </span>
                 )}
                 {parsedExamCode.paperNumber && (
-                  <span className="rounded-md bg-white/[0.04] px-2 py-0.5 font-mono font-medium text-zinc-200 border border-white/[0.08]">
+                  <span className="rounded-md bg-[#222225] px-2 py-0.5 font-mono text-zinc-200 border border-white/[0.08]">
                     Paper {parsedExamCode.paperNumber}{parsedExamCode.variant ? ` (Var ${parsedExamCode.variant})` : ''}
                   </span>
                 )}
                 {parsedExamCode.seasonCode && (
-                  <span className="rounded-md bg-white/[0.04] px-2 py-0.5 font-mono font-medium text-zinc-200 border border-white/[0.08]">
+                  <span className="rounded-md bg-[#222225] px-2 py-0.5 font-mono text-zinc-200 border border-white/[0.08]">
                     Series: {parsedExamCode.seasonCode} ({parsedExamCode.sessionName})
                   </span>
                 )}
                 {parsedExamCode.year && (
-                  <span className="rounded-md bg-white/[0.04] px-2 py-0.5 font-mono font-medium text-zinc-200 border border-white/[0.08]">
+                  <span className="rounded-md bg-[#222225] px-2 py-0.5 font-mono tabular-nums text-zinc-200 border border-white/[0.08]">
                     Year: {parsedExamCode.year}
                   </span>
                 )}
                 {parsedExamCode.questionNumber && (
-                  <span className="rounded-md bg-white/[0.04] px-2 py-0.5 font-mono font-medium text-zinc-200 border border-white/[0.08]">
+                  <span className="rounded-md bg-[#222225] px-2 py-0.5 font-mono text-zinc-200 border border-white/[0.08]">
                     Target: {parsedExamCode.questionNumber}
                   </span>
                 )}
                 {parsedExamCode.isMultipleChoice && (
-                  <span className="rounded-md bg-white/[0.04] px-2 py-0.5 text-[10px] font-medium text-zinc-200 border border-white/[0.08]">
-                    MCQ 40 Discrete Items
+                  <span className="rounded-md bg-[#222225] px-2 py-0.5 text-xs font-mono text-zinc-200 border border-white/[0.08]">
+                    MCQ 40 discrete items
                   </span>
                 )}
               </div>
@@ -929,9 +931,9 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             {/* Quick Exam Code & Q# Lookup shortcuts */}
             {activeTab === 'questions' && (
               <div className="flex flex-wrap items-center gap-1.5 pt-0.5 text-xs">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1 shrink-0">
-                  <FileText className="h-3 w-3 text-[#FF5B37]" />
-                  Sample Exam Codes:
+                <span className="text-xs font-medium text-zinc-400 flex items-center gap-1 shrink-0">
+                  <FileText className="h-3.5 w-3.5 text-[#FF5B37]" />
+                  Sample exam codes:
                 </span>
                 {[
                   { label: '0580/42/M/J/23 Q6(b)', query: '0580/42/M/J/23 Q6(b)' },
@@ -945,7 +947,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                     key={idx}
                     type="button"
                     onClick={() => setSearchQuery(shortcut.query)}
-                    className="rounded-lg border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-[11px] text-zinc-300 hover:border-[#FF5B37]/40 hover:text-white transition cursor-pointer font-mono"
+                    className="rounded-lg border border-white/[0.06] bg-[#141416] px-2 py-0.5 text-xs text-zinc-300 hover:border-[#FF5B37]/40 hover:text-white transition cursor-pointer font-mono"
                   >
                     {shortcut.label}
                   </button>
@@ -957,20 +959,20 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
         {/* Mode B: Visual Filter Layout (Horizontal Rows: Row 1 Filters + Row 2 Question Pills) */}
         {activeTab === 'questions' && searchMode === 'modeB' && (
-          <div className="space-y-4 p-4 rounded-2xl border border-white/[0.06] bg-[#111113]">
+          <div className="space-y-4 p-4 rounded-xl border border-white/[0.08] bg-[#141416]">
             {/* Row 1: [ Subject ] [ Year ] [ Variant (1, 2, 3) ] [ Month/Series (M/J, O/N, F/M) ] */}
             <div>
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-[#FF5B37] mb-2">
-                Row 1: Exam Filter Blocks
+              <div className="text-xs font-medium text-[#FF5B37] mb-2">
+                Exam filter parameters
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 text-xs">
                 {/* 1. Subject */}
                 <div>
-                  <label className="text-[10px] font-medium text-zinc-400 mb-1 block">Subject</label>
+                  <label className="text-xs font-medium text-zinc-400 mb-1 block">Subject</label>
                   <select
                     value={selectedSubjectId}
                     onChange={(e) => setSelectedSubjectId(e.target.value)}
-                    className="w-full rounded-xl border border-white/[0.08] bg-[#18181B] p-2 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none truncate transition-colors"
+                    className="w-full rounded-lg border border-white/[0.08] bg-[#18181b] p-2 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none truncate transition-colors"
                   >
                     <option value="all">All Subjects</option>
                     {subjects.map((s) => (
@@ -983,11 +985,11 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
                 {/* 2. Paper Component */}
                 <div>
-                  <label className="text-[10px] font-medium text-zinc-400 mb-1 block">Paper Component</label>
+                  <label className="text-xs font-medium text-zinc-400 mb-1 block">Paper component</label>
                   <select
                     value={selectedPaperNumber}
                     onChange={(e) => setSelectedPaperNumber(e.target.value)}
-                    className="w-full rounded-xl border border-white/[0.08] bg-[#18181B] p-2 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none truncate transition-colors"
+                    className="w-full rounded-lg border border-white/[0.08] bg-[#18181b] p-2 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none truncate transition-colors"
                   >
                     <option value="All">All Papers ({availablePapers.length})</option>
                     {availablePapers.map((p) => (
@@ -1000,11 +1002,11 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
                 {/* 3. Year */}
                 <div>
-                  <label className="text-[10px] font-medium text-zinc-400 mb-1 block">Year</label>
+                  <label className="text-xs font-medium text-zinc-400 mb-1 block">Year</label>
                   <select
                     value={selectedYear}
                     onChange={(e) => setSelectedYear(e.target.value)}
-                    className="w-full rounded-xl border border-white/[0.08] bg-[#18181B] p-2 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
+                    className="w-full rounded-lg border border-white/[0.08] bg-[#18181b] p-2 text-zinc-100 text-xs font-mono tabular-nums cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
                   >
                     <option value="All">All Years (2010–2026)</option>
                     {['2026', '2025', '2024', '2023', '2022', '2021', '2020', '2019', '2018', '2017', '2016', '2015', '2014', '2013', '2012', '2011', '2010'].map((y) => (
@@ -1015,11 +1017,11 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
                 {/* 4. Variant (1, 2, 3) */}
                 <div>
-                  <label className="text-[10px] font-medium text-zinc-400 mb-1 block">Variant</label>
+                  <label className="text-xs font-medium text-zinc-400 mb-1 block">Variant</label>
                   <select
                     value={selectedVariant}
                     onChange={(e) => setSelectedVariant(e.target.value)}
-                    className="w-full rounded-xl border border-white/[0.08] bg-[#18181B] p-2 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
+                    className="w-full rounded-lg border border-white/[0.08] bg-[#18181b] p-2 text-zinc-100 text-xs font-mono cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
                   >
                     <option value="All">All Variants (1, 2, 3)</option>
                     <option value="1">Variant 1</option>
@@ -1030,11 +1032,11 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
                 {/* 5. Month / Series */}
                 <div>
-                  <label className="text-[10px] font-medium text-zinc-400 mb-1 block">Month / Series</label>
+                  <label className="text-xs font-medium text-zinc-400 mb-1 block">Series session</label>
                   <select
                     value={selectedSession}
                     onChange={(e) => setSelectedSession(e.target.value)}
-                    className="w-full rounded-xl border border-white/[0.08] bg-[#18181B] p-2 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
+                    className="w-full rounded-lg border border-white/[0.08] bg-[#18181b] p-2 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
                   >
                     <option value="All">All Series</option>
                     <option value="May/June">May / June (M/J &amp; Edexcel June)</option>
@@ -1051,11 +1053,11 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             {/* Row 2: [ Question Number ] visual pill selector */}
             <div className="pt-2 border-t border-white/[0.06]">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
-                  Select Question Number:
+                <span className="text-xs font-medium text-zinc-400">
+                  Select question number:
                 </span>
-                <span className="text-[10px] text-zinc-500">
-                  {selectedPaperNumber === '1' || selectedPaperNumber === '2' ? '40 Discrete MCQ Items' : '12 Theory Questions'}
+                <span className="text-xs font-mono text-zinc-500">
+                  {selectedPaperNumber === '1' || selectedPaperNumber === '2' ? '40 discrete MCQ items' : '12 theory questions'}
                 </span>
               </div>
 
@@ -1063,10 +1065,10 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                 <button
                   type="button"
                   onClick={() => setSelectedQuestionPill('All')}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition cursor-pointer ${
+                  className={`rounded-lg px-2.5 py-1 text-xs font-medium transition cursor-pointer ${
                     selectedQuestionPill === 'All'
                       ? 'bg-[#FF5B37] text-white shadow-sm'
-                      : 'bg-[#18181B] text-zinc-400 hover:text-white border border-white/[0.06]'
+                      : 'bg-[#18181b] text-zinc-400 hover:text-white border border-white/[0.06]'
                   }`}
                 >
                   All Questions
@@ -1080,10 +1082,10 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                       key={q}
                       type="button"
                       onClick={() => setSelectedQuestionPill(q)}
-                      className={`rounded-lg px-2.5 py-1 text-xs font-mono font-medium transition cursor-pointer ${
+                      className={`rounded-lg px-2.5 py-1 text-xs font-mono tabular-nums font-medium transition cursor-pointer ${
                         isSelected
                           ? 'bg-[#FF5B37] text-white shadow-sm'
-                          : 'bg-[#18181B] text-zinc-300 hover:bg-white/[0.06] border border-white/[0.06]'
+                          : 'bg-[#18181b] text-zinc-300 hover:bg-white/[0.06] border border-white/[0.06]'
                       }`}
                     >
                       {q}
@@ -1099,13 +1101,13 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 text-xs">
           {/* 1. Exam Board */}
           <div>
-            <label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mb-1 block">
-              Exam Board
+            <label className="text-xs font-medium text-zinc-400 mb-1 block">
+              Exam board
             </label>
             <select
               value={selectedBoard}
               onChange={(e) => setSelectedBoard(e.target.value as any)}
-              className="w-full rounded-xl border border-white/[0.08] bg-[#111113] p-2.5 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
+              className="w-full rounded-lg border border-white/[0.08] bg-[#141416] p-2 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
             >
               <option value="All">All Boards (Cambridge, Edexcel, OxfordAQA)</option>
               <option value="CIE">Cambridge (CIE)</option>
@@ -1116,13 +1118,13 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
           {/* 2. Subject Filter */}
           <div>
-            <label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mb-1 block">
+            <label className="text-xs font-medium text-zinc-400 mb-1 block">
               Subject
             </label>
             <select
               value={selectedSubjectId}
               onChange={(e) => setSelectedSubjectId(e.target.value)}
-              className="w-full rounded-xl border border-white/[0.08] bg-[#111113] p-2.5 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none truncate transition-colors"
+              className="w-full rounded-lg border border-white/[0.08] bg-[#141416] p-2 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none truncate transition-colors"
             >
               <option value="all">All Subjects</option>
               {subjects.map((s) => (
@@ -1135,14 +1137,14 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
           {/* 3. Year Filter (2010 - 2026) */}
           <div>
-            <label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mb-1 flex items-center justify-between">
-              <span>Exam Year</span>
-              {selectedYear !== 'All' && <span className="text-[9px] text-[#FF5B37] font-semibold">Active</span>}
+            <label className="text-xs font-medium text-zinc-400 mb-1 flex items-center justify-between">
+              <span>Exam year</span>
+              {selectedYear !== 'All' && <span className="text-[10px] text-[#FF5B37] font-mono font-medium">Active</span>}
             </label>
             <select
               value={selectedYear}
               onChange={(e) => setSelectedYear(e.target.value)}
-              className="w-full rounded-xl border border-white/[0.08] bg-[#111113] p-2.5 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
+              className="w-full rounded-lg border border-white/[0.08] bg-[#141416] p-2 text-zinc-100 text-xs font-mono tabular-nums cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
             >
               <option value="All">All Years (2010–2026)</option>
               <option value="2026">2026 (Specimen &amp; Forecast)</option>
@@ -1167,13 +1169,13 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
           {/* 4. Session / Series Filter */}
           <div>
-            <label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mb-1 block">
-              Exam Series
+            <label className="text-xs font-medium text-zinc-400 mb-1 block">
+              Exam series
             </label>
             <select
               value={selectedSession}
               onChange={(e) => setSelectedSession(e.target.value)}
-              className="w-full rounded-xl border border-white/[0.08] bg-[#111113] p-2.5 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
+              className="w-full rounded-lg border border-white/[0.08] bg-[#141416] p-2 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
             >
               <option value="All">All Series</option>
               <option value="May/June">May / June (Summer - s &amp; Edexcel June)</option>
@@ -1190,14 +1192,14 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             <>
               {/* 5. Paper Component Filter (Paper 1, 2, 3, 4, 5, 6) */}
               <div>
-                <label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mb-1 flex items-center justify-between">
-                  <span>Paper Number</span>
-                  {selectedPaperNumber !== 'All' && <span className="text-[9px] text-[#FF5B37] font-semibold">Active</span>}
+                <label className="text-xs font-medium text-zinc-400 mb-1 flex items-center justify-between">
+                  <span>Paper component</span>
+                  {selectedPaperNumber !== 'All' && <span className="text-[10px] text-[#FF5B37] font-mono font-medium">Active</span>}
                 </label>
                 <select
                   value={selectedPaperNumber}
                   onChange={(e) => setSelectedPaperNumber(e.target.value)}
-                  className="w-full rounded-xl border border-white/[0.08] bg-[#111113] p-2.5 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
+                  className="w-full rounded-lg border border-white/[0.08] bg-[#141416] p-2 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
                 >
                   <option value="All">All Papers ({availablePapers.length} Components)</option>
                   {availablePapers.map((p) => (
@@ -1210,14 +1212,14 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
               {/* 6. Variant Filter (1, 2, 3 & Regional) */}
               <div>
-                <label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mb-1 flex items-center justify-between">
+                <label className="text-xs font-medium text-zinc-400 mb-1 flex items-center justify-between">
                   <span>Variant</span>
-                  {selectedVariant !== 'All' && <span className="text-[9px] text-[#FF5B37] font-semibold">Active</span>}
+                  {selectedVariant !== 'All' && <span className="text-[10px] text-[#FF5B37] font-mono font-medium">Active</span>}
                 </label>
                 <select
                   value={selectedVariant}
                   onChange={(e) => setSelectedVariant(e.target.value)}
-                  className="w-full rounded-xl border border-white/[0.08] bg-[#111113] p-2.5 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
+                  className="w-full rounded-lg border border-white/[0.08] bg-[#141416] p-2 text-zinc-100 text-xs font-mono cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
                 >
                   <option value="All">All Variants (1, 2, 3)</option>
                   <option value="1">Variant 1 (e.g. 11, 21, 41 / Standard)</option>
@@ -1230,14 +1232,14 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             <>
               {/* 5. Classified Topic Filter */}
               <div>
-                <label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mb-1 flex items-center justify-between">
+                <label className="text-xs font-medium text-zinc-400 mb-1 flex items-center justify-between">
                   <span>Topic</span>
-                  {selectedTopic !== 'All' && <span className="text-[9px] text-[#FF5B37] font-semibold">Active</span>}
+                  {selectedTopic !== 'All' && <span className="text-[10px] text-[#FF5B37] font-mono font-medium">Active</span>}
                 </label>
                 <select
                   value={selectedTopic}
                   onChange={(e) => setSelectedTopic(e.target.value)}
-                  className="w-full rounded-xl border border-white/[0.08] bg-[#111113] p-2.5 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
+                  className="w-full rounded-lg border border-white/[0.08] bg-[#141416] p-2 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
                 >
                   <option value="All">All Topics ({availableTopics.length})</option>
                   {availableTopics.map((topic) => (
@@ -1250,14 +1252,14 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
               {/* 6. Difficulty Tier Filter */}
               <div>
-                <label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mb-1 flex items-center justify-between">
-                  <span>Difficulty Tier</span>
-                  {selectedTier !== 'All' && <span className="text-[9px] text-[#FF5B37] font-semibold">Active</span>}
+                <label className="text-xs font-medium text-zinc-400 mb-1 flex items-center justify-between">
+                  <span>Difficulty tier</span>
+                  {selectedTier !== 'All' && <span className="text-[10px] text-[#FF5B37] font-mono font-medium">Active</span>}
                 </label>
                 <select
                   value={selectedTier}
                   onChange={(e) => setSelectedTier(e.target.value)}
-                  className="w-full rounded-xl border border-white/[0.08] bg-[#111113] p-2.5 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
+                  className="w-full rounded-lg border border-white/[0.08] bg-[#141416] p-2 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none transition-colors"
                 >
                   <option value="All">All Difficulty Tiers</option>
                   <option value="Grade 9 Challenge">Grade 9 Challenge / Hard</option>
@@ -1271,11 +1273,11 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
         </div>
 
         {/* Row 2 Filter Controls: Question Number & Sub-Part */}
-        <div className="rounded-2xl border border-white/[0.06] bg-[#111113] p-3 sm:p-4 space-y-2.5 animate-fadeIn">
+        <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-3 sm:p-4 space-y-2.5 animate-fadeIn">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+            <span className="text-xs font-medium text-zinc-400 flex items-center gap-1.5">
               <Filter className="h-3.5 w-3.5 text-[#FF5B37]" />
-              <span>Question Number &amp; Sub-Part Precision Filter</span>
+              <span>Question number &amp; sub-part precision filter</span>
             </span>
             {(selectedQuestionFilter !== 'All' || selectedSubPartFilter !== 'All') && (
               <button
@@ -1284,7 +1286,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                   setSelectedQuestionFilter('All');
                   setSelectedSubPartFilter('All');
                 }}
-                className="text-[11px] text-[#FF5B37] hover:text-[#FFA63A] underline font-medium cursor-pointer"
+                className="text-xs text-[#FF5B37] hover:text-[#F97316] underline font-medium cursor-pointer"
               >
                 Reset Row 2
               </button>
@@ -1295,11 +1297,11 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             {/* Question Number Selector */}
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className="text-[10px] font-medium text-zinc-400">
-                  Question Number
+                <label className="text-xs font-medium text-zinc-400">
+                  Question number
                 </label>
                 {selectedQuestionFilter !== 'All' && (
-                  <span className="rounded bg-[#FF5B37]/15 px-1.5 py-0.2 text-[10px] font-mono text-[#FF5B37]">
+                  <span className="rounded bg-[#FF5B37]/15 px-1.5 py-0.5 text-[10px] font-mono text-[#FF5B37]">
                     Active: {selectedQuestionFilter}
                   </span>
                 )}
@@ -1307,7 +1309,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               <select
                 value={selectedQuestionFilter}
                 onChange={(e) => setSelectedQuestionFilter(e.target.value)}
-                className="w-full rounded-xl border border-white/[0.08] bg-[#18181B] p-2.5 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none font-mono transition-colors"
+                className="w-full rounded-lg border border-white/[0.08] bg-[#18181b] p-2 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none font-mono tabular-nums transition-colors"
               >
                 <option value="All">All Question Numbers (Q1 – Q40)</option>
                 {Array.from({ length: 40 }, (_, i) => `Q${i + 1}`).map((q) => (
@@ -1321,11 +1323,11 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             {/* Sub-Part Selector */}
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className="text-[10px] font-medium text-zinc-400">
-                  Sub-Part (a, b, c, i, ii)
+                <label className="text-xs font-medium text-zinc-400">
+                  Sub-part (a, b, c, i, ii)
                 </label>
                 {selectedSubPartFilter !== 'All' && (
-                  <span className="rounded bg-[#FF5B37]/15 px-1.5 py-0.2 text-[10px] font-mono text-[#FF5B37]">
+                  <span className="rounded bg-[#FF5B37]/15 px-1.5 py-0.5 text-[10px] font-mono text-[#FF5B37]">
                     Active: Part {selectedSubPartFilter}
                   </span>
                 )}
@@ -1333,7 +1335,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               <select
                 value={selectedSubPartFilter}
                 onChange={(e) => setSelectedSubPartFilter(e.target.value)}
-                className="w-full rounded-xl border border-white/[0.08] bg-[#18181B] p-2.5 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none font-mono transition-colors"
+                className="w-full rounded-lg border border-white/[0.08] bg-[#18181b] p-2 text-zinc-100 text-xs cursor-pointer focus:border-[#FF5B37] focus:outline-none font-mono transition-colors"
               >
                 <option value="All">All Sub-Parts (Complete Question &amp; All Parts)</option>
                 <option value="(a)">Part (a)</option>
@@ -1352,15 +1354,15 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
         {activeTab === 'questions' && availableTopics.length > 0 && (
           <div className="pt-3 border-t border-white/[0.06]">
             <div className="flex items-center justify-between gap-2 mb-2">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+              <span className="text-xs font-medium text-zinc-400 flex items-center gap-1.5">
                 <Tag className="h-3.5 w-3.5 text-[#FF5B37]" />
-                Filter by Topic ({availableTopics.length} topics):
+                Filter by topic ({availableTopics.length} topics):
               </span>
               {selectedTopic !== 'All' && (
                 <button
                   type="button"
                   onClick={() => setSelectedTopic('All')}
-                  className="text-[11px] text-[#FF5B37] hover:text-[#FFA63A] underline font-medium cursor-pointer"
+                  className="text-xs text-[#FF5B37] hover:text-[#F97316] underline font-medium cursor-pointer"
                 >
                   Clear topic filter
                 </button>
@@ -1370,14 +1372,14 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               <button
                 type="button"
                 onClick={() => setSelectedTopic('All')}
-                className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+                className={`rounded-lg px-2.5 py-1 text-xs font-medium transition cursor-pointer flex items-center gap-1.5 ${
                   selectedTopic === 'All'
                     ? 'bg-[#FF5B37] text-white shadow-sm'
-                    : 'bg-white/[0.03] text-zinc-300 hover:bg-white/[0.06] hover:text-white border border-white/[0.06]'
+                    : 'bg-[#141416] text-zinc-300 hover:bg-[#1f1f23] hover:text-white border border-white/[0.06]'
                 }`}
               >
                 <span>All Topics</span>
-                <span className={`rounded-full px-1.5 py-0.2 text-[10px] font-mono ${selectedTopic === 'All' ? 'bg-black/25 text-white' : 'bg-black/20 text-zinc-400'}`}>
+                <span className={`rounded px-1.5 py-0.5 text-[10px] font-mono tabular-nums ${selectedTopic === 'All' ? 'bg-black/25 text-white' : 'bg-[#222225] text-zinc-400'}`}>
                   {getAllPastPapers().filter((p) => {
                     if (selectedBoard !== 'All' && p.board !== selectedBoard) return false;
                     if (selectedSubjectId !== 'all') {
@@ -1401,16 +1403,16 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                     key={top}
                     type="button"
                     onClick={() => setSelectedTopic(isSelected ? 'All' : top)}
-                    className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+                    className={`rounded-lg px-2.5 py-1 text-xs font-medium transition cursor-pointer flex items-center gap-1.5 ${
                       isSelected
                         ? 'bg-[#FF5B37] text-white shadow-sm'
-                        : 'bg-white/[0.03] text-zinc-300 hover:bg-white/[0.06] hover:text-white border border-white/[0.06]'
+                        : 'bg-[#141416] text-zinc-300 hover:bg-[#1f1f23] hover:text-white border border-white/[0.06]'
                     }`}
                   >
                     <span>{top}</span>
                     <span
-                      className={`rounded-full px-1.5 py-0.2 text-[10px] font-mono ${
-                        isSelected ? 'bg-black/25 text-white' : 'bg-black/20 text-zinc-400'
+                      className={`rounded px-1.5 py-0.5 text-[10px] font-mono tabular-nums ${
+                        isSelected ? 'bg-black/25 text-white' : 'bg-[#222225] text-zinc-400'
                       }`}
                     >
                       {count}
@@ -1424,20 +1426,20 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
         {/* Subject Exam Paper Structure Banner */}
         {currentSubjectSpec && (
-          <div className="rounded-2xl border border-white/[0.06] bg-[#111113] p-3.5 space-y-3">
+          <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-3.5 space-y-3">
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <div className="flex items-center gap-2.5">
-                <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-white/[0.06] text-zinc-300 font-bold text-xs border border-white/[0.08]">
-                  📋
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#222225] text-[#FF5B37] border border-white/[0.08]">
+                  <FileText className="h-4 w-4" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-zinc-100 uppercase tracking-wider flex items-center gap-2">
+                  <h4 className="text-xs font-medium text-[#ededed] flex items-center gap-2">
                     <span>{currentSubjectSpec.subjectName} ({currentSubjectSpec.subjectCode})</span>
-                    <span className="rounded bg-white/[0.06] px-1.5 py-0.2 text-[9px] font-semibold text-zinc-300 border border-white/[0.08]">
+                    <span className="rounded bg-[#222225] px-1.5 py-0.5 text-[9px] font-mono text-zinc-300 border border-white/[0.08]">
                       {currentSubjectSpec.board} Exam Structure
                     </span>
                   </h4>
-                  <p className="text-[11px] text-zinc-400">
+                  <p className="text-xs text-zinc-400">
                     Required components: {currentSubjectSpec.totalPapersRequired}
                   </p>
                 </div>
@@ -1447,7 +1449,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                 <button
                   type="button"
                   onClick={() => setSelectedPaperNumber('All')}
-                  className="inline-flex items-center gap-1 text-[11px] font-medium text-zinc-300 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] px-2.5 py-1 rounded-lg border border-white/[0.08] transition cursor-pointer"
+                  className="inline-flex items-center gap-1 text-xs font-medium text-zinc-300 hover:text-white bg-[#222225] hover:bg-[#2c2c31] px-2.5 py-1 rounded-lg border border-white/[0.08] transition cursor-pointer"
                 >
                   <RotateCcw className="h-3 w-3" />
                   <span>Show All Papers ({currentSubjectSpec.papers.length})</span>
@@ -1463,15 +1465,15 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                     key={String(p.paperNumber)}
                     type="button"
                     onClick={() => setSelectedPaperNumber(isSelected ? 'All' : String(p.paperNumber))}
-                    className={`text-left p-3 rounded-xl border transition cursor-pointer flex flex-col justify-between group ${
+                    className={`text-left p-3 rounded-lg border transition cursor-pointer flex flex-col justify-between group ${
                       isSelected
-                        ? 'bg-[#FF5B37]/15 border-[#FF5B37] text-white shadow-sm ring-1 ring-[#FF5B37]'
-                        : 'bg-[#18181B] border-white/[0.06] hover:border-white/[0.12] text-zinc-300 hover:bg-[#1E1E22]'
+                        ? 'bg-[#222225] border-[#FF5B37] text-white shadow-sm ring-1 ring-[#FF5B37]'
+                        : 'bg-[#18181b] border-white/[0.08] hover:border-white/[0.14] text-zinc-300 hover:bg-[#1e1e22]'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2 mb-1.5">
                       <div className="flex items-center gap-1.5">
-                        <span className={`text-xs font-bold ${isSelected ? 'text-[#FF5B37]' : 'text-zinc-200'}`}>
+                        <span className={`text-xs font-medium font-mono ${isSelected ? 'text-[#FF5B37]' : 'text-zinc-200'}`}>
                           {typeof p.paperNumber === 'number' ? `Paper ${p.paperNumber}` : p.paperNumber}
                         </span>
                         {p.codeSuffix && (
@@ -1482,31 +1484,31 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                       </div>
                       <div className="flex items-center gap-1.5">
                         {p.isListening && (
-                          <span className="rounded bg-white/[0.06] px-1.5 py-0.5 text-[9px] font-semibold text-zinc-300 border border-white/[0.08] flex items-center gap-1">
+                          <span className="rounded bg-[#222225] px-1.5 py-0.5 text-[9px] font-medium text-zinc-300 border border-white/[0.08] flex items-center gap-1">
                             <Headphones className="h-2.5 w-2.5" /> Audio
                           </span>
                         )}
                         {p.weightPercent && (
-                          <span className="text-[10px] font-medium text-zinc-400">
+                          <span className="text-xs font-mono tabular-nums text-zinc-400">
                             {p.weightPercent}%
                           </span>
                         )}
                       </div>
                     </div>
 
-                    <div className="text-xs font-semibold text-zinc-100 mb-1.5 line-clamp-1">
+                    <div className="text-xs font-medium text-zinc-100 mb-1.5 line-clamp-1">
                       {p.name}
                     </div>
 
-                    <div className="text-[10px] text-zinc-400 flex items-center gap-1.5 flex-wrap">
-                      <span className="font-medium text-zinc-300">{p.marks} Marks</span>
+                    <div className="text-xs text-zinc-400 flex items-center gap-1.5 flex-wrap">
+                      <span className="font-mono tabular-nums text-zinc-300">{p.marks} Marks</span>
                       <span>•</span>
                       <span>{p.duration}</span>
                       <span>•</span>
                       <span className="text-zinc-400">{p.tier}</span>
                     </div>
 
-                    <p className="text-[10px] text-zinc-400 mt-2 line-clamp-2 leading-relaxed border-t border-white/[0.06] pt-1.5">
+                    <p className="text-xs text-zinc-400 mt-2 line-clamp-2 leading-relaxed border-t border-white/[0.06] pt-1.5">
                       {p.description}
                     </p>
                   </button>
@@ -1521,14 +1523,14 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
           <div className="flex items-center gap-2 text-zinc-400 flex-wrap">
             {activeTab === 'pdf-library' ? (
               <span>
-                Found <strong className="text-zinc-100 font-semibold">{filteredPdfs.length}</strong> past paper PDFs across 2010–2026
+                Found <strong className="text-zinc-100 font-medium font-mono tabular-nums">{filteredPdfs.length}</strong> past paper PDFs across 2010–2026
                 {filteredPdfs.length > displayedPdfs.length && (
-                  <span className="text-zinc-400 ml-1.5">(Showing first {displayedPdfs.length})</span>
+                  <span className="text-zinc-400 ml-1.5">(Showing first <span className="font-mono tabular-nums">{displayedPdfs.length}</span>)</span>
                 )}
               </span>
             ) : (
               <span>
-                Showing <strong className="text-zinc-100 font-semibold">{filteredPapers.length}</strong> official past paper questions
+                Showing <strong className="text-zinc-100 font-medium font-mono tabular-nums">{filteredPapers.length}</strong> official past paper questions
                 {selectedTopic !== 'All' && (
                   <span className="ml-1 text-[#FF5B37] font-medium">in topic "{selectedTopic}"</span>
                 )}
@@ -1537,7 +1539,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
             {(selectedBoard !== 'All' || selectedSubjectId !== 'all' || selectedTopic !== 'All' || selectedYear !== 'All' || selectedSession !== 'All' || selectedPaperNumber !== 'All' || selectedVariant !== 'All' || selectedTier !== 'All' || searchQuery) && (
               <button
                 onClick={handleResetFilters}
-                className="flex items-center gap-1 text-[#FF5B37] hover:text-[#FFA63A] font-medium cursor-pointer underline ml-2"
+                className="flex items-center gap-1 text-[#FF5B37] hover:text-[#F97316] font-medium cursor-pointer underline ml-2"
               >
                 <RotateCcw className="h-3 w-3" /> Reset Filters
               </button>
@@ -1547,10 +1549,10 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
           <div className="flex items-center gap-2">
             {activeTab === 'questions' && (
               /* View Mode Toggle: Stacked vs Side-by-Side */
-              <div className="hidden sm:flex items-center rounded-lg border border-white/[0.08] bg-[#111113] p-0.5">
+              <div className="hidden sm:flex items-center rounded-lg border border-white/[0.08] bg-[#141416] p-0.5">
                 <button
                   onClick={() => setViewMode('stacked')}
-                  className={`rounded px-2.5 py-1 text-[11px] font-semibold transition cursor-pointer ${
+                  className={`rounded-md px-2.5 py-1 text-xs font-medium transition cursor-pointer ${
                     viewMode === 'stacked'
                       ? 'bg-[#FF5B37] text-white shadow-sm'
                       : 'text-zinc-400 hover:text-white'
@@ -1560,7 +1562,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                 </button>
                 <button
                   onClick={() => setViewMode('side-by-side')}
-                  className={`rounded px-2.5 py-1 text-[11px] font-semibold transition cursor-pointer ${
+                  className={`rounded-md px-2.5 py-1 text-xs font-medium transition cursor-pointer ${
                     viewMode === 'side-by-side'
                       ? 'bg-[#FF5B37] text-white shadow-sm'
                       : 'text-zinc-400 hover:text-white'
@@ -1573,7 +1575,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
             <button
               onClick={handlePrintPaper}
-              className="flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-[#18181B] px-3 py-1.5 text-xs font-medium text-zinc-200 hover:bg-[#222227] hover:text-white transition cursor-pointer"
+              className="flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-[#222225] px-3 py-1.5 text-xs font-medium text-zinc-200 hover:bg-[#2c2c31] hover:text-white transition cursor-pointer"
               title="Print Question Paper & Mark Scheme Handout"
             >
               <Printer className="h-3.5 w-3.5 text-zinc-400" />
@@ -1589,33 +1591,33 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
       {activeTab === 'pdf-library' && (
         <div className="space-y-4">
           {/* Information callout banner */}
-          <div className="rounded-2xl border border-white/[0.06] bg-[#18181B] p-4 flex items-center justify-between flex-wrap gap-3">
+          <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-4 flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-white/[0.04] text-[#FF5B37] border border-white/[0.06] shrink-0">
+              <div className="p-2 rounded-lg bg-[#222225] text-[#FF5B37] border border-white/[0.08] shrink-0">
                 <FileDown className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs font-semibold text-zinc-100">Full Exam Library: 2010 to 2026 (All Subjects, All Papers &amp; All Variants)</p>
-                <p className="text-[11px] text-zinc-400">
-                  Select <strong className="text-zinc-300">View</strong> for in-app preview with annotations, or <strong className="text-zinc-300">Download</strong> for direct PDF save.
+                <p className="text-xs font-medium text-zinc-100">Full exam library: 2010 to 2026 (All subjects, all papers &amp; all variants)</p>
+                <p className="text-xs text-zinc-400">
+                  Select <strong className="text-zinc-300 font-medium">View</strong> for in-app preview with annotations, or <strong className="text-zinc-300 font-medium">Download</strong> for direct PDF save.
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2 text-xs">
-              <span className="rounded-lg bg-white/[0.04] text-zinc-300 border border-white/[0.06] px-2 py-1 font-medium flex items-center gap-1">
-                <CheckCircle className="h-3.5 w-3.5 text-emerald-400" /> QP + MS Paired
+              <span className="rounded-lg bg-[#222225] text-zinc-300 border border-white/[0.08] px-2.5 py-1 font-medium flex items-center gap-1.5">
+                <CheckCircle className="h-3.5 w-3.5 text-[#4cc38a]" /> QP + MS Paired
               </span>
-              <span className="rounded-lg bg-white/[0.04] text-zinc-300 border border-white/[0.06] px-2 py-1 font-medium flex items-center gap-1">
+              <span className="rounded-lg bg-[#222225] text-zinc-300 border border-white/[0.08] px-2.5 py-1 font-medium flex items-center gap-1.5">
                 <Award className="h-3.5 w-3.5 text-[#FF5B37]" /> Examiner Reports
               </span>
-              <span className="rounded-lg bg-white/[0.04] text-zinc-300 border border-white/[0.06] px-2 py-1 font-medium flex items-center gap-1">
+              <span className="rounded-lg bg-[#222225] text-zinc-300 border border-white/[0.08] px-2.5 py-1 font-medium flex items-center gap-1.5">
                 <TrendingUp className="h-3.5 w-3.5 text-zinc-400" /> Grade Thresholds
               </span>
             </div>
           </div>
 
           {filteredPdfs.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-white/[0.08] bg-[#18181B]/40 p-10 text-center text-zinc-400">
+            <div className="rounded-2xl border border-dashed border-white/[0.08] bg-[#18181b]/40 p-10 text-center text-zinc-400">
               <FileText className="mx-auto h-12 w-12 text-zinc-600 mb-3" />
               <h4 className="text-base font-semibold text-zinc-200">No past paper PDFs match your current filters.</h4>
               <p className="text-xs text-zinc-500 mt-1 max-w-md mx-auto">
@@ -1623,7 +1625,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               </p>
               <button
                 onClick={handleResetFilters}
-                className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-[#FF5B37] hover:bg-[#e04825] px-4 py-2 text-xs font-semibold text-white transition cursor-pointer shadow-sm"
+                className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-[#FF5B37] hover:bg-[#F97316] px-4 py-2 text-xs font-medium text-white transition cursor-pointer shadow-sm"
               >
                 <RotateCcw className="h-3.5 w-3.5" />
                 Reset All Filters
@@ -1650,27 +1652,27 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                   return (
                     <div
                       key={pdf.id}
-                      className="rounded-2xl border border-white/[0.06] bg-[#18181B] hover:border-white/[0.12] p-5 transition flex flex-col justify-between group shadow-sm"
+                      className="rounded-xl border border-white/[0.08] bg-[#18181b] hover:border-white/[0.16] p-5 transition flex flex-col justify-between group shadow-sm"
                     >
                       <div>
                         {/* Header: Syllabus Code, Board, Variant & Year */}
-                        <div className="flex items-center justify-between gap-2 flex-wrap pb-2.5 border-b border-white/[0.06] mb-3 text-xs">
+                        <div className="flex items-center justify-between gap-2 flex-wrap pb-2.5 border-b border-white/[0.08] mb-3 text-xs">
                           <div className="flex items-center gap-2">
-                            <span className="font-mono font-semibold text-zinc-200">
+                            <span className="font-mono font-medium text-zinc-200">
                               {pdf.board} • {pdf.paperCode}
                             </span>
                             {pdf.variant && (
-                              <span className="text-zinc-400 font-mono text-[11px]">
+                              <span className="text-zinc-400 font-mono text-xs">
                                 Var {pdf.variant}
                               </span>
                             )}
                             {Boolean(pdf.isUnavailable) && (
-                              <span className="text-rose-400 text-[11px] font-medium">
+                              <span className="text-[#e5484d] text-xs font-medium">
                                 • Not Administered
                               </span>
                             )}
                             {isListeningPaper && !pdf.isUnavailable && (
-                              <span className="text-[#FF5B37] text-[11px] font-medium flex items-center gap-1">
+                              <span className="text-[#FF5B37] text-xs font-medium flex items-center gap-1">
                                 • <Headphones className="h-3 w-3 inline" /> Audio
                               </span>
                             )}
@@ -1681,18 +1683,18 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                               {pdf.tier}
                             </span>
                             <span className="text-zinc-600">•</span>
-                            <span className="font-mono text-zinc-300 font-semibold">
+                            <span className="font-mono tabular-nums text-zinc-300 font-medium">
                               {pdf.year}
                             </span>
                           </div>
                         </div>
 
                         {/* Title & Subject Code */}
-                        <h3 className="text-base font-bold text-zinc-100 flex items-center gap-2 tracking-tight">
+                        <h3 className="text-base font-semibold text-[#ededed] flex items-center gap-2 tracking-tight">
                           <span>{pdf.subjectName}</span>
                           <span className="text-xs font-mono font-normal text-zinc-400">({pdf.subjectCode})</span>
                         </h3>
-                        <p className="text-xs font-semibold text-[#FF5B37] mt-0.5">
+                        <p className="text-xs font-medium text-[#FF5B37] mt-0.5">
                           {pdf.session}
                         </p>
                         <p className="text-xs text-zinc-400 mt-1 leading-relaxed line-clamp-2">
@@ -1701,15 +1703,15 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
                         {/* Official Examination Notices */}
                         {Boolean(pdf.isUnavailable) && (
-                          <div className="mt-3 flex items-start gap-2 rounded-xl bg-rose-500/10 border border-rose-500/20 p-2.5 text-xs text-rose-300 leading-snug">
-                            <Info className="h-4 w-4 text-rose-400 shrink-0 mt-0.5" />
+                          <div className="mt-3 flex items-start gap-2 rounded-lg bg-[#e5484d]/10 border border-[#e5484d]/20 p-2.5 text-xs text-[#e5484d] leading-snug">
+                            <Info className="h-4 w-4 shrink-0 mt-0.5" />
                             <span>
                               <strong>Official Examination Record:</strong> {pdf.unavailableReason || 'This variant was not administered or published by Cambridge for this series.'}
                             </span>
                           </div>
                         )}
                         {(pdf.qpUnavailableReason || pdf.msUnavailableReason) && !pdf.isUnavailable && (
-                          <div className="mt-3 flex items-start gap-2 rounded-xl bg-white/[0.03] border border-white/[0.08] p-2.5 text-xs text-zinc-300 leading-snug">
+                          <div className="mt-3 flex items-start gap-2 rounded-lg bg-[#141416] border border-white/[0.08] p-2.5 text-xs text-zinc-300 leading-snug">
                             <Info className="h-4 w-4 text-[#FF5B37] shrink-0 mt-0.5" />
                             <span>
                               <strong>Series Record:</strong> {pdf.qpUnavailableReason ? `${pdf.qpUnavailableReason}. ` : ''}{pdf.msUnavailableReason ? `${pdf.msUnavailableReason}.` : ''}
@@ -1717,7 +1719,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                           </div>
                         )}
                         {Boolean(pdf.isPortal) && !pdf.isUnavailable && (
-                          <div className="mt-3 flex items-start gap-2 rounded-xl bg-white/[0.03] border border-white/[0.08] p-2.5 text-xs text-zinc-300 leading-snug">
+                          <div className="mt-3 flex items-start gap-2 rounded-lg bg-[#141416] border border-white/[0.08] p-2.5 text-xs text-zinc-300 leading-snug">
                             <Info className="h-4 w-4 text-zinc-400 shrink-0 mt-0.5" />
                             <span>
                               <strong>Board Material:</strong> Access through official {pdf.board} qualification materials.
@@ -1727,18 +1729,18 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                       </div>
 
                       {/* Action Buttons: Audio, QP, MS, ER, GT */}
-                      <div className="mt-5 pt-3.5 border-t border-white/[0.06] space-y-2">
+                      <div className="mt-5 pt-3.5 border-t border-white/[0.08] space-y-2">
                         {pdf.isUnavailable ? (
-                          <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-3 text-center text-xs text-zinc-400 font-medium">
-                            <span className="text-zinc-200 font-semibold">Variant Not Administered:</span> Not published for this examination series.
+                          <div className="rounded-lg border border-white/[0.08] bg-[#141416] p-3 text-center text-xs text-zinc-400 font-medium">
+                            <span className="text-zinc-200 font-medium">Variant Not Administered:</span> Not published for this examination series.
                           </div>
                         ) : (
                           <>
                             {/* Listening Audio Track Stream & Download Box */}
                             {isListeningPaper && audioUrls && (
-                              <div className="bg-[#111113] rounded-xl p-3 border border-white/[0.08] space-y-2 mb-2">
+                              <div className="bg-[#141416] rounded-lg p-3 border border-white/[0.08] space-y-2 mb-2">
                                 <div className="flex items-center justify-between gap-2">
-                                  <div className="flex items-center gap-2 text-xs font-semibold text-zinc-200">
+                                  <div className="flex items-center gap-2 text-xs font-medium text-zinc-200">
                                     <Headphones className="h-3.5 w-3.5 text-[#FF5B37] shrink-0" />
                                     <span>Examination Listening Track</span>
                                   </div>
@@ -1747,7 +1749,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     download
-                                    className="inline-flex items-center gap-1 text-[11px] text-zinc-300 hover:text-white font-medium bg-white/[0.04] hover:bg-white/[0.08] px-2 py-1 rounded-md border border-white/[0.08] transition"
+                                    className="inline-flex items-center gap-1 text-xs text-zinc-300 hover:text-white font-medium bg-[#222225] hover:bg-[#2c2c31] px-2.5 py-1 rounded-md border border-white/[0.08] transition"
                                     title="Download official listening exam MP3 track"
                                   >
                                     <Download className="h-3 w-3" />
@@ -1765,7 +1767,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                             )}
 
                             {/* Question Paper Row */}
-                            <div className="flex items-center justify-between gap-2 bg-[#111113] rounded-xl p-2.5 border border-white/[0.06]">
+                            <div className="flex items-center justify-between gap-2 bg-[#141416] rounded-lg p-2.5 border border-white/[0.08]">
                               <div className="flex items-center gap-2 text-xs font-medium text-zinc-200">
                                 <FileText className="h-4 w-4 text-zinc-400 shrink-0" />
                                 <span>Question Paper (QP)</span>
@@ -1773,7 +1775,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                               {pdf.qpPdfUrl ? (
                                 <div className="flex items-center gap-1.5">
                                   {Boolean(pdf.isPortal) ? (
-                                    <span className="text-[11px] text-zinc-400 font-medium px-1">Board Hub</span>
+                                    <span className="text-xs text-zinc-400 font-medium px-1">Board Hub</span>
                                   ) : (
                                     <button
                                       type="button"
@@ -1793,7 +1795,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                           } : undefined
                                         )
                                       }
-                                      className="inline-flex items-center gap-1 rounded-lg border border-white/[0.08] bg-[#1E1E22] px-2 py-1 text-xs font-medium text-zinc-200 hover:bg-white/[0.08] hover:text-white transition cursor-pointer"
+                                      className="inline-flex items-center gap-1 rounded-lg border border-white/[0.08] bg-[#222225] px-2.5 py-1 text-xs font-medium text-zinc-200 hover:bg-[#2c2c31] hover:text-white transition cursor-pointer"
                                       title="Preview in-app viewer"
                                     >
                                       <Eye className="h-3.5 w-3.5 text-zinc-400" />
@@ -1812,7 +1814,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                           href={isPortalPaper ? pdf.qpPdfUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.qpPdfUrl)}${pdf.backupQpUrl ? `&fallback=${encodeURIComponent(pdf.backupQpUrl)}` : ''}`}
                                           target="_blank"
                                           rel="noopener noreferrer"
-                                          className="inline-flex items-center gap-1 rounded-lg border border-white/[0.08] bg-[#1E1E22] px-2 py-1 text-xs font-medium text-zinc-200 hover:bg-white/[0.08] hover:text-white transition"
+                                          className="inline-flex items-center gap-1 rounded-lg border border-white/[0.08] bg-[#222225] px-2.5 py-1 text-xs font-medium text-zinc-200 hover:bg-[#2c2c31] hover:text-white transition"
                                           title={isPortalPaper ? `Open official ${pdf.board} qualification materials hub` : "Open PDF directly in verified viewer"}
                                         >
                                           <ExternalLink className="h-3.5 w-3.5 text-zinc-400" />
@@ -1822,7 +1824,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                           href={isPortalPaper && pdf.backupQpUrl ? pdf.backupQpUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.qpPdfUrl)}${pdf.backupQpUrl ? `&fallback=${encodeURIComponent(pdf.backupQpUrl)}` : ''}&download=true`}
                                           target="_blank"
                                           rel="noopener noreferrer"
-                                          className="inline-flex items-center gap-1 rounded-lg bg-[#FF5B37] hover:bg-[#e04825] px-2.5 py-1 text-xs font-semibold text-white transition shadow-sm"
+                                          className="inline-flex items-center gap-1 rounded-lg bg-[#FF5B37] hover:bg-[#F97316] px-2.5 py-1 text-xs font-medium text-white transition shadow-sm"
                                           title={isPortalPaper ? `Search verified archive pack for ${pdf.paperCode}` : "Download official Question Paper PDF"}
                                         >
                                           <Download className="h-3.5 w-3.5" />
@@ -1833,22 +1835,22 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                   })()}
                                 </div>
                               ) : (
-                                <span className="text-[11px] text-zinc-400 font-medium px-2 py-0.5 rounded bg-white/[0.04]">
+                                <span className="text-xs text-zinc-400 font-medium px-2 py-0.5 rounded bg-[#222225] border border-white/[0.08]">
                                   {pdf.qpUnavailableReason || 'QP Not Published'}
                                 </span>
                               )}
                             </div>
 
                             {/* Mark Scheme Row */}
-                            <div className="flex items-center justify-between gap-2 bg-[#111113] rounded-xl p-2.5 border border-white/[0.06]">
+                            <div className="flex items-center justify-between gap-2 bg-[#141416] rounded-lg p-2.5 border border-white/[0.08]">
                               <div className="flex items-center gap-2 text-xs font-medium text-zinc-200">
-                                <CheckCircle className={`h-4 w-4 shrink-0 ${pdf.msPdfUrl ? 'text-emerald-400/90' : 'text-zinc-500'}`} />
+                                <CheckCircle className={`h-4 w-4 shrink-0 ${pdf.msPdfUrl ? 'text-[#4cc38a]' : 'text-zinc-500'}`} />
                                 <span>Mark Scheme (MS)</span>
                               </div>
                               {pdf.msPdfUrl ? (
                                 <div className="flex items-center gap-1.5">
                                   {Boolean(pdf.isPortal) ? (
-                                    <span className="text-[11px] text-zinc-400 font-medium px-1">Board Hub</span>
+                                    <span className="text-xs text-zinc-400 font-medium px-1">Board Hub</span>
                                   ) : (
                                     <button
                                       type="button"
@@ -1863,7 +1865,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                           pdf.paperCode
                                         )
                                       }
-                                      className="inline-flex items-center gap-1 rounded-lg border border-white/[0.08] bg-[#1E1E22] px-2 py-1 text-xs font-medium text-zinc-200 hover:bg-white/[0.08] hover:text-white transition cursor-pointer"
+                                      className="inline-flex items-center gap-1 rounded-lg border border-white/[0.08] bg-[#222225] px-2.5 py-1 text-xs font-medium text-zinc-200 hover:bg-[#2c2c31] hover:text-white transition cursor-pointer"
                                       title="Preview Mark Scheme in-app"
                                     >
                                       <Eye className="h-3.5 w-3.5 text-zinc-400" />
@@ -1882,7 +1884,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                           href={isPortalPaper ? pdf.msPdfUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.msPdfUrl!)}${pdf.backupMsUrl ? `&fallback=${encodeURIComponent(pdf.backupMsUrl)}` : ''}`}
                                           target="_blank"
                                           rel="noopener noreferrer"
-                                          className="inline-flex items-center gap-1 rounded-lg border border-white/[0.08] bg-[#1E1E22] px-2 py-1 text-xs font-medium text-zinc-200 hover:bg-white/[0.08] hover:text-white transition"
+                                          className="inline-flex items-center gap-1 rounded-lg border border-white/[0.08] bg-[#222225] px-2.5 py-1 text-xs font-medium text-zinc-200 hover:bg-[#2c2c31] hover:text-white transition"
                                           title={isPortalPaper ? `Open official ${pdf.board} qualification materials hub` : "Open Mark Scheme in verified viewer"}
                                         >
                                           <ExternalLink className="h-3.5 w-3.5 text-zinc-400" />
@@ -1892,7 +1894,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                           href={isPortalPaper && pdf.backupMsUrl ? pdf.backupMsUrl : `/api/pdf-proxy?url=${encodeURIComponent(pdf.msPdfUrl!)}${pdf.backupMsUrl ? `&fallback=${encodeURIComponent(pdf.backupMsUrl)}` : ''}&download=true`}
                                           target="_blank"
                                           rel="noopener noreferrer"
-                                          className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/15 hover:bg-emerald-500/25 px-2.5 py-1 text-xs font-semibold text-emerald-300 transition"
+                                          className="inline-flex items-center gap-1 rounded-lg border border-[#4cc38a]/30 bg-[#4cc38a]/15 hover:bg-[#4cc38a]/25 px-2.5 py-1 text-xs font-medium text-[#4cc38a] transition"
                                           title={isPortalPaper ? `Search verified archive pack for ${pdf.paperCode} Mark Scheme` : "Download official Mark Scheme PDF"}
                                         >
                                           <Download className="h-3.5 w-3.5" />
@@ -1903,7 +1905,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                   })()}
                                 </div>
                               ) : (
-                                <span className="text-[11px] text-zinc-400 font-medium px-2 py-0.5 rounded bg-white/[0.04]">
+                                <span className="text-xs text-zinc-400 font-medium px-2 py-0.5 rounded bg-[#222225] border border-white/[0.08]">
                                   {pdf.msUnavailableReason || 'MS Not Published'}
                                 </span>
                               )}
@@ -1911,7 +1913,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
                             {/* Extra Session Materials: Examiner Report & Grade Thresholds */}
                             {(pdf.examinerReportUrl || pdf.gradeThresholdsUrl) && (
-                              <div className="flex items-center justify-between gap-2 pt-1 text-[11px]">
+                              <div className="flex items-center justify-between gap-2 pt-1 text-xs">
                                 {pdf.examinerReportUrl && (
                                   <button
                                     type="button"
@@ -1963,14 +1965,14 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                 <div className="pt-6 pb-2 text-center">
                   <button
                     onClick={() => setPageLimit((prev) => prev + 36)}
-                    className="inline-flex items-center gap-2 rounded-2xl bg-[#18181B] hover:bg-[#222227] border border-white/[0.08] px-6 py-3 text-xs font-semibold text-zinc-200 transition shadow-sm cursor-pointer"
+                    className="inline-flex items-center gap-2 rounded-lg bg-[#18181b] hover:bg-[#222225] border border-white/[0.08] px-5 py-2.5 text-xs font-medium text-zinc-200 transition shadow-sm cursor-pointer"
                   >
                     <RefreshCw className="h-4 w-4 text-[#FF5B37]" />
                     <span>Load More Papers (Showing {displayedPdfs.length} of {filteredPdfs.length})</span>
                   </button>
                   <button
                     onClick={() => setPageLimit(filteredPdfs.length)}
-                    className="ml-3 inline-flex items-center gap-1 rounded-2xl border border-white/[0.08] bg-[#111113] px-4 py-3 text-xs font-medium text-zinc-400 hover:text-white transition cursor-pointer"
+                    className="ml-3 inline-flex items-center gap-1 rounded-lg border border-white/[0.08] bg-[#141416] px-4 py-2.5 text-xs font-medium text-zinc-400 hover:text-white transition cursor-pointer"
                   >
                     <span>Show All ({filteredPdfs.length})</span>
                   </button>
@@ -1987,10 +1989,10 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
       {activeTab === 'questions' && (
         <div className="space-y-4">
           {filteredPapers.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-slate-800 bg-slate-900/40 p-10 text-center text-slate-400">
-              <FileText className="mx-auto h-12 w-12 text-slate-600 mb-3" />
-              <h4 className="text-base font-bold text-slate-300">No past paper questions matched these filter criteria.</h4>
-              <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+            <div className="rounded-2xl border border-dashed border-white/[0.08] bg-[#18181b]/40 p-10 text-center text-zinc-400">
+              <FileText className="mx-auto h-12 w-12 text-zinc-600 mb-3" />
+              <h4 className="text-base font-semibold text-zinc-200">No past paper questions matched these filter criteria.</h4>
+              <p className="text-xs text-zinc-500 mt-1 max-w-md mx-auto">
                 {selectedTopic !== 'All' 
                   ? `No questions found under topic "${selectedTopic}". Try choosing "All Topics" or resetting filters.`
                   : 'Try switching Exam Board to "All Boards", clearing the search term, or selecting "All Subjects".'}
@@ -1999,14 +2001,14 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                 {selectedTopic !== 'All' && (
                   <button
                     onClick={() => setSelectedTopic('All')}
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-sky-500/30 bg-sky-500/10 px-3.5 py-2 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition cursor-pointer"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-[#222225] px-3.5 py-2 text-xs font-medium text-zinc-200 hover:bg-[#2c2c31] transition cursor-pointer"
                   >
                     Clear Topic: "{selectedTopic}"
                   </button>
                 )}
                 <button
                   onClick={handleResetFilters}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-sky-600 px-4 py-2 text-xs font-bold text-white hover:bg-sky-500 transition cursor-pointer"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-[#FF5B37] hover:bg-[#F97316] px-4 py-2 text-xs font-medium text-white transition cursor-pointer"
                 >
                   <RotateCcw className="h-3.5 w-3.5" />
                   Reset All Filters
@@ -2023,21 +2025,21 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
               return (
                 <div
                   key={paper.id}
-                  className={`rounded-2xl border transition overflow-hidden shadow-sm ${
+                  className={`rounded-xl border transition overflow-hidden shadow-sm ${
                     paper.isExactCodeMatch
-                      ? 'border-[#FF5B37]/60 bg-[#18181B] ring-1 ring-[#FF5B37]/30'
-                      : 'border-white/[0.06] bg-[#18181B] hover:border-white/[0.12]'
+                      ? 'border-[#FF5B37]/60 bg-[#18181b] ring-1 ring-[#FF5B37]/30'
+                      : 'border-white/[0.08] bg-[#18181b] hover:border-white/[0.14]'
                   }`}
                 >
                   {/* Exact Code Match Banner */}
                   {paper.isExactCodeMatch && (
-                    <div className="bg-[#111113] border-b border-white/[0.06] px-4 py-2.5 flex items-center justify-between flex-wrap gap-2">
-                      <div className="flex items-center gap-2 text-xs font-semibold text-emerald-300">
-                        <CheckCircle className="h-4 w-4 text-emerald-400" />
+                    <div className="bg-[#141416] border-b border-white/[0.08] px-4 py-2.5 flex items-center justify-between flex-wrap gap-2">
+                      <div className="flex items-center gap-2 text-xs font-medium text-[#4cc38a]">
+                        <CheckCircle className="h-4 w-4 text-[#4cc38a]" />
                         <span>Exact Question Match: {paper.paperCode} {paper.session} - {paper.questionNumber}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-mono text-zinc-300 bg-white/[0.04] px-2 py-0.5 rounded border border-white/[0.08]">
+                        <span className="text-[10px] font-mono text-zinc-300 bg-[#222225] px-2 py-0.5 rounded border border-white/[0.08]">
                           {paper.subParts?.length ? `${paper.subParts.length} Sub-Parts (${paper.marks} Marks)` : `${paper.marks} Mark Official Item`}
                         </span>
                         <span className="text-[10px] font-mono text-[#FF5B37] bg-[#FF5B37]/10 px-2 py-0.5 rounded border border-[#FF5B37]/20">
@@ -2048,12 +2050,12 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                   )}
 
                   {/* Paper Header */}
-                  <div className="p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-white/[0.06] bg-[#111113]/40">
+                  <div className="p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-white/[0.08] bg-[#141416]/50">
                     <div className="flex items-start sm:items-center gap-2.5 flex-wrap">
-                      <span className="rounded-lg bg-white/[0.04] px-2.5 py-1 text-xs font-semibold text-zinc-200 border border-white/[0.08] font-mono">
+                      <span className="rounded-lg bg-[#222225] px-2.5 py-1 text-xs font-medium text-zinc-200 border border-white/[0.08] font-mono tabular-nums">
                         {paper.paperCode} • {paper.session}
                       </span>
-                      <span className="font-bold text-zinc-100 text-sm">
+                      <span className="font-medium text-zinc-100 text-sm font-mono tabular-nums">
                         {paper.questionNumber} ({paper.marks} Marks)
                       </span>
                       <span className="text-zinc-600">•</span>
@@ -2062,7 +2064,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                       <button
                         type="button"
                         onClick={() => setSelectedTopic(paper.topic)}
-                        className="text-xs text-[#FF5B37] hover:text-[#FFA63A] hover:underline font-medium transition cursor-pointer"
+                        className="text-xs text-[#FF5B37] hover:text-[#F97316] hover:underline font-medium transition cursor-pointer"
                         title={`Filter questions by topic: ${paper.topic}`}
                       >
                         {paper.topic}
@@ -2082,17 +2084,17 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                       {/* Copy Question & Mark Scheme */}
                       <button
                         onClick={() => handleCopyQuestion(paper)}
-                        className={`p-2 rounded-xl border transition cursor-pointer flex items-center gap-1 text-xs font-medium ${
+                        className={`p-2 rounded-lg border transition cursor-pointer flex items-center gap-1 text-xs font-medium ${
                           copiedQuestionId === paper.id
-                            ? 'border-emerald-500/40 bg-emerald-500/20 text-emerald-300'
-                            : 'border-white/[0.08] bg-[#111113] text-zinc-400 hover:text-white'
+                            ? 'border-[#4cc38a]/40 bg-[#4cc38a]/20 text-[#4cc38a]'
+                            : 'border-white/[0.08] bg-[#222225] text-zinc-400 hover:text-white'
                         }`}
                         title="Copy Question & Mark Scheme text to clipboard"
                       >
                         {copiedQuestionId === paper.id ? (
                           <>
-                            <Check className="h-4 w-4 text-emerald-400" />
-                            <span className="text-[11px] font-semibold text-emerald-300">Copied!</span>
+                            <Check className="h-4 w-4 text-[#4cc38a]" />
+                            <span className="text-[11px] font-medium text-[#4cc38a]">Copied!</span>
                           </>
                         ) : (
                           <>
@@ -2105,10 +2107,10 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                       {/* Bookmark Toggle */}
                       <button
                         onClick={() => toggleBookmark(paper)}
-                        className={`p-2 rounded-xl border transition cursor-pointer ${
+                        className={`p-2 rounded-lg border transition cursor-pointer ${
                           isBookmarked
                             ? 'border-amber-500/40 bg-amber-500/15 text-amber-300'
-                            : 'border-white/[0.08] bg-[#111113] text-zinc-400 hover:text-white'
+                            : 'border-white/[0.08] bg-[#222225] text-zinc-400 hover:text-white'
                         }`}
                         title={isBookmarked ? 'Saved to Bookmarks' : 'Bookmark this question'}
                       >
@@ -2119,7 +2121,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                       {viewMode === 'stacked' && (
                         <button
                           onClick={() => setExpandedPaperId(isExpanded ? null : paper.id)}
-                          className="rounded-xl border border-white/[0.08] bg-[#1E1E22] px-3.5 py-1.5 text-xs font-medium text-zinc-200 hover:bg-white/[0.08] hover:text-white transition cursor-pointer"
+                          className="rounded-lg border border-white/[0.08] bg-[#222225] px-3 py-1.5 text-xs font-medium text-zinc-200 hover:bg-[#2c2c31] hover:text-white transition cursor-pointer"
                         >
                           {isExpanded ? 'Hide Mark Scheme' : 'Reveal Mark Scheme'}
                         </button>
@@ -2128,10 +2130,10 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                       {/* Grade My Answer Button */}
                       <button
                         onClick={() => setTestingPaperId(testingPaperId === paper.id ? null : paper.id)}
-                        className={`rounded-xl border px-3 py-1.5 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+                        className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition cursor-pointer flex items-center gap-1.5 ${
                           testingPaperId === paper.id
-                            ? 'border-emerald-500/50 bg-emerald-500/20 text-emerald-300'
-                            : 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20'
+                            ? 'border-[#4cc38a]/50 bg-[#4cc38a]/20 text-[#4cc38a]'
+                            : 'border-[#4cc38a]/30 bg-[#4cc38a]/10 text-[#4cc38a] hover:bg-[#4cc38a]/20'
                         }`}
                         title="Enter your answer and get instant Cambridge marks"
                       >
@@ -2143,7 +2145,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                       {onOpenSolverWithQuestion && (
                         <button
                           onClick={() => onOpenSolverWithQuestion(paper.questionPrompt)}
-                          className="rounded-xl bg-[#FF5B37] hover:bg-[#e04825] px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm transition cursor-pointer flex items-center gap-1.5"
+                          className="rounded-lg bg-[#FF5B37] hover:bg-[#F97316] px-3 py-1.5 text-xs font-medium text-white shadow-sm transition cursor-pointer flex items-center gap-1.5"
                         >
                           <Calculator className="h-3.5 w-3.5" />
                           <span>Step Solver</span>
@@ -2154,7 +2156,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                       {onOpenSplitViewer && (
                         <button
                           onClick={() => onOpenSplitViewer(paper)}
-                          className="rounded-xl border border-white/[0.08] bg-[#1E1E22] px-3 py-1.5 text-xs font-medium text-zinc-200 hover:bg-white/[0.08] hover:text-white transition cursor-pointer flex items-center gap-1"
+                          className="rounded-lg border border-white/[0.08] bg-[#222225] px-3 py-1.5 text-xs font-medium text-zinc-200 hover:bg-[#2c2c31] hover:text-white transition cursor-pointer flex items-center gap-1"
                           title="Open in Timed Split-Screen Exam Mode"
                         >
                           <Columns className="h-3.5 w-3.5 text-zinc-400" />
@@ -2175,7 +2177,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                             paper.paperCode
                           )
                         }
-                        className="rounded-xl border border-white/[0.08] bg-[#1E1E22] px-3 py-1.5 text-xs font-medium text-zinc-200 hover:bg-white/[0.08] hover:text-white transition flex items-center gap-1.5 cursor-pointer"
+                        className="rounded-lg border border-white/[0.08] bg-[#222225] px-2.5 py-1.5 text-xs font-medium text-zinc-200 hover:bg-[#2c2c31] hover:text-white transition flex items-center gap-1.5 cursor-pointer"
                         title="Preview authentic Question Paper PDF"
                       >
                         <Eye className="h-3.5 w-3.5 text-zinc-400" />
@@ -2187,7 +2189,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                         href={paper.board === 'Edexcel' || downloadUrl.includes('pearson.com') ? downloadUrl : `/api/pdf-proxy?url=${encodeURIComponent(downloadUrl)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="rounded-xl border border-white/[0.08] bg-[#1E1E22] px-3 py-1.5 text-xs font-medium text-zinc-200 hover:bg-white/[0.08] hover:text-white transition flex items-center gap-1.5"
+                        className="rounded-lg border border-white/[0.08] bg-[#222225] px-2.5 py-1.5 text-xs font-medium text-zinc-200 hover:bg-[#2c2c31] hover:text-white transition flex items-center gap-1.5"
                         title="Open PDF directly in new window"
                       >
                         <ExternalLink className="h-3.5 w-3.5 text-zinc-400" />
@@ -2197,16 +2199,16 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                   </div>
 
                   {/* Content: Either Stacked or Side-by-Side (QP left, MS right) */}
-                  <div className={`${viewMode === 'side-by-side' ? 'grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-white/[0.06]' : ''}`}>
+                  <div className={`${viewMode === 'side-by-side' ? 'grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-white/[0.08]' : ''}`}>
                     {/* Question Paper Pane */}
                     <div className="p-4 sm:p-5 space-y-3">
                       <div className="flex items-center justify-between flex-wrap gap-2">
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                            Official Question Paper:
+                          <span className="text-xs font-medium text-zinc-400">
+                            Official question paper:
                           </span>
                           {/* Exam Anatomy Component Badge */}
-                          <span className="rounded-md bg-slate-800 px-2 py-0.5 text-[10px] font-bold text-slate-300 border border-slate-700">
+                          <span className="rounded-md bg-[#222225] px-2 py-0.5 text-xs font-mono text-zinc-300 border border-white/[0.08]">
                             {paper.componentType || (paper.paperCode.includes('/1') || paper.paperCode.includes('/2') ? 'MCQ (40 Discrete Items)' : 'Theory & Extended (Sub-Part Structured)')}
                           </span>
                         </div>
@@ -2220,13 +2222,13 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                 navigator.clipboard.writeText(`[${paper.paperCode} ${paper.session} - ${paper.questionNumber}] ${paper.questionPrompt || ''}`);
                               }
                             }}
-                            className="inline-flex items-center gap-1 rounded-lg border border-blue-500/40 bg-blue-500/10 px-2.5 py-1 text-[11px] font-semibold text-blue-300 hover:bg-blue-500/20 transition cursor-pointer"
+                            className="inline-flex items-center gap-1 rounded-lg border border-white/[0.08] bg-[#222225] px-2.5 py-1 text-xs font-medium text-zinc-200 hover:bg-[#2c2c31] transition cursor-pointer"
                             title="Open Mark Scheme Solver to view step-by-step criteria"
                           >
-                            <Calculator className="h-3 w-3 text-blue-400" />
+                            <Calculator className="h-3 w-3 text-[#FF5B37]" />
                             <span>Mark Scheme Breakdown</span>
                           </button>
-                          <span className="text-xs font-bold text-amber-400">
+                          <span className="text-xs font-mono tabular-nums font-medium text-amber-400">
                             {typeof activeSubPartMap[paper.id] === 'number' && paper.subParts?.[activeSubPartMap[paper.id] as number]
                               ? `[${paper.subParts[activeSubPartMap[paper.id] as number].marks} Marks in Part ${paper.subParts[activeSubPartMap[paper.id] as number].part}]`
                               : `[${paper.marks} Marks Available]`}
@@ -2236,10 +2238,10 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
                       {/* Sub-Part Hierarchy Tabs */}
                       {paper.subParts && paper.subParts.length > 0 && (
-                        <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-2.5 space-y-2">
-                          <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1">
-                            <span>Exam Anatomy Sub-Part Hierarchy:</span>
-                            <span className="text-sky-400 font-mono">
+                        <div className="rounded-lg border border-white/[0.08] bg-[#141416] p-2.5 space-y-2">
+                          <div className="flex items-center justify-between text-xs font-medium text-zinc-400 px-1">
+                            <span>Sub-part hierarchy:</span>
+                            <span className="text-zinc-300 font-mono">
                               {typeof activeSubPartMap[paper.id] === 'number' ? `Viewing Part ${paper.subParts[activeSubPartMap[paper.id] as number].part}` : 'Viewing All Parts'}
                             </span>
                           </div>
@@ -2247,10 +2249,10 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                             <button
                               type="button"
                               onClick={() => setActiveSubPartMap(prev => ({ ...prev, [paper.id]: 'all' }))}
-                              className={`rounded-lg px-2.5 py-1 text-xs font-bold transition cursor-pointer ${
+                              className={`rounded-md px-2.5 py-1 text-xs font-medium transition cursor-pointer ${
                                 (activeSubPartMap[paper.id] ?? 'all') === 'all'
-                                  ? 'bg-sky-500 text-white shadow-sm ring-1 ring-sky-300'
-                                  : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                                  ? 'bg-[#FF5B37] text-white shadow-sm'
+                                  : 'bg-[#222225] text-zinc-400 hover:text-white border border-white/[0.08]'
                               }`}
                             >
                               All Sub-Parts ({paper.marks}M)
@@ -2262,14 +2264,14 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                   key={sp.part}
                                   type="button"
                                   onClick={() => setActiveSubPartMap(prev => ({ ...prev, [paper.id]: spIdx }))}
-                                  className={`rounded-lg px-2.5 py-1 text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                                  className={`rounded-md px-2.5 py-1 text-xs font-medium transition cursor-pointer flex items-center gap-1.5 ${
                                     isSpActive
-                                      ? 'bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow-md ring-1 ring-sky-400'
-                                      : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
+                                      ? 'bg-[#FF5B37] text-white shadow-sm'
+                                      : 'bg-[#222225] text-zinc-300 hover:bg-[#2c2c31] border border-white/[0.08]'
                                   }`}
                                 >
                                   <span>Part {sp.part}</span>
-                                  <span className="rounded bg-black/40 px-1.5 py-0.2 text-[10px] font-mono text-sky-200">
+                                  <span className="rounded bg-black/30 px-1.5 py-0.5 text-[10px] font-mono tabular-nums text-zinc-300">
                                     [{sp.marks}M]
                                   </span>
                                 </button>
@@ -2281,29 +2283,29 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
                       {/* Display Question Prompt (Specific Subpart vs Full Question) */}
                       {typeof activeSubPartMap[paper.id] === 'number' && paper.subParts?.[activeSubPartMap[paper.id] as number] ? (
-                        <div className="space-y-2.5 rounded-xl border border-sky-500/30 bg-sky-950/20 p-4 animate-fadeIn">
+                        <div className="space-y-2.5 rounded-lg border border-white/[0.08] bg-[#141416] p-4 animate-fadeIn">
                           <div className="flex items-center justify-between text-xs">
-                            <span className="font-bold text-sky-300 font-mono text-sm">
+                            <span className="font-medium text-[#ededed] font-mono text-sm">
                               Part {paper.subParts[activeSubPartMap[paper.id] as number].part}
                             </span>
-                            <span className="rounded-md bg-sky-500/20 px-2.5 py-0.5 text-[11px] font-bold text-sky-200 border border-sky-500/30">
+                            <span className="rounded-md bg-[#222225] px-2.5 py-0.5 text-xs font-mono tabular-nums font-medium text-zinc-200 border border-white/[0.08]">
                               Allocated: [{paper.subParts[activeSubPartMap[paper.id] as number].marks} Marks]
                             </span>
                           </div>
                           <MathRenderer
                             content={paper.subParts[activeSubPartMap[paper.id] as number].prompt}
-                            className="text-sm text-slate-100 leading-relaxed font-medium"
+                            className="text-sm text-zinc-100 leading-relaxed font-normal"
                           />
                           {paper.subParts[activeSubPartMap[paper.id] as number].diagramOrMath && (
-                            <div className="rounded-xl border border-slate-800 bg-slate-950 p-3 text-center overflow-x-auto">
+                            <div className="rounded-lg border border-white/[0.08] bg-[#111113] p-3 text-center overflow-x-auto">
                               <MathRenderer
                                 content={`$$${paper.subParts[activeSubPartMap[paper.id] as number].diagramOrMath}$$`}
-                                className="text-sm font-bold text-sky-300"
+                                className="text-sm font-semibold text-zinc-200"
                               />
                             </div>
                           )}
                           {paper.subParts[activeSubPartMap[paper.id] as number].examinerTip && (
-                            <p className="text-[11px] text-amber-300/90 pt-1 border-t border-sky-900/40">
+                            <p className="text-xs text-amber-300/90 pt-1 border-t border-white/[0.06]">
                               💡 Examiner Tip: {paper.subParts[activeSubPartMap[paper.id] as number].examinerTip}
                             </p>
                           )}
@@ -2312,12 +2314,12 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                         <>
                           <MathRenderer
                             content={paper.questionPrompt}
-                            className="text-sm text-slate-100 leading-relaxed font-medium"
+                            className="text-sm text-zinc-100 leading-relaxed font-normal"
                           />
 
                           {paper.diagramOrMath && (
-                            <div className="rounded-xl border border-slate-800 bg-slate-950 p-3 text-center overflow-x-auto">
-                              <MathRenderer content={`$$${paper.diagramOrMath}$$`} className="text-sm font-bold text-sky-300" />
+                            <div className="rounded-lg border border-white/[0.08] bg-[#111113] p-3 text-center overflow-x-auto">
+                              <MathRenderer content={`$$${paper.diagramOrMath}$$`} className="text-sm font-semibold text-zinc-200" />
                             </div>
                           )}
                         </>
@@ -2325,46 +2327,46 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
                       {/* Interactive Student Answer Grading Drawer */}
                       {testingPaperId === paper.id && (
-                        <div className="mt-3 rounded-xl border border-emerald-500/30 bg-slate-950/90 p-4 space-y-3 animate-fadeIn">
+                        <div className="mt-3 rounded-lg border border-white/[0.08] bg-[#141416] p-4 space-y-3 animate-fadeIn">
                           <div className="flex items-center justify-between">
-                            <label className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                            <label className="text-xs font-medium text-[#4cc38a] flex items-center gap-1.5">
                               <Edit3 className="h-4 w-4" />
                               Test Yourself: Enter Your Working or Final Answer:
                             </label>
-                            <span className="text-xs text-slate-400">Total Marks: [{paper.marks}]</span>
+                            <span className="text-xs text-zinc-400 font-mono tabular-nums">Total Marks: [{paper.marks}]</span>
                           </div>
                           <textarea
                             rows={2}
                             value={studentAnswers[paper.id] || ''}
                             onChange={(e) => setStudentAnswers((prev) => ({ ...prev, [paper.id]: e.target.value }))}
                             placeholder={`Enter your answer or working for ${paper.questionNumber} to be evaluated against official Cambridge mark scheme...`}
-                            className="w-full rounded-xl border border-slate-700 bg-slate-900 p-3 text-xs sm:text-sm text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none"
+                            className="w-full rounded-lg border border-white/[0.08] bg-[#18181b] p-3 text-xs text-[#ededed] placeholder-zinc-500 focus:border-[#FF5B37] focus:outline-none"
                           />
                           <div className="flex items-center justify-between flex-wrap gap-2">
                             <button
                               type="button"
                               onClick={() => handleGradePaperAnswer(paper)}
                               disabled={!(studentAnswers[paper.id] || '').trim()}
-                              className="rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-2 text-xs font-bold text-white shadow-md hover:from-emerald-500 hover:to-teal-500 transition cursor-pointer disabled:opacity-50"
+                              className="rounded-lg bg-[#FF5B37] hover:bg-[#F97316] px-4 py-2 text-xs font-medium text-white transition cursor-pointer disabled:opacity-50"
                             >
                               Grade My Answer Against Official MS
                             </button>
-                            <span className="text-[11px] text-slate-500">Instant step-by-step marking with [M], [A], [B] allocations</span>
+                            <span className="text-xs text-zinc-500">Instant step-by-step marking with [M], [A], [B] allocations</span>
                           </div>
 
                           {/* Grading Report */}
                           {gradingReports[paper.id] && (
-                            <div className="rounded-xl border border-emerald-500/30 bg-slate-900/95 p-4 space-y-3 text-xs mt-3 animate-fadeIn">
-                              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2">
-                                <span className="font-bold text-white flex items-center gap-1.5">
+                            <div className="rounded-lg border border-white/[0.08] bg-[#18181b] p-4 space-y-3 text-xs mt-3 animate-fadeIn">
+                              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/[0.08] pb-2">
+                                <span className="font-medium text-white flex items-center gap-1.5">
                                   <Award className="h-4 w-4 text-amber-400" />
                                   Official Examiner Evaluation:
                                 </span>
                                 <div className="flex items-center gap-2">
-                                  <span className="rounded-lg bg-indigo-500/20 border border-indigo-500/30 px-2.5 py-0.5 font-bold text-indigo-300">
+                                  <span className="rounded-md bg-[#222225] border border-white/[0.08] px-2.5 py-0.5 font-medium font-mono tabular-nums text-zinc-200">
                                     Mark: {gradingReports[paper.id].marksEarned} / {gradingReports[paper.id].totalMarks} ({gradingReports[paper.id].percentage}%)
                                   </span>
-                                  <span className="rounded-lg bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 font-semibold text-emerald-300">
+                                  <span className="rounded-md bg-[#4cc38a]/15 border border-[#4cc38a]/30 px-2 py-0.5 font-medium text-[#4cc38a]">
                                     {gradingReports[paper.id].verdict}
                                   </span>
                                 </div>
@@ -2376,16 +2378,16 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                   <div
                                     key={idx}
                                     className={`p-2.5 rounded-lg border flex items-start justify-between gap-2 ${
-                                      m.awarded ? 'border-emerald-500/25 bg-emerald-950/20 text-emerald-200' : 'border-rose-500/25 bg-rose-950/20 text-rose-200'
+                                      m.awarded ? 'border-[#4cc38a]/25 bg-[#4cc38a]/10 text-emerald-200' : 'border-[#e5484d]/25 bg-[#e5484d]/10 text-rose-200'
                                     }`}
                                   >
                                     <div>
-                                      <div className="font-bold flex items-center gap-1">
+                                      <div className="font-medium flex items-center gap-1">
                                         <span className="font-mono">{m.markType}</span>
                                         <span>{m.awarded ? '✅ [AWARDED]' : '❌ [LOST]'}</span>
                                       </div>
-                                      <p className="text-slate-300 mt-0.5">{m.requirement}</p>
-                                      <p className="text-[10px] text-slate-400 italic mt-0.5">{m.feedback}</p>
+                                      <p className="text-zinc-300 mt-0.5">{m.requirement}</p>
+                                      <p className="text-xs text-zinc-400 italic mt-0.5">{m.feedback}</p>
                                     </div>
                                   </div>
                                 ))}
@@ -2394,20 +2396,20 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                               {/* Missing marks */}
                               {gradingReports[paper.id].missingMarksExplained.length > 0 && (
                                 <div className="rounded-lg border border-amber-500/25 bg-amber-950/20 p-3 space-y-1.5 text-amber-200">
-                                  <div className="font-bold flex items-center gap-1 text-amber-300">
+                                  <div className="font-medium flex items-center gap-1 text-amber-300">
                                     <AlertCircle className="h-3.5 w-3.5" />
-                                    What Was Missing & Exact Phrasing Needed:
+                                    What Was Missing &amp; Exact Phrasing Needed:
                                   </div>
                                   {gradingReports[paper.id].missingMarksExplained.map((miss, idx) => (
                                     <div key={idx} className="pt-1">
                                       <p><strong>{miss.markType}:</strong> {miss.whatWasMissing}</p>
-                                      <p className="text-emerald-300 font-semibold">👉 {miss.whatToWriteToGetMark}</p>
+                                      <p className="text-[#4cc38a] font-medium">👉 {miss.whatToWriteToGetMark}</p>
                                     </div>
                                   ))}
                                 </div>
                               )}
 
-                              <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-800 text-[11px] text-slate-400">
+                              <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-white/[0.08] text-xs text-zinc-400">
                                 <div>Final Answer: <strong className="text-white">${paper.finalAnswer}$</strong></div>
                                 {paper.examinerReportSnippet && <div>💡 {paper.examinerReportSnippet}</div>}
                               </div>
@@ -2419,17 +2421,17 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
                     {/* Mark Scheme Pane (Side-by-side or expanded stacked) */}
                     {isExpanded && (
-                      <div className={`p-4 sm:p-5 space-y-3 ${viewMode === 'stacked' ? 'border-t border-slate-800 bg-slate-950/70' : 'bg-slate-950/50'}`}>
-                        <div className="rounded-xl border border-emerald-500/25 bg-emerald-950/20 p-4 space-y-2">
+                      <div className={`p-4 sm:p-5 space-y-3 ${viewMode === 'stacked' ? 'border-t border-white/[0.08] bg-[#141416]/50' : 'bg-[#141416]/30'}`}>
+                        <div className="rounded-lg border border-[#4cc38a]/20 bg-[#141416] p-4 space-y-2">
                           <div className="flex flex-wrap items-center justify-between gap-2">
-                            <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                            <span className="text-xs font-medium text-[#4cc38a] flex items-center gap-1.5">
                               <CheckCircle className="h-4 w-4" />
                               {typeof activeSubPartMap[paper.id] === 'number' && paper.subParts?.[activeSubPartMap[paper.id] as number]
                                 ? `Mark Scheme: Part ${paper.subParts[activeSubPartMap[paper.id] as number].part} [${paper.subParts[activeSubPartMap[paper.id] as number].marks}M]`
                                 : 'Official Mark Scheme:'}
                             </span>
                             <div className="flex items-center gap-3">
-                              <span className="text-xs font-mono font-bold text-white">
+                              <span className="text-xs font-mono font-medium text-white">
                                 Final: {typeof activeSubPartMap[paper.id] === 'number' && paper.subParts?.[activeSubPartMap[paper.id] as number]?.finalAnswer
                                   ? paper.subParts[activeSubPartMap[paper.id] as number].finalAnswer
                                   : paper.finalAnswer}
@@ -2447,7 +2449,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                     paper.paperCode
                                   )
                                 }
-                                className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-bold text-emerald-300 hover:bg-emerald-500/20 transition cursor-pointer"
+                                className="inline-flex items-center gap-1 rounded-lg border border-[#4cc38a]/30 bg-[#4cc38a]/10 px-2 py-0.5 text-xs font-medium text-[#4cc38a] hover:bg-[#4cc38a]/20 transition cursor-pointer"
                                 title="Preview official mark scheme PDF"
                               >
                                 <Eye className="h-3 w-3" />
@@ -2457,7 +2459,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                                 href={paper.board === 'Edexcel' || msDownloadUrl.includes('pearson.com') ? msDownloadUrl : `/api/pdf-proxy?url=${encodeURIComponent(msDownloadUrl)}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-950/40 px-2 py-0.5 text-[11px] font-bold text-emerald-300 hover:bg-emerald-900/60 transition"
+                                className="inline-flex items-center gap-1 rounded-lg border border-white/[0.08] bg-[#222225] px-2 py-0.5 text-xs font-medium text-zinc-300 hover:text-white transition"
                                 title="Open MS directly in verified viewer"
                               >
                                 <ExternalLink className="h-3 w-3" />
@@ -2469,15 +2471,15 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                           <div className="space-y-1.5 pt-1">
                             {typeof activeSubPartMap[paper.id] === 'number' && paper.subParts?.[activeSubPartMap[paper.id] as number] ? (
                               paper.subParts[activeSubPartMap[paper.id] as number].markScheme.map((item, idx) => (
-                                <div key={idx} className="flex items-start gap-2 text-xs text-slate-200">
-                                  <span className="font-bold text-emerald-400 font-mono shrink-0">{item.markType}</span>
+                                <div key={idx} className="flex items-start gap-2 text-xs text-zinc-200">
+                                  <span className="font-mono font-medium text-[#4cc38a] shrink-0">{item.markType}</span>
                                   <MathRenderer content={item.requirement} />
                                 </div>
                               ))
                             ) : (
                               paper.markScheme.map((item, idx) => (
-                                <div key={idx} className="flex items-start gap-2 text-xs text-slate-200">
-                                  <span className="font-bold text-indigo-400 font-mono shrink-0">{item.markType}</span>
+                                <div key={idx} className="flex items-start gap-2 text-xs text-zinc-200">
+                                  <span className="font-mono font-medium text-zinc-300 shrink-0">{item.markType}</span>
                                   <MathRenderer content={item.requirement} />
                                 </div>
                               ))
@@ -2487,8 +2489,8 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
                         {/* Principal Examiner Report Warning */}
                         {paper.examinerReportSnippet && (
-                          <div className="rounded-xl border border-amber-500/25 bg-amber-950/20 p-3.5 text-xs text-amber-200/90 leading-relaxed">
-                            <div className="flex items-center gap-1.5 font-bold text-amber-300 mb-1">
+                          <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-200/90 leading-relaxed">
+                            <div className="flex items-center gap-1.5 font-medium text-amber-300 mb-1">
                               <AlertCircle className="h-3.5 w-3.5" />
                               Principal Examiner Report Advice:
                             </div>
@@ -2510,11 +2512,11 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
       {/* ==================================================== */}
       {previewModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-2 sm:p-4 md:p-6 animate-fadeIn"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-4 md:p-6 animate-fadeIn"
           onClick={() => setPreviewModal(null)}
         >
           <div
-            className="flex flex-col w-full max-w-5xl h-[92vh] bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden"
+            className="flex flex-col w-full max-w-5xl h-[92vh] bg-[#18181b] border border-white/[0.08] rounded-2xl shadow-2xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Top Bar */}
@@ -2535,39 +2537,39 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
               return (
                 <>
-                  <div className="flex items-center justify-between gap-3 p-3 sm:p-4 bg-slate-950 border-b border-slate-800 flex-wrap">
+                  <div className="flex items-center justify-between gap-3 p-3 sm:p-4 bg-[#141416] border-b border-white/[0.08] flex-wrap">
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div
-                        className={`p-2 rounded-xl shrink-0 ${
+                        className={`p-2 rounded-lg border border-white/[0.08] shrink-0 ${
                           previewModal.type === 'ms'
-                            ? 'bg-emerald-500/20 text-emerald-400'
+                            ? 'bg-[#4cc38a]/15 text-[#4cc38a]'
                             : previewModal.type === 'er'
-                            ? 'bg-indigo-500/20 text-indigo-400'
+                            ? 'bg-[#FF5B37]/15 text-[#FF5B37]'
                             : previewModal.type === 'gt'
-                            ? 'bg-purple-500/20 text-purple-400'
-                            : 'bg-sky-500/20 text-sky-400'
+                            ? 'bg-[#222225] text-zinc-300'
+                            : 'bg-[#222225] text-[#FF5B37]'
                         }`}
                       >
-                        <FileText className="h-5 w-5" />
+                        <FileText className="h-4 w-4" />
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <h3 className="text-sm font-bold text-white truncate">
+                          <h3 className="text-xs sm:text-sm font-semibold text-[#ededed] truncate">
                             {previewModal.title}
                           </h3>
                           {isPearsonPortal && (
-                            <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 border border-amber-500/30 text-amber-300">
+                            <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-mono font-medium bg-[#222225] border border-white/[0.08] text-amber-300">
                               Pearson Edexcel
                             </span>
                           )}
                           {isOxfordPortal && (
-                            <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 border border-emerald-500/30 text-emerald-300">
+                            <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-mono font-medium bg-[#222225] border border-white/[0.08] text-[#4cc38a]">
                               OxfordAQA
                             </span>
                           )}
                         </div>
                         {previewModal.subtitle && (
-                          <p className="text-[11px] text-slate-400 truncate">
+                          <p className="text-xs text-zinc-400 truncate">
                             {previewModal.subtitle}
                           </p>
                         )}
@@ -2578,12 +2580,12 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                     <div className="flex items-center gap-2 shrink-0 flex-wrap">
                       {/* Engine Switcher (Only for direct PDF documents) */}
                       {!isBoardPortal && (
-                        <div className="hidden sm:flex items-center rounded-lg border border-slate-700 bg-slate-800 p-0.5 text-[11px]">
+                        <div className="hidden sm:flex items-center rounded-lg border border-white/[0.08] bg-[#18181b] p-0.5 text-xs">
                           <button
                             type="button"
                             onClick={() => setViewerEngine('proxy')}
-                            className={`rounded px-2 py-1 font-semibold transition cursor-pointer ${
-                              viewerEngine === 'proxy' ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-white'
+                            className={`rounded-md px-2 py-1 font-medium transition cursor-pointer ${
+                              viewerEngine === 'proxy' ? 'bg-[#FF5B37] text-white shadow-sm' : 'text-zinc-400 hover:text-white'
                             }`}
                             title="Verified Serverless PDF Stream (Auto-Mirrored & Clean)"
                           >
@@ -2592,8 +2594,8 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                           <button
                             type="button"
                             onClick={() => setViewerEngine('gdocs')}
-                            className={`rounded px-2 py-1 font-semibold transition cursor-pointer ${
-                              viewerEngine === 'gdocs' ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-white'
+                            className={`rounded-md px-2 py-1 font-medium transition cursor-pointer ${
+                              viewerEngine === 'gdocs' ? 'bg-[#FF5B37] text-white shadow-sm' : 'text-zinc-400 hover:text-white'
                             }`}
                             title="Universal Google Docs Embed Viewer (Recommended on mobile/tablets)"
                           >
@@ -2602,8 +2604,8 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                           <button
                             type="button"
                             onClick={() => setViewerEngine('direct')}
-                            className={`rounded px-2 py-1 font-semibold transition cursor-pointer ${
-                              viewerEngine === 'direct' ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-white'
+                            className={`rounded-md px-2 py-1 font-medium transition cursor-pointer ${
+                              viewerEngine === 'direct' ? 'bg-[#FF5B37] text-white shadow-sm' : 'text-zinc-400 hover:text-white'
                             }`}
                             title="Direct PDF Embed"
                           >
@@ -2617,7 +2619,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                         <button
                           type="button"
                           onClick={() => setUseBackupMirror(!useBackupMirror)}
-                          className="inline-flex items-center gap-1 rounded-xl border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer"
+                          className="inline-flex items-center gap-1 rounded-lg border border-white/[0.08] bg-[#222225] px-2.5 py-1.5 text-xs font-medium text-zinc-300 hover:text-white transition cursor-pointer"
                           title="Switch between Primary CDN and Backup CDN"
                         >
                           <RefreshCw className="h-3 w-3" />
@@ -2630,7 +2632,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                         href={isBoardPortal ? currentModalUrl : `/api/pdf-proxy?url=${encodeURIComponent(currentModalUrl)}${previewModal?.backupUrl ? `&fallback=${encodeURIComponent(previewModal.backupUrl)}` : ''}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 rounded-xl border border-sky-500/40 bg-sky-500/10 px-3 py-1.5 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-[#222225] px-3 py-1.5 text-xs font-medium text-zinc-200 hover:bg-[#2c2c31] hover:text-white transition"
                         title={isBoardPortal ? `Launch ${boardName} Official Portal` : 'Open PDF directly in full browser window'}
                       >
                         <ExternalLink className="h-3.5 w-3.5" />
@@ -2642,7 +2644,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                         <a
                           href={`/api/pdf-proxy?url=${encodeURIComponent(currentModalUrl)}${previewModal?.backupUrl ? `&fallback=${encodeURIComponent(previewModal.backupUrl)}` : ''}&download=true`}
                           download
-                          className="inline-flex items-center gap-1.5 rounded-xl bg-sky-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-sky-500 transition shadow-sm"
+                          className="inline-flex items-center gap-1.5 rounded-lg bg-[#FF5B37] hover:bg-[#F97316] px-3 py-1.5 text-xs font-medium text-white transition shadow-sm"
                           title="Download PDF to computer"
                         >
                           <Download className="h-3.5 w-3.5" />
@@ -2654,19 +2656,19 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                       <button
                         type="button"
                         onClick={() => setPreviewModal(null)}
-                        className="p-1.5 rounded-xl border border-slate-700 bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition cursor-pointer"
+                        className="p-1.5 rounded-lg border border-white/[0.08] bg-[#222225] text-zinc-400 hover:text-white hover:bg-[#2c2c31] transition cursor-pointer"
                         title="Close preview (Esc)"
                       >
-                        <X className="h-5 w-5" />
+                        <X className="h-4 w-4" />
                       </button>
                     </div>
                   </div>
 
                   {/* Floating Audio Player HUD in Modal Viewer */}
                   {previewModal.hasAudio && previewModal.audioStreamUrl && (
-                    <div className="bg-gradient-to-r from-sky-950/95 via-indigo-950/90 to-slate-950 border-b border-sky-500/30 px-4 py-2.5 flex items-center justify-between gap-3 flex-wrap shadow-inner">
-                      <div className="flex items-center gap-2 text-xs font-bold text-sky-300">
-                        <Headphones className="h-4 w-4 text-sky-400 animate-pulse shrink-0" />
+                    <div className="bg-[#141416] border-b border-white/[0.08] px-4 py-2.5 flex items-center justify-between gap-3 flex-wrap">
+                      <div className="flex items-center gap-2 text-xs font-medium text-zinc-200">
+                        <Headphones className="h-4 w-4 text-[#FF5B37] shrink-0" />
                         <span>Official Listening Exam Track:</span>
                       </div>
                       <div className="flex-1 min-w-[220px] max-w-md">
@@ -2678,7 +2680,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                           target="_blank"
                           rel="noopener noreferrer"
                           download
-                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-sky-600 hover:bg-sky-500 text-xs font-bold text-white transition shadow-sm"
+                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#FF5B37] hover:bg-[#F97316] text-xs font-medium text-white transition shadow-sm"
                         >
                           <Download className="h-3.5 w-3.5" />
                           <span>Download MP3</span>
@@ -2688,10 +2690,10 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                   )}
 
                   {/* Helper notice */}
-                  <div className="bg-sky-950/40 border-b border-sky-500/20 px-4 py-2 text-[11px] text-sky-200 flex items-center justify-between gap-2 flex-wrap">
+                  <div className="bg-[#18181b] border-b border-white/[0.06] px-4 py-2 text-xs text-zinc-400 flex items-center justify-between gap-2 flex-wrap">
                     {isBoardPortal ? (
                       <span>
-                        🔒 <strong>{boardName} Materials Hub:</strong> Official {boardName} past papers & mark schemes are hosted on the exam board's official qualifications repository.
+                        🔒 <strong>{boardName} Materials Hub:</strong> Official {boardName} past papers &amp; mark schemes are hosted on the exam board's official qualifications repository.
                       </span>
                     ) : (
                       <span>
@@ -2702,7 +2704,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                       href={currentModalUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="underline font-bold text-sky-300 hover:text-white ml-auto"
+                      className="underline font-medium text-[#FF5B37] hover:text-[#F97316] ml-auto"
                     >
                       {isBoardPortal ? `Launch ${boardName} Portal ↗` : 'Launch Direct PDF ↗'}
                     </a>
@@ -2710,39 +2712,39 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
 
                   {/* Modal Body: Board Hub Card vs PDF Viewer */}
                   {isBoardPortal ? (
-                    <div className="relative flex-1 w-full bg-slate-950 overflow-y-auto flex items-center justify-center p-4 sm:p-8">
-                      <div className="max-w-xl w-full bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl text-center space-y-6 animate-fadeIn">
-                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-950/80 border border-blue-800/50 text-blue-300 text-xs font-semibold uppercase tracking-wider">
+                    <div className="relative flex-1 w-full bg-[#111113] overflow-y-auto flex items-center justify-center p-4 sm:p-8">
+                      <div className="max-w-xl w-full bg-[#18181b] border border-white/[0.08] rounded-2xl p-6 sm:p-8 shadow-2xl text-center space-y-6 animate-fadeIn">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#222225] border border-white/[0.08] text-[#FF5B37] text-xs font-medium">
                           <BookOpen className="h-4 w-4" />
-                          Official {boardName} Archive
+                          <span>Official {boardName} Archive</span>
                         </div>
 
                         <div>
-                          <h2 className="text-xl sm:text-2xl font-black text-white">
+                          <h2 className="text-xl sm:text-2xl font-semibold text-[#ededed]">
                             {previewModal.title}
                           </h2>
                           {previewModal.subtitle && (
-                            <p className="text-xs sm:text-sm text-slate-400 mt-1 font-medium">
+                            <p className="text-xs sm:text-sm text-zinc-400 mt-1 font-normal">
                               {previewModal.subtitle}
                             </p>
                           )}
                         </div>
 
-                        <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 text-left space-y-2">
-                          <p className="font-bold text-slate-200 flex items-center gap-2">
+                        <div className="p-4 rounded-xl bg-[#141416] border border-white/[0.08] text-xs text-zinc-300 text-left space-y-2">
+                          <p className="font-medium text-zinc-200 flex items-center gap-2">
                             <span>✅</span> Verified Exam Board Portal Search
                           </p>
-                          <p className="text-slate-400 leading-relaxed">
-                            {boardName} provides international past papers & mark schemes via their official qualifications portal. We have prepared the exact pre-filtered portal search and direct backup mirrors for this paper below:
+                          <p className="text-zinc-400 leading-relaxed">
+                            {boardName} provides international past papers &amp; mark schemes via their official qualifications portal. We have prepared the exact pre-filtered portal search and direct backup mirrors for this paper below:
                           </p>
                         </div>
 
-                        <div className="flex flex-col gap-3">
+                        <div className="flex flex-col gap-2.5">
                           <a
                             href={currentModalUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-sky-600 hover:bg-sky-500 px-5 py-3 text-sm font-bold text-white transition shadow-lg shadow-sky-600/25 cursor-pointer"
+                            className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[#FF5B37] hover:bg-[#F97316] px-5 py-2.5 text-xs font-medium text-white transition shadow-sm cursor-pointer"
                           >
                             <span>Launch Official {boardName} Portal</span>
                             <ExternalLink className="h-4 w-4" />
@@ -2753,7 +2755,7 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                               href={previewModal.backupUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 hover:text-white px-4 py-2.5 text-xs font-semibold text-slate-300 transition"
+                              className="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-white/[0.08] bg-[#222225] hover:bg-[#2c2c31] hover:text-white px-4 py-2 text-xs font-medium text-zinc-300 transition"
                             >
                               <span>Search on PapaCambridge Archive</span>
                               <ExternalLink className="h-3.5 w-3.5" />
@@ -2764,20 +2766,20 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                             href={`https://www.google.com/search?q=${encodeURIComponent(portalSearchQuery)}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 hover:text-white px-4 py-2.5 text-xs font-semibold text-slate-300 transition"
+                            className="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-white/[0.08] bg-[#222225] hover:bg-[#2c2c31] hover:text-white px-4 py-2 text-xs font-medium text-zinc-300 transition"
                           >
                             <span>Search Google for Direct PDF Mirror</span>
                             <ExternalLink className="h-3.5 w-3.5" />
                           </a>
                         </div>
 
-                        <p className="text-[11px] text-slate-500 pt-2 border-t border-slate-800/80">
+                        <p className="text-xs text-zinc-500 pt-2 border-t border-white/[0.08]">
                           Fahemny IGCSE Platform • Fast, Verified Exam Preparation
                         </p>
                       </div>
                     </div>
                   ) : (
-                    <div className="relative flex-1 w-full bg-slate-950 overflow-hidden">
+                    <div className="relative flex-1 w-full bg-[#111113] overflow-hidden">
                       <iframe
                         src={
                           viewerEngine === 'proxy'
@@ -2793,17 +2795,17 @@ export const PastPaperFinder: React.FC<PastPaperFinderProps> = ({
                   )}
 
                   {/* Modal Footer */}
-                  <div className="p-2 sm:p-2.5 bg-slate-950 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 px-4 flex-wrap gap-2">
+                  <div className="p-2 sm:p-2.5 bg-[#141416] border-t border-white/[0.08] flex items-center justify-between text-xs text-zinc-400 px-4 flex-wrap gap-2">
                     <div className="flex items-center gap-2">
-                      <span>Press <kbd className="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-300 font-mono">Esc</kbd> to close</span>
-                      <span className="text-slate-600">•</span>
-                      <span className="text-[10px] text-slate-500 font-mono truncate max-w-xs">{currentModalUrl}</span>
+                      <span>Press <kbd className="rounded bg-[#222225] border border-white/[0.08] px-1.5 py-0.5 text-[10px] text-zinc-300 font-mono">Esc</kbd> to close</span>
+                      <span className="text-zinc-600">•</span>
+                      <span className="text-xs text-zinc-500 font-mono truncate max-w-xs">{currentModalUrl}</span>
                     </div>
                     <a
                       href={currentModalUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sky-400 hover:underline flex items-center gap-1 font-semibold"
+                      className="text-[#FF5B37] hover:underline flex items-center gap-1 font-medium"
                     >
                       <span>Trouble viewing inline? Open original document</span>
                       <ExternalLink className="h-3 w-3" />
