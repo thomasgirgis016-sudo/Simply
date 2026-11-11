@@ -109,15 +109,15 @@ export const SimplyLogo: React.FC<SimplyLogoProps> = ({
         <div className="flex flex-col leading-none justify-center">
           <div className="flex items-center gap-1.5 sm:gap-2">
             <span
-              className={`font-black tracking-tight text-white ${currentSize.text} font-['Plus_Jakarta_Sans',sans-serif]`}
+              className={`font-semibold tracking-tight text-white ${currentSize.text}`}
             >
               Fahemny
             </span>
-            <span className="rounded-md bg-gradient-to-r from-[#FF5E62] to-[#FFA63A] px-1.5 py-0.5 sm:px-2 sm:py-0.5 text-[9px] sm:text-xs font-black uppercase tracking-wider text-slate-950 shadow-md">
+            <span className="rounded-md bg-[#232325] border border-white/[0.08] px-1.5 py-0.5 text-[9px] sm:text-xs font-mono font-medium text-[#FF5B37]">
               IGCSE
             </span>
           </div>
-          <span className={`hidden sm:block font-semibold tracking-wide text-slate-400 mt-1 ${currentSize.sub}`}>
+          <span className={`hidden sm:block font-normal text-zinc-400 mt-0.5 ${currentSize.sub}`}>
             Cambridge & Edexcel Exam Suite
           </span>
         </div>

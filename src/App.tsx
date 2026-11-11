@@ -779,7 +779,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0e1a] text-slate-100 flex font-sans selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen bg-[#111113] text-[#ededed] flex font-sans selection:bg-[#FF5B37]/30 selection:text-white">
       {/* Modern Collapsible Sidebar (Desktop & Mobile Drawer) */}
       <AppSidebar
         activeTab={activeTab}

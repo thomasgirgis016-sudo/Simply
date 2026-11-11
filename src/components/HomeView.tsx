@@ -198,41 +198,41 @@ export const HomeView: React.FC<HomeViewProps> = ({
   }, [searchQuery, subjects]);
 
   return (
-    <div className="space-y-8 animate-fadeIn max-w-7xl mx-auto w-full">
-      {/* View Switcher Pill (Shows when user is logged in so they can view the public landing presentation anytime) */}
+    <div className="space-y-12 animate-fadeIn max-w-7xl mx-auto w-full">
+      {/* View Switcher (Shows when user is logged in so they can view the public platform overview anytime) */}
       {currentUser && (
-        <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
+        <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-400 font-medium">Viewing as:</span>
-            <div className="inline-flex rounded-lg bg-[#111723] p-1 border border-white/[0.08]">
+            <span className="text-xs text-[#85858b] font-normal">View mode:</span>
+            <div className="inline-flex rounded-lg bg-[#0f0f10] p-1 border border-white/[0.08]">
               <button
                 onClick={() => setViewMode('workspace')}
-                className={`px-3 py-1 rounded-md text-xs font-bold transition ${
+                className={`px-3 py-1 rounded-md text-xs font-medium transition-colors duration-150 ${
                   viewMode === 'workspace'
-                    ? 'bg-[#FF5B37] text-white shadow-sm'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-[#232325] text-[#ededed]'
+                    : 'text-[#85858b] hover:text-[#ededed]'
                 }`}
               >
-                My Academic Workspace
+                Academic workspace
               </button>
               <button
                 onClick={() => setViewMode('landing')}
-                className={`px-3 py-1 rounded-md text-xs font-bold transition ${
+                className={`px-3 py-1 rounded-md text-xs font-medium transition-colors duration-150 ${
                   viewMode === 'landing'
-                    ? 'bg-[#FF5B37] text-white shadow-sm'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-[#232325] text-[#ededed]'
+                    : 'text-[#85858b] hover:text-[#ededed]'
                 }`}
               >
-                Platform Overview
+                Platform overview
               </button>
             </div>
           </div>
 
-          <div className="hidden sm:flex items-center gap-2 text-xs text-slate-400">
-            <span className="font-mono text-emerald-400 font-semibold">● Active Session:</span>
-            <span>{currentUser.name}</span>
-            <span className="text-slate-600">|</span>
-            <span className="font-mono text-amber-300">Grade {profile.targetGrade} Candidate</span>
+          <div className="hidden sm:flex items-center gap-2 text-xs text-[#85858b]">
+            <span className="inline-block h-2 w-2 rounded-full bg-[#4cc38a]" />
+            <span className="text-[#ededed] font-medium">{currentUser.name}</span>
+            <span className="text-[#85858b]/40">•</span>
+            <span className="font-mono text-[#a1a1a6]">Grade {profile.targetGrade} candidate</span>
           </div>
         </div>
       )}
@@ -243,32 +243,25 @@ export const HomeView: React.FC<HomeViewProps> = ({
       {viewMode === 'landing' && (
         <div className="space-y-16 py-2">
           {/* 1. HERO SECTION */}
-          <section className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0E1420] p-6 sm:p-12 shadow-2xl">
-            {/* Subtle architectural grain & ambient warmth (No generic cyber glows) */}
-            <div className="absolute top-0 right-0 w-96 h-96 bg-[#FF5B37]/5 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#FFA63A]/5 rounded-full blur-3xl pointer-events-none" />
-
+          <section className="relative rounded-2xl border border-white/[0.08] bg-[#19191b] p-8 sm:p-12">
             <div className="relative z-10 max-w-4xl space-y-6">
               {/* Syllabus Accreditation Pill */}
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.04] px-3.5 py-1 text-xs font-semibold text-slate-300">
-                <span className="h-2 w-2 rounded-full bg-[#FF5B37]" />
-                <span>Cambridge (CAIE) & Pearson Edexcel IGCSE</span>
-                <span className="text-slate-500">•</span>
-                <span className="text-amber-300 font-mono">2026 Ready</span>
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-[#232325] px-3.5 py-1 text-xs text-[#a1a1a6]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#FF5B37]" />
+                <span>Cambridge (CAIE) &amp; Pearson Edexcel IGCSE</span>
+                <span className="text-[#85858b]">•</span>
+                <span className="font-mono text-[#ededed]">2026 series</span>
               </div>
 
               {/* Natural, Honest Headline */}
               <div className="space-y-3">
-                <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.12]">
-                  The IGCSE platform built by someone who actually{' '}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF5B37] via-[#FF7A45] to-[#FFA63A]">
-                    sat the papers.
-                  </span>
+                <h1 className="text-3xl sm:text-5xl lg:text-6xl font-medium text-[#ededed] tracking-tight leading-[1.08]">
+                  The IGCSE revision workspace built around official mark schemes
                 </h1>
-                <p className="text-base sm:text-xl text-slate-300 max-w-2xl font-normal leading-relaxed pt-1">
-                  Stop scrolling through chaotic Google Drives and watermarked PDFs.
-                  Practice with 1,200+ official past papers, synchronized mark schemes,
-                  line-by-line method breakdowns, and examiner pitfall warnings.
+                <p className="text-base sm:text-lg text-[#a1a1a6] max-w-2xl font-normal leading-relaxed pt-1">
+                  Stop scrolling through disorganized folders and watermarked scans.
+                  Practice with 1,200+ synchronized past papers, step-by-step method mark breakdowns,
+                  and verified examiner pitfall reports.
                 </p>
               </div>
 
@@ -282,9 +275,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
                       onOpenAuth('signup');
                     }
                   }}
-                  className="btn-brand-primary text-sm sm:text-base py-3 px-6 shadow-lg shadow-[#FF5B37]/20"
+                  className="inline-flex items-center gap-2 rounded-lg bg-[#FF5B37] hover:bg-[#e04f2d] text-white text-sm font-medium py-3 px-6 transition-colors duration-150 cursor-pointer"
                 >
-                  <span>Explore Past Paper Vault</span>
+                  <span>Explore past paper vault</span>
                   <ArrowRight className="h-4 w-4" />
                 </button>
 
@@ -296,39 +289,39 @@ export const HomeView: React.FC<HomeViewProps> = ({
                       onOpenAuth('signin');
                     }
                   }}
-                  className="btn-brand-secondary text-sm sm:text-base py-3 px-5"
+                  className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] bg-[#232325] hover:bg-[#2c2c30] text-[#ededed] text-sm font-medium py-3 px-5 transition-colors duration-150 cursor-pointer"
                 >
-                  <Calculator className="h-4 w-4 text-amber-400" />
-                  <span>See Mark Scheme Solver</span>
+                  <Calculator className="h-4 w-4 text-[#85858b]" />
+                  <span>Mark scheme solver</span>
                 </button>
 
                 {!currentUser && onOpenAuth && (
                   <button
                     onClick={() => onOpenAuth('signin')}
-                    className="text-xs sm:text-sm font-semibold text-slate-400 hover:text-white px-3 py-2 transition"
+                    className="text-xs sm:text-sm font-normal text-[#85858b] hover:text-[#ededed] px-3 py-2 transition-colors duration-150 cursor-pointer"
                   >
-                    Already have an account? <span className="text-[#FFA63A] underline">Sign in</span>
+                    Already have an account? <span className="text-[#ededed] underline underline-offset-4">Sign in</span>
                   </button>
                 )}
               </div>
 
-              {/* Honest Proof Points */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 border-t border-white/[0.08]">
+              {/* Grounded Proof Points */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-8 border-t border-white/[0.08]">
                 <div>
-                  <div className="text-2xl font-black font-mono text-white">1,200+</div>
-                  <div className="text-xs text-slate-400 mt-0.5">Official Past Papers</div>
+                  <div className="text-2xl font-medium font-mono tabular-nums text-[#ededed]">1,200+</div>
+                  <div className="text-xs text-[#85858b] mt-1">Official past papers</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-black font-mono text-emerald-400">[M1][A1]</div>
-                  <div className="text-xs text-slate-400 mt-0.5">Method & Accuracy Marks</div>
+                  <div className="text-2xl font-medium font-mono tabular-nums text-[#4cc38a]">[M1][A1]</div>
+                  <div className="text-xs text-[#85858b] mt-1">Method &amp; accuracy marks</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-black font-mono text-amber-300">2018–2025</div>
-                  <div className="text-xs text-slate-400 mt-0.5">Series Synchronized</div>
+                  <div className="text-2xl font-medium font-mono tabular-nums text-[#ededed]">2018–2025</div>
+                  <div className="text-xs text-[#85858b] mt-1">Series synchronized</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-black font-mono text-sky-400">100%</div>
-                  <div className="text-xs text-slate-400 mt-0.5">Syllabus-Aligned Topics</div>
+                  <div className="text-2xl font-medium font-mono tabular-nums text-[#ededed]">100%</div>
+                  <div className="text-xs text-[#85858b] mt-1">Syllabus-aligned topics</div>
                 </div>
               </div>
             </div>
@@ -337,24 +330,24 @@ export const HomeView: React.FC<HomeViewProps> = ({
           {/* 2. REAL INTERACTIVE PLATFORM SHOWCASE */}
           <section className="space-y-6">
             <div className="text-center max-w-2xl mx-auto space-y-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#FF5B37]">
-                Live Platform Showcase
+              <span className="text-xs text-[#85858b] font-normal">
+                Platform showcase
               </span>
-              <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-                Crafted for how students actually study
+              <h2 className="text-2xl sm:text-3xl font-medium text-[#ededed] tracking-tight">
+                Designed for how candidates actually revise
               </h2>
-              <p className="text-xs sm:text-sm text-slate-400">
-                Click each feature below to preview how Fahemny tackles the real pain points of IGCSE exam prep.
+              <p className="text-xs sm:text-sm text-[#a1a1a6]">
+                Explore how Fahemny solves the core bottlenecks of Cambridge and Edexcel exam preparation.
               </p>
             </div>
 
             {/* Feature Tab Bar */}
-            <div className="flex rounded-xl bg-[#111723] p-1.5 border border-white/[0.08] max-w-2xl mx-auto gap-1">
+            <div className="flex rounded-lg bg-[#0f0f10] p-1 border border-white/[0.08] max-w-2xl mx-auto gap-1">
               {[
-                { id: 'split', label: 'Split-Screen Papers', icon: Columns },
-                { id: 'solver', label: 'Step-by-Step Solver', icon: Calculator },
-                { id: 'pitfalls', label: 'Examiner Pitfalls', icon: TrendingDown },
-                { id: 'whatsapp', label: 'Weekly WhatsApp Report', icon: Smartphone },
+                { id: 'split', label: 'Split-screen papers', icon: Columns },
+                { id: 'solver', label: 'Step-by-step solver', icon: Calculator },
+                { id: 'pitfalls', label: 'Examiner pitfalls', icon: TrendingDown },
+                { id: 'whatsapp', label: 'Weekly progress report', icon: Smartphone },
               ].map((tab) => {
                 const Icon = tab.icon;
                 const isActive = previewTab === tab.id;
@@ -362,13 +355,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   <button
                     key={tab.id}
                     onClick={() => setPreviewTab(tab.id as any)}
-                    className={`flex-1 py-2 px-2 sm:px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                    className={`flex-1 py-2 px-2 sm:px-3 rounded-md text-xs font-medium transition-colors duration-150 flex items-center justify-center gap-1.5 cursor-pointer ${
                       isActive
-                        ? 'bg-[#1A2333] text-white border border-white/[0.12] shadow-sm'
-                        : 'text-slate-400 hover:text-white'
+                        ? 'bg-[#232325] text-[#ededed] border border-white/[0.08]'
+                        : 'text-[#85858b] hover:text-[#ededed]'
                     }`}
                   >
-                    <Icon className={`h-3.5 w-3.5 ${isActive ? 'text-[#FF5B37]' : ''}`} />
+                    <Icon className="h-3.5 w-3.5 shrink-0" />
                     <span className="hidden sm:inline">{tab.label}</span>
                     <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
                   </button>
@@ -377,59 +370,59 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
 
             {/* Interactive Showcase Frame */}
-            <div className="rounded-2xl border border-white/[0.1] bg-[#0E1420] p-4 sm:p-7 shadow-xl">
+            <div className="rounded-2xl border border-white/[0.08] bg-[#19191b] p-6 sm:p-8">
               {/* Tab 1: Split-Screen Viewer Preview */}
               {previewTab === 'split' && (
                 <div className="space-y-4">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/[0.08] pb-3">
                     <div>
-                      <span className="text-xs font-mono font-bold text-amber-400">CAIE 0580/42 • May/June 2024</span>
-                      <h3 className="text-sm sm:text-base font-bold text-white mt-0.5">
-                        Synchronized Question Paper & Mark Scheme Dual-Pane
+                      <span className="text-xs font-mono text-[#85858b]">CAIE 0580/42 • May/June 2024</span>
+                      <h3 className="text-sm sm:text-base font-medium text-[#ededed] mt-0.5">
+                        Synchronized question paper &amp; mark scheme dual-pane
                       </h3>
                     </div>
-                    <span className="text-[11px] text-slate-400">No more flipping between tabs or printing 50 pages</span>
+                    <span className="text-xs text-[#85858b]">Zero tab flipping or PDF printing</span>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Left Pane: Question Paper */}
-                    <div className="rounded-xl border border-white/[0.08] bg-[#121824] p-4 space-y-3 font-sans">
-                      <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 border-b border-white/[0.06] pb-2">
-                        <span className="font-bold text-white">QUESTION 4(b)</span>
-                        <span className="text-amber-400 font-bold">[4 Marks]</span>
+                    <div className="rounded-xl border border-white/[0.08] bg-[#141415] p-5 space-y-3 font-sans">
+                      <div className="flex items-center justify-between text-xs font-mono text-[#85858b] border-b border-white/[0.06] pb-2">
+                        <span className="text-[#ededed] font-medium">Question 4(b)</span>
+                        <span className="tabular-nums">[4 marks]</span>
                       </div>
-                      <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
-                        A solid cone has radius <code className="text-amber-300 font-mono">r = 6 cm</code> and slant height <code className="text-amber-300 font-mono">l = 10 cm</code>.
+                      <p className="text-xs sm:text-sm text-[#ededed] leading-relaxed">
+                        A solid cone has radius <code className="text-[#ededed] font-mono">r = 6 cm</code> and slant height <code className="text-[#ededed] font-mono">l = 10 cm</code>.
                         <br />
-                        Calculate the total surface area of the cone. Give your answer in terms of <span className="font-mono text-amber-300">π</span>.
+                        Calculate the total surface area of the cone. Give your answer in terms of <span className="font-mono text-[#ededed]">π</span>.
                       </p>
-                      <div className="rounded-lg bg-black/30 p-2.5 text-[11px] text-slate-400 border border-white/[0.04]">
-                        Formula given on syllabus: <code className="text-slate-300 font-mono">Curved Surface Area = πrl</code>
+                      <div className="rounded-md bg-[#232325] p-2.5 text-xs text-[#a1a1a6] border border-white/[0.06]">
+                        Formula reference: <code className="text-[#ededed] font-mono">Curved Surface Area = πrl</code>
                       </div>
                     </div>
 
                     {/* Right Pane: Official Mark Scheme */}
-                    <div className="rounded-xl border border-emerald-500/30 bg-[#0B1A14] p-4 space-y-3 font-sans">
-                      <div className="flex items-center justify-between text-[11px] font-mono text-emerald-400 border-b border-emerald-500/20 pb-2">
-                        <span className="font-bold">OFFICIAL CAIE MARK SCHEME</span>
-                        <span className="bg-emerald-500/20 px-2 py-0.5 rounded text-[10px] font-bold">VERIFIED</span>
+                    <div className="rounded-xl border border-white/[0.08] bg-[#141415] p-5 space-y-3 font-sans">
+                      <div className="flex items-center justify-between text-xs font-mono text-[#85858b] border-b border-white/[0.06] pb-2">
+                        <span className="text-[#ededed] font-medium">Official CAIE mark scheme</span>
+                        <span className="rounded bg-[#232325] border border-white/[0.08] px-2 py-0.5 text-[11px] text-[#4cc38a]">Verified</span>
                       </div>
-                      <div className="space-y-2 text-xs text-slate-200">
+                      <div className="space-y-2 text-xs text-[#a1a1a6]">
                         <div className="flex items-start justify-between gap-2 border-b border-white/[0.04] pb-1.5">
                           <span>Curved area = π × 6 × 10 = 60π</span>
-                          <span className="font-mono font-bold text-emerald-400 shrink-0">[M1] Method</span>
+                          <span className="font-mono text-[#ededed] shrink-0">[M1]</span>
                         </div>
                         <div className="flex items-start justify-between gap-2 border-b border-white/[0.04] pb-1.5">
                           <span>Base circular area = π × 6² = 36π</span>
-                          <span className="font-mono font-bold text-emerald-400 shrink-0">[M1] Base</span>
+                          <span className="font-mono text-[#ededed] shrink-0">[M1]</span>
                         </div>
-                        <div className="flex items-start justify-between gap-2 pt-0.5 font-bold text-white">
+                        <div className="flex items-start justify-between gap-2 pt-0.5 text-[#ededed] font-medium">
                           <span>Total surface area = 60π + 36π = 96π</span>
-                          <span className="font-mono text-emerald-300 shrink-0">[A1] Exact Value</span>
+                          <span className="font-mono text-[#4cc38a] shrink-0">[A1]</span>
                         </div>
                       </div>
-                      <div className="text-[10px] text-amber-300/90 pt-1 italic">
-                        Examiner Note: Common trap — 42% of candidates forgot to add the circular base.
+                      <div className="text-xs text-[#85858b] pt-2 border-t border-white/[0.06]">
+                        Examiner report note: 42% of candidates omitted the circular base area.
                       </div>
                     </div>
                   </div>
@@ -441,34 +434,34 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 <div className="space-y-4">
                   <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
                     <div>
-                      <span className="text-xs font-mono font-bold text-sky-400">Step-by-Step Mark Scheme Solver</span>
-                      <h3 className="text-sm sm:text-base font-bold text-white mt-0.5">
-                        Never wonder why you lost a mark again
+                      <span className="text-xs font-mono text-[#85858b]">Step-by-step mark scheme solver</span>
+                      <h3 className="text-sm sm:text-base font-medium text-[#ededed] mt-0.5">
+                        Line-by-line mark breakdown against official examiner standards
                       </h3>
                     </div>
-                    <span className="text-[11px] bg-sky-500/15 text-sky-300 border border-sky-500/30 px-2 py-0.5 rounded font-mono">
-                      Line-by-Line Criteria
+                    <span className="text-xs font-mono text-[#85858b] bg-[#232325] px-2 py-0.5 rounded border border-white/[0.08]">
+                      CAIE 0625/42
                     </span>
                   </div>
 
-                  <div className="rounded-xl border border-white/[0.08] bg-[#121824] p-4 space-y-3">
-                    <div className="text-xs text-slate-400 font-mono">Syllabus: Cambridge IGCSE Physics (0625) • Paper 4 Extended</div>
-                    <div className="text-xs sm:text-sm font-semibold text-white">
+                  <div className="rounded-xl border border-white/[0.08] bg-[#141415] p-5 space-y-3">
+                    <div className="text-xs text-[#85858b] font-mono">Cambridge IGCSE Physics (0625) • Paper 4 Extended</div>
+                    <div className="text-xs sm:text-sm text-[#ededed]">
                       "A 1200 W electric kettle heats 0.8 kg of water from 20°C to 100°C. Specific heat capacity of water = 4200 J/(kg·°C). Calculate the minimum time required."
                     </div>
 
                     <div className="space-y-2 pt-2">
-                      <div className="flex items-center gap-2 rounded-lg bg-emerald-950/30 border border-emerald-500/30 p-2.5 text-xs text-slate-200">
-                        <span className="rounded bg-emerald-500/20 px-1.5 py-0.5 text-[10px] font-mono font-bold text-emerald-300">[M1]</span>
-                        <span>Energy required: <code className="text-emerald-300 font-mono">Q = mcΔT = 0.8 × 4200 × (100 - 20) = 268,800 J</code></span>
+                      <div className="flex items-center gap-2 rounded-lg bg-[#232325] border border-white/[0.08] p-3 text-xs text-[#a1a1a6]">
+                        <span className="rounded bg-[#141415] border border-white/[0.08] px-1.5 py-0.5 text-xs font-mono text-[#ededed]">[M1]</span>
+                        <span>Energy required: <code className="text-[#ededed] font-mono">Q = mcΔT = 0.8 × 4200 × (100 - 20) = 268,800 J</code></span>
                       </div>
-                      <div className="flex items-center gap-2 rounded-lg bg-emerald-950/30 border border-emerald-500/30 p-2.5 text-xs text-slate-200">
-                        <span className="rounded bg-emerald-500/20 px-1.5 py-0.5 text-[10px] font-mono font-bold text-emerald-300">[M1]</span>
-                        <span>Time relationship: <code className="text-emerald-300 font-mono">t = Energy / Power = 268,800 / 1200</code></span>
+                      <div className="flex items-center gap-2 rounded-lg bg-[#232325] border border-white/[0.08] p-3 text-xs text-[#a1a1a6]">
+                        <span className="rounded bg-[#141415] border border-white/[0.08] px-1.5 py-0.5 text-xs font-mono text-[#ededed]">[M1]</span>
+                        <span>Time relationship: <code className="text-[#ededed] font-mono">t = Energy / Power = 268,800 / 1200</code></span>
                       </div>
-                      <div className="flex items-center gap-2 rounded-lg bg-emerald-950/30 border border-emerald-500/30 p-2.5 text-xs text-slate-200">
-                        <span className="rounded bg-emerald-500/20 px-1.5 py-0.5 text-[10px] font-mono font-bold text-emerald-300">[A1]</span>
-                        <span>Final answer: <code className="text-emerald-300 font-mono">t = 224 s (or 3.73 minutes)</code></span>
+                      <div className="flex items-center gap-2 rounded-lg bg-[#232325] border border-white/[0.08] p-3 text-xs text-[#ededed] font-medium">
+                        <span className="rounded bg-[#141415] border border-white/[0.08] px-1.5 py-0.5 text-xs font-mono text-[#4cc38a]">[A1]</span>
+                        <span>Final answer: <code className="text-[#4cc38a] font-mono">t = 224 s (or 3.73 minutes)</code></span>
                       </div>
                     </div>
                   </div>
@@ -480,31 +473,31 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 <div className="space-y-4">
                   <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
                     <div>
-                      <span className="text-xs font-mono font-bold text-rose-400">Examiner Pitfall Heatmap</span>
-                      <h3 className="text-sm sm:text-base font-bold text-white mt-0.5">
+                      <span className="text-xs font-mono text-[#85858b]">Examiner pitfall catalog</span>
+                      <h3 className="text-sm sm:text-base font-medium text-[#ededed] mt-0.5">
                         Misconceptions pulled directly from official Principal Examiner Reports
                       </h3>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div className="rounded-xl border border-rose-500/30 bg-rose-950/15 p-3.5 space-y-1.5">
-                      <div className="flex items-center justify-between text-[11px] font-bold text-rose-300">
-                        <span>Cambridge Biology 0610 • Osmosis</span>
-                        <span className="font-mono">71% Error Rate</span>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="rounded-xl border border-white/[0.08] bg-[#141415] p-5 space-y-2">
+                      <div className="flex items-center justify-between text-xs font-mono text-[#85858b]">
+                        <span className="text-[#ededed] font-medium">Cambridge Biology 0610 • Osmosis</span>
+                        <span className="text-[#e5484d]">71% error rate</span>
                       </div>
-                      <p className="text-xs text-slate-300 leading-relaxed">
-                        Candidates frequently write "water moves from a dilute to concentrated solution" without specifying <strong>water potential gradient</strong> or mentioning the <strong>partially permeable membrane</strong>. Zero marks awarded.
+                      <p className="text-xs text-[#a1a1a6] leading-relaxed">
+                        Candidates frequently write "water moves from a dilute to concentrated solution" without specifying water potential gradient or mentioning the partially permeable membrane. Zero marks awarded.
                       </p>
                     </div>
 
-                    <div className="rounded-xl border border-amber-500/30 bg-amber-950/15 p-3.5 space-y-1.5">
-                      <div className="flex items-center justify-between text-[11px] font-bold text-amber-300">
-                        <span>Cambridge Chemistry 0620 • Electrolysis</span>
-                        <span className="font-mono">58% Error Rate</span>
+                    <div className="rounded-xl border border-white/[0.08] bg-[#141415] p-5 space-y-2">
+                      <div className="flex items-center justify-between text-xs font-mono text-[#85858b]">
+                        <span className="text-[#ededed] font-medium">Cambridge Chemistry 0620 • Electrolysis</span>
+                        <span className="text-[#e5484d]">58% error rate</span>
                       </div>
-                      <p className="text-xs text-slate-300 leading-relaxed">
-                        Confusing anode and cathode ionic discharges. In dilute sulfuric acid, candidates mistakenly state oxygen is formed by the decomposition of acid rather than oxidation of <code className="font-mono text-amber-200">OH⁻</code> ions.
+                      <p className="text-xs text-[#a1a1a6] leading-relaxed">
+                        Confusing anode and cathode ionic discharges. In dilute sulfuric acid, candidates mistakenly state oxygen is formed by decomposition of acid rather than oxidation of hydroxide ions.
                       </p>
                     </div>
                   </div>
@@ -516,25 +509,25 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 <div className="space-y-4">
                   <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
                     <div>
-                      <span className="text-xs font-mono font-bold text-emerald-400">Automated Parent WhatsApp Reports</span>
-                      <h3 className="text-sm sm:text-base font-bold text-white mt-0.5">
-                        Transparent weekly diagnostics delivered directly to parents' phones
+                      <span className="text-xs font-mono text-[#85858b]">Automated parent progress dispatch</span>
+                      <h3 className="text-sm sm:text-base font-medium text-[#ededed] mt-0.5">
+                        Weekly diagnostic summaries delivered directly to WhatsApp
                       </h3>
                     </div>
                   </div>
 
-                  <div className="max-w-md mx-auto rounded-2xl bg-[#0B141A] p-4 border border-emerald-500/30 space-y-2 text-xs">
-                    <div className="rounded-xl bg-[#005C4B] p-3 text-slate-100 space-y-1 text-[11px] leading-relaxed">
-                      <div className="font-bold text-white">📊 FAHEMNY IGCSE — Weekly Academic Statement</div>
-                      <div>Candidate: <strong>Thomas</strong> (Target: Grade 9 / A*)</div>
-                      <div>Syllabus: Cambridge Mathematics (0580) & Physics (0625)</div>
-                      <div className="pt-1 text-slate-200">
-                        • Weekly Accuracy: <strong>89%</strong> (142 questions completed)<br />
-                        • Study Streak: <strong>7 consecutive days</strong><br />
-                        • Focus Chapter for this week: <em>0580 Vectors & Transformations</em>
+                  <div className="max-w-md mx-auto rounded-xl bg-[#141415] p-5 border border-white/[0.08] space-y-2 text-xs">
+                    <div className="rounded-lg bg-[#232325] p-4 text-[#ededed] space-y-1.5 text-xs leading-relaxed border border-white/[0.06]">
+                      <div className="font-medium text-[#ededed]">Fahemny IGCSE — Weekly Academic Statement</div>
+                      <div className="text-[#a1a1a6]">Candidate: <strong className="text-[#ededed]">Thomas</strong> (Target: Grade 9 / A*)</div>
+                      <div className="text-[#a1a1a6]">Syllabus: Cambridge Mathematics (0580) &amp; Physics (0625)</div>
+                      <div className="pt-2 text-[#a1a1a6] space-y-1 border-t border-white/[0.06]">
+                        <div>• Weekly accuracy: <span className="font-mono text-[#ededed]">89%</span> (142 questions completed)</div>
+                        <div>• Active study streak: <span className="font-mono text-[#ededed]">7 consecutive days</span></div>
+                        <div>• Target focus area: <span className="text-[#ededed]">0580 Vectors &amp; Transformations</span></div>
                       </div>
-                      <div className="pt-2 text-[10px] text-cyan-200 font-mono underline">
-                        📄 View Complete Verified Audit & Download PDF: https://simply-igcse.com/?tab=report&id=candidate_1
+                      <div className="pt-2 text-xs text-[#85858b] font-mono">
+                        View digital report statement: fahemny-igcse.com/?tab=report
                       </div>
                     </div>
                   </div>
@@ -543,48 +536,48 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
           </section>
 
-          {/* 3. WHY STUDENTS MISS THE GRADE 9 (IGCSE REALITY) */}
+          {/* 3. WHY CANDIDATES MISS THE GRADE 9 */}
           <section className="space-y-6">
             <div className="max-w-2xl space-y-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
-                The Real Exam Challenge
+              <span className="text-xs text-[#85858b] font-normal">
+                Exam hall challenges
               </span>
-              <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-                Why hard-working students miss the Grade 9
+              <h2 className="text-2xl sm:text-3xl font-medium text-[#ededed] tracking-tight">
+                Why hard-working candidates miss the Grade 9
               </h2>
-              <p className="text-xs sm:text-sm text-slate-400">
-                Examiner reports consistently show that lost marks rarely come from lack of studying. They come from mark scheme traps.
+              <p className="text-xs sm:text-sm text-[#a1a1a6]">
+                Principal examiner reports consistently confirm that lost marks rarely stem from lack of revision. They stem from mark scheme traps.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="rounded-2xl border border-white/[0.08] bg-[#111723] p-5 space-y-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-500/15 text-rose-400 border border-rose-500/30">
-                  <ShieldAlert className="h-5 w-5" />
+              <div className="rounded-xl border border-white/[0.08] bg-[#19191b] p-5 space-y-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#232325] text-[#ededed] border border-white/[0.08]">
+                  <ShieldAlert className="h-4 w-4" />
                 </div>
-                <h3 className="text-base font-bold text-white">The Command Word Trap</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Writing a description when the question says <em>"Explain"</em> costs 2 to 3 marks every single time. Fahemny highlights command words across all papers and flags the exact expected structure.
+                <h3 className="text-base font-medium text-[#ededed]">The command word trap</h3>
+                <p className="text-xs text-[#a1a1a6] leading-relaxed">
+                  Writing a description when the question specifies "Explain" costs 2 to 3 marks every time. Fahemny highlights command words across all papers and flags the exact expected structure.
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-white/[0.08] bg-[#111723] p-5 space-y-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/30">
-                  <Calculator className="h-5 w-5" />
+              <div className="rounded-xl border border-white/[0.08] bg-[#19191b] p-5 space-y-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#232325] text-[#ededed] border border-white/[0.08]">
+                  <Calculator className="h-4 w-4" />
                 </div>
-                <h3 className="text-base font-bold text-white">Missing Method Marks</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Students often lose all 5 marks because of one mental arithmetic error. Our solver breaks down intermediate <span className="font-mono text-emerald-400 font-bold">[M1]</span> marks you can salvage even if the final number is wrong.
+                <h3 className="text-base font-medium text-[#ededed]">Missing method marks</h3>
+                <p className="text-xs text-[#a1a1a6] leading-relaxed">
+                  Students often forfeit all 5 marks over one minor arithmetic slip. Our solver isolates intermediate [M1] criteria that earn marks even if the final figure is wrong.
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-white/[0.08] bg-[#111723] p-5 space-y-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-500/15 text-sky-400 border border-sky-500/30">
-                  <Columns className="h-5 w-5" />
+              <div className="rounded-xl border border-white/[0.08] bg-[#19191b] p-5 space-y-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#232325] text-[#ededed] border border-white/[0.08]">
+                  <Columns className="h-4 w-4" />
                 </div>
-                <h3 className="text-base font-bold text-white">Chaotic PDF Juggling</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Searching 3 different websites to find whether variant 2 or variant 3 has the mark scheme wastes 45 minutes of revision every day. Fahemny synchronizes question papers and mark schemes side by side.
+                <h3 className="text-base font-medium text-[#ededed]">Disorganized PDF searches</h3>
+                <p className="text-xs text-[#a1a1a6] leading-relaxed">
+                  Toggling multiple archive mirrors to confirm whether variant 2 or 3 contains the required mark scheme drains revision momentum. Fahemny synchronizes question papers and mark schemes side by side.
                 </p>
               </div>
             </div>
@@ -594,67 +587,63 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <section className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.08] pb-4">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#FF5B37]">
-                  Supported Examinations
+                <span className="text-xs text-[#85858b] font-normal">
+                  Supported examinations
                 </span>
-                <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                  Comprehensive Cambridge & Edexcel Syllabuses
+                <h2 className="text-xl sm:text-2xl font-medium text-[#ededed] tracking-tight">
+                  Comprehensive Cambridge &amp; Edexcel syllabuses
                 </h2>
               </div>
 
               {/* Board Selector */}
-              <div className="flex rounded-lg bg-[#111723] p-1 border border-white/[0.08]">
+              <div className="flex rounded-lg bg-[#0f0f10] p-1 border border-white/[0.08]">
                 {(['All', 'CIE', 'Edexcel'] as const).map((b) => (
                   <button
                     key={b}
                     onClick={() => setBoardFilter(b)}
-                    className={`px-3 py-1 rounded-md text-xs font-bold transition cursor-pointer ${
+                    className={`px-3 py-1 rounded-md text-xs font-medium transition-colors duration-150 cursor-pointer ${
                       boardFilter === b
-                        ? 'bg-[#FF5B37] text-white shadow-sm'
-                        : 'text-slate-400 hover:text-white'
+                        ? 'bg-[#232325] text-[#ededed]'
+                        : 'text-[#85858b] hover:text-[#ededed]'
                     }`}
                   >
-                    {b === 'All' ? 'All Boards' : b === 'CIE' ? 'Cambridge' : 'Edexcel'}
+                    {b === 'All' ? 'All boards' : b === 'CIE' ? 'Cambridge' : 'Edexcel'}
                   </button>
                 ))}
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredSubjects.map((sub) => {
                 const isCie = sub.board === 'CIE';
                 return (
                   <div
                     key={sub.id}
-                    className="rounded-2xl border border-white/[0.08] bg-[#111723] p-4 sm:p-5 flex flex-col justify-between space-y-4 hover:border-white/[0.18] transition"
+                    className="rounded-xl border border-white/[0.08] bg-[#19191b] p-5 flex flex-col justify-between space-y-4 hover:border-white/[0.16] transition-colors duration-150"
                   >
                     <div>
                       <div className="flex items-center justify-between">
-                        <span className={`px-2.5 py-0.5 rounded-md text-xs font-mono font-black border ${
-                          isCie
-                            ? 'bg-sky-500/15 text-sky-300 border-sky-500/30'
-                            : 'bg-violet-500/15 text-violet-300 border-violet-500/30'
-                        }`}>
+                        <span className="px-2 py-0.5 rounded text-xs font-mono font-medium bg-[#232325] text-[#ededed] border border-white/[0.08]">
                           {sub.code}
                         </span>
-                        <span className="text-[11px] text-slate-400 font-medium">
+                        <span className="text-xs text-[#85858b]">
                           {isCie ? 'Cambridge IGCSE' : 'Pearson Edexcel'}
                         </span>
                       </div>
 
-                      <h3 className="text-base font-bold text-white mt-2">{sub.name}</h3>
-                      <p className="text-xs text-slate-400 mt-1 line-clamp-1">
+                      <h3 className="text-base font-medium text-[#ededed] mt-2.5">{sub.name}</h3>
+                      <p className="text-xs text-[#85858b] mt-1 line-clamp-1">
                         {sub.topics.slice(0, 3).join(' • ')}...
                       </p>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-1.5 pt-2 border-t border-white/[0.06] text-center">
+                    <div className="grid grid-cols-3 gap-2 pt-3 border-t border-white/[0.06] text-center">
                       <button
                         onClick={() => {
                           onSelectSubject(sub);
                           onNavigateTab('finder');
                         }}
-                        className="rounded-lg bg-[#162030] hover:bg-[#1E2B40] text-slate-200 py-1.5 text-xs font-bold transition"
+                        className="rounded-md bg-[#232325] hover:bg-[#2c2c30] text-[#ededed] py-1.5 text-xs font-medium transition-colors duration-150 cursor-pointer"
                       >
                         Papers
                       </button>
@@ -663,7 +652,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                           onSelectSubject(sub);
                           onNavigateTab('revision');
                         }}
-                        className="rounded-lg bg-[#162030] hover:bg-[#1E2B40] text-slate-200 py-1.5 text-xs font-bold transition"
+                        className="rounded-md bg-[#232325] hover:bg-[#2c2c30] text-[#ededed] py-1.5 text-xs font-medium transition-colors duration-150 cursor-pointer"
                       >
                         Notes
                       </button>
@@ -672,7 +661,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                           onSelectSubject(sub);
                           onNavigateTab('solver');
                         }}
-                        className="rounded-lg bg-[#162030] hover:bg-[#1E2B40] text-slate-200 py-1.5 text-xs font-bold transition"
+                        className="rounded-md bg-[#232325] hover:bg-[#2c2c30] text-[#ededed] py-1.5 text-xs font-medium transition-colors duration-150 cursor-pointer"
                       >
                         Solver
                       </button>
@@ -683,39 +672,39 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
           </section>
 
-          {/* 5. A NOTE FROM THE FOUNDER (Human Editorial Touch) */}
-          <section className="rounded-3xl border border-white/[0.08] bg-[#0E1420] p-6 sm:p-8 space-y-4">
+          {/* 5. A NOTE FROM THE FOUNDER */}
+          <section className="rounded-2xl border border-white/[0.08] bg-[#19191b] p-6 sm:p-8 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-[#FF5B37]/20 border border-[#FF5B37]/40 flex items-center justify-center font-bold text-[#FF5B37]">
+              <div className="h-9 w-9 rounded-full bg-[#232325] border border-white/[0.08] flex items-center justify-center font-medium text-[#ededed] text-sm">
                 T
               </div>
               <div>
-                <h4 className="text-sm sm:text-base font-bold text-white">A Note from Thomas</h4>
-                <p className="text-xs text-slate-400">Founder of Fahemny &amp; IGCSE Candidate</p>
+                <h4 className="text-sm font-medium text-[#ededed]">A note from Thomas</h4>
+                <p className="text-xs text-[#85858b]">Founder of Fahemny &amp; IGCSE candidate</p>
               </div>
             </div>
 
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-editorial italic text-base sm:text-lg">
-              "I built Fahemny because during my own exam preparation, I was exhausted from digging through chaotic Google Drives and listening to generic YouTube tutorials that skipped the mark scheme. Fahemny gives you what actually matters in the exam hall: clarity, speed, and exact examiner expectations."
+            <p className="text-xs sm:text-sm text-[#a1a1a6] leading-relaxed font-normal">
+              "I built Fahemny because during my own exam preparation, digging through chaotic cloud drives and watching video tutorials that omitted exact mark criteria wasted crucial study hours. Fahemny gives you what actually matters in the exam hall: clarity, speed, and line-by-line mark scheme expectations."
             </p>
           </section>
 
           {/* 6. CRAFTED FOOTER */}
-          <footer className="border-t border-white/[0.08] pt-8 pb-12 space-y-6 text-xs text-slate-400">
+          <footer className="border-t border-white/[0.08] pt-8 pb-12 space-y-6 text-xs text-[#85858b]">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <SimplyLogo size="sm" showText={true} />
               </div>
 
               <div className="flex flex-wrap items-center gap-4 text-xs">
-                <button onClick={() => onNavigateTab('finder')} className="hover:text-white transition">Past Papers</button>
-                <button onClick={() => onNavigateTab('solver')} className="hover:text-white transition">Step Solver</button>
-                <button onClick={() => onNavigateTab('revision')} className="hover:text-white transition">Revision Notes</button>
-                <button onClick={() => setIsAboutModalOpen(true)} className="hover:text-white transition">Platform Philosophy</button>
+                <button onClick={() => onNavigateTab('finder')} className="hover:text-[#ededed] transition-colors duration-150 cursor-pointer">Past papers</button>
+                <button onClick={() => onNavigateTab('solver')} className="hover:text-[#ededed] transition-colors duration-150 cursor-pointer">Step solver</button>
+                <button onClick={() => onNavigateTab('revision')} className="hover:text-[#ededed] transition-colors duration-150 cursor-pointer">Revision notes</button>
+                <button onClick={() => setIsAboutModalOpen(true)} className="hover:text-[#ededed] transition-colors duration-150 cursor-pointer">Platform philosophy</button>
               </div>
             </div>
 
-            <p className="text-[11px] text-slate-500 leading-relaxed">
+            <p className="text-xs text-[#85858b]/80 leading-relaxed">
               Cambridge Assessment International Education (CAIE) and Pearson Edexcel are registered trademarks. Fahemny is an independent academic revision suite created to help students master examination technique.
             </p>
           </footer>
@@ -728,32 +717,31 @@ export const HomeView: React.FC<HomeViewProps> = ({
       {viewMode === 'workspace' && (
         <div className="space-y-6">
           {/* 1. STUDENT ACADEMIC HEADER & OMNISEARCH */}
-          <section className="rounded-3xl border border-white/[0.08] bg-[#0E1420] p-4 sm:p-7 shadow-xl space-y-4">
+          <section className="rounded-2xl border border-white/[0.08] bg-[#19191b] p-6 space-y-5">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FF5B37]/15 px-2.5 py-0.5 text-xs font-bold text-[#FF5B37] border border-[#FF5B37]/30">
-                    <ShieldCheck className="h-3.5 w-3.5" />
-                    Academic Workspace
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-[#232325] px-3 py-1 text-xs text-[#a1a1a6] border border-white/[0.08]">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#FF5B37]" />
+                    Academic workspace
                   </span>
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-xs font-bold text-emerald-300 border border-emerald-500/30">
-                    <Award className="h-3.5 w-3.5" />
-                    Target Grade: {profile.targetGrade}
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-[#232325] px-3 py-1 text-xs text-[#a1a1a6] border border-white/[0.08]">
+                    Target grade: <span className="font-mono text-[#ededed] font-medium">{profile.targetGrade}</span>
                   </span>
                 </div>
 
-                <h1 className="text-xl sm:text-3xl font-black text-white tracking-tight">
-                  {currentUser ? `Welcome back, ${currentUser.name}` : `Welcome to your Study Workspace`}
+                <h1 className="text-xl sm:text-2xl font-medium text-[#ededed] tracking-tight">
+                  {activeSubject.name} ({activeSubject.code})
                 </h1>
-                <p className="text-xs sm:text-sm text-slate-300 max-w-xl">
-                  Focus on what matters today: official papers, method marks, and unmastered mistakes.
+                <p className="text-xs sm:text-sm text-[#85858b] max-w-xl">
+                  Official past papers, step-by-step mark schemes, and unmastered error rematching.
                 </p>
               </div>
 
               {/* Active Syllabus Quick Chips */}
               <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-1">
-                  Active Syllabus:
+                <span className="text-xs text-[#85858b] shrink-0 mr-1">
+                  Syllabus:
                 </span>
                 {subjects.map((sub) => {
                   const isActive = sub.id === activeSubject.id;
@@ -761,10 +749,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     <button
                       key={sub.id}
                       onClick={() => onSelectSubject(sub)}
-                      className={`rounded-xl px-3 py-1.5 text-xs font-mono font-bold transition shrink-0 cursor-pointer ${
+                      className={`rounded-lg px-3 py-1.5 text-xs font-mono font-medium transition-colors duration-150 shrink-0 cursor-pointer ${
                         isActive
-                          ? 'bg-[#FF5B37] text-white shadow-md shadow-[#FF5B37]/20 ring-1 ring-white/20'
-                          : 'border border-white/[0.08] bg-[#121824] text-slate-400 hover:text-white hover:border-white/[0.16]'
+                          ? 'bg-[#FF5B37] text-white'
+                          : 'border border-white/[0.08] bg-[#141415] text-[#85858b] hover:text-[#ededed] hover:border-white/[0.16]'
                       }`}
                       title={`${sub.code} - ${sub.name}`}
                     >
@@ -777,18 +765,18 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
             {/* Omnisearch Bar */}
             <div className="relative">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#85858b]" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={`Search ${activeSubject.code} past papers, topics, formulas...`}
-                className="w-full rounded-2xl border border-white/[0.1] bg-[#121824] py-2.5 pl-10 pr-14 text-sm text-white placeholder-slate-400 shadow-inner focus:border-[#FF5B37] focus:outline-none focus:ring-1 focus:ring-[#FF5B37]/30 transition"
+                className="w-full rounded-xl border border-white/[0.08] bg-[#141415] py-2.5 pl-10 pr-14 text-sm text-[#ededed] placeholder-[#85858b] focus:border-white/[0.2] focus:outline-none transition-colors duration-150"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-white px-2 py-0.5 rounded bg-slate-800"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#85858b] hover:text-[#ededed] px-2 py-0.5 rounded bg-[#232325]"
                 >
                   Clear
                 </button>
@@ -796,19 +784,19 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
               {/* Live Search Results Popover */}
               {searchResults && (
-                <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-96 overflow-y-auto rounded-2xl border border-white/[0.1] bg-[#0E1420] p-3 shadow-2xl">
+                <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-96 overflow-y-auto rounded-xl border border-white/[0.08] bg-[#141415] p-3 shadow-2xl">
                   {searchResults.subjects.length === 0 &&
                   searchResults.papers.length === 0 &&
                   searchResults.notes.length === 0 ? (
-                    <div className="p-4 text-center text-xs text-slate-400">
+                    <div className="p-4 text-center text-xs text-[#85858b]">
                       No results found for "{searchQuery}". Try a code like "{activeSubject.code}" or topic like "Algebra".
                     </div>
                   ) : (
                     <div className="space-y-3">
                       {searchResults.papers.length > 0 && (
                         <div>
-                          <div className="text-[10px] font-bold uppercase tracking-wider text-amber-400 px-2 py-1">
-                            Past Papers ({searchResults.papers.length})
+                          <div className="text-xs text-[#85858b] px-2 py-1 font-mono">
+                            Past papers ({searchResults.papers.length})
                           </div>
                           <div className="space-y-1">
                             {searchResults.papers.map((paper) => (
@@ -820,17 +808,17 @@ export const HomeView: React.FC<HomeViewProps> = ({
                                   onNavigateTab('finder');
                                   setSearchQuery('');
                                 }}
-                                className="w-full flex items-center justify-between rounded-xl p-2 text-left hover:bg-[#162030] transition"
+                                className="w-full flex items-center justify-between rounded-lg p-2.5 text-left hover:bg-[#232325] transition-colors duration-150 cursor-pointer"
                               >
                                 <div>
-                                  <div className="text-xs font-bold text-slate-200">
+                                  <div className="text-xs font-medium text-[#ededed]">
                                     {paper.session} {paper.questionNumber} • {paper.topic}
                                   </div>
-                                  <div className="text-[11px] text-slate-400 line-clamp-1">
+                                  <div className="text-xs text-[#85858b] line-clamp-1">
                                     {paper.questionPrompt}
                                   </div>
                                 </div>
-                                <span className="shrink-0 text-[10px] font-bold text-amber-400 ml-2 font-mono">
+                                <span className="shrink-0 text-xs text-[#85858b] ml-2 font-mono tabular-nums">
                                   {paper.marks}M
                                 </span>
                               </button>
@@ -841,8 +829,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
                       {searchResults.notes.length > 0 && (
                         <div>
-                          <div className="text-[10px] font-bold uppercase tracking-wider text-sky-400 px-2 py-1">
-                            Revision Notes ({searchResults.notes.length})
+                          <div className="text-xs text-[#85858b] px-2 py-1 font-mono">
+                            Revision notes ({searchResults.notes.length})
                           </div>
                           <div className="space-y-1">
                             {searchResults.notes.map((note) => (
@@ -852,10 +840,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
                                   onNavigateTab('revision');
                                   setSearchQuery('');
                                 }}
-                                className="w-full flex items-center justify-between rounded-xl p-2 text-left hover:bg-[#162030] transition"
+                                className="w-full flex items-center justify-between rounded-lg p-2.5 text-left hover:bg-[#232325] transition-colors duration-150 cursor-pointer"
                               >
-                                <span className="text-xs font-semibold text-slate-200">{note.title}</span>
-                                <span className="text-[10px] text-slate-400">{note.chapter}</span>
+                                <span className="text-xs font-medium text-[#ededed]">{note.title}</span>
+                                <span className="text-xs text-[#85858b]">{note.chapter}</span>
                               </button>
                             ))}
                           </div>
@@ -872,30 +860,30 @@ export const HomeView: React.FC<HomeViewProps> = ({
               {onOpenExamHud && (
                 <button
                   onClick={onOpenExamHud}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/[0.08] bg-[#121824] hover:bg-[#1A2333] text-slate-200 text-xs font-bold transition shrink-0"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/[0.08] bg-[#141415] hover:bg-[#232325] text-[#ededed] text-xs font-medium transition-colors duration-150 shrink-0 cursor-pointer"
                 >
-                  <Atom className="h-3.5 w-3.5 text-amber-400" />
-                  <span>Periodic Table & Formula HUD</span>
+                  <Atom className="h-3.5 w-3.5 text-[#85858b]" />
+                  <span>Periodic table &amp; formula HUD</span>
                 </button>
               )}
 
               {onOpenRevisionKit && (
                 <button
                   onClick={onOpenRevisionKit}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/[0.08] bg-[#121824] hover:bg-[#1A2333] text-slate-200 text-xs font-bold transition shrink-0"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/[0.08] bg-[#141415] hover:bg-[#232325] text-[#ededed] text-xs font-medium transition-colors duration-150 shrink-0 cursor-pointer"
                 >
-                  <Download className="h-3.5 w-3.5 text-rose-400" />
-                  <span>Cambridge Formula Booklet PDF</span>
+                  <Download className="h-3.5 w-3.5 text-[#85858b]" />
+                  <span>Cambridge formula booklet PDF</span>
                 </button>
               )}
 
               {onOpenPwaModal && (
                 <button
                   onClick={onOpenPwaModal}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/[0.08] bg-[#121824] hover:bg-[#1A2333] text-slate-200 text-xs font-bold transition shrink-0"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/[0.08] bg-[#141415] hover:bg-[#232325] text-[#ededed] text-xs font-medium transition-colors duration-150 shrink-0 cursor-pointer"
                 >
-                  <Smartphone className="h-3.5 w-3.5 text-emerald-400" />
-                  <span>Install Web App</span>
+                  <Smartphone className="h-3.5 w-3.5 text-[#85858b]" />
+                  <span>Install web app</span>
                 </button>
               )}
             </div>
@@ -907,34 +895,34 @@ export const HomeView: React.FC<HomeViewProps> = ({
           {/* 3. FOUR CORE REVISION WORKSPACES */}
           <section className="space-y-3">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                <Compass className="h-4 w-4 text-[#FF5B37]" />
-                <span>Primary Workspaces • {activeSubject.code}</span>
+              <h2 className="text-xs font-mono text-[#85858b] uppercase tracking-wider flex items-center gap-2">
+                <Compass className="h-3.5 w-3.5" />
+                <span>Primary revision workspaces • {activeSubject.code}</span>
               </h2>
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Card 1: Past Paper Vault */}
               <div
                 onClick={() => onNavigateTab('finder')}
-                className="rounded-2xl border border-white/[0.08] bg-[#111723] p-4 sm:p-5 flex flex-col justify-between hover:border-amber-500/50 hover:bg-[#162030] transition cursor-pointer"
+                className="rounded-xl border border-white/[0.08] bg-[#19191b] p-5 flex flex-col justify-between hover:border-white/[0.2] hover:bg-[#202024] transition-colors duration-150 cursor-pointer"
               >
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/25">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#232325] text-[#ededed] border border-white/[0.08]">
                       <FileText className="h-4 w-4" />
                     </div>
-                    <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-bold text-amber-300 font-mono">
+                    <span className="rounded bg-[#232325] border border-white/[0.08] px-1.5 py-0.5 text-xs text-[#85858b] font-mono tabular-nums">
                       {OFFICIAL_PAST_PAPER_PDFS.length.toLocaleString()}+
                     </span>
                   </div>
-                  <h3 className="text-sm sm:text-base font-bold text-white">Past Paper Vault</h3>
-                  <p className="hidden sm:block text-xs text-slate-400 mt-1 line-clamp-2">
-                    Official CAIE & Edexcel papers, QP & MS synchronized with topic filters.
+                  <h3 className="text-base font-medium text-[#ededed]">Past paper vault</h3>
+                  <p className="hidden sm:block text-xs text-[#a1a1a6] mt-1 line-clamp-2">
+                    Official CAIE &amp; Edexcel papers, question paper &amp; mark scheme synchronized with topic filters.
                   </p>
                 </div>
-                <div className="mt-3 flex items-center gap-1 text-xs font-bold text-amber-400">
-                  <span>Open Vault</span>
+                <div className="mt-4 flex items-center gap-1 text-xs font-medium text-[#ededed]">
+                  <span>Open vault</span>
                   <ArrowRight className="h-3.5 w-3.5" />
                 </div>
               </div>
@@ -942,24 +930,24 @@ export const HomeView: React.FC<HomeViewProps> = ({
               {/* Card 2: Step-by-Step Solver */}
               <div
                 onClick={() => onNavigateTab('solver')}
-                className="rounded-2xl border border-white/[0.08] bg-[#111723] p-4 sm:p-5 flex flex-col justify-between hover:border-sky-500/50 hover:bg-[#162030] transition cursor-pointer"
+                className="rounded-xl border border-white/[0.08] bg-[#19191b] p-5 flex flex-col justify-between hover:border-white/[0.2] hover:bg-[#202024] transition-colors duration-150 cursor-pointer"
               >
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-500/15 text-sky-400 border border-sky-500/25">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#232325] text-[#ededed] border border-white/[0.08]">
                       <Calculator className="h-4 w-4" />
                     </div>
-                    <span className="rounded bg-sky-500/15 px-1.5 py-0.5 text-[10px] font-bold text-sky-300 font-mono">
+                    <span className="rounded bg-[#232325] border border-white/[0.08] px-1.5 py-0.5 text-xs text-[#4cc38a] font-mono">
                       [M1][A1]
                     </span>
                   </div>
-                  <h3 className="text-sm sm:text-base font-bold text-white">Step-by-Step Solver</h3>
-                  <p className="hidden sm:block text-xs text-slate-400 mt-1 line-clamp-2">
+                  <h3 className="text-base font-medium text-[#ededed]">Step-by-step solver</h3>
+                  <p className="hidden sm:block text-xs text-[#a1a1a6] mt-1 line-clamp-2">
                     Line-by-line mark scheme breakdown for typed questions or past paper photos.
                   </p>
                 </div>
-                <div className="mt-3 flex items-center gap-1 text-xs font-bold text-sky-400">
-                  <span>Solve Question</span>
+                <div className="mt-4 flex items-center gap-1 text-xs font-medium text-[#ededed]">
+                  <span>Solve question</span>
                   <ArrowRight className="h-3.5 w-3.5" />
                 </div>
               </div>
@@ -967,24 +955,24 @@ export const HomeView: React.FC<HomeViewProps> = ({
               {/* Card 3: Personal Mistake Log */}
               <div
                 onClick={() => onNavigateTab('mistakes')}
-                className="rounded-2xl border border-white/[0.08] bg-[#111723] p-4 sm:p-5 flex flex-col justify-between hover:border-rose-500/50 hover:bg-[#162030] transition cursor-pointer"
+                className="rounded-xl border border-white/[0.08] bg-[#19191b] p-5 flex flex-col justify-between hover:border-white/[0.2] hover:bg-[#202024] transition-colors duration-150 cursor-pointer"
               >
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-500/15 text-rose-400 border border-rose-500/25">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#232325] text-[#ededed] border border-white/[0.08]">
                       <BookMarked className="h-4 w-4" />
                     </div>
-                    <span className="rounded bg-rose-500/15 px-1.5 py-0.5 text-[10px] font-bold text-rose-300 font-mono">
-                      {mistakesCount} Unmastered
+                    <span className="rounded bg-[#232325] border border-white/[0.08] px-1.5 py-0.5 text-xs text-[#e5484d] font-mono tabular-nums">
+                      {mistakesCount} unmastered
                     </span>
                   </div>
-                  <h3 className="text-sm sm:text-base font-bold text-white">Error Notebook</h3>
-                  <p className="hidden sm:block text-xs text-slate-400 mt-1 line-clamp-2">
-                    Your personal mistakes log with active Rematch quiz to guarantee mastery.
+                  <h3 className="text-base font-medium text-[#ededed]">Error notebook</h3>
+                  <p className="hidden sm:block text-xs text-[#a1a1a6] mt-1 line-clamp-2">
+                    Personal error log with active rematch quiz to guarantee exam mastery.
                   </p>
                 </div>
-                <div className="mt-3 flex items-center gap-1 text-xs font-bold text-rose-400">
-                  <span>Rematch Now</span>
+                <div className="mt-4 flex items-center gap-1 text-xs font-medium text-[#ededed]">
+                  <span>Rematch now</span>
                   <ArrowRight className="h-3.5 w-3.5" />
                 </div>
               </div>
@@ -992,24 +980,24 @@ export const HomeView: React.FC<HomeViewProps> = ({
               {/* Card 4: Night Before Cheat Sheets */}
               <div
                 onClick={() => onNavigateTab('cheatsheets')}
-                className="rounded-2xl border border-white/[0.08] bg-[#111723] p-4 sm:p-5 flex flex-col justify-between hover:border-[#FF5B37]/50 hover:bg-[#162030] transition cursor-pointer"
+                className="rounded-xl border border-white/[0.08] bg-[#19191b] p-5 flex flex-col justify-between hover:border-white/[0.2] hover:bg-[#202024] transition-colors duration-150 cursor-pointer"
               >
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#FF5B37]/15 text-[#FF5B37] border border-[#FF5B37]/25">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#232325] text-[#ededed] border border-white/[0.08]">
                       <FileText className="h-4 w-4" />
                     </div>
-                    <span className="rounded bg-[#FF5B37]/15 px-1.5 py-0.5 text-[10px] font-bold text-[#FFA63A] font-mono">
-                      1-Page PDF
+                    <span className="rounded bg-[#232325] border border-white/[0.08] px-1.5 py-0.5 text-xs text-[#ededed] font-mono">
+                      1-page PDF
                     </span>
                   </div>
-                  <h3 className="text-sm sm:text-base font-bold text-white">Cheat Sheets</h3>
-                  <p className="hidden sm:block text-xs text-slate-400 mt-1 line-clamp-2">
-                    Emergency 1-page high-yield formula & trap summaries for active recall.
+                  <h3 className="text-base font-medium text-[#ededed]">Cheat sheets</h3>
+                  <p className="hidden sm:block text-xs text-[#a1a1a6] mt-1 line-clamp-2">
+                    Emergency 1-page high-yield formula &amp; trap summaries for active recall.
                   </p>
                 </div>
-                <div className="mt-3 flex items-center gap-1 text-xs font-bold text-[#FF5B37]">
-                  <span>Open Sheets</span>
+                <div className="mt-4 flex items-center gap-1 text-xs font-medium text-[#ededed]">
+                  <span>Open sheets</span>
                   <ArrowRight className="h-3.5 w-3.5" />
                 </div>
               </div>
@@ -1017,30 +1005,31 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </section>
 
           {/* 4. TODAY'S DAILY CAMBRIDGE CHALLENGE */}
-          <section className="rounded-2xl border border-amber-500/30 bg-[#0E1420] p-4 sm:p-6 shadow-xl space-y-3">
+          <section className="rounded-2xl border border-white/[0.08] bg-[#19191b] p-5 sm:p-6 space-y-4">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-white/[0.08] pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500/20 text-amber-400">
-                  <Flame className="h-4 w-4 fill-amber-400" />
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#232325] text-[#ededed] border border-white/[0.08]">
+                  <Flame className="h-4 w-4 text-[#FF5B37]" />
                 </div>
                 <div>
-                  <h3 className="text-sm sm:text-base font-bold text-white">
-                    Daily Cambridge Challenge • {activeSubject.code}
+                  <h3 className="text-sm sm:text-base font-medium text-[#ededed]">
+                    Daily challenge • {activeSubject.code}
                   </h3>
-                  <span className="text-[11px] text-slate-400 font-mono">
+                  <span className="text-xs text-[#85858b] font-mono">
                     {dailyQuestion.paperCode} • {dailyQuestion.questionNumber} ({dailyQuestion.topic})
                   </span>
                 </div>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="rounded-md bg-[#121824] px-2.5 py-1 text-xs font-mono font-bold text-amber-300 border border-white/[0.08]">
-                  🔥 {streakState.currentStreak} Day Streak ({streakState.xpPoints} XP)
+                <span className="rounded-md bg-[#232325] px-2.5 py-1 text-xs font-mono font-medium tabular-nums text-[#ededed] border border-white/[0.08] inline-flex items-center gap-1.5">
+                  <Flame className="h-3.5 w-3.5 text-[#FF5B37]" />
+                  <span>{streakState.currentStreak} day streak ({streakState.xpPoints} XP)</span>
                 </span>
               </div>
             </div>
 
-            <div className="text-xs sm:text-sm text-slate-200 leading-relaxed pt-1">
+            <div className="text-xs sm:text-sm text-[#ededed] leading-relaxed pt-1">
               <MathRenderer content={dailyQuestion.questionPrompt} />
             </div>
 
@@ -1050,11 +1039,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 value={dailyAnswerInput}
                 onChange={(e) => setDailyAnswerInput(e.target.value)}
                 placeholder="Final answer (e.g. 14.5 or x = 3)..."
-                className="flex-1 min-w-0 rounded-xl border border-white/[0.1] bg-[#121824] px-3 py-2 text-sm font-mono text-white placeholder-slate-500 focus:border-amber-400 focus:outline-none"
+                className="flex-1 min-w-0 rounded-lg border border-white/[0.08] bg-[#141415] px-3 py-2 text-sm font-mono text-[#ededed] placeholder-[#85858b] focus:border-white/[0.2] focus:outline-none"
               />
               <button
                 type="submit"
-                className="rounded-xl bg-[#FF5B37] hover:bg-[#E84E2A] text-white px-4 py-2 text-xs font-bold transition cursor-pointer"
+                className="rounded-lg bg-[#FF5B37] hover:bg-[#e04f2d] text-white px-4 py-2 text-xs font-medium transition-colors duration-150 cursor-pointer"
               >
                 Verify
               </button>
@@ -1062,10 +1051,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
             {dailyResult && (
               <div
-                className={`rounded-xl p-2.5 text-xs font-semibold border animate-fadeIn ${
+                className={`rounded-lg p-3 text-xs font-normal border ${
                   dailyResult.isCorrect
-                    ? 'border-emerald-500/40 bg-emerald-950/40 text-emerald-200'
-                    : 'border-amber-500/40 bg-amber-950/40 text-amber-200'
+                    ? 'border-[#4cc38a]/30 bg-[#141415] text-[#4cc38a]'
+                    : 'border-[#e5484d]/30 bg-[#141415] text-[#e5484d]'
                 }`}
               >
                 {dailyResult.message}
@@ -1077,28 +1066,28 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <section className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.08] pb-3">
               <div>
-                <h2 className="text-sm font-bold text-white uppercase tracking-wider">
-                  Specialized Examination Suites
+                <h2 className="text-xs font-mono text-[#85858b] uppercase tracking-wider">
+                  Specialized examination suites
                 </h2>
-                <p className="text-xs text-slate-400">
-                  Select a workflow category to explore focused preparation tools
+                <p className="text-xs text-[#a1a1a6]">
+                  Focused preparation workflows for examiner technique and authentic past paper mocks
                 </p>
               </div>
 
-              <div className="flex rounded-lg bg-[#111723] p-1 border border-white/[0.08]">
+              <div className="flex rounded-lg bg-[#0f0f10] p-1 border border-white/[0.08]">
                 {[
-                  { id: 'all', label: 'All Tools' },
-                  { id: 'papers', label: 'Papers & Mocks' },
-                  { id: 'technique', label: 'Examiner Technique' },
-                  { id: 'recall', label: 'Active Recall' },
+                  { id: 'all', label: 'All tools' },
+                  { id: 'papers', label: 'Papers & mocks' },
+                  { id: 'technique', label: 'Examiner technique' },
+                  { id: 'recall', label: 'Active recall' },
                 ].map((cat) => (
                   <button
                     key={cat.id}
                     onClick={() => setActiveCategory(cat.id as WorkspaceCategory)}
-                    className={`px-3 py-1 rounded-md text-xs font-bold transition cursor-pointer ${
+                    className={`px-3 py-1 rounded-md text-xs font-medium transition-colors duration-150 cursor-pointer ${
                       activeCategory === cat.id
-                        ? 'bg-[#FF5B37] text-white shadow-sm'
-                        : 'text-slate-400 hover:text-white'
+                        ? 'bg-[#232325] text-[#ededed]'
+                        : 'text-[#85858b] hover:text-[#ededed]'
                     }`}
                   >
                     {cat.label}
@@ -1107,29 +1096,29 @@ export const HomeView: React.FC<HomeViewProps> = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* Tool 1: Science ATP Master */}
               {(activeCategory === 'all' || activeCategory === 'technique') && (
                 <div
                   onClick={() => onNavigateTab('atp')}
-                  className="rounded-2xl border border-white/[0.08] bg-[#111723] p-4 flex flex-col justify-between hover:border-amber-500/50 hover:bg-[#162030] transition cursor-pointer"
+                  className="rounded-xl border border-white/[0.08] bg-[#19191b] p-5 flex flex-col justify-between space-y-3 hover:border-white/[0.18] transition-colors duration-150 cursor-pointer"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#232325] text-[#ededed] border border-white/[0.08]">
                         <FlaskConical className="h-4 w-4" />
                       </div>
-                      <span className="rounded bg-amber-500/10 px-2 py-0.5 text-[10px] font-mono font-bold text-amber-300">
+                      <span className="rounded bg-[#232325] border border-white/[0.08] px-2 py-0.5 text-xs font-mono text-[#85858b]">
                         Paper 6
                       </span>
                     </div>
-                    <h3 className="text-sm font-bold text-white">Science ATP Lab Master</h3>
-                    <p className="text-xs text-slate-400 mt-1">
+                    <h3 className="text-sm font-medium text-[#ededed]">Science ATP lab master</h3>
+                    <p className="text-xs text-[#a1a1a6] mt-1">
                       Interactive flame tests, meniscus reader, cation identification, and 6-mark plan builder.
                     </p>
                   </div>
-                  <div className="mt-3 flex items-center gap-1 text-xs font-bold text-amber-400">
-                    <span>Launch Lab</span>
+                  <div className="mt-2 flex items-center gap-1 text-xs font-medium text-[#ededed]">
+                    <span>Launch lab</span>
                     <ArrowRight className="h-3 w-3" />
                   </div>
                 </div>
@@ -1139,24 +1128,24 @@ export const HomeView: React.FC<HomeViewProps> = ({
               {(activeCategory === 'all' || activeCategory === 'technique') && (
                 <div
                   onClick={() => onNavigateTab('pitfalls')}
-                  className="rounded-2xl border border-white/[0.08] bg-[#111723] p-4 flex flex-col justify-between hover:border-rose-500/50 hover:bg-[#162030] transition cursor-pointer"
+                  className="rounded-xl border border-white/[0.08] bg-[#19191b] p-5 flex flex-col justify-between space-y-3 hover:border-white/[0.18] transition-colors duration-150 cursor-pointer"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-500/15 text-rose-400">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#232325] text-[#ededed] border border-white/[0.08]">
                         <TrendingDown className="h-4 w-4" />
                       </div>
-                      <span className="rounded bg-rose-500/10 px-2 py-0.5 text-[10px] font-mono font-bold text-rose-300">
-                        Examiner Reports
+                      <span className="rounded bg-[#232325] border border-white/[0.08] px-2 py-0.5 text-xs font-mono text-[#85858b]">
+                        Reports
                       </span>
                     </div>
-                    <h3 className="text-sm font-bold text-white">Examiner Pitfall Heatmap</h3>
-                    <p className="text-xs text-slate-400 mt-1">
-                      Official CAIE reports synthesized into exact misconceptions costing candidates the A*.
+                    <h3 className="text-sm font-medium text-[#ededed]">Examiner pitfall catalog</h3>
+                    <p className="text-xs text-[#a1a1a6] mt-1">
+                      Official CAIE reports synthesized into exact misconceptions costing candidates marks.
                     </p>
                   </div>
-                  <div className="mt-3 flex items-center gap-1 text-xs font-bold text-rose-400">
-                    <span>View Pitfalls</span>
+                  <div className="mt-2 flex items-center gap-1 text-xs font-medium text-[#ededed]">
+                    <span>View pitfalls</span>
                     <ArrowRight className="h-3 w-3" />
                   </div>
                 </div>
@@ -1166,24 +1155,24 @@ export const HomeView: React.FC<HomeViewProps> = ({
               {(activeCategory === 'all' || activeCategory === 'papers') && (
                 <div
                   onClick={() => onNavigateTab('mock')}
-                  className="rounded-2xl border border-white/[0.08] bg-[#111723] p-4 flex flex-col justify-between hover:border-sky-500/50 hover:bg-[#162030] transition cursor-pointer"
+                  className="rounded-xl border border-white/[0.08] bg-[#19191b] p-5 flex flex-col justify-between space-y-3 hover:border-white/[0.18] transition-colors duration-150 cursor-pointer"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-sky-500/15 text-sky-400">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#232325] text-[#ededed] border border-white/[0.08]">
                         <Clock className="h-4 w-4" />
                       </div>
-                      <span className="rounded bg-sky-500/10 px-2 py-0.5 text-[10px] font-mono font-bold text-sky-300">
+                      <span className="rounded bg-[#232325] border border-white/[0.08] px-2 py-0.5 text-xs font-mono text-[#85858b]">
                         Timed
                       </span>
                     </div>
-                    <h3 className="text-sm font-bold text-white">Timed Mock Simulator</h3>
-                    <p className="text-xs text-slate-400 mt-1">
+                    <h3 className="text-sm font-medium text-[#ededed]">Timed mock simulator</h3>
+                    <p className="text-xs text-[#a1a1a6] mt-1">
                       Sit full-length Cambridge papers under authentic exam conditions with Grade 9 boundaries.
                     </p>
                   </div>
-                  <div className="mt-3 flex items-center gap-1 text-xs font-bold text-sky-400">
-                    <span>Start Mock</span>
+                  <div className="mt-2 flex items-center gap-1 text-xs font-medium text-[#ededed]">
+                    <span>Start mock</span>
                     <ArrowRight className="h-3 w-3" />
                   </div>
                 </div>
@@ -1193,24 +1182,24 @@ export const HomeView: React.FC<HomeViewProps> = ({
               {(activeCategory === 'all' || activeCategory === 'papers') && (
                 <div
                   onClick={() => onNavigateTab('split')}
-                  className="rounded-2xl border border-white/[0.08] bg-[#111723] p-4 flex flex-col justify-between hover:border-amber-500/50 hover:bg-[#162030] transition cursor-pointer"
+                  className="rounded-xl border border-white/[0.08] bg-[#19191b] p-5 flex flex-col justify-between space-y-3 hover:border-white/[0.18] transition-colors duration-150 cursor-pointer"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#232325] text-[#ededed] border border-white/[0.08]">
                         <Columns className="h-4 w-4" />
                       </div>
-                      <span className="rounded bg-amber-500/10 px-2 py-0.5 text-[10px] font-mono font-bold text-amber-300">
-                        Dual Pane
+                      <span className="rounded bg-[#232325] border border-white/[0.08] px-2 py-0.5 text-xs font-mono text-[#85858b]">
+                        Dual pane
                       </span>
                     </div>
-                    <h3 className="text-sm font-bold text-white">Split-Screen QP/MS</h3>
-                    <p className="text-xs text-slate-400 mt-1">
-                      Synchronized Question Paper and Mark Scheme side by side without printing.
+                    <h3 className="text-sm font-medium text-[#ededed]">Split-screen QP/MS</h3>
+                    <p className="text-xs text-[#a1a1a6] mt-1">
+                      Synchronized question paper and mark scheme side by side without printing.
                     </p>
                   </div>
-                  <div className="mt-3 flex items-center gap-1 text-xs font-bold text-amber-400">
-                    <span>Open Dual View</span>
+                  <div className="mt-2 flex items-center gap-1 text-xs font-medium text-[#ededed]">
+                    <span>Open dual view</span>
                     <ArrowRight className="h-3 w-3" />
                   </div>
                 </div>
@@ -1220,24 +1209,24 @@ export const HomeView: React.FC<HomeViewProps> = ({
               {(activeCategory === 'all' || activeCategory === 'recall') && (
                 <div
                   onClick={() => onNavigateTab('flashcards')}
-                  className="rounded-2xl border border-white/[0.08] bg-[#111723] p-4 flex flex-col justify-between hover:border-emerald-500/50 hover:bg-[#162030] transition cursor-pointer"
+                  className="rounded-xl border border-white/[0.08] bg-[#19191b] p-5 flex flex-col justify-between space-y-3 hover:border-white/[0.18] transition-colors duration-150 cursor-pointer"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-400">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#232325] text-[#ededed] border border-white/[0.08]">
                         <Layers className="h-4 w-4" />
                       </div>
-                      <span className="rounded bg-emerald-500/10 px-2 py-0.5 text-[10px] font-mono font-bold text-emerald-300">
+                      <span className="rounded bg-[#232325] border border-white/[0.08] px-2 py-0.5 text-xs font-mono text-[#85858b]">
                         SM-2
                       </span>
                     </div>
-                    <h3 className="text-sm font-bold text-white">Topic Active Recall Decks</h3>
-                    <p className="text-xs text-slate-400 mt-1">
+                    <h3 className="text-sm font-medium text-[#ededed]">Active recall decks</h3>
+                    <p className="text-xs text-[#a1a1a6] mt-1">
                       Spaced-repetition formula and definition decks scheduled for exam memory.
                     </p>
                   </div>
-                  <div className="mt-3 flex items-center gap-1 text-xs font-bold text-emerald-400">
-                    <span>Practice Cards</span>
+                  <div className="mt-2 flex items-center gap-1 text-xs font-medium text-[#ededed]">
+                    <span>Practice cards</span>
                     <ArrowRight className="h-3 w-3" />
                   </div>
                 </div>
@@ -1247,24 +1236,24 @@ export const HomeView: React.FC<HomeViewProps> = ({
               {(activeCategory === 'all' || activeCategory === 'technique') && (
                 <div
                   onClick={() => onNavigateTab('traps')}
-                  className="rounded-2xl border border-white/[0.08] bg-[#111723] p-4 flex flex-col justify-between hover:border-rose-500/50 hover:bg-[#162030] transition cursor-pointer"
+                  className="rounded-xl border border-white/[0.08] bg-[#19191b] p-5 flex flex-col justify-between space-y-3 hover:border-white/[0.18] transition-colors duration-150 cursor-pointer"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-500/15 text-rose-400">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#232325] text-[#ededed] border border-white/[0.08]">
                         <ShieldAlert className="h-4 w-4" />
                       </div>
-                      <span className="rounded bg-rose-500/10 px-2 py-0.5 text-[10px] font-mono font-bold text-rose-300">
-                        Command Words
+                      <span className="rounded bg-[#232325] border border-white/[0.08] px-2 py-0.5 text-xs font-mono text-[#85858b]">
+                        Traps
                       </span>
                     </div>
-                    <h3 className="text-sm font-bold text-white">Command Words Trap Detector</h3>
-                    <p className="text-xs text-slate-400 mt-1">
+                    <h3 className="text-sm font-medium text-[#ededed]">Command words detector</h3>
+                    <p className="text-xs text-[#a1a1a6] mt-1">
                       Master "State" vs "Describe" vs "Explain" to never throw away method marks.
                     </p>
                   </div>
-                  <div className="mt-3 flex items-center gap-1 text-xs font-bold text-rose-400">
-                    <span>View Traps</span>
+                  <div className="mt-2 flex items-center gap-1 text-xs font-medium text-[#ededed]">
+                    <span>View traps</span>
                     <ArrowRight className="h-3 w-3" />
                   </div>
                 </div>
@@ -1276,47 +1265,47 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <section className="space-y-4 pt-2">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
               <div>
-                <h2 className="text-sm font-bold text-white uppercase tracking-wider">
-                  Enrolled Syllabuses
+                <h2 className="text-xs font-mono text-[#85858b] uppercase tracking-wider">
+                  Enrolled syllabuses
                 </h2>
-                <p className="text-xs text-slate-400">
-                  Quick access to all papers, revision notes, and quizzes across your enrolled subjects
+                <p className="text-xs text-[#a1a1a6]">
+                  Past papers, revision notes, and quizzes across your enrolled subjects
                 </p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {subjects.map((sub) => {
                 const isActive = sub.id === activeSubject.id;
                 return (
                   <div
                     key={sub.id}
-                    className={`rounded-2xl border p-4 flex flex-col justify-between space-y-3 transition ${
+                    className={`rounded-xl border p-5 flex flex-col justify-between space-y-4 transition-colors duration-150 ${
                       isActive
-                        ? 'border-[#FF5B37]/60 bg-[#162030] ring-1 ring-[#FF5B37]/30'
-                        : 'border-white/[0.08] bg-[#111723] hover:border-white/[0.16]'
+                        ? 'border-white/[0.2] bg-[#19191b]'
+                        : 'border-white/[0.08] bg-[#19191b] hover:border-white/[0.16]'
                     }`}
                   >
                     <div>
                       <div className="flex items-center justify-between">
-                        <span className="px-2 py-0.5 rounded text-xs font-mono font-bold bg-white/[0.08] text-white">
+                        <span className="px-2 py-0.5 rounded text-xs font-mono font-medium bg-[#232325] text-[#ededed] border border-white/[0.08]">
                           {sub.code}
                         </span>
-                        <span className="text-[10px] text-slate-400 font-medium">{sub.board}</span>
+                        <span className="text-xs text-[#85858b]">{sub.board}</span>
                       </div>
-                      <h3 className="text-sm font-bold text-white mt-2">{sub.name}</h3>
-                      <p className="text-xs text-slate-400 mt-0.5 line-clamp-1">
+                      <h3 className="text-base font-medium text-[#ededed] mt-2.5">{sub.name}</h3>
+                      <p className="text-xs text-[#85858b] mt-1 line-clamp-1">
                         {sub.topics.slice(0, 3).join(' • ')}...
                       </p>
                     </div>
 
-                    <div className="grid grid-cols-4 gap-1 pt-2 border-t border-white/[0.06] text-center">
+                    <div className="grid grid-cols-4 gap-1.5 pt-3 border-t border-white/[0.06] text-center">
                       <button
                         onClick={() => {
                           onSelectSubject(sub);
                           onNavigateTab('finder');
                         }}
-                        className="rounded-lg bg-black/30 hover:bg-[#FF5B37] hover:text-white text-slate-300 py-1 text-[11px] font-semibold transition"
+                        className="rounded-md bg-[#232325] hover:bg-[#2c2c30] text-[#ededed] py-1.5 text-xs font-medium transition-colors duration-150 cursor-pointer"
                       >
                         Papers
                       </button>
@@ -1325,7 +1314,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                           onSelectSubject(sub);
                           onNavigateTab('revision');
                         }}
-                        className="rounded-lg bg-black/30 hover:bg-[#FF5B37] hover:text-white text-slate-300 py-1 text-[11px] font-semibold transition"
+                        className="rounded-md bg-[#232325] hover:bg-[#2c2c30] text-[#ededed] py-1.5 text-xs font-medium transition-colors duration-150 cursor-pointer"
                       >
                         Notes
                       </button>
@@ -1334,7 +1323,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                           onSelectSubject(sub);
                           onNavigateTab('quiz');
                         }}
-                        className="rounded-lg bg-black/30 hover:bg-[#FF5B37] hover:text-white text-slate-300 py-1 text-[11px] font-semibold transition"
+                        className="rounded-md bg-[#232325] hover:bg-[#2c2c30] text-[#ededed] py-1.5 text-xs font-medium transition-colors duration-150 cursor-pointer"
                       >
                         Quiz
                       </button>
@@ -1343,7 +1332,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                           onSelectSubject(sub);
                           onNavigateTab('solver');
                         }}
-                        className="rounded-lg bg-black/30 hover:bg-[#FF5B37] hover:text-white text-slate-300 py-1 text-[11px] font-semibold transition"
+                        className="rounded-md bg-[#232325] hover:bg-[#2c2c30] text-[#ededed] py-1.5 text-xs font-medium transition-colors duration-150 cursor-pointer"
                       >
                         Solver
                       </button>
