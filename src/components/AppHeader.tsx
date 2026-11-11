@@ -151,11 +151,11 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           <div className="hidden sm:flex items-center gap-2">
             {/* Daily Streak Flame */}
             <div
-              className="flex items-center gap-1.5 rounded-lg bg-zinc-900 border border-white/[0.06] px-2.5 py-1 text-xs text-zinc-300 cursor-default"
+              className="flex items-center gap-1.5 rounded-lg bg-[#18181b] border border-white/[0.08] px-2.5 py-1 text-xs text-zinc-300 cursor-default"
               title={`${streak.currentStreak} Day Study Streak`}
             >
               <Flame className="h-3.5 w-3.5 text-[#FF5B37] fill-[#FF5B37]" />
-              <span className="font-mono font-semibold">{streak.currentStreak}d</span>
+              <span className="font-mono font-medium tabular-nums">{streak.currentStreak}d</span>
             </div>
 
             {/* Parent WhatsApp Report Button */}
@@ -164,8 +164,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 onClick={onOpenParentReport}
                 className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium border transition cursor-pointer ${
                   isWeeklyReportDue
-                    ? 'border-emerald-500/40 bg-emerald-950/30 text-emerald-300'
-                    : 'border-white/[0.06] bg-zinc-900 text-zinc-400 hover:text-white hover:border-white/[0.12]'
+                    ? 'border-[#4cc38a]/40 bg-[#141416] text-[#4cc38a]'
+                    : 'border-white/[0.08] bg-[#18181b] text-zinc-400 hover:text-white hover:bg-[#222225]'
                 }`}
                 title="Send Weekly Progress Report to Parent via WhatsApp"
               >
@@ -178,9 +178,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             {onOpenPayment && (
               <button
                 onClick={onOpenPayment}
-                className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
+                className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium transition cursor-pointer ${
                   currentUser?.isPro
-                    ? 'border border-amber-500/30 bg-amber-950/20 text-amber-300'
+                    ? 'border border-amber-500/30 bg-[#18181b] text-amber-300'
                     : 'bg-[#FF5B37] text-white hover:bg-[#F97316]'
                 }`}
               >
@@ -193,10 +193,10 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             {(currentUser?.role === 'founder' || currentUser?.role === 'admin') && onNavigateTab && (
               <button
                 onClick={() => onNavigateTab('admin')}
-                className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
+                className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-medium transition cursor-pointer ${
                   activeTab === 'admin'
-                    ? 'border-amber-500/60 bg-amber-500/20 text-amber-300'
-                    : 'border-white/[0.08] bg-zinc-900 text-amber-400/90 hover:text-amber-300'
+                    ? 'border-[#FF5B37]/60 bg-[#222225] text-white'
+                    : 'border-white/[0.08] bg-[#18181b] text-zinc-300 hover:text-white hover:bg-[#222225]'
                 }`}
               >
                 <Crown className="h-3.5 w-3.5 text-amber-400" />
@@ -209,7 +209,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           {currentUser ? (
             <button
               onClick={onOpenProfile}
-              className="h-8 w-8 rounded-lg bg-[#27272A] hover:bg-[#323236] border border-white/[0.08] flex items-center justify-center text-xs font-bold text-white transition cursor-pointer shrink-0"
+              className="h-8 w-8 rounded-lg bg-[#222225] hover:bg-[#2a2a2e] border border-white/[0.08] flex items-center justify-center text-xs font-medium text-white transition cursor-pointer shrink-0"
               title={`${currentUser.name} (${profile.targetGrade})`}
             >
               {currentUser.name.charAt(0).toUpperCase()}
@@ -217,7 +217,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           ) : (
             <button
               onClick={() => onOpenAuth('signin')}
-              className="rounded-lg bg-[#FF5B37] hover:bg-[#F97316] text-white px-3 py-1.5 text-xs font-semibold transition cursor-pointer shrink-0 whitespace-nowrap"
+              className="rounded-lg bg-[#FF5B37] hover:bg-[#F97316] text-white px-3 py-1.5 text-xs font-medium transition cursor-pointer shrink-0 whitespace-nowrap"
             >
               Sign In
             </button>
