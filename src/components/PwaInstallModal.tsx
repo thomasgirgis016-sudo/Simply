@@ -69,12 +69,12 @@ export const PwaInstallModal: React.FC<PwaInstallModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
-      <div className="relative w-full max-w-md rounded-3xl border border-slate-800 bg-slate-900 p-5 sm:p-6 shadow-2xl space-y-5">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
+      <div className="relative w-full max-w-md rounded-2xl border border-white/[0.08] bg-[#18181b] p-5 sm:p-6 shadow-2xl space-y-5">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 h-8 w-8 flex items-center justify-center rounded-xl bg-slate-800 text-slate-400 hover:text-white transition cursor-pointer"
+          className="absolute right-4 top-4 h-8 w-8 flex items-center justify-center rounded-lg bg-[#222225] border border-white/[0.08] text-zinc-400 hover:text-white transition cursor-pointer"
         >
           <X className="h-4 w-4" />
         </button>
@@ -83,17 +83,17 @@ export const PwaInstallModal: React.FC<PwaInstallModalProps> = ({
         <div className="flex items-center gap-3">
           <SimplyLogo size="md" showText={false} />
           <div>
-            <h3 className="text-base sm:text-lg font-black text-white tracking-tight">
+            <h3 className="text-base font-semibold text-white tracking-tight">
               Install Fahemny IGCSE App
             </h3>
-            <span className="text-[11px] font-bold text-indigo-400">
+            <span className="text-[11px] font-medium text-[#FF5B37]">
               Offline Revision & Native Mobile Shell
             </span>
           </div>
         </div>
 
         {/* Benefits list */}
-        <div className="rounded-2xl border border-slate-800 bg-slate-950/60 p-3.5 space-y-2 text-xs text-slate-300">
+        <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-3.5 space-y-2 text-xs text-zinc-300">
           <div className="flex items-center gap-2">
             <CheckCircle className="h-4 w-4 text-emerald-400 shrink-0" />
             <span>Instant 1-tap launch from your iPhone/Android Home Screen</span>
@@ -103,26 +103,26 @@ export const PwaInstallModal: React.FC<PwaInstallModalProps> = ({
             <span>Offline access to Formula Sheets & Night Before Cheat Sheets</span>
           </div>
           <div className="flex items-center gap-2">
-            <Smartphone className="h-4 w-4 text-indigo-400 shrink-0" />
+            <Smartphone className="h-4 w-4 text-[#FF5B37] shrink-0" />
             <span>Full-screen view with zero browser URL bar distractions</span>
           </div>
         </div>
 
         {/* Platform Specific Install Steps */}
         {isInstalled ? (
-          <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-3 text-center text-xs text-emerald-300 font-bold">
+          <div className="rounded-xl border border-emerald-500/20 bg-emerald-950/20 p-3 text-center text-xs text-emerald-300 font-medium">
             ✓ App is already installed and active on this device!
           </div>
         ) : isIOS ? (
           /* iOS Instructions */
-          <div className="space-y-3 rounded-2xl border border-indigo-500/30 bg-indigo-950/20 p-4 text-xs text-slate-200">
-            <div className="font-bold text-indigo-300 flex items-center gap-1.5">
-              <Smartphone className="h-4 w-4" />
+          <div className="space-y-3 rounded-xl border border-white/[0.08] bg-[#141416] p-4 text-xs text-zinc-200">
+            <div className="font-semibold text-white flex items-center gap-1.5">
+              <Smartphone className="h-4 w-4 text-[#FF5B37]" />
               <span>How to Install on iPhone / iPad:</span>
             </div>
-            <ol className="list-decimal list-inside space-y-2 text-[11px] text-slate-300">
+            <ol className="list-decimal list-inside space-y-2 text-[11px] text-zinc-300">
               <li className="leading-relaxed">
-                Tap the <strong className="text-white">Share</strong> icon in the Safari bottom bar (<Share className="h-3.5 w-3.5 inline text-indigo-400" />).
+                Tap the <strong className="text-white">Share</strong> icon in the Safari bottom bar (<Share className="h-3.5 w-3.5 inline text-[#FF5B37]" />).
               </li>
               <li className="leading-relaxed">
                 Scroll down and select <strong className="text-white">"Add to Home Screen"</strong> (<PlusSquare className="h-3.5 w-3.5 inline text-emerald-400" />).
@@ -136,24 +136,24 @@ export const PwaInstallModal: React.FC<PwaInstallModalProps> = ({
           /* Native Android / Chrome 1-Click Install */
           <button
             onClick={handleInstallClick}
-            className="w-full flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-400 hover:to-indigo-500 py-3 text-xs sm:text-sm font-black text-white shadow-xl shadow-indigo-500/25 transition active:scale-95 cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 rounded-lg bg-[#FF5B37] hover:bg-[#ff6c4b] py-2.5 text-xs font-semibold text-white shadow-sm transition cursor-pointer"
           >
             <Download className="h-4 w-4" />
             <span>Install App on Device</span>
           </button>
         ) : (
           /* Fallback Desktop / Browser instructions */
-          <div className="space-y-2 rounded-2xl border border-slate-800 bg-slate-950/80 p-3.5 text-xs text-slate-300">
-            <p className="font-semibold text-white">To install on Desktop or Chrome:</p>
-            <p className="text-[11px] text-slate-400">
-              Click the install icon (<Download className="h-3.5 w-3.5 inline text-indigo-400" />) in your browser’s URL bar, or click your browser menu (⋮) and choose <strong>"Install Fahemny IGCSE"</strong>.
+          <div className="space-y-2 rounded-xl border border-white/[0.08] bg-[#141416] p-3.5 text-xs text-zinc-300">
+            <p className="font-medium text-white">To install on Desktop or Chrome:</p>
+            <p className="text-[11px] text-zinc-400 leading-relaxed">
+              Click the install icon (<Download className="h-3.5 w-3.5 inline text-[#FF5B37]" />) in your browser’s URL bar, or click your browser menu (⋮) and choose <strong>"Install Fahemny IGCSE"</strong>.
             </p>
           </div>
         )}
 
         <button
           onClick={onClose}
-          className="w-full text-center text-xs text-slate-500 hover:text-slate-300 transition py-1 cursor-pointer"
+          className="w-full text-center text-xs text-zinc-500 hover:text-zinc-300 transition py-1 cursor-pointer"
         >
           Maybe later
         </button>

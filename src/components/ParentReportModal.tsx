@@ -107,66 +107,66 @@ export const ParentReportModal: React.FC<ParentReportModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto animate-fadeIn">
-      <div className="relative w-full max-w-3xl my-8 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden print:border-none print:shadow-none print:m-0 print:p-0 print:w-full print:max-w-full">
+      <div className="relative w-full max-w-3xl my-8 bg-[#18181b] border border-white/[0.08] rounded-2xl shadow-2xl overflow-hidden print:border-none print:shadow-none print:m-0 print:p-0 print:w-full print:max-w-full">
         {/* Modal Controls (Hidden in Print) */}
-        <div className="flex items-center justify-between p-5 border-b border-slate-800 bg-slate-950/80 no-print">
+        <div className="flex items-center justify-between p-4 sm:p-5 border-b border-white/[0.08] bg-[#141416] no-print">
           <div className="flex items-center gap-2">
-            <Award className="w-5 h-5 text-indigo-400" />
-            <span className="text-sm font-bold text-white uppercase tracking-wider">
+            <Award className="w-4.5 h-4.5 text-[#FF5B37]" />
+            <span className="text-xs sm:text-sm font-semibold text-zinc-100 uppercase tracking-wider">
               Cambridge Academic Progress Statement
             </span>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={handleShareWhatsApp}
-              className="px-3.5 py-1.5 text-xs font-bold rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1.5 transition-colors shadow-sm cursor-pointer"
+              className="px-3 py-1.5 text-xs font-medium rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1.5 transition-colors shadow-sm cursor-pointer"
               title={profile.parentWhatsapp ? `Send report directly to parent: ${profile.parentWhatsapp}` : 'Share report summary on WhatsApp'}
             >
               <Share2 className="w-3.5 h-3.5" />
-              <span>Send to Parent WhatsApp</span>
+              <span>Send to WhatsApp</span>
             </button>
             <button
               onClick={handlePrint}
-              className="px-3.5 py-1.5 text-xs font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-1.5 transition-colors shadow-sm cursor-pointer"
+              className="px-3 py-1.5 text-xs font-medium rounded-lg border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.08] text-zinc-300 hover:text-white flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <Printer className="w-3.5 h-3.5" />
-              Print / Save PDF
+              <span>Print A4</span>
             </button>
             <button
               onClick={onClose}
-              className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
+              className="p-1.5 text-zinc-400 hover:text-white rounded-lg hover:bg-white/[0.06] transition-colors cursor-pointer"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
 
         {/* Weekly Parent Report Status Banner (Hidden in Print) */}
-        <div className="bg-slate-950 border-b border-slate-800 p-4 px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 no-print">
+        <div className="bg-[#141416] border-b border-white/[0.08] p-4 px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 no-print">
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-xl shrink-0 ${isWeeklyReportDue ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-400'}`}>
+            <div className={`p-2 rounded-lg shrink-0 ${isWeeklyReportDue ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-white/[0.04] text-zinc-400 border border-white/[0.06]'}`}>
               <Calendar className="w-4 h-4" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-white">
+                <span className="text-xs font-semibold text-zinc-200">
                   Weekly Parent WhatsApp Dispatch:
                 </span>
                 {isWeeklyReportDue ? (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 animate-pulse">
-                    📅 Report Due This Week
+                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    Report Due
                   </span>
                 ) : (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">
-                    ✓ Dispatched {daysSinceLastReport !== null ? `${daysSinceLastReport}d ago` : 'recently'}
+                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-white/[0.04] text-zinc-400 border border-white/[0.06]">
+                    Dispatched {daysSinceLastReport !== null ? `${daysSinceLastReport}d ago` : 'recently'}
                   </span>
                 )}
               </div>
-              <p className="text-[11px] text-slate-400 mt-0.5">
+              <p className="text-[11px] text-zinc-400 mt-0.5">
                 {profile.parentWhatsapp ? (
                   <>Registered Parent WhatsApp: <strong className="text-emerald-400 font-mono">{profile.parentWhatsapp}</strong></>
                 ) : (
-                  <span className="text-amber-300">No parent number registered yet. Click Profile to add one.</span>
+                  <span className="text-amber-400">No parent number registered yet. Click Profile to add one.</span>
                 )}
               </p>
             </div>
@@ -174,73 +174,73 @@ export const ParentReportModal: React.FC<ParentReportModalProps> = ({
 
           <button
             onClick={handleShareWhatsApp}
-            className="px-3 py-1.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 text-xs font-bold transition flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
+            className="px-3 py-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 text-xs font-medium transition-colors flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
           >
-            <span>📱 Dispatch Weekly Report</span>
+            <span>Dispatch Weekly Report</span>
           </button>
         </div>
 
         {/* Printable Formal Academic Report Card */}
         <div
           ref={printRef}
-          className="p-8 sm:p-10 space-y-8 bg-slate-900 text-slate-100 print:bg-white print:text-black print:p-8"
+          className="p-8 sm:p-10 space-y-8 bg-[#18181b] text-zinc-200 print:bg-white print:text-black print:p-8"
         >
           {/* Official Letterhead */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b-2 border-indigo-500/40 pb-6 gap-4 print:border-black">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/[0.08] pb-6 gap-4 print:border-black">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-black tracking-tight text-white print:text-black">
-                  FAHEMNY<span className="text-indigo-400 print:text-indigo-800"> IGCSE</span>
+                <span className="text-2xl font-bold tracking-tight text-white print:text-black">
+                  FAHEMNY<span className="text-[#FF5B37] print:text-black"> IGCSE</span>
                 </span>
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 print:border-black print:text-black">
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium uppercase tracking-wider bg-white/[0.04] border border-white/[0.08] text-zinc-300 print:border-black print:text-black">
                   Official Audit
                 </span>
               </div>
-              <p className="text-xs text-slate-400 print:text-gray-600">
+              <p className="text-xs text-zinc-400 print:text-gray-600">
                 Cambridge Assessment International Education (CAIE) Prep Suite
               </p>
             </div>
 
-            <div className="text-right space-y-0.5 text-xs text-slate-400 print:text-gray-600">
-              <div className="font-semibold text-slate-200 print:text-black">
+            <div className="text-right space-y-0.5 text-xs text-zinc-400 print:text-gray-600">
+              <div className="font-medium text-zinc-200 print:text-black">
                 Date Issued: {reportDate}
               </div>
-              <div>Report Reference: CAIE-RPT-{Math.floor(100000 + Math.random() * 900000)}</div>
+              <div className="font-mono">Report Reference: CAIE-RPT-{Math.floor(100000 + Math.random() * 900000)}</div>
               <div>Status: Verified Academic Record</div>
             </div>
           </div>
 
           {/* Student Profile Overview */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-5 rounded-2xl bg-slate-950/60 border border-slate-800 print:bg-gray-50 print:border-gray-300">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-5 rounded-xl bg-[#141416] border border-white/[0.08] print:bg-gray-50 print:border-gray-300">
             <div>
-              <div className="text-[11px] uppercase tracking-wider text-slate-400 print:text-gray-500 font-semibold">
+              <div className="text-[11px] uppercase tracking-wider text-zinc-500 print:text-gray-500 font-medium">
                 Student Name
               </div>
-              <div className="text-base font-bold text-white print:text-black mt-0.5">
+              <div className="text-base font-semibold text-zinc-100 print:text-black mt-0.5">
                 {profile.name || 'Candidate'}
               </div>
             </div>
             <div>
-              <div className="text-[11px] uppercase tracking-wider text-slate-400 print:text-gray-500 font-semibold">
+              <div className="text-[11px] uppercase tracking-wider text-zinc-500 print:text-gray-500 font-medium">
                 Cohort / Level
               </div>
-              <div className="text-sm font-semibold text-slate-200 print:text-black mt-0.5">
+              <div className="text-sm font-medium text-zinc-300 print:text-black mt-0.5">
                 {profile.grade || 'Year 11 / IGCSE'}
               </div>
             </div>
             <div>
-              <div className="text-[11px] uppercase tracking-wider text-slate-400 print:text-gray-500 font-semibold">
+              <div className="text-[11px] uppercase tracking-wider text-zinc-500 print:text-gray-500 font-medium">
                 Target Grade
               </div>
-              <div className="text-sm font-bold text-indigo-400 print:text-indigo-800 mt-0.5">
+              <div className="text-sm font-mono font-semibold text-[#FF5B37] print:text-black mt-0.5">
                 {targetGrade}
               </div>
             </div>
             <div>
-              <div className="text-[11px] uppercase tracking-wider text-slate-400 print:text-gray-500 font-semibold">
+              <div className="text-[11px] uppercase tracking-wider text-zinc-500 print:text-gray-500 font-medium">
                 Projected Grade
               </div>
-              <div className="text-sm font-bold text-emerald-400 print:text-emerald-800 mt-0.5">
+              <div className="text-sm font-mono font-semibold text-emerald-400 print:text-black mt-0.5">
                 {projectedGrade}
               </div>
             </div>
@@ -248,38 +248,38 @@ export const ParentReportModal: React.FC<ParentReportModalProps> = ({
 
           {/* Performance KPI Cards */}
           <div className="grid grid-cols-3 gap-4">
-            <div className="p-4 rounded-xl bg-slate-950/40 border border-slate-800 text-center print:border-gray-300 print:bg-white">
-              <div className="text-2xl sm:text-3xl font-black text-indigo-400 print:text-indigo-800 font-mono">
+            <div className="p-4 rounded-xl bg-[#141416] border border-white/[0.08] text-center print:border-gray-300 print:bg-white">
+              <div className="text-2xl sm:text-3xl font-semibold text-[#FF5B37] print:text-black font-mono">
                 {overallMockAverage}%
               </div>
-              <div className="text-xs font-semibold text-slate-300 print:text-gray-700 mt-1">
+              <div className="text-xs font-medium text-zinc-300 print:text-gray-700 mt-1">
                 Mock Exam Average
               </div>
-              <div className="text-[10px] text-slate-400 print:text-gray-500">
+              <div className="text-[10px] text-zinc-500 print:text-gray-500">
                 Across {studentSubjects.length || 5} subjects
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-slate-950/40 border border-slate-800 text-center print:border-gray-300 print:bg-white">
-              <div className="text-2xl sm:text-3xl font-black text-emerald-400 print:text-emerald-800 font-mono">
+            <div className="p-4 rounded-xl bg-[#141416] border border-white/[0.08] text-center print:border-gray-300 print:bg-white">
+              <div className="text-2xl sm:text-3xl font-semibold text-emerald-400 print:text-black font-mono">
                 {totalQuestionsSolved}
               </div>
-              <div className="text-xs font-semibold text-slate-300 print:text-gray-700 mt-1">
+              <div className="text-xs font-medium text-zinc-300 print:text-gray-700 mt-1">
                 Questions Mastered
               </div>
-              <div className="text-[10px] text-slate-400 print:text-gray-500">
+              <div className="text-[10px] text-zinc-500 print:text-gray-500">
                 Official past paper items
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-slate-950/40 border border-slate-800 text-center print:border-gray-300 print:bg-white">
-              <div className="text-2xl sm:text-3xl font-black text-amber-400 print:text-amber-800 font-mono">
+            <div className="p-4 rounded-xl bg-[#141416] border border-white/[0.08] text-center print:border-gray-300 print:bg-white">
+              <div className="text-2xl sm:text-3xl font-semibold text-amber-400 print:text-black font-mono">
                 {streak.currentStreak}
               </div>
-              <div className="text-xs font-semibold text-slate-300 print:text-gray-700 mt-1">
+              <div className="text-xs font-medium text-zinc-300 print:text-gray-700 mt-1">
                 Day Study Streak
               </div>
-              <div className="text-[10px] text-slate-400 print:text-gray-500">
+              <div className="text-[10px] text-zinc-500 print:text-gray-500">
                 Consistent revision log
               </div>
             </div>
@@ -287,44 +287,44 @@ export const ParentReportModal: React.FC<ParentReportModalProps> = ({
 
           {/* Subject Breakdown Table */}
           <div className="space-y-3">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-300 print:text-black flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-indigo-400 print:text-black" />
+            <h3 className="text-xs font-medium uppercase tracking-wider text-zinc-400 print:text-black flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-[#FF5B37] print:text-black" />
               Syllabus Mastery Breakdown
             </h3>
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="border-b border-slate-800 print:border-gray-300 text-slate-400 print:text-gray-600 font-semibold">
+                  <tr className="border-b border-white/[0.08] print:border-gray-300 text-zinc-400 print:text-gray-600 font-medium">
                     <th className="py-2.5 px-3">Subject / Syllabus</th>
                     <th className="py-2.5 px-3">Recent Mock Score</th>
                     <th className="py-2.5 px-3">Target Grade</th>
                     <th className="py-2.5 px-3">Mastery Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60 print:divide-gray-200">
+                <tbody className="divide-y divide-white/[0.04] print:divide-gray-200">
                   {studentSubjects.map((sub, i) => {
                     const mockScore = 80 + ((i * 7) % 15);
                     const isStrong = mockScore >= 85;
                     return (
-                      <tr key={sub.id} className="hover:bg-slate-950/30 print:hover:bg-transparent">
-                        <td className="py-3 px-3 font-medium text-slate-200 print:text-black">
-                          <span className="font-mono font-bold text-indigo-400 print:text-black mr-2">
+                      <tr key={sub.id} className="hover:bg-white/[0.02] print:hover:bg-transparent">
+                        <td className="py-3 px-3 font-medium text-zinc-200 print:text-black">
+                          <span className="font-mono font-medium text-[#FF5B37] print:text-black mr-2">
                             {sub.code}
                           </span>
                           {sub.name}
                         </td>
-                        <td className="py-3 px-3 font-mono font-semibold text-slate-300 print:text-black">
+                        <td className="py-3 px-3 font-mono font-medium text-zinc-300 print:text-black">
                           {mockScore}%
                         </td>
-                        <td className="py-3 px-3 font-semibold text-slate-200 print:text-black">
+                        <td className="py-3 px-3 font-mono font-medium text-zinc-200 print:text-black">
                           {targetGrade}
                         </td>
                         <td className="py-3 px-3">
                           <span
-                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold ${
+                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-medium ${
                               isStrong
-                                ? 'bg-emerald-500/10 text-emerald-400 print:text-emerald-800'
-                                : 'bg-amber-500/10 text-amber-400 print:text-amber-800'
+                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
                             }`}
                           >
                             {isStrong ? '✓ On Track for A*' : '⚠️ Revision Required'}
@@ -339,23 +339,23 @@ export const ParentReportModal: React.FC<ParentReportModalProps> = ({
           </div>
 
           {/* Examiner Commentary & Action Plan */}
-          <div className="p-5 rounded-2xl bg-indigo-950/20 border border-indigo-500/20 space-y-2.5 print:bg-gray-50 print:border-gray-300">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-indigo-300 print:text-black">
-              <FileCheck className="w-4 h-4 text-indigo-400 print:text-black" />
+          <div className="p-4.5 rounded-xl bg-[#141416] border border-white/[0.08] space-y-2 print:bg-gray-50 print:border-gray-300">
+            <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-[#FF5B37] print:text-black">
+              <FileCheck className="w-4 h-4 text-[#FF5B37] print:text-black" />
               Cambridge Head of Academic Assessment Commentary
             </div>
-            <p className="text-xs text-slate-300 print:text-gray-700 leading-relaxed">
+            <p className="text-xs text-zinc-300 print:text-gray-700 leading-relaxed">
               Candidate shows consistent revision dedication with a reliable active study streak. To guarantee an A* (Grade 9) in the upcoming examination series, candidate should concentrate on <strong>Paper 4 Theory Extended Section B structured questions</strong> and master <strong>Cambridge command words</strong> (specifically distinguishing <em>Describe</em> from <em>Explain</em> to avoid losing working marks).
             </p>
           </div>
 
           {/* Formal Verification Stamp / Footer */}
-          <div className="pt-6 border-t border-slate-800 print:border-gray-300 flex flex-col sm:flex-row sm:items-center justify-between text-[11px] text-slate-500 print:text-gray-600 gap-3">
+          <div className="pt-6 border-t border-white/[0.08] print:border-gray-300 flex flex-col sm:flex-row sm:items-center justify-between text-[11px] text-zinc-500 print:text-gray-600 gap-3 font-mono">
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-400 print:text-black" />
               <span>Electronically verified via Fahemny IGCSE Assessment Engine</span>
             </div>
-            <div className="font-mono">
+            <div>
               Cambridge International Standards • London & Cairo
             </div>
           </div>

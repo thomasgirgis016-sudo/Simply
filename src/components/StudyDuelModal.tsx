@@ -173,19 +173,19 @@ export const StudyDuelModal: React.FC<StudyDuelModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto animate-fadeIn">
-      <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto animate-fadeIn">
+      <div className="relative w-full max-w-2xl bg-[#18181b] border border-white/[0.08] rounded-2xl shadow-2xl overflow-hidden">
         {/* Top Header */}
-        <div className="flex items-center justify-between p-5 border-b border-slate-800 bg-slate-950/80">
+        <div className="flex items-center justify-between p-5 border-b border-white/[0.08] bg-[#141416]">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+            <div className="w-8 h-8 rounded-lg bg-[#FF5B37]/10 border border-[#FF5B37]/30 flex items-center justify-center text-[#FF5B37]">
               <Swords className="w-4 h-4" />
             </div>
             <div>
-              <div className="text-sm font-bold text-white flex items-center gap-2">
+              <div className="text-sm font-semibold text-white flex items-center gap-2">
                 Study With a Friend • Past Paper Duel
               </div>
-              <div className="text-[11px] text-slate-400">
+              <div className="text-[11px] text-zinc-400">
                 Synchronized Cambridge challenge with live mark scheme comparison
               </div>
             </div>
@@ -193,7 +193,7 @@ export const StudyDuelModal: React.FC<StudyDuelModalProps> = ({
 
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+            className="p-1.5 text-zinc-400 hover:text-white rounded-lg hover:bg-[#222225] transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -204,31 +204,31 @@ export const StudyDuelModal: React.FC<StudyDuelModalProps> = ({
           {/* LOBBY VIEW */}
           {duelState === 'lobby' && (
             <div className="space-y-6 text-center">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-rose-600 mx-auto flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                <Swords className="w-8 h-8 text-white" />
+              <div className="w-14 h-14 rounded-xl bg-[#FF5B37]/10 border border-[#FF5B37]/30 mx-auto flex items-center justify-center text-[#FF5B37]">
+                <Swords className="w-7 h-7" />
               </div>
 
               <div className="space-y-2">
-                <h3 className="text-2xl font-black text-white">
+                <h3 className="text-xl font-bold text-white">
                   Challenge a Classmate to a Cambridge Sprint
                 </h3>
-                <p className="text-xs text-slate-300 max-w-md mx-auto">
+                <p className="text-xs text-zinc-400 max-w-md mx-auto leading-relaxed">
                   Compete on identical official past paper questions under timed exam conditions. Compare answers directly against Cambridge mark scheme points.
                 </p>
               </div>
 
               {/* Room Code Share Card */}
-              <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 max-w-sm mx-auto space-y-2">
-                <div className="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">
+              <div className="p-4 rounded-xl bg-[#141416] border border-white/[0.08] max-w-sm mx-auto space-y-2">
+                <div className="text-[11px] uppercase tracking-wider text-zinc-400 font-medium">
                   Share Your Duel Room Code
                 </div>
                 <div className="flex items-center justify-center gap-3">
-                  <span className="font-mono text-2xl font-black text-indigo-400 tracking-wider">
+                  <span className="font-mono text-2xl font-bold text-[#FF5B37] tracking-wider">
                     {roomCode}
                   </span>
                   <button
                     onClick={handleCopyCode}
-                    className="p-2 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-200 transition-colors"
+                    className="p-2 rounded-lg bg-[#222225] hover:bg-[#28282c] text-zinc-200 border border-white/[0.08] transition-colors"
                     title="Copy code"
                   >
                     {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
@@ -241,11 +241,11 @@ export const StudyDuelModal: React.FC<StudyDuelModalProps> = ({
 
               {/* Subject Selection */}
               <div className="max-w-sm mx-auto text-left space-y-1.5">
-                <label className="text-xs font-semibold text-slate-400">Select Exam Subject</label>
+                <label className="text-xs font-medium text-zinc-400">Select Exam Subject</label>
                 <select
                   value={selectedSubjectCode}
                   onChange={e => setSelectedSubjectCode(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 text-slate-200 text-xs rounded-xl p-3 focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-[#141416] border border-white/[0.08] text-zinc-200 text-xs rounded-lg p-3 focus:outline-none focus:border-[#FF5B37]/50"
                 >
                   <option value="0580">0580 - Cambridge IGCSE Mathematics</option>
                   <option value="0625">0625 - Cambridge IGCSE Physics</option>
@@ -256,7 +256,7 @@ export const StudyDuelModal: React.FC<StudyDuelModalProps> = ({
               {/* Start Button */}
               <button
                 onClick={handleStartDuel}
-                className="w-full max-w-sm mx-auto py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-rose-600 hover:from-indigo-500 hover:to-rose-500 text-white font-bold text-sm shadow-xl shadow-indigo-600/20 flex items-center justify-center gap-2 transition-all"
+                className="w-full max-w-sm mx-auto py-3 rounded-lg bg-[#FF5B37] hover:bg-[#ff6c4b] text-white font-semibold text-xs transition-colors flex items-center justify-center gap-2 shadow-sm"
               >
                 <Play className="w-4 h-4 fill-current" />
                 Start Past Paper Duel
@@ -268,46 +268,46 @@ export const StudyDuelModal: React.FC<StudyDuelModalProps> = ({
           {duelState === 'active' && (
             <div className="space-y-6">
               {/* Header with Clocks & Dual Progress */}
-              <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+              <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
                 <div className="space-y-0.5">
-                  <div className="text-[11px] font-bold text-indigo-400 uppercase tracking-wider font-mono">
+                  <div className="text-[11px] font-semibold text-[#FF5B37] uppercase tracking-wider font-mono">
                     {currentQ.paperInfo}
                   </div>
-                  <div className="text-sm font-bold text-white">
+                  <div className="text-sm font-semibold text-white">
                     Question {currentQuestionIndex + 1} of {SAMPLE_DUEL_QUESTIONS.length} • {currentQ.marks} Marks
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 font-mono text-sm font-bold">
-                  <Clock className="w-4 h-4" />
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 font-mono text-xs font-medium">
+                  <Clock className="w-3.5 h-3.5" />
                   {formatTime(timeLeft)}
                 </div>
               </div>
 
               {/* Peer status ticker */}
-              <div className="flex items-center justify-between text-xs px-3 py-2 rounded-xl bg-slate-950/60 border border-slate-800 text-slate-400">
-                <span className="flex items-center gap-1.5 text-slate-300">
-                  <Users className="w-3.5 h-3.5 text-indigo-400" />
+              <div className="flex items-center justify-between text-xs px-3 py-2 rounded-lg bg-[#141416] border border-white/[0.08] text-zinc-400">
+                <span className="flex items-center gap-1.5 text-zinc-300">
+                  <Users className="w-3.5 h-3.5 text-[#FF5B37]" />
                   Opponent: <strong>Study Buddy</strong>
                 </span>
                 <span className="text-amber-400 text-[11px]">{peerStatus}</span>
               </div>
 
               {/* Question Text */}
-              <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800 text-sm text-slate-200 leading-relaxed font-medium">
+              <div className="p-4 rounded-xl bg-[#141416] border border-white/[0.08] text-xs text-zinc-200 leading-relaxed font-normal">
                 {currentQ.questionText}
               </div>
 
               {/* Student Working Text Area */}
               <div className="space-y-2">
-                <label className="text-xs font-semibold text-slate-400 block">
+                <label className="text-xs font-medium text-zinc-400 block">
                   Write Your Working & Final Answer:
                 </label>
                 <textarea
                   value={userAnswer}
                   onChange={e => setUserAnswer(e.target.value)}
                   placeholder="Type your working steps, formulas, and final answers here..."
-                  className="w-full h-32 bg-slate-950 border border-slate-800 rounded-2xl p-4 text-xs font-mono text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors"
+                  className="w-full h-32 bg-[#141416] border border-white/[0.08] rounded-xl p-4 text-xs font-mono text-zinc-200 focus:outline-none focus:border-[#FF5B37]/50 transition-colors"
                 />
               </div>
 
@@ -315,7 +315,7 @@ export const StudyDuelModal: React.FC<StudyDuelModalProps> = ({
               <div className="flex justify-end gap-3">
                 <button
                   onClick={handleSubmitAnswer}
-                  className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg transition-all flex items-center gap-2"
+                  className="px-5 py-2.5 rounded-lg bg-[#FF5B37] hover:bg-[#ff6c4b] text-white font-medium text-xs transition-colors flex items-center gap-2 shadow-sm"
                 >
                   <span>Submit & Reveal Mark Scheme</span>
                   <ArrowRight className="w-4 h-4" />
@@ -328,19 +328,19 @@ export const StudyDuelModal: React.FC<StudyDuelModalProps> = ({
           {duelState === 'review' && (
             <div className="space-y-6">
               <div className="space-y-1">
-                <div className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                <div className="text-xs font-semibold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
                   <ShieldCheck className="w-4 h-4" />
                   Cambridge Mark Scheme Reveal
                 </div>
-                <h3 className="text-lg font-bold text-white">
+                <h3 className="text-base font-semibold text-white">
                   Compare Your Answer & Self-Grade
                 </h3>
               </div>
 
               {/* Mark Scheme Points Box */}
-              <div className="p-4 rounded-2xl bg-emerald-950/20 border border-emerald-500/30 space-y-2.5">
-                <div className="text-xs font-bold text-emerald-300">Official Cambridge Mark Criteria:</div>
-                <ul className="space-y-1.5 text-xs text-slate-200 font-mono">
+              <div className="p-4 rounded-xl bg-emerald-950/20 border border-emerald-500/20 space-y-2.5">
+                <div className="text-xs font-semibold text-emerald-300">Official Cambridge Mark Criteria:</div>
+                <ul className="space-y-1.5 text-xs text-zinc-200 font-mono">
                   {currentQ.markSchemePoints.map((pt, idx) => (
                     <li key={idx} className="flex items-start gap-2">
                       <span className="text-emerald-400 font-bold shrink-0">✓</span>
@@ -351,16 +351,16 @@ export const StudyDuelModal: React.FC<StudyDuelModalProps> = ({
               </div>
 
               {/* User Answer Comparison */}
-              <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
-                <div className="text-[11px] font-semibold text-slate-400">Your Submitted Answer:</div>
-                <div className="text-xs font-mono text-slate-300 whitespace-pre-wrap">
+              <div className="p-4 rounded-xl bg-[#141416] border border-white/[0.08] space-y-1">
+                <div className="text-[11px] font-medium text-zinc-400">Your Submitted Answer:</div>
+                <div className="text-xs font-mono text-zinc-300 whitespace-pre-wrap">
                   {userAnswer || '(No written answer submitted)'}
                 </div>
               </div>
 
               {/* Self-Grade Selector */}
-              <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-3">
-                <div className="text-xs font-bold text-slate-200">
+              <div className="p-4 rounded-xl bg-[#141416] border border-white/[0.08] space-y-3">
+                <div className="text-xs font-medium text-zinc-200">
                   How many marks did you earn for this question? (Out of {currentQ.marks})
                 </div>
                 <div className="flex gap-2">
@@ -368,7 +368,7 @@ export const StudyDuelModal: React.FC<StudyDuelModalProps> = ({
                     <button
                       key={m}
                       onClick={() => handleSelfGrade(m)}
-                      className="flex-1 py-2 text-xs font-bold rounded-xl bg-slate-800 hover:bg-indigo-600 text-white transition-colors"
+                      className="flex-1 py-2 text-xs font-medium rounded-lg bg-[#222225] hover:bg-[#FF5B37] text-white border border-white/[0.08] transition-colors"
                     >
                       {m} / {currentQ.marks}
                     </button>
@@ -381,43 +381,43 @@ export const StudyDuelModal: React.FC<StudyDuelModalProps> = ({
           {/* FINAL WINNER / CELEBRATION VIEW */}
           {duelState === 'winner' && (
             <div className="space-y-6 text-center py-4">
-              <div className="w-16 h-16 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-amber-400 mx-auto flex items-center justify-center">
-                <Award className="w-8 h-8" />
+              <div className="w-14 h-14 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 mx-auto flex items-center justify-center">
+                <Award className="w-7 h-7" />
               </div>
 
               <div className="space-y-1">
-                <h3 className="text-2xl font-black text-white">
+                <h3 className="text-xl font-bold text-white">
                   {userScore >= peerScore ? '🏆 Victory! Duel Complete' : '🤝 Great Effort! Duel Complete'}
                 </h3>
-                <p className="text-xs text-slate-300">
+                <p className="text-xs text-zinc-400">
                   Both candidates completed all Cambridge sprint past paper questions.
                 </p>
               </div>
 
               {/* Dual Scoreboard */}
               <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto">
-                <div className="p-4 rounded-2xl bg-slate-950 border border-indigo-500/40">
-                  <div className="text-xs text-indigo-400 font-bold uppercase">{profile.name || 'You'}</div>
-                  <div className="text-3xl font-black text-white font-mono mt-1">{userScore} Marks</div>
+                <div className="p-4 rounded-xl bg-[#141416] border border-[#FF5B37]/40">
+                  <div className="text-xs text-[#FF5B37] font-semibold uppercase">{profile.name || 'You'}</div>
+                  <div className="text-2xl font-bold text-white font-mono mt-1">{userScore} Marks</div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800">
-                  <div className="text-xs text-slate-400 font-bold uppercase">Study Buddy</div>
-                  <div className="text-3xl font-black text-slate-300 font-mono mt-1">{peerScore} Marks</div>
+                <div className="p-4 rounded-xl bg-[#141416] border border-white/[0.08]">
+                  <div className="text-xs text-zinc-400 font-semibold uppercase">Study Buddy</div>
+                  <div className="text-2xl font-bold text-zinc-300 font-mono mt-1">{peerScore} Marks</div>
                 </div>
               </div>
 
               <div className="flex justify-center gap-3 pt-2">
                 <button
                   onClick={handleStartDuel}
-                  className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg transition-all flex items-center gap-1.5"
+                  className="px-5 py-2.5 rounded-lg bg-[#FF5B37] hover:bg-[#ff6c4b] text-white font-medium text-xs transition-colors flex items-center gap-1.5 shadow-sm"
                 >
                   <RotateCcw className="w-4 h-4" />
                   Rematch Another Paper
                 </button>
                 <button
                   onClick={onClose}
-                  className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition-colors"
+                  className="px-5 py-2.5 rounded-lg bg-[#222225] hover:bg-[#28282c] text-zinc-300 border border-white/[0.08] font-medium text-xs transition-colors"
                 >
                   Close Duel
                 </button>

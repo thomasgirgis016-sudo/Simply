@@ -1241,21 +1241,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       )}
 
       {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-indigo-950/40 to-slate-900 p-6 sm:p-8 shadow-2xl">
-        <div className="absolute -top-12 -right-12 h-44 w-44 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#18181b] p-6 sm:p-7 shadow-lg">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative">
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div className="flex items-center gap-3">
               <SimplyLogo size="sm" />
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-indigo-500/15 px-3 py-0.5 text-xs font-bold text-indigo-300 border border-indigo-500/30">
-                <ShieldCheck className="h-3.5 w-3.5 text-indigo-400" />
+              <div className="inline-flex items-center gap-1.5 rounded-md bg-[#FF5B37]/10 px-2.5 py-0.5 text-xs font-medium text-[#FF5B37] border border-[#FF5B37]/20">
+                <ShieldCheck className="h-3.5 w-3.5 text-[#FF5B37]" />
                 <span>Executive Governance & Administration</span>
               </div>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
               Admissions Waitlist & Student Approvals
             </h1>
-            <p className="text-xs sm:text-sm text-slate-300 max-w-2xl">
+            <p className="text-xs sm:text-sm text-zinc-400 max-w-2xl leading-relaxed">
               Manage student waitlist verification, review new applicants, authorize access to Cambridge & Edexcel study suites, and publish content.
             </p>
           </div>
@@ -1263,7 +1262,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <div className="flex items-center gap-2 self-start md:self-auto shrink-0 flex-wrap">
             <button
               onClick={handleResetAllDemoData}
-              className="flex items-center gap-1.5 rounded-xl border border-rose-500/40 bg-rose-500/10 px-3.5 py-2 text-xs font-bold text-rose-300 hover:bg-rose-500/20 transition cursor-pointer"
+              className="flex items-center gap-1.5 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-1.5 text-xs font-medium text-rose-300 hover:bg-rose-500/20 transition cursor-pointer"
               title="Reset all test cohorts, transactions, and enquiries to clean 0-state"
             >
               <RotateCcw className="h-3.5 w-3.5 text-rose-400" />
@@ -1272,7 +1271,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
             <button
               onClick={handleManualRefresh}
-              className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800/80 px-3.5 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition cursor-pointer"
+              className="flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-[#222225] px-3 py-1.5 text-xs font-medium text-zinc-200 hover:bg-[#28282c] transition cursor-pointer"
               title="Refresh and sync all accounts from server database"
             >
               <RefreshCw className="h-3.5 w-3.5" />
@@ -1281,7 +1280,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
             <button
               onClick={() => setIsAddModalOpen(true)}
-              className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-indigo-500/20 hover:from-indigo-400 hover:to-indigo-500 transition cursor-pointer"
+              className="flex items-center gap-1.5 rounded-lg bg-[#FF5B37] hover:bg-[#ff6c4b] px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm transition cursor-pointer"
             >
               <UserPlus className="h-4 w-4" />
               <span>Pre-Approve Account</span>
@@ -1289,7 +1288,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
             <button
               onClick={handlePurgeNonFounder}
-              className="flex items-center gap-1.5 rounded-xl border border-rose-500/40 bg-rose-950/30 px-3.5 py-2 text-xs font-bold text-rose-300 hover:bg-rose-900/40 hover:text-white transition cursor-pointer"
+              className="flex items-center gap-1.5 rounded-lg border border-rose-500/30 bg-rose-950/20 px-3 py-1.5 text-xs font-medium text-rose-300 hover:bg-rose-900/40 hover:text-white transition cursor-pointer"
               title="Remove all accounts except Founder Thomas (Code 2011)"
             >
               <Trash2 className="h-4 w-4" />
@@ -1300,22 +1299,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       </div>
 
       {/* Admin Mode Tab Switcher (Mobile Swipeable) */}
-      <div className="flex items-center gap-2 border-b border-slate-800 pb-3 overflow-x-auto no-scrollbar scroll-smooth flex-nowrap">
+      <div className="flex items-center gap-2 border-b border-white/[0.08] pb-3 overflow-x-auto no-scrollbar scroll-smooth flex-nowrap">
         <button
           onClick={() => setAdminActiveTab('accounts')}
-          className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
+          className={`shrink-0 flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-medium transition cursor-pointer ${
             adminActiveTab === 'accounts'
-              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
-              : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
+              ? 'bg-[#FF5B37] text-white shadow-sm'
+              : 'border border-white/[0.08] bg-[#141416] text-zinc-400 hover:text-white'
           }`}
         >
           <Users className="h-4 w-4" />
           <span>Student Accounts & Access</span>
-          <span className="rounded-full bg-slate-950/60 px-2 py-0.5 text-[10px] text-slate-300">
+          <span className="rounded-full bg-black/40 px-2 py-0.5 text-[10px] text-zinc-300">
             {metrics.total}
           </span>
           {metrics.pending > 0 && (
-            <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-black text-amber-300 border border-amber-500/30 animate-pulse">
+            <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-300 border border-amber-500/30">
               {metrics.pending} Pending
             </span>
           )}
@@ -1323,16 +1322,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         <button
           onClick={() => setAdminActiveTab('whatsapp')}
-          className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
+          className={`shrink-0 flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-medium transition cursor-pointer ${
             adminActiveTab === 'whatsapp'
-              ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30'
-              : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
+              ? 'bg-[#FF5B37] text-white shadow-sm'
+              : 'border border-white/[0.08] bg-[#141416] text-zinc-400 hover:text-white'
           }`}
         >
           <Smartphone className="h-4 w-4" />
           <span>WhatsApp Testing & Auto-Dispatch</span>
           <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
-            reportsDueCount > 0 ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse' : 'bg-slate-950/60 text-slate-300'
+            reportsDueCount > 0 ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-black/40 text-zinc-300'
           }`}>
             {reportsDueCount > 0 ? `${reportsDueCount} Due` : 'Ready'}
           </span>
@@ -1340,120 +1339,120 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         <button
           onClick={() => setAdminActiveTab('access-codes')}
-          className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
+          className={`shrink-0 flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-medium transition cursor-pointer ${
             adminActiveTab === 'access-codes'
-              ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-lg shadow-amber-500/30 font-black'
-              : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
+              ? 'bg-[#FF5B37] text-white shadow-sm'
+              : 'border border-white/[0.08] bg-[#141416] text-zinc-400 hover:text-white'
           }`}
         >
           <KeyRound className="h-4 w-4" />
           <span>Staff & Founder Access Codes</span>
-          <span className="rounded-full bg-slate-950/60 px-2 py-0.5 text-[10px] text-amber-300 border border-amber-500/30">
+          <span className="rounded-full bg-black/40 px-2 py-0.5 text-[10px] text-amber-300 border border-amber-500/30">
             {staffCodes.length} Codes
           </span>
         </button>
 
         <button
           onClick={() => setAdminActiveTab('audit')}
-          className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
+          className={`shrink-0 flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-medium transition cursor-pointer ${
             adminActiveTab === 'audit'
-              ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
-              : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
+              ? 'bg-[#FF5B37] text-white shadow-sm'
+              : 'border border-white/[0.08] bg-[#141416] text-zinc-400 hover:text-white'
           }`}
         >
           <History className="h-4 w-4" />
           <span>Platform Activity & Change Trail</span>
-          <span className="rounded-full bg-slate-950/60 px-2 py-0.5 text-[10px] text-slate-300">
+          <span className="rounded-full bg-black/40 px-2 py-0.5 text-[10px] text-zinc-300">
             {auditLogs.length}
           </span>
         </button>
 
         <button
           onClick={() => setAdminActiveTab('pricing')}
-          className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
+          className={`shrink-0 flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-medium transition cursor-pointer ${
             adminActiveTab === 'pricing'
-              ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/30 font-black'
-              : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
+              ? 'bg-[#FF5B37] text-white shadow-sm'
+              : 'border border-white/[0.08] bg-[#141416] text-zinc-400 hover:text-white'
           }`}
         >
           <Tag className="h-4 w-4" />
           <span>Pricing & Promotions</span>
-          <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] text-amber-300 border border-amber-500/30">
+          <span className="rounded-full bg-black/40 px-2 py-0.5 text-[10px] text-amber-300 border border-amber-500/30">
             {pricingSettings.discountActive ? 'Discount Live' : 'Base'}
           </span>
         </button>
 
         <button
           onClick={() => setAdminActiveTab('enquiries')}
-          className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
+          className={`shrink-0 flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-medium transition cursor-pointer ${
             adminActiveTab === 'enquiries'
-              ? 'bg-teal-600 text-white shadow-lg shadow-teal-600/30'
-              : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
+              ? 'bg-[#FF5B37] text-white shadow-sm'
+              : 'border border-white/[0.08] bg-[#141416] text-zinc-400 hover:text-white'
           }`}
         >
           <Building className="h-4 w-4" />
           <span>School Applications</span>
-          <span className="rounded-full bg-teal-500/20 px-2 py-0.5 text-[10px] text-teal-300 border border-teal-500/30">
+          <span className="rounded-full bg-black/40 px-2 py-0.5 text-[10px] text-emerald-300 border border-white/[0.08]">
             {schoolSubmissions.length} Submissions
           </span>
         </button>
 
         <button
           onClick={() => setAdminActiveTab('cms')}
-          className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
+          className={`shrink-0 flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-medium transition cursor-pointer ${
             adminActiveTab === 'cms'
-              ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
-              : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
+              ? 'bg-[#FF5B37] text-white shadow-sm'
+              : 'border border-white/[0.08] bg-[#141416] text-zinc-400 hover:text-white'
           }`}
         >
           <BookOpen className="h-4 w-4" />
           <span>Question & Flashcard CMS</span>
-          <span className="rounded-full bg-purple-500/20 px-2 py-0.5 text-[10px] text-purple-300 border border-purple-500/30">
+          <span className="rounded-full bg-black/40 px-2 py-0.5 text-[10px] text-zinc-300">
             Authoring
           </span>
         </button>
 
         <button
           onClick={() => setAdminActiveTab('payments')}
-          className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
+          className={`shrink-0 flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-medium transition cursor-pointer ${
             adminActiveTab === 'payments'
-              ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30'
-              : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
+              ? 'bg-[#FF5B37] text-white shadow-sm'
+              : 'border border-white/[0.08] bg-[#141416] text-zinc-400 hover:text-white'
           }`}
         >
           <Receipt className="h-4 w-4" />
           <span>BDC Bank Feed & InstaPay</span>
-          <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-300 border border-emerald-500/30">
+          <span className="rounded-full bg-black/40 px-2 py-0.5 text-[10px] text-emerald-300 border border-emerald-500/30">
             {bankMetrics.unclaimed} Unclaimed
           </span>
         </button>
 
         <button
           onClick={() => setAdminActiveTab('classroom')}
-          className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
+          className={`shrink-0 flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-medium transition cursor-pointer ${
             adminActiveTab === 'classroom'
-              ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/30'
-              : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
+              ? 'bg-[#FF5B37] text-white shadow-sm'
+              : 'border border-white/[0.08] bg-[#141416] text-zinc-400 hover:text-white'
           }`}
         >
           <GraduationCap className="h-4 w-4" />
           <span>Teacher Classroom</span>
-          <span className="rounded-full bg-violet-500/20 px-2 py-0.5 text-[10px] text-violet-300 border border-violet-500/30">
+          <span className="rounded-full bg-black/40 px-2 py-0.5 text-[10px] text-zinc-300">
             Cohorts & Heatmaps
           </span>
         </button>
 
         <button
           onClick={() => setAdminActiveTab('qa')}
-          className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
+          className={`shrink-0 flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-medium transition cursor-pointer ${
             adminActiveTab === 'qa'
-              ? 'bg-sky-600 text-white shadow-lg shadow-sky-600/30'
-              : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
+              ? 'bg-[#FF5B37] text-white shadow-sm'
+              : 'border border-white/[0.08] bg-[#141416] text-zinc-400 hover:text-white'
           }`}
         >
           <ShieldCheck className="h-4 w-4" />
           <span>Past Paper QA Agent</span>
-          <span className="rounded-full bg-sky-500/20 px-2 py-0.5 text-[10px] text-sky-300 border border-sky-500/30">
+          <span className="rounded-full bg-black/40 px-2 py-0.5 text-[10px] text-zinc-300">
             {overallHealthStatus.label}
           </span>
         </button>
@@ -1463,83 +1462,83 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <>
           {/* Overview Metric Cards */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-md">
-              <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+            <div className="rounded-xl border border-white/[0.08] bg-[#18181b] p-4 shadow-sm">
+              <div className="flex items-center justify-between text-zinc-400 text-xs font-medium">
                 <span>Total Accounts</span>
-                <Users className="h-4 w-4 text-indigo-400" />
+                <Users className="h-4 w-4 text-[#FF5B37]" />
               </div>
-              <div className="text-2xl font-black text-white mt-1 font-mono">{metrics.total}</div>
-              <span className="text-[10px] text-slate-500">Registered users</span>
+              <div className="text-2xl font-bold text-white mt-1 font-mono">{metrics.total}</div>
+              <span className="text-[10px] text-zinc-500">Registered users</span>
             </div>
 
-            <div className={`rounded-2xl border p-4 shadow-md transition ${
+            <div className={`rounded-xl border p-4 shadow-sm transition ${
               metrics.pending > 0
-                ? 'border-amber-500/50 bg-amber-950/20 ring-1 ring-amber-500/30'
-                : 'border-slate-800 bg-slate-900/80'
+                ? 'border-amber-500/40 bg-amber-950/10'
+                : 'border-white/[0.08] bg-[#18181b]'
             }`}>
               <div className="flex items-center justify-between text-xs font-medium text-amber-300">
                 <span>Pending Approvals</span>
-                <Clock className="h-4 w-4 text-amber-400 animate-pulse" />
+                <Clock className="h-4 w-4 text-amber-400" />
               </div>
-              <div className="text-2xl font-black text-amber-300 mt-1 font-mono">{metrics.pending}</div>
+              <div className="text-2xl font-bold text-amber-300 mt-1 font-mono">{metrics.pending}</div>
               <span className="text-[10px] text-amber-400/80">Requires your review</span>
             </div>
 
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-md">
-              <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+            <div className="rounded-xl border border-white/[0.08] bg-[#18181b] p-4 shadow-sm">
+              <div className="flex items-center justify-between text-zinc-400 text-xs font-medium">
                 <span>Active Students</span>
                 <UserCheck className="h-4 w-4 text-emerald-400" />
               </div>
-              <div className="text-2xl font-black text-emerald-400 mt-1 font-mono">{metrics.approved}</div>
-              <span className="text-[10px] text-slate-500">Full tool access</span>
+              <div className="text-2xl font-bold text-emerald-400 mt-1 font-mono">{metrics.approved}</div>
+              <span className="text-[10px] text-zinc-500">Full tool access</span>
             </div>
 
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-md">
-              <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+            <div className="rounded-xl border border-white/[0.08] bg-[#18181b] p-4 shadow-sm">
+              <div className="flex items-center justify-between text-zinc-400 text-xs font-medium">
                 <span>Administrators</span>
-                <Crown className="h-4 w-4 text-purple-400" />
+                <Crown className="h-4 w-4 text-[#FF5B37]" />
               </div>
-              <div className="text-2xl font-black text-purple-300 mt-1 font-mono">{metrics.admins}</div>
-              <span className="text-[10px] text-slate-500">System managers</span>
+              <div className="text-2xl font-bold text-zinc-200 mt-1 font-mono">{metrics.admins}</div>
+              <span className="text-[10px] text-zinc-500">System managers</span>
             </div>
           </div>
 
           {/* Subscription Revenue Telemetry Cards */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-3">
-            <div className="rounded-2xl border border-indigo-500/30 bg-indigo-950/20 p-4 shadow-md">
-              <div className="flex items-center justify-between text-indigo-300 text-xs font-semibold">
+            <div className="rounded-xl border border-white/[0.08] bg-[#18181b] p-4 shadow-sm">
+              <div className="flex items-center justify-between text-zinc-300 text-xs font-medium">
                 <span>Plus Subscribers</span>
-                <span className="text-[10px] font-bold bg-indigo-500/20 px-1.5 py-0.5 rounded border border-indigo-500/30">150 EGP/mo</span>
+                <span className="text-[10px] font-bold bg-[#FF5B37]/10 text-[#FF5B37] px-1.5 py-0.5 rounded border border-[#FF5B37]/20">150 EGP/mo</span>
               </div>
-              <div className="text-2xl font-black text-indigo-300 mt-1 font-mono">{financialMetrics.plusCount}</div>
-              <span className="text-[10px] text-slate-400">Classified & quiz members</span>
+              <div className="text-2xl font-bold text-white mt-1 font-mono">{financialMetrics.plusCount}</div>
+              <span className="text-[10px] text-zinc-500">Classified & quiz members</span>
             </div>
 
-            <div className="rounded-2xl border border-amber-500/30 bg-amber-950/20 p-4 shadow-md">
-              <div className="flex items-center justify-between text-amber-300 text-xs font-semibold">
+            <div className="rounded-xl border border-white/[0.08] bg-[#18181b] p-4 shadow-sm">
+              <div className="flex items-center justify-between text-amber-300 text-xs font-medium">
                 <span>Pro Subscribers</span>
-                <span className="text-[10px] font-bold bg-amber-500/20 px-1.5 py-0.5 rounded border border-amber-500/30">250 EGP/mo</span>
+                <span className="text-[10px] font-bold bg-amber-500/10 text-amber-300 px-1.5 py-0.5 rounded border border-amber-500/20">250 EGP/mo</span>
               </div>
-              <div className="text-2xl font-black text-amber-300 mt-1 font-mono">{financialMetrics.proCount}</div>
-              <span className="text-[10px] text-slate-400">Full solver & examiner access</span>
+              <div className="text-2xl font-bold text-amber-300 mt-1 font-mono">{financialMetrics.proCount}</div>
+              <span className="text-[10px] text-zinc-500">Full solver & examiner access</span>
             </div>
 
-            <div className="rounded-2xl border border-emerald-500/30 bg-emerald-950/20 p-4 shadow-md">
-              <div className="flex items-center justify-between text-emerald-300 text-xs font-semibold">
+            <div className="rounded-xl border border-white/[0.08] bg-[#18181b] p-4 shadow-sm">
+              <div className="flex items-center justify-between text-emerald-300 text-xs font-medium">
                 <span>Estimated MRR</span>
                 <TrendingUp className="h-4 w-4 text-emerald-400" />
               </div>
-              <div className="text-2xl font-black text-emerald-300 mt-1 font-mono">EGP {financialMetrics.estimatedMrr.toLocaleString()}</div>
-              <span className="text-[10px] text-slate-400">Monthly recurring inflow</span>
+              <div className="text-2xl font-bold text-emerald-300 mt-1 font-mono">EGP {financialMetrics.estimatedMrr.toLocaleString()}</div>
+              <span className="text-[10px] text-zinc-500">Monthly recurring inflow</span>
             </div>
 
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-md">
-              <div className="flex items-center justify-between text-slate-400 text-xs font-semibold">
+            <div className="rounded-xl border border-white/[0.08] bg-[#18181b] p-4 shadow-sm">
+              <div className="flex items-center justify-between text-zinc-400 text-xs font-medium">
                 <span>Projected ARR</span>
                 <Crown className="h-4 w-4 text-amber-400" />
               </div>
-              <div className="text-2xl font-black text-white mt-1 font-mono">EGP {financialMetrics.estimatedArr.toLocaleString()}</div>
-              <span className="text-[10px] text-slate-400">Annualized subscription base</span>
+              <div className="text-2xl font-bold text-white mt-1 font-mono">EGP {financialMetrics.estimatedArr.toLocaleString()}</div>
+              <span className="text-[10px] text-zinc-500">Annualized subscription base</span>
             </div>
           </div>
 

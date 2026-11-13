@@ -90,22 +90,22 @@ export const ExamReferenceHudModal: React.FC<ExamReferenceHudModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
-      <div className="relative flex flex-col w-full max-w-5xl h-[92vh] rounded-3xl border border-slate-800 bg-slate-900 shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
+      <div className="relative flex flex-col w-full max-w-5xl h-[92vh] rounded-2xl border border-white/[0.08] bg-[#18181b] shadow-2xl overflow-hidden">
         {/* Top Header */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-slate-800 bg-slate-950/80">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-white/[0.08] bg-[#141416]">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
-              <Atom className="h-5 w-5" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/[0.04] text-[#FF5B37] border border-white/[0.08]">
+              <Atom className="h-4.5 w-4.5" />
             </div>
             <div>
-              <h2 className="text-sm sm:text-base font-black text-white flex items-center gap-2">
+              <h2 className="text-sm sm:text-base font-semibold text-zinc-100 flex items-center gap-2">
                 Cambridge Exam Reference HUD
-                <span className="hidden sm:inline-block rounded-md bg-indigo-500/20 px-2 py-0.5 text-[10px] font-mono text-indigo-300">
+                <span className="hidden sm:inline-block rounded border border-white/[0.08] bg-white/[0.04] px-2 py-0.5 text-[10px] font-mono text-zinc-300">
                   Official CAIE / Edexcel Standard
                 </span>
               </h2>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-zinc-400">
                 Periodic Table of Elements & Verified Exam Formulas
               </p>
             </div>
@@ -114,7 +114,7 @@ export const ExamReferenceHudModal: React.FC<ExamReferenceHudModalProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={() => window.print()}
-              className="hidden sm:flex items-center gap-1.5 rounded-xl border border-slate-800 bg-slate-900 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer"
+              className="hidden sm:flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors cursor-pointer"
               title="Print Reference Sheet"
             >
               <Printer className="h-3.5 w-3.5" />
@@ -122,7 +122,7 @@ export const ExamReferenceHudModal: React.FC<ExamReferenceHudModalProps> = ({
             </button>
             <button
               onClick={onClose}
-              className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-800 bg-slate-900 text-slate-400 hover:text-white transition cursor-pointer"
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03] text-zinc-400 hover:text-white hover:bg-white/[0.08] transition-colors cursor-pointer"
               aria-label="Close Reference HUD"
             >
               <X className="h-4 w-4" />
@@ -131,13 +131,13 @@ export const ExamReferenceHudModal: React.FC<ExamReferenceHudModalProps> = ({
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex items-center gap-1.5 px-4 sm:px-6 py-2.5 border-b border-slate-800/80 bg-slate-950/40 overflow-x-auto no-scrollbar text-xs">
+        <div className="flex items-center gap-1.5 px-4 sm:px-6 py-2 border-b border-white/[0.08] bg-[#141416] overflow-x-auto no-scrollbar text-xs">
           <button
             onClick={() => setActiveTab('periodic')}
-            className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 font-bold shrink-0 transition cursor-pointer ${
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-medium shrink-0 transition-colors cursor-pointer ${
               activeTab === 'periodic'
-                ? 'bg-indigo-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                ? 'bg-[#FF5B37] text-white shadow-sm'
+                : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'
             }`}
           >
             <Atom className="h-3.5 w-3.5" />
@@ -146,10 +146,10 @@ export const ExamReferenceHudModal: React.FC<ExamReferenceHudModalProps> = ({
 
           <button
             onClick={() => setActiveTab('formulas-math')}
-            className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 font-bold shrink-0 transition cursor-pointer ${
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-medium shrink-0 transition-colors cursor-pointer ${
               activeTab === 'formulas-math'
-                ? 'bg-indigo-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                ? 'bg-[#FF5B37] text-white shadow-sm'
+                : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'
             }`}
           >
             <Calculator className="h-3.5 w-3.5" />
@@ -158,10 +158,10 @@ export const ExamReferenceHudModal: React.FC<ExamReferenceHudModalProps> = ({
 
           <button
             onClick={() => setActiveTab('formulas-phys')}
-            className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 font-bold shrink-0 transition cursor-pointer ${
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-medium shrink-0 transition-colors cursor-pointer ${
               activeTab === 'formulas-phys'
-                ? 'bg-indigo-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                ? 'bg-[#FF5B37] text-white shadow-sm'
+                : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'
             }`}
           >
             <Compass className="h-3.5 w-3.5" />
@@ -170,10 +170,10 @@ export const ExamReferenceHudModal: React.FC<ExamReferenceHudModalProps> = ({
 
           <button
             onClick={() => setActiveTab('formulas-chem')}
-            className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 font-bold shrink-0 transition cursor-pointer ${
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-medium shrink-0 transition-colors cursor-pointer ${
               activeTab === 'formulas-chem'
-                ? 'bg-indigo-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                ? 'bg-[#FF5B37] text-white shadow-sm'
+                : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'
             }`}
           >
             <FlaskConical className="h-3.5 w-3.5" />
@@ -189,13 +189,13 @@ export const ExamReferenceHudModal: React.FC<ExamReferenceHudModalProps> = ({
               {/* Search Bar */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-4">
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500" />
                   <input
                     type="text"
                     value={elementSearch}
                     onChange={(e) => setElementSearch(e.target.value)}
                     placeholder="Search element by name, symbol (e.g. Fe), or atomic number..."
-                    className="w-full rounded-xl border border-slate-700 bg-slate-950 py-2 pl-9 pr-3 text-xs text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
+                    className="w-full rounded-lg border border-white/[0.08] bg-[#141416] py-1.5 pl-9 pr-3 text-xs text-zinc-100 placeholder-zinc-500 focus:border-[#FF5B37]/60 focus:outline-none"
                   />
                 </div>
 
@@ -211,10 +211,10 @@ export const ExamReferenceHudModal: React.FC<ExamReferenceHudModalProps> = ({
                     <button
                       key={cat.id}
                       onClick={() => setCategoryFilter(cat.id)}
-                      className={`px-2 py-1 rounded-lg font-semibold shrink-0 cursor-pointer ${
+                      className={`px-2 py-1 rounded-md font-medium shrink-0 cursor-pointer transition-colors ${
                         categoryFilter === cat.id
-                          ? 'bg-indigo-600 text-white'
-                          : 'bg-slate-800 text-slate-400 hover:text-slate-200'
+                          ? 'bg-[#FF5B37] text-white'
+                          : 'bg-white/[0.04] text-zinc-400 hover:text-zinc-200 border border-white/[0.06]'
                       }`}
                     >
                       {cat.label}
@@ -231,11 +231,11 @@ export const ExamReferenceHudModal: React.FC<ExamReferenceHudModalProps> = ({
                     <button
                       key={el.number}
                       onClick={() => setSelectedElement(el)}
-                      className={`flex flex-col justify-between p-2 rounded-xl border transition cursor-pointer text-left ${getCategoryColor(
+                      className={`flex flex-col justify-between p-2 rounded-lg border transition cursor-pointer text-left ${getCategoryColor(
                         el.category
                       )} ${
                         isSelected
-                          ? 'ring-2 ring-indigo-400 scale-105 shadow-lg'
+                          ? 'ring-2 ring-[#FF5B37] scale-102 shadow-lg'
                           : 'hover:brightness-125'
                       }`}
                     >
@@ -243,10 +243,10 @@ export const ExamReferenceHudModal: React.FC<ExamReferenceHudModalProps> = ({
                         <span>{el.number}</span>
                         <span>{el.mass}</span>
                       </div>
-                      <div className="text-sm sm:text-base font-black my-0.5 tracking-tight">
+                      <div className="text-sm sm:text-base font-semibold my-0.5 tracking-tight font-mono">
                         {el.symbol}
                       </div>
-                      <div className="text-[9px] truncate font-medium">
+                      <div className="text-[9px] truncate font-normal">
                         {el.name}
                       </div>
                     </button>
@@ -256,65 +256,65 @@ export const ExamReferenceHudModal: React.FC<ExamReferenceHudModalProps> = ({
             </div>
 
             {/* Element Detail Drawer */}
-            <div className="w-full md:w-80 shrink-0 border-t md:border-t-0 md:border-l border-slate-800 bg-slate-950/70 p-4 sm:p-5 flex flex-col justify-between overflow-y-auto">
+            <div className="w-full md:w-80 shrink-0 border-t md:border-t-0 md:border-l border-white/[0.08] bg-[#141416] p-4 sm:p-5 flex flex-col justify-between overflow-y-auto">
               {selectedElement ? (
                 <div className="space-y-4">
                   <div className="flex items-start justify-between">
                     <div>
-                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-indigo-400">
+                      <span className="text-[10px] font-mono font-medium uppercase tracking-wider text-[#FF5B37]">
                         Atomic No. {selectedElement.number} • Group {selectedElement.group} • Period {selectedElement.period}
                       </span>
-                      <h3 className="text-2xl font-black text-white mt-0.5 flex items-center gap-2">
+                      <h3 className="text-2xl font-semibold text-zinc-100 mt-0.5 flex items-center gap-2">
                         {selectedElement.name}
-                        <span className="text-indigo-400 font-mono">({selectedElement.symbol})</span>
+                        <span className="text-[#FF5B37] font-mono font-medium">({selectedElement.symbol})</span>
                       </h3>
                     </div>
-                    <span className="rounded-lg bg-indigo-500/20 px-2 py-1 text-xs font-mono font-black text-indigo-300 border border-indigo-500/30">
+                    <span className="rounded-md bg-white/[0.04] px-2 py-1 text-xs font-mono font-medium text-zinc-300 border border-white/[0.08]">
                       Ar = {selectedElement.mass}
                     </span>
                   </div>
 
                   <div className="space-y-2 text-xs">
-                    <div className="flex justify-between py-1.5 border-b border-slate-800">
-                      <span className="text-slate-400">State at RTP (25°C):</span>
-                      <span className="font-bold text-white capitalize">{selectedElement.stateAtRtp}</span>
+                    <div className="flex justify-between py-1.5 border-b border-white/[0.06]">
+                      <span className="text-zinc-400">State at RTP (25°C):</span>
+                      <span className="font-medium text-zinc-200 capitalize">{selectedElement.stateAtRtp}</span>
                     </div>
-                    <div className="flex justify-between py-1.5 border-b border-slate-800">
-                      <span className="text-slate-400">Electronic Configuration:</span>
-                      <span className="font-mono font-bold text-indigo-300">{selectedElement.electrons}</span>
+                    <div className="flex justify-between py-1.5 border-b border-white/[0.06]">
+                      <span className="text-zinc-400">Electronic Configuration:</span>
+                      <span className="font-mono font-medium text-zinc-200">{selectedElement.electrons}</span>
                     </div>
-                    <div className="flex justify-between py-1.5 border-b border-slate-800">
-                      <span className="text-slate-400">Valency / Oxidation:</span>
-                      <span className="font-mono font-bold text-emerald-300">{selectedElement.valency}</span>
+                    <div className="flex justify-between py-1.5 border-b border-white/[0.06]">
+                      <span className="text-zinc-400">Valency / Oxidation:</span>
+                      <span className="font-mono font-medium text-emerald-400">{selectedElement.valency}</span>
                     </div>
-                    <div className="flex justify-between py-1.5 border-b border-slate-800">
-                      <span className="text-slate-400">Chemical Family:</span>
-                      <span className="font-semibold text-slate-200 capitalize">{selectedElement.category.replace('-', ' ')}</span>
+                    <div className="flex justify-between py-1.5 border-b border-white/[0.06]">
+                      <span className="text-zinc-400">Chemical Family:</span>
+                      <span className="font-normal text-zinc-300 capitalize">{selectedElement.category.replace('-', ' ')}</span>
                     </div>
                   </div>
 
                   {selectedElement.igcseExamNotes && (
-                    <div className="rounded-xl border border-amber-500/30 bg-amber-950/20 p-3 space-y-1">
-                      <div className="flex items-center gap-1.5 text-[11px] font-bold text-amber-300">
+                    <div className="rounded-lg border border-amber-500/20 bg-amber-500/[0.04] p-3 space-y-1">
+                      <div className="flex items-center gap-1.5 text-[11px] font-medium text-amber-400">
                         <GraduationCap className="h-3.5 w-3.5 text-amber-400" />
                         <span>Cambridge Examiner Practical Notes</span>
                       </div>
-                      <p className="text-xs text-slate-300 leading-relaxed font-sans">
+                      <p className="text-xs text-zinc-300 leading-relaxed font-sans">
                         {selectedElement.igcseExamNotes}
                       </p>
                     </div>
                   )}
                 </div>
               ) : (
-                <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-500 space-y-2">
-                  <Atom className="h-10 w-10 text-slate-600 animate-pulse" />
-                  <p className="text-xs font-semibold">
+                <div className="h-full flex flex-col items-center justify-center text-center p-6 text-zinc-500 space-y-2">
+                  <Atom className="h-10 w-10 text-zinc-600 animate-pulse" />
+                  <p className="text-xs">
                     Tap any element in the Periodic Table to view its atomic structure, electron configuration, and official Cambridge exam notes.
                   </p>
                 </div>
               )}
 
-              <div className="pt-3 border-t border-slate-800/80 text-[10px] text-slate-500 flex items-center justify-between">
+              <div className="pt-3 border-t border-white/[0.08] text-[10px] text-zinc-500 flex items-center justify-between">
                 <span>Standard RTP: 25°C, 1 atm</span>
                 <span>CAIE 0620 Syllabus</span>
               </div>
@@ -332,11 +332,11 @@ export const ExamReferenceHudModal: React.FC<ExamReferenceHudModalProps> = ({
               return true;
             }).map((cat, idx) => (
               <div key={idx} className="space-y-3">
-                <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                  <h3 className="text-base font-bold text-white tracking-tight">
+                <div className="flex items-center justify-between pb-2 border-b border-white/[0.08]">
+                  <h3 className="text-sm font-semibold text-zinc-100 tracking-tight">
                     {cat.title}
                   </h3>
-                  <span className="text-xs font-mono font-bold text-indigo-400">
+                  <span className="text-xs font-mono font-medium text-[#FF5B37]">
                     Syllabus {cat.subject}
                   </span>
                 </div>
@@ -345,27 +345,27 @@ export const ExamReferenceHudModal: React.FC<ExamReferenceHudModalProps> = ({
                   {cat.items.map((item, itemIdx) => (
                     <div
                       key={itemIdx}
-                      className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4 space-y-2.5 shadow-md hover:border-indigo-500/40 transition"
+                      className="rounded-xl border border-white/[0.08] bg-[#141416] p-4 space-y-2.5 shadow-sm hover:border-white/[0.14] transition-colors"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-white">
+                        <span className="text-xs font-medium text-zinc-200">
                           {item.name}
                         </span>
-                        <span className="text-[10px] font-mono text-slate-500">
+                        <span className="text-[10px] font-mono text-zinc-500">
                           Formula
                         </span>
                       </div>
 
-                      <div className="rounded-xl border border-indigo-500/20 bg-indigo-950/30 p-2.5 text-center text-sm font-serif text-indigo-200">
+                      <div className="rounded-lg border border-white/[0.08] bg-[#18181b] p-2.5 text-center text-sm font-serif text-zinc-100">
                         <MathRenderer content={`$${item.formula}$`} />
                       </div>
 
-                      <div className="text-[11px] text-slate-400 font-sans">
-                        <span className="font-semibold text-slate-300">Variables: </span>
+                      <div className="text-[11px] text-zinc-400 font-sans">
+                        <span className="font-medium text-zinc-300">Variables: </span>
                         {item.variables}
                       </div>
 
-                      <div className="pt-2 border-t border-slate-800/80 text-[11px] text-amber-300/90 flex items-start gap-1.5">
+                      <div className="pt-2 border-t border-white/[0.06] text-[11px] text-amber-400/90 flex items-start gap-1.5">
                         <GraduationCap className="h-3 w-3 text-amber-400 shrink-0 mt-0.5" />
                         <span>{item.examTip}</span>
                       </div>
