@@ -320,28 +320,28 @@ export const EslSpeakingSimulator: React.FC<EslSpeakingSimulatorProps> = ({
   return (
     <div className="mx-auto max-w-5xl space-y-6 animate-fadeIn pb-12">
       {/* Top Banner */}
-      <div className="rounded-3xl border border-cyan-500/30 bg-gradient-to-br from-slate-900 via-cyan-950/20 to-slate-900 p-6 shadow-2xl">
+      <div className="rounded-2xl border border-white/[0.08] bg-[#18181b] p-6 shadow-xl">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1.5">
-            <div className="inline-flex items-center gap-2 rounded-full bg-cyan-500/15 px-3 py-1 text-xs font-bold text-cyan-300 border border-cyan-500/30">
+            <div className="inline-flex items-center gap-2 rounded-md bg-[#FF5B37]/10 px-3 py-1 text-xs font-semibold text-[#FF5B37] border border-[#FF5B37]/20">
               <Mic className="h-4 w-4" />
               <span>Cambridge IGCSE ESL (0510 / 0511) · Component 5 Speaking</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-              Official 30-Mark Examiner Oral Simulator
+            <h1 className="text-2xl sm:text-3xl font-semibold text-white tracking-tight">
+              30-Mark Examiner Oral Simulator
             </h1>
-            <p className="text-xs sm:text-sm text-slate-300">
+            <p className="text-xs sm:text-sm text-slate-400">
               Two-turn dialogue simulation with British speech synthesis, official 3-part Cambridge rubrics, and line-by-line grammar feedback.
             </p>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="rounded-xl border border-slate-700 bg-slate-800/80 px-3 py-1.5 text-xs font-semibold text-slate-300">
-              Max Score: <strong className="text-cyan-400 font-mono">30 Marks</strong>
+            <span className="rounded-lg border border-white/[0.08] bg-[#222225] px-3 py-1.5 text-xs font-medium text-slate-300">
+              Max Score: <strong className="text-white font-mono">30 Marks</strong>
             </span>
             <button
               onClick={handleReset}
-              className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer"
+              className="flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-[#222225] px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-white/[0.08] transition cursor-pointer"
             >
               <RotateCcw className="h-3.5 w-3.5" />
               <span>Reset</span>
@@ -354,10 +354,10 @@ export const EslSpeakingSimulator: React.FC<EslSpeakingSimulatorProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* LEFT: Candidate Topic Card (Official Part C) */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="rounded-3xl border border-slate-800 bg-slate-900/90 p-5 sm:p-6 shadow-xl space-y-4">
+          <div className="rounded-2xl border border-white/[0.08] bg-[#18181b] p-5 sm:p-6 shadow-xl space-y-4">
             {/* Card Selector Dropdown */}
             <div>
-              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+              <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block mb-1">
                 Select Candidate Card (Part C Topic):
               </label>
               <select
@@ -369,7 +369,7 @@ export const EslSpeakingSimulator: React.FC<EslSpeakingSimulatorProps> = ({
                     handleReset();
                   }
                 }}
-                className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-xs text-white font-semibold focus:border-cyan-500 focus:outline-none cursor-pointer"
+                className="w-full rounded-lg border border-white/[0.08] bg-[#141416] p-2.5 text-xs text-white font-medium focus:border-[#FF5B37] focus:outline-none cursor-pointer"
               >
                 {SAMPLE_SPEAKING_CARDS.map((card) => (
                   <option key={card.id} value={card.id}>
@@ -380,17 +380,17 @@ export const EslSpeakingSimulator: React.FC<EslSpeakingSimulatorProps> = ({
             </div>
 
             {/* Preparation Timer */}
-            <div className="rounded-2xl border border-amber-500/30 bg-amber-950/20 p-3.5 flex items-center justify-between">
+            <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-3.5 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-amber-400" />
-                <span className="text-xs text-amber-200">
+                <Clock className="h-4 w-4 text-[#FF5B37]" />
+                <span className="text-xs text-slate-300 font-medium">
                   Card Prep Time: <strong className="font-mono text-sm text-white">{Math.floor(prepSecondsLeft / 60)}:{(prepSecondsLeft % 60).toString().padStart(2, '0')}</strong>
                 </span>
               </div>
               <button
                 type="button"
                 onClick={() => setIsPrepTimerRunning(!isPrepTimerRunning)}
-                className="rounded-lg bg-amber-500/20 px-2.5 py-1 text-[11px] font-bold text-amber-300 hover:bg-amber-500/30 transition cursor-pointer"
+                className="rounded-lg bg-white/[0.06] border border-white/[0.08] px-2.5 py-1 text-[11px] font-semibold text-slate-200 hover:bg-white/[0.1] transition cursor-pointer"
               >
                 {isPrepTimerRunning ? 'Pause' : 'Start 2-Min Prep'}
               </button>
@@ -398,21 +398,21 @@ export const EslSpeakingSimulator: React.FC<EslSpeakingSimulatorProps> = ({
 
             {/* Card Content Display */}
             <div className="space-y-3">
-              <h3 className="text-base font-bold text-white">{selectedCard.title}</h3>
-              <p className="text-xs text-slate-300 leading-relaxed bg-slate-950/70 p-3 rounded-xl border border-slate-800">
+              <h3 className="text-base font-semibold text-white">{selectedCard.title}</h3>
+              <p className="text-xs text-slate-300 leading-relaxed bg-[#141416] p-3 rounded-xl border border-white/[0.08]">
                 {selectedCard.examinerPrompt}
               </p>
             </div>
 
             {/* Discussion Bullet Points A to E */}
             <div className="space-y-2">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
                 Official Discussion Bullet Prompts:
               </p>
-              <ul className="space-y-1.5 text-xs text-slate-200">
+              <ul className="space-y-1.5 text-xs text-slate-300">
                 {selectedCard.topicCardBulletPoints?.map((bullet, idx) => (
-                  <li key={idx} className="flex items-start gap-2 bg-slate-950/50 p-2 rounded-lg border border-slate-800/60">
-                    <span className="font-bold text-cyan-400 shrink-0 font-mono">
+                  <li key={idx} className="flex items-start gap-2 bg-[#141416] p-2 rounded-lg border border-white/[0.06]">
+                    <span className="font-semibold text-[#FF5B37] shrink-0 font-mono">
                       {String.fromCharCode(65 + idx)}.
                     </span>
                     <span className="leading-snug">{bullet}</span>
@@ -422,13 +422,13 @@ export const EslSpeakingSimulator: React.FC<EslSpeakingSimulatorProps> = ({
             </div>
 
             {/* British Voice Audio Controls */}
-            <div className="border-t border-slate-800 pt-3 flex items-center justify-between">
+            <div className="border-t border-white/[0.08] pt-3 flex items-center justify-between">
               <button
                 type="button"
                 onClick={handleSpeakCardPrompt}
-                className="flex items-center gap-2 rounded-xl border border-cyan-500/40 bg-cyan-950/30 px-3.5 py-2 text-xs font-bold text-cyan-300 hover:bg-cyan-900/40 transition active:scale-95 cursor-pointer"
+                className="flex items-center gap-2 rounded-lg border border-white/[0.08] bg-[#222225] px-3.5 py-2 text-xs font-semibold text-slate-200 hover:bg-white/[0.08] transition active:scale-95 cursor-pointer"
               >
-                {isSpeakingExaminer ? <VolumeX className="h-4 w-4 text-rose-400" /> : <Volume2 className="h-4 w-4 text-cyan-400" />}
+                {isSpeakingExaminer ? <VolumeX className="h-4 w-4 text-rose-400" /> : <Volume2 className="h-4 w-4 text-[#FF5B37]" />}
                 <span>{isSpeakingExaminer ? 'Stop Voice' : 'Examiner: Read Card Aloud (UK)'}</span>
               </button>
 
@@ -445,23 +445,23 @@ export const EslSpeakingSimulator: React.FC<EslSpeakingSimulatorProps> = ({
 
         {/* RIGHT: Two-Turn Dialogue Input & Controls */}
         <div className="lg:col-span-7 space-y-4">
-          <div className="rounded-3xl border border-slate-800 bg-slate-900/90 p-5 sm:p-6 shadow-xl space-y-5">
+          <div className="rounded-2xl border border-white/[0.08] bg-[#18181b] p-5 sm:p-6 shadow-xl space-y-5">
             {/* Step Indicator (Turn 1 vs Turn 2) */}
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
               <div className="flex items-center gap-2">
-                <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${currentTurn === 1 ? 'bg-cyan-500 text-slate-950' : 'bg-emerald-500/20 text-emerald-400'}`}>
+                <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold ${currentTurn === 1 ? 'bg-[#FF5B37] text-white' : 'bg-emerald-500/20 text-emerald-400'}`}>
                   {currentTurn === 2 ? '✓' : '1'}
                 </span>
-                <span className="text-xs font-bold text-white">
+                <span className="text-xs font-semibold text-white">
                   Turn 1: Candidate Card Response
                 </span>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${currentTurn === 2 ? 'bg-cyan-500 text-slate-950' : 'bg-slate-800 text-slate-400'}`}>
+                <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold ${currentTurn === 2 ? 'bg-[#FF5B37] text-white' : 'bg-[#222225] text-slate-400'}`}>
                   2
                 </span>
-                <span className="text-xs font-bold text-slate-400">
+                <span className="text-xs font-semibold text-slate-400">
                   Turn 2: Part C Follow-Up Probing
                 </span>
               </div>
@@ -470,20 +470,20 @@ export const EslSpeakingSimulator: React.FC<EslSpeakingSimulatorProps> = ({
             {/* Turn 1 Input Area */}
             <div className={`space-y-2 ${currentTurn === 2 ? 'opacity-70' : ''}`}>
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-300">
+                <span className="text-xs font-semibold text-slate-300">
                   Initial Speech: Present your perspective on the card
                 </span>
                 {currentTurn === 1 && (
                   <button
                     type="button"
                     onClick={handleToggleRecording}
-                    className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition active:scale-95 cursor-pointer ${
+                    className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition active:scale-95 cursor-pointer ${
                       isRecording
                         ? 'bg-rose-600 text-white shadow-lg animate-pulse'
-                        : 'border border-cyan-500/40 bg-cyan-600/20 text-cyan-300 hover:bg-cyan-600/30'
+                        : 'border border-white/[0.08] bg-[#222225] text-slate-200 hover:bg-white/[0.08]'
                     }`}
                   >
-                    {isRecording ? <MicOff className="h-3.5 w-3.5" /> : <Mic className="h-3.5 w-3.5" />}
+                    {isRecording ? <MicOff className="h-3.5 w-3.5" /> : <Mic className="h-3.5 w-3.5 text-[#FF5B37]" />}
                     <span>{isRecording ? 'Recording...' : 'Record Voice (Mic)'}</span>
                   </button>
                 )}
@@ -495,9 +495,9 @@ export const EslSpeakingSimulator: React.FC<EslSpeakingSimulatorProps> = ({
                 disabled={currentTurn === 2}
                 onChange={(e) => setStudentResponseTurn1(e.target.value)}
                 placeholder="Speak into your microphone or type your initial oral presentation here (aim for 60 to 120 words to demonstrate fluency)..."
-                className="w-full rounded-2xl border border-slate-700 bg-slate-950 p-3.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:border-cyan-500 focus:outline-none leading-relaxed"
+                className="w-full rounded-xl border border-white/[0.08] bg-[#141416] p-3 text-xs sm:text-sm text-white placeholder-slate-500 focus:border-[#FF5B37] focus:outline-none leading-relaxed"
               />
-              <div className="flex justify-between text-[11px] text-slate-400">
+              <div className="flex justify-between text-[11px] text-slate-400 font-mono">
                 <span>{studentResponseTurn1.trim().split(/\s+/).filter(Boolean).length} words recorded</span>
                 <span>Target: 60–120 words</span>
               </div>
@@ -510,7 +510,7 @@ export const EslSpeakingSimulator: React.FC<EslSpeakingSimulatorProps> = ({
                   type="button"
                   disabled={!studentResponseTurn1.trim()}
                   onClick={handleAdvanceToTurn2}
-                  className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 px-5 py-2.5 text-xs font-bold text-white shadow-lg shadow-cyan-500/25 hover:from-cyan-400 hover:to-indigo-500 transition cursor-pointer disabled:opacity-40"
+                  className="flex items-center gap-2 rounded-lg bg-[#FF5B37] hover:bg-[#e04f2e] px-5 py-2 text-xs font-semibold text-white transition cursor-pointer disabled:opacity-40"
                 >
                   <span>Submit Turn 1 & Trigger Examiner Follow-Up</span>
                   <ArrowRight className="h-4 w-4" />
@@ -520,18 +520,18 @@ export const EslSpeakingSimulator: React.FC<EslSpeakingSimulatorProps> = ({
 
             {/* Turn 2 Follow-Up Section */}
             {currentTurn === 2 && (
-              <div className="space-y-3 pt-3 border-t border-slate-800 animate-fadeIn">
+              <div className="space-y-3 pt-3 border-t border-white/[0.08] animate-fadeIn">
                 {/* Examiner Question Banner */}
-                <div className="rounded-2xl border border-cyan-500/30 bg-cyan-950/30 p-4 space-y-2">
+                <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-4 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-cyan-300 flex items-center gap-1.5">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-[#FF5B37] flex items-center gap-1.5">
                       <MessageSquare className="h-3.5 w-3.5" />
                       Senior Examiner Follow-Up Probing Question:
                     </span>
                     <button
                       type="button"
                       onClick={handleSpeakFollowUp}
-                      className="text-cyan-400 hover:text-cyan-200 text-xs font-semibold flex items-center gap-1 cursor-pointer"
+                      className="text-[#FF5B37] hover:underline text-xs font-medium flex items-center gap-1 cursor-pointer"
                     >
                       <Volume2 className="h-3.5 w-3.5" />
                       <span>Re-play Audio</span>
@@ -543,19 +543,19 @@ export const EslSpeakingSimulator: React.FC<EslSpeakingSimulatorProps> = ({
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-300">
+                  <span className="text-xs font-semibold text-slate-300">
                     Your Response to Follow-Up Question:
                   </span>
                   <button
                     type="button"
                     onClick={handleToggleRecording}
-                    className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition active:scale-95 cursor-pointer ${
+                    className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition active:scale-95 cursor-pointer ${
                       isRecording
                         ? 'bg-rose-600 text-white shadow-lg animate-pulse'
-                        : 'border border-cyan-500/40 bg-cyan-600/20 text-cyan-300 hover:bg-cyan-600/30'
+                        : 'border border-white/[0.08] bg-[#222225] text-slate-200 hover:bg-white/[0.08]'
                     }`}
                   >
-                    {isRecording ? <MicOff className="h-3.5 w-3.5" /> : <Mic className="h-3.5 w-3.5" />}
+                    {isRecording ? <MicOff className="h-3.5 w-3.5" /> : <Mic className="h-3.5 w-3.5 text-[#FF5B37]" />}
                     <span>{isRecording ? 'Recording...' : 'Record Voice'}</span>
                   </button>
                 </div>
@@ -565,7 +565,7 @@ export const EslSpeakingSimulator: React.FC<EslSpeakingSimulatorProps> = ({
                   value={studentResponseTurn2}
                   onChange={(e) => setStudentResponseTurn2(e.target.value)}
                   placeholder="Answer the examiner's follow-up question. Support your answer with a balanced perspective or real-life example..."
-                  className="w-full rounded-2xl border border-slate-700 bg-slate-950 p-3.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:border-cyan-500 focus:outline-none leading-relaxed"
+                  className="w-full rounded-xl border border-white/[0.08] bg-[#141416] p-3 text-xs sm:text-sm text-white placeholder-slate-500 focus:border-[#FF5B37] focus:outline-none leading-relaxed"
                 />
 
                 <div className="pt-2 flex items-center justify-between">
@@ -581,7 +581,7 @@ export const EslSpeakingSimulator: React.FC<EslSpeakingSimulatorProps> = ({
                     type="button"
                     disabled={isEvaluating}
                     onClick={handleEvaluate}
-                    className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-6 py-2.5 text-xs font-bold text-white shadow-lg shadow-emerald-500/25 hover:from-emerald-400 hover:to-teal-500 transition cursor-pointer"
+                    className="flex items-center gap-2 rounded-lg bg-[#FF5B37] hover:bg-[#e04f2e] px-5 py-2 text-xs font-semibold text-white transition cursor-pointer"
                   >
                     <CheckCheck className="h-4 w-4" />
                     <span>{isEvaluating ? 'Evaluating Cambridge Rubrics...' : 'Assess Full 30-Mark Exam'}</span>
@@ -595,28 +595,28 @@ export const EslSpeakingSimulator: React.FC<EslSpeakingSimulatorProps> = ({
 
       {/* EVALUATION RESULTS: OFFICIAL CAMBRIDGE 30-MARK RUBRIC */}
       {evaluation && (
-        <div className="rounded-3xl border border-cyan-500/40 bg-slate-900/95 p-6 sm:p-8 shadow-2xl space-y-6 animate-fadeIn">
+        <div className="rounded-2xl border border-white/[0.08] bg-[#18181b] p-6 sm:p-8 shadow-2xl space-y-6 animate-fadeIn">
           {/* Header & Overall Score */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.08] pb-5">
             <div className="space-y-1">
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-cyan-500/20 px-3 py-1 text-xs font-bold text-cyan-300 border border-cyan-500/30">
+              <div className="inline-flex items-center gap-1.5 rounded-md bg-[#FF5B37]/10 px-2.5 py-0.5 text-xs font-semibold text-[#FF5B37] border border-[#FF5B37]/20">
                 <Award className="h-4 w-4" />
                 <span>Official Cambridge IGCSE Component 5 Speaking Report</span>
               </div>
-              <h2 className="text-2xl font-black text-white">Oral Performance Evaluation</h2>
-              <p className="text-xs text-slate-300">
+              <h2 className="text-xl sm:text-2xl font-semibold text-white">Oral Performance Evaluation</h2>
+              <p className="text-xs text-slate-400">
                 Assessment broken down across the three official Cambridge Component 5 criteria (10 marks each).
               </p>
             </div>
 
-            <div className="rounded-2xl border border-amber-500/40 bg-gradient-to-br from-amber-950/30 via-slate-950 to-amber-950/20 px-6 py-4 text-center shrink-0 shadow-lg">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-amber-400">
+            <div className="rounded-xl border border-white/[0.08] bg-[#141416] px-6 py-4 text-center shrink-0">
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
                 Total Cambridge Mark
               </div>
-              <div className="text-4xl font-black text-amber-300 font-mono mt-0.5">
-                {evaluation.totalScore ?? 25} <span className="text-lg text-slate-400">/ 30</span>
+              <div className="text-3xl font-semibold text-[#FF5B37] font-mono mt-0.5">
+                {evaluation.totalScore ?? 25} <span className="text-base text-slate-400">/ 30</span>
               </div>
-              <div className="text-xs font-bold text-emerald-400 mt-1">
+              <div className="text-xs font-semibold text-emerald-400 mt-1">
                 {evaluation.estimatedGrade || 'Grade 9 / A* Standard'}
               </div>
             </div>
@@ -625,12 +625,12 @@ export const EslSpeakingSimulator: React.FC<EslSpeakingSimulatorProps> = ({
           {/* 3 OFFICIAL CAMBRIDGE CRITERIA CARDS (10 MARKS EACH) */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Criteria 1: Grammatical Accuracy and Variety */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4 space-y-2">
-              <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
-                <span className="font-bold text-sm text-cyan-300">
+            <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-4 space-y-2">
+              <div className="flex items-center justify-between border-b border-white/[0.08] pb-2">
+                <span className="font-semibold text-xs text-slate-200">
                   1. Grammar & Variety
                 </span>
-                <span className="rounded-lg bg-cyan-500/20 px-2 py-0.5 text-xs font-bold text-cyan-300 font-mono">
+                <span className="rounded-md bg-white/[0.04] px-2 py-0.5 text-xs font-semibold text-slate-300 font-mono border border-white/[0.06]">
                   {evaluation.grammaticalAccuracyAndVariety?.score ?? evaluation.structureAndGrammar?.score ?? 8} / 10
                 </span>
               </div>
@@ -638,44 +638,44 @@ export const EslSpeakingSimulator: React.FC<EslSpeakingSimulatorProps> = ({
                 {evaluation.grammaticalAccuracyAndVariety?.feedback || evaluation.structureAndGrammar?.feedback}
               </p>
               {evaluation.grammaticalAccuracyAndVariety?.quotedPhrases && evaluation.grammaticalAccuracyAndVariety.quotedPhrases.length > 0 && (
-                <div className="text-[11px] text-slate-400 bg-slate-900/80 p-2 rounded-lg italic">
+                <div className="text-[11px] text-slate-400 bg-[#18181b] p-2 rounded-lg italic">
                   Quoted: {evaluation.grammaticalAccuracyAndVariety.quotedPhrases.join(' ')}
                 </div>
               )}
             </div>
 
             {/* Criteria 2: Vocabulary */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4 space-y-2">
-              <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
-                <span className="font-bold text-sm text-purple-300">
+            <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-4 space-y-2">
+              <div className="flex items-center justify-between border-b border-white/[0.08] pb-2">
+                <span className="font-semibold text-xs text-slate-200">
                   2. Vocabulary Range
                 </span>
-                <span className="rounded-lg bg-purple-500/20 px-2 py-0.5 text-xs font-bold text-purple-300 font-mono">
+                <span className="rounded-md bg-white/[0.04] px-2 py-0.5 text-xs font-semibold text-slate-300 font-mono border border-white/[0.06]">
                   {evaluation.vocabulary?.score ?? evaluation.vocabularyRange?.score ?? 8} / 10
                 </span>
               </div>
               <p className="text-xs text-slate-300 leading-relaxed">
                 {evaluation.vocabulary?.feedback || evaluation.vocabularyRange?.feedback}
               </p>
-              <div className="text-[11px] text-purple-300/80 bg-purple-950/30 p-2 rounded-lg">
+              <div className="text-[11px] text-slate-400 bg-[#18181b] p-2 rounded-lg">
                 Collocation and technical lexical resource verified.
               </div>
             </div>
 
             {/* Criteria 3: Development and Fluency */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4 space-y-2">
-              <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
-                <span className="font-bold text-sm text-emerald-300">
+            <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-4 space-y-2">
+              <div className="flex items-center justify-between border-b border-white/[0.08] pb-2">
+                <span className="font-semibold text-xs text-slate-200">
                   3. Development & Fluency
                 </span>
-                <span className="rounded-lg bg-emerald-500/20 px-2 py-0.5 text-xs font-bold text-emerald-300 font-mono">
+                <span className="rounded-md bg-white/[0.04] px-2 py-0.5 text-xs font-semibold text-slate-300 font-mono border border-white/[0.06]">
                   {evaluation.developmentAndFluency?.score ?? evaluation.fluencyAndCohesion?.score ?? 9} / 10
                 </span>
               </div>
               <p className="text-xs text-slate-300 leading-relaxed">
                 {evaluation.developmentAndFluency?.feedback || evaluation.fluencyAndCohesion?.feedback}
               </p>
-              <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1">
+              <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 font-mono">
                 <span>Pacing: <strong className="text-white">{evaluation.developmentAndFluency?.pacingWpm || 125} WPM</strong></span>
                 <span>Fillers: <strong className="text-white">{evaluation.developmentAndFluency?.fillerWordsCount || 0}</strong></span>
               </div>
@@ -684,24 +684,24 @@ export const EslSpeakingSimulator: React.FC<EslSpeakingSimulatorProps> = ({
 
           {/* SIDE-BY-SIDE GRAMMAR CORRECTIONS */}
           {evaluation.grammaticalAccuracyAndVariety?.grammarCorrections && evaluation.grammaticalAccuracyAndVariety.grammarCorrections.length > 0 && (
-            <div className="rounded-2xl border border-slate-800 bg-slate-950/90 p-5 space-y-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-rose-300 flex items-center gap-1.5">
+            <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-5 space-y-3">
+              <span className="text-xs font-semibold uppercase tracking-wider text-rose-300 flex items-center gap-1.5">
                 <AlertCircle className="h-4 w-4" />
                 Examiner Grammar & Sentence Structure Corrections:
               </span>
               <div className="space-y-2 text-xs">
                 {evaluation.grammaticalAccuracyAndVariety.grammarCorrections.map((gc, i) => (
-                  <div key={i} className="rounded-xl bg-slate-900 p-3 border border-slate-800 grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+                  <div key={i} className="rounded-lg bg-[#18181b] p-3 border border-white/[0.08] grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
                     <div className="md:col-span-4 text-rose-300/90">
-                      <span className="text-[10px] uppercase font-bold text-rose-400 block mb-0.5">You Said:</span>
+                      <span className="text-[10px] uppercase font-semibold text-rose-400 block mb-0.5">You Said:</span>
                       "{gc.youSaid}"
                     </div>
-                    <div className="md:col-span-4 text-emerald-300 font-semibold">
-                      <span className="text-[10px] uppercase font-bold text-emerald-400 block mb-0.5">Band 9 Version:</span>
+                    <div className="md:col-span-4 text-emerald-300 font-medium">
+                      <span className="text-[10px] uppercase font-semibold text-emerald-400 block mb-0.5">Band 9 Version:</span>
                       "{gc.better}"
                     </div>
                     <div className="md:col-span-4 text-slate-400 text-[11px]">
-                      <span className="text-[10px] uppercase font-bold text-slate-500 block mb-0.5">Examiner Rule:</span>
+                      <span className="text-[10px] uppercase font-semibold text-slate-500 block mb-0.5">Examiner Rule:</span>
                       {gc.ruleExplanation}
                     </div>
                   </div>
@@ -712,18 +712,18 @@ export const EslSpeakingSimulator: React.FC<EslSpeakingSimulatorProps> = ({
 
           {/* BAND 9 VOCABULARY UPGRADES TABLE */}
           {(evaluation.vocabulary?.band9Upgrades || evaluation.suggestedUpgradedPhrases) && (
-            <div className="rounded-2xl border border-indigo-500/30 bg-indigo-950/20 p-5 space-y-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-indigo-300 flex items-center gap-1.5">
-                <Award className="h-4 w-4" />
+            <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-5 space-y-3">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                <Award className="h-4 w-4 text-[#FF5B37]" />
                 Band 9 Vocabulary Upgrades:
               </span>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                 {(evaluation.vocabulary?.band9Upgrades || evaluation.suggestedUpgradedPhrases || []).map((u: any, idx: number) => (
-                  <div key={idx} className="rounded-xl bg-slate-950/80 p-3 border border-slate-800 flex flex-col justify-between">
+                  <div key={idx} className="rounded-lg bg-[#18181b] p-3 border border-white/[0.08] flex flex-col justify-between">
                     <div className="flex items-center justify-between gap-2 mb-1">
                       <span className="text-rose-300 line-through text-[11px]">{u.original}</span>
-                      <ArrowRight className="h-3.5 w-3.5 text-indigo-400 shrink-0" />
-                      <span className="font-bold text-emerald-300">{u.upgraded}</span>
+                      <ArrowRight className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                      <span className="font-semibold text-emerald-300">{u.upgraded}</span>
                     </div>
                     {u.context && (
                       <span className="text-[10px] text-slate-400 italic mt-1">{u.context}</span>
@@ -736,8 +736,8 @@ export const EslSpeakingSimulator: React.FC<EslSpeakingSimulatorProps> = ({
 
           {/* EXAMINER RECOMMENDATIONS & STRENGTHS */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-            <div className="rounded-2xl border border-emerald-500/25 bg-emerald-950/20 p-4 space-y-2">
-              <div className="font-bold text-emerald-300 flex items-center gap-1.5">
+            <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.06] p-4 space-y-2">
+              <div className="font-semibold text-emerald-300 flex items-center gap-1.5">
                 <CheckCircle className="h-4 w-4" />
                 Demonstrated Strengths in Discussion:
               </div>
@@ -751,8 +751,8 @@ export const EslSpeakingSimulator: React.FC<EslSpeakingSimulatorProps> = ({
               </ul>
             </div>
 
-            <div className="rounded-2xl border border-amber-500/25 bg-amber-950/20 p-4 space-y-2">
-              <div className="font-bold text-amber-300 flex items-center gap-1.5">
+            <div className="rounded-xl border border-amber-500/20 bg-amber-500/[0.06] p-4 space-y-2">
+              <div className="font-semibold text-amber-300 flex items-center gap-1.5">
                 <AlertCircle className="h-4 w-4" />
                 Key Recommendations for Exam Day:
               </div>

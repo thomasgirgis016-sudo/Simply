@@ -235,10 +235,10 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       {/* Top Banner & Mastery Progress */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg backdrop-blur-sm">
+      <div className="rounded-2xl border border-white/[0.08] bg-[#18181b] p-5 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <span className="inline-block rounded-md bg-blue-950/80 px-2.5 py-0.5 text-xs font-semibold text-blue-300 border border-blue-800/50">
+            <span className="inline-block rounded-md bg-[#FF5B37]/15 px-2.5 py-0.5 text-xs font-mono font-semibold text-[#FF5B37] border border-[#FF5B37]/30">
               {subject.code} • {subject.name}
             </span>
             <h2 className="text-xl font-bold text-white mt-1">Topic Active Recall Decks</h2>
@@ -247,8 +247,8 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
 
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <div className="text-right hidden sm:block">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Mastery Progress</p>
-              <p className="text-sm font-extrabold text-emerald-400">
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-400">Mastery Progress</p>
+              <p className="text-sm font-bold text-emerald-400 font-mono tabular-nums">
                 {masteredCount} / {subjectCards.length} ({masteryPercentage}%)
               </p>
             </div>
@@ -260,23 +260,23 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                 setCurrentIndex(0);
                 setIsFlipped(false);
               }}
-              className={`flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-bold transition cursor-pointer ${
+              className={`flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-semibold transition cursor-pointer ${
                 filterDueOnly
-                  ? 'bg-amber-500 border-amber-500 text-slate-950 font-black shadow-md'
-                  : 'bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20'
+                  ? 'bg-[#FF5B37] border-[#FF5B37] text-white shadow-sm'
+                  : 'bg-[#FF5B37]/10 border-[#FF5B37]/25 text-[#FF5B37] hover:bg-[#FF5B37]/20'
               }`}
               title="Filter to show only cards scheduled for SM-2 spaced repetition review today"
             >
               <Lightbulb className="h-3.5 w-3.5" />
-              <span>{dueCardsCount} Due Today</span>
+              <span className="font-mono">{dueCardsCount} Due Today</span>
             </button>
 
             <button
               onClick={handleExportAnkiCsv}
-              className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-700 hover:text-white transition cursor-pointer shadow-sm"
+              className="flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-[#141416] px-3.5 py-2 text-xs font-medium text-slate-200 hover:bg-[#222225] hover:text-white transition cursor-pointer"
               title="Download flashcards in Anki-compatible CSV format"
             >
-              <Download className="h-3.5 w-3.5 text-cyan-400" />
+              <Download className="h-3.5 w-3.5 text-[#FF5B37]" />
               <span>Export Deck (Anki)</span>
             </button>
 
@@ -284,7 +284,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
             <button
               onClick={handleGenerateNext10Cards}
               disabled={isGeneratingTen}
-              className="flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 px-4 py-2 text-xs font-semibold text-white shadow-sm transition cursor-pointer active:scale-95 disabled:opacity-50"
+              className="flex items-center gap-2 rounded-xl bg-[#FF5B37] hover:bg-[#e04f2e] px-4 py-2 text-xs font-semibold text-white shadow-none transition cursor-pointer disabled:opacity-50"
               title="Generate the next 10 high-yield exam flashcards for this chapter"
             >
               <Layers className={`h-4 w-4 ${isGeneratingTen ? 'animate-spin' : ''}`} />
@@ -293,18 +293,18 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
 
             <button
               onClick={() => setIsAiModalOpen(true)}
-              className="flex items-center gap-2 rounded-xl bg-slate-800 border border-slate-700 px-3.5 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-700 hover:text-white transition cursor-pointer"
+              className="flex items-center gap-2 rounded-xl bg-[#141416] border border-white/[0.08] px-3.5 py-2 text-xs font-medium text-slate-300 hover:bg-[#222225] hover:text-white transition cursor-pointer"
             >
-              <PlusCircle className="h-4 w-4 text-indigo-400" />
+              <PlusCircle className="h-4 w-4 text-[#FF5B37]" />
               <span>Custom Prompt</span>
             </button>
           </div>
         </div>
 
         {/* Linked Dropdowns: Select Subject & Select Chapter */}
-        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-slate-800/80 pt-4">
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-white/[0.08] pt-4">
           <div>
-            <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+            <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
               Select Subject:
             </label>
             <select
@@ -318,7 +318,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                   setIsFlipped(false);
                 }
               }}
-              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-xs font-semibold text-white focus:border-indigo-500 focus:outline-none cursor-pointer"
+              className="w-full rounded-xl border border-white/[0.1] bg-[#111113] px-3 py-2 text-xs font-medium text-white focus:border-[#FF5B37] focus:outline-none cursor-pointer"
             >
               {subjects && subjects.length > 0 ? (
                 subjects.map((s) => (
@@ -333,7 +333,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+            <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
               Select Chapter / Topic:
             </label>
             <select
@@ -343,7 +343,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                 setCurrentIndex(0);
                 setIsFlipped(false);
               }}
-              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-xs font-semibold text-white focus:border-indigo-500 focus:outline-none cursor-pointer"
+              className="w-full rounded-xl border border-white/[0.1] bg-[#111113] px-3 py-2 text-xs font-medium text-white focus:border-[#FF5B37] focus:outline-none cursor-pointer"
             >
               <option value="All">All Chapters ({subjectCards.length} cards total)</option>
               {subject.topics.map((t) => {
@@ -359,25 +359,25 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
         </div>
 
         {/* Progress Bar */}
-        <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-slate-800">
+        <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-[#111113] border border-white/[0.08]">
           <div
-            className="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 transition-all duration-500"
+            className="h-full bg-[#FF5B37] transition-all duration-500 rounded-full"
             style={{ width: `${masteryPercentage}%` }}
           />
         </div>
 
         {/* Tier & Topic Filter Bar */}
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-slate-800/80 pt-3">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-white/[0.08] pt-3">
           {/* Core vs Extended filter */}
-          <div className="flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
-            <span className="px-2 text-[11px] font-bold text-slate-400">Tier:</span>
+          <div className="flex items-center gap-1.5 bg-[#141416] p-1 rounded-xl border border-white/[0.08] text-xs">
+            <span className="px-2 text-[11px] font-semibold text-slate-400">Tier:</span>
             {(['All', 'Core', 'Extended'] as const).map((tier) => (
               <button
                 key={tier}
                 onClick={() => { setSelectedTier(tier); setCurrentIndex(0); setIsFlipped(false); }}
-                className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
+                className={`rounded-lg px-2.5 py-1 text-xs font-medium transition cursor-pointer ${
                   selectedTier === tier
-                    ? 'bg-indigo-600 text-white shadow-sm'
+                    ? 'bg-[#222225] border border-white/[0.08] text-white shadow-sm'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
@@ -386,7 +386,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
             ))}
           </div>
 
-          <span className="text-xs text-slate-400">
+          <span className="text-xs text-slate-400 font-mono">
             Showing {filteredCards.length} cards
           </span>
         </div>
@@ -395,10 +395,10 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
         <div className="mt-3 flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
           <button
             onClick={() => { setSelectedTopic('All'); setCurrentIndex(0); setIsFlipped(false); }}
-            className={`rounded-lg px-3 py-1 text-xs font-semibold transition shrink-0 cursor-pointer ${
+            className={`rounded-lg px-3 py-1 text-xs font-medium transition shrink-0 cursor-pointer ${
               selectedTopic === 'All'
-                ? 'bg-indigo-600 text-white'
-                : 'bg-slate-800 text-slate-400 hover:text-white'
+                ? 'bg-[#FF5B37] text-white shadow-sm'
+                : 'bg-[#141416] border border-white/[0.08] text-slate-400 hover:text-white'
             }`}
           >
             All Topics ({subjectCards.length})
@@ -410,10 +410,10 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
               <button
                 key={t}
                 onClick={() => { setSelectedTopic(t); setCurrentIndex(0); setIsFlipped(false); }}
-                className={`rounded-lg px-3 py-1 text-xs font-semibold transition shrink-0 ${
+                className={`rounded-lg px-3 py-1 text-xs font-medium transition shrink-0 cursor-pointer ${
                   selectedTopic === t
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-slate-800 text-slate-400 hover:text-white'
+                    ? 'bg-[#FF5B37] text-white shadow-sm'
+                    : 'bg-[#141416] border border-white/[0.08] text-slate-400 hover:text-white'
                 }`}
               >
                 {t} ({count})
@@ -425,15 +425,15 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
 
       {/* Card Arena */}
       {filteredCards.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-800 bg-slate-900/40 p-12 text-center">
+        <div className="rounded-2xl border border-dashed border-white/[0.1] bg-[#18181b] p-12 text-center">
           <Layers className="mx-auto h-12 w-12 text-slate-600 mb-3" />
-          <h3 className="text-base font-bold text-slate-300">No flashcards found for this topic</h3>
-          <p className="mt-1 text-xs text-slate-500">
+          <h3 className="text-base font-semibold text-slate-200">No flashcards found for this topic</h3>
+          <p className="mt-1 text-xs text-slate-400">
             Click "Generate Topic Cards" above to compile cards for this syllabus unit!
           </p>
           <button
             onClick={() => setIsAiModalOpen(true)}
-            className="mt-4 inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 px-4 py-2 text-xs font-semibold text-white shadow-sm transition cursor-pointer"
+            className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#FF5B37] hover:bg-[#e04f2e] px-4 py-2 text-xs font-semibold text-white shadow-none transition cursor-pointer"
           >
             <Layers className="h-4 w-4" />
             Generate Topic Cards
@@ -450,38 +450,38 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
             className="group relative h-80 sm:h-96 w-full cursor-pointer perspective-1000 select-none touch-pan-y"
           >
             <div
-              className={`relative h-full w-full rounded-2xl sm:rounded-3xl border border-slate-700/80 bg-gradient-to-br transition-all duration-500 transform-style-preserve-3d shadow-2xl ${
+              className={`relative h-full w-full rounded-2xl border transition-all duration-500 transform-style-preserve-3d shadow-xl ${
                 isFlipped ? 'rotate-y-180' : ''
               } ${
                 currentCard?.mastered
-                  ? 'border-emerald-500/40 from-slate-900 via-slate-900 to-emerald-950/30'
-                  : 'from-slate-900 via-slate-900 to-indigo-950/40'
+                  ? 'border-emerald-500/40 bg-[#161d19]'
+                  : 'border-white/[0.08] bg-[#18181b]'
               }`}
             >
               {/* FRONT SIDE */}
               <div className="absolute inset-0 flex flex-col justify-between p-4 sm:p-7 backface-hidden">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-2 sm:pb-3">
+                <div className="flex items-center justify-between border-b border-white/[0.08] pb-2 sm:pb-3">
                   <div className="flex items-center gap-1.5 sm:gap-2">
-                    <span className="rounded-md bg-indigo-500/20 px-2 py-0.5 text-[10px] sm:text-xs font-bold text-indigo-300">
+                    <span className="rounded-md bg-[#FF5B37]/10 px-2 py-0.5 text-[10px] sm:text-xs font-semibold text-[#FF5B37] border border-[#FF5B37]/20">
                       {currentCard?.topic}
                     </span>
-                    <span className="rounded-md bg-slate-800 px-2 py-0.5 text-[9px] sm:text-[10px] font-semibold text-slate-400">
+                    <span className="rounded-md bg-white/[0.04] px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-slate-400 border border-white/[0.06]">
                       {currentCard?.difficulty}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-1.5 sm:gap-2">
                     {currentCard?.intervalDays && (
-                      <span className="rounded-md bg-indigo-500/15 px-2 py-0.5 text-[10px] font-bold text-indigo-300 border border-indigo-500/25">
+                      <span className="rounded-md bg-white/[0.04] px-2 py-0.5 text-[10px] font-mono text-slate-300 border border-white/[0.08]">
                         Interval: {currentCard.intervalDays}d
                       </span>
                     )}
                     {currentCard?.mastered && (
-                      <span className="flex items-center gap-1 rounded-md bg-emerald-500/10 px-2 py-0.5 text-[11px] font-bold text-emerald-400 border border-emerald-500/20">
+                      <span className="flex items-center gap-1 rounded-md bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold text-emerald-400 border border-emerald-500/20">
                         <Award className="h-3 w-3" /> Mastered
                       </span>
                     )}
-                    <span className="text-xs font-medium text-slate-500">
+                    <span className="text-xs font-mono tabular-nums text-slate-500">
                       {currentIndex + 1} of {filteredCards.length}
                     </span>
                   </div>
@@ -489,31 +489,31 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
 
                 {/* Question Content */}
                 <div className="my-auto text-center px-2 sm:px-4">
-                  <p className="text-xs font-bold uppercase tracking-wider text-indigo-400 mb-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-[#FF5B37] mb-2">
                     Question / Prompt
                   </p>
                   <MathRenderer
                     content={currentCard?.question || ''}
-                    className="text-base sm:text-lg md:text-xl font-bold text-white leading-relaxed"
+                    className="text-base sm:text-lg md:text-xl font-semibold text-slate-100 leading-relaxed"
                   />
                 </div>
 
-                <div className="flex items-center justify-between border-t border-slate-800/80 pt-3 text-xs text-slate-400">
+                <div className="flex items-center justify-between border-t border-white/[0.08] pt-3 text-xs text-slate-400">
                   <span className="flex items-center gap-1.5 text-slate-400 text-[11px] sm:text-xs">
                     <RotateCw className="h-3.5 w-3.5 group-hover:rotate-180 transition duration-500" />
                     Tap anywhere to flip card
                   </span>
-                  <span className="font-semibold text-indigo-400">FLIP ↺</span>
+                  <span className="font-semibold text-[#FF5B37]">FLIP ↺</span>
                 </div>
               </div>
 
               {/* BACK SIDE */}
-              <div className="absolute inset-0 flex flex-col justify-between p-4 sm:p-7 backface-hidden rotate-y-180 bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950/70 rounded-2xl sm:rounded-3xl">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-2 sm:pb-3">
-                  <span className="rounded-md bg-emerald-500/20 px-2.5 py-0.5 text-[11px] sm:text-xs font-bold text-emerald-300">
+              <div className="absolute inset-0 flex flex-col justify-between p-4 sm:p-7 backface-hidden rotate-y-180 bg-[#141416] rounded-2xl border border-white/[0.08]">
+                <div className="flex items-center justify-between border-b border-white/[0.08] pb-2 sm:pb-3">
+                  <span className="rounded-md bg-emerald-500/10 px-2.5 py-0.5 text-[11px] sm:text-xs font-semibold text-emerald-400 border border-emerald-500/20">
                     Syllabus Mark Scheme Answer
                   </span>
-                  <span className="text-xs font-medium text-slate-500">
+                  <span className="text-xs font-mono tabular-nums text-slate-500">
                     {currentIndex + 1} of {filteredCards.length}
                   </span>
                 </div>
@@ -522,12 +522,12 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                 <div className="my-auto overflow-y-auto px-1 sm:px-2 max-h-56">
                   <MathRenderer
                     content={currentCard?.answer || ''}
-                    className="text-xs sm:text-sm md:text-base text-slate-100 font-medium leading-relaxed"
+                    className="text-xs sm:text-sm md:text-base text-slate-200 font-medium leading-relaxed"
                   />
 
                   {currentCard?.examinerTip && (
-                    <div className="mt-3 sm:mt-4 rounded-xl border border-amber-500/30 bg-amber-950/30 p-2.5 sm:p-3 text-left">
-                      <div className="flex items-center gap-1.5 text-amber-300 text-xs font-bold mb-1">
+                    <div className="mt-3 sm:mt-4 rounded-xl border border-amber-500/20 bg-amber-500/[0.06] p-2.5 sm:p-3 text-left">
+                      <div className="flex items-center gap-1.5 text-amber-400 text-xs font-semibold mb-1">
                         <Lightbulb className="h-3.5 w-3.5" />
                         Examiner Pro-Tip:
                       </div>
@@ -536,9 +536,9 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                   )}
                 </div>
 
-                <div className="flex items-center justify-between border-t border-slate-800/80 pt-3 text-xs text-slate-400">
+                <div className="flex items-center justify-between border-t border-white/[0.08] pt-3 text-xs text-slate-400">
                   <span className="text-slate-400 text-[11px] sm:text-xs">Tap anywhere to flip back</span>
-                  <span className="font-semibold text-indigo-400">FLIP ↺</span>
+                  <span className="font-semibold text-[#FF5B37]">FLIP ↺</span>
                 </div>
               </div>
             </div>
@@ -550,19 +550,19 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
           </div>
 
           {/* Bottom Review Controls */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 rounded-2xl border border-slate-800 bg-slate-900/60 p-3 sm:p-4 shadow-md">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 rounded-xl border border-white/[0.08] bg-[#18181b] p-3 sm:p-4">
             {/* Prev / Next buttons */}
             <div className="flex items-center justify-between sm:justify-start gap-2 order-2 sm:order-1">
               <button
                 onClick={handlePrev}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-4 py-2.5 sm:py-2 text-xs font-bold text-slate-200 hover:bg-slate-700 active:scale-95 transition cursor-pointer"
+                className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 rounded-lg border border-white/[0.08] bg-[#222225] px-4 py-2.5 sm:py-2 text-xs font-semibold text-slate-200 hover:bg-white/[0.08] active:scale-95 transition cursor-pointer"
               >
                 <ChevronLeft className="h-4 w-4" />
                 <span>Previous</span>
               </button>
               <button
                 onClick={handleNext}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-4 py-2.5 sm:py-2 text-xs font-bold text-slate-200 hover:bg-slate-700 active:scale-95 transition cursor-pointer"
+                className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 rounded-lg border border-white/[0.08] bg-[#222225] px-4 py-2.5 sm:py-2 text-xs font-semibold text-slate-200 hover:bg-white/[0.08] active:scale-95 transition cursor-pointer"
               >
                 <span>Next</span>
                 <ChevronRight className="h-4 w-4" />
@@ -574,7 +574,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
               <button
                 type="button"
                 onClick={() => handleRateCard('again')}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-1 sm:gap-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 sm:px-3.5 py-2 sm:py-2 text-xs font-bold text-rose-300 hover:bg-rose-500/20 active:scale-95 transition cursor-pointer"
+                className="flex-1 sm:flex-none flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 sm:px-3.5 py-2 sm:py-2 text-xs font-semibold text-rose-300 hover:bg-rose-500/20 active:scale-95 transition cursor-pointer"
                 title="Review tomorrow (1 day interval)"
               >
                 <HelpCircle className="h-3.5 w-3.5 shrink-0" />
@@ -583,7 +583,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
               <button
                 type="button"
                 onClick={() => handleRateCard('good')}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-1 sm:gap-1.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-3 sm:px-3.5 py-2 sm:py-2 text-xs font-bold text-indigo-300 hover:bg-indigo-500/20 active:scale-95 transition cursor-pointer"
+                className="flex-1 sm:flex-none flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg border border-[#FF5B37]/30 bg-[#FF5B37]/10 px-3 sm:px-3.5 py-2 sm:py-2 text-xs font-semibold text-[#FF5B37] hover:bg-[#FF5B37]/20 active:scale-95 transition cursor-pointer"
                 title="Review in 3 days"
               >
                 <CheckCircle className="h-3.5 w-3.5 shrink-0" />
@@ -592,7 +592,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
               <button
                 type="button"
                 onClick={() => handleRateCard('easy')}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-1 sm:gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 sm:px-3.5 py-2 sm:py-2 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20 active:scale-95 transition cursor-pointer"
+                className="flex-1 sm:flex-none flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 sm:px-3.5 py-2 sm:py-2 text-xs font-semibold text-emerald-300 hover:bg-emerald-500/20 active:scale-95 transition cursor-pointer"
                 title="Review in 7 days"
               >
                 <Award className="h-3.5 w-3.5 shrink-0" />
@@ -604,15 +604,15 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
           {/* Desktop & Tablet Keyboard Shortcuts Guide */}
           <div className="hidden sm:flex items-center justify-center gap-4 text-[11px] text-slate-400 font-medium">
             <span className="flex items-center gap-1.5">
-              <kbd className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 font-mono text-[10px]">Space</kbd> or <kbd className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 font-mono text-[10px]">Enter</kbd> Flip Card
+              <kbd className="px-1.5 py-0.5 rounded bg-[#222225] border border-white/[0.08] text-slate-300 font-mono text-[10px]">Space</kbd> or <kbd className="px-1.5 py-0.5 rounded bg-[#222225] border border-white/[0.08] text-slate-300 font-mono text-[10px]">Enter</kbd> Flip Card
             </span>
             <span>•</span>
             <span className="flex items-center gap-1.5">
-              <kbd className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 font-mono text-[10px]">←</kbd> Still Learning (1d)
+              <kbd className="px-1.5 py-0.5 rounded bg-[#222225] border border-white/[0.08] text-slate-300 font-mono text-[10px]">←</kbd> Still Learning (1d)
             </span>
             <span>•</span>
             <span className="flex items-center gap-1.5">
-              <kbd className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 font-mono text-[10px]">→</kbd> Mastered (3d)
+              <kbd className="px-1.5 py-0.5 rounded bg-[#222225] border border-white/[0.08] text-slate-300 font-mono text-[10px]">→</kbd> Mastered (3d)
             </span>
           </div>
         </div>
@@ -621,19 +621,19 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
       {/* AI Generate Deck Modal */}
       {isAiModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-fadeIn">
-          <div className="relative w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-2xl">
+          <div className="relative w-full max-w-md rounded-2xl border border-white/[0.08] bg-[#18181b] p-6 shadow-2xl">
             <button
               onClick={() => setIsAiModalOpen(false)}
-              className="absolute right-4 top-4 rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white transition"
+              className="absolute right-4 top-4 rounded-lg p-1.5 text-slate-400 hover:bg-white/[0.08] hover:text-white transition"
             >
               <X className="h-5 w-5" />
             </button>
 
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="rounded-xl bg-blue-950/80 p-2 text-blue-300 border border-blue-800/50">
+              <div className="rounded-xl bg-[#FF5B37]/10 p-2 text-[#FF5B37] border border-[#FF5B37]/20">
                 <Layers className="h-5 w-5" />
               </div>
-              <h3 className="text-lg font-bold text-white">Generate Topic Flashcards</h3>
+              <h3 className="text-base font-semibold text-white">Generate Topic Flashcards</h3>
             </div>
 
             <p className="text-xs text-slate-300 mb-4 leading-relaxed">
@@ -642,7 +642,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
 
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-medium text-slate-300 mb-1.5">
                   Syllabus Topic or Subtopic
                 </label>
                 <input
@@ -650,7 +650,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                   value={aiTopicInput}
                   onChange={(e) => setAiTopicInput(e.target.value)}
                   placeholder="e.g. Organic Chemistry Alkanes & Alkenes"
-                  className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-sm text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+                  className="w-full rounded-lg border border-white/[0.08] bg-[#141416] p-2.5 text-sm text-white placeholder-slate-500 focus:border-[#FF5B37] focus:outline-none"
                 />
               </div>
 
@@ -661,7 +661,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                     key={t}
                     type="button"
                     onClick={() => setAiTopicInput(t)}
-                    className="rounded-md border border-slate-800 bg-slate-800/60 px-2 py-1 text-[11px] text-slate-300 hover:border-blue-500 hover:text-white cursor-pointer"
+                    className="rounded-md border border-white/[0.08] bg-white/[0.04] px-2 py-1 text-[11px] text-slate-300 hover:border-[#FF5B37]/40 hover:text-white cursor-pointer transition"
                   >
                     + {t}
                   </button>
@@ -669,11 +669,11 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
               </div>
             </div>
 
-            <div className="mt-6 flex items-center justify-end gap-2 border-t border-slate-800 pt-4">
+            <div className="mt-6 flex items-center justify-end gap-2 border-t border-white/[0.08] pt-4">
               <button
                 type="button"
                 onClick={() => setIsAiModalOpen(false)}
-                className="rounded-xl px-4 py-2 text-xs font-medium text-slate-400 hover:bg-slate-800 hover:text-white cursor-pointer"
+                className="rounded-lg px-4 py-2 text-xs font-medium text-slate-400 hover:bg-white/[0.08] hover:text-white cursor-pointer transition"
               >
                 Cancel
               </button>
@@ -681,7 +681,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                 type="button"
                 onClick={handleGenerateAiDeck}
                 disabled={isGenerating || !aiTopicInput.trim()}
-                className="flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 px-5 py-2 text-xs font-semibold text-white shadow-sm disabled:opacity-50 cursor-pointer"
+                className="flex items-center gap-2 rounded-lg bg-[#FF5B37] hover:bg-[#e04f2e] px-5 py-2 text-xs font-semibold text-white disabled:opacity-50 cursor-pointer transition"
               >
                 {isGenerating ? (
                   <>

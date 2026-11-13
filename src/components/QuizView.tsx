@@ -291,18 +291,18 @@ export const QuizView: React.FC<QuizViewProps> = ({
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       {/* Top Banner */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg backdrop-blur-sm">
+      <div className="rounded-2xl border border-white/[0.08] bg-[#18181b] p-5">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-block rounded-md bg-emerald-500/20 px-2 py-0.5 text-xs font-semibold text-emerald-300 border border-emerald-500/30">
+              <span className="inline-block rounded-md bg-[#FF5B37]/10 px-2 py-0.5 text-xs font-semibold text-[#FF5B37] border border-[#FF5B37]/20">
                 {subject.code} • Past Paper Mock Quizzes
               </span>
-              <span className="rounded-md bg-slate-800 px-2 py-0.5 text-[11px] font-bold text-slate-300 border border-slate-700">
+              <span className="rounded-md bg-white/[0.04] px-2 py-0.5 text-[11px] font-semibold text-slate-300 border border-white/[0.08]">
                 {subject.board} Official Syllabus
               </span>
             </div>
-            <h2 className="text-xl font-bold text-white mt-1">IGCSE Exam Practice & Mark Schemes</h2>
+            <h2 className="text-xl font-semibold text-white mt-1">IGCSE Exam Practice & Mark Schemes</h2>
             <p className="text-xs text-slate-400">Authentic past paper questions with [M], [A], [B] mark scheme breakdowns</p>
           </div>
 
@@ -310,24 +310,24 @@ export const QuizView: React.FC<QuizViewProps> = ({
             {/* Printable Exam Paper Toggle */}
             <button
               onClick={() => setIsPrintMode(!isPrintMode)}
-              className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-bold transition cursor-pointer active:scale-95 ${
+              className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition cursor-pointer active:scale-95 ${
                 isPrintMode
-                  ? 'border-sky-500 bg-sky-500/20 text-sky-300 ring-1 ring-sky-500'
-                  : 'border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white'
+                  ? 'border-[#FF5B37] bg-[#FF5B37]/10 text-[#FF5B37]'
+                  : 'border-white/[0.08] bg-[#222225] text-slate-200 hover:bg-white/[0.08]'
               }`}
               title="Toggle authentic Cambridge/Edexcel printable exam paper worksheet"
             >
-              <Printer className="h-4 w-4 text-sky-400" />
-              <span>{isPrintMode ? 'Exit Print View' : '🖨️ Printable Paper'}</span>
+              <Printer className="h-4 w-4" />
+              <span>{isPrintMode ? 'Exit Print View' : 'Printable Paper'}</span>
             </button>
 
             {/* Pacing Timer Toggle */}
             <button
               onClick={() => setIsTimerEnabled(!isTimerEnabled)}
-              className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold transition cursor-pointer active:scale-95 ${
+              className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition cursor-pointer active:scale-95 ${
                 isTimerEnabled
-                  ? 'border-amber-500 bg-amber-500/15 text-amber-300'
-                  : 'border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
+                  ? 'border-amber-500/40 bg-amber-500/10 text-amber-300'
+                  : 'border-white/[0.08] bg-[#222225] text-slate-300 hover:bg-white/[0.08]'
               }`}
               title="Toggle timed exam simulation (1.5 min per mark standard pacing)"
             >
@@ -338,26 +338,26 @@ export const QuizView: React.FC<QuizViewProps> = ({
             {/* Score History */}
             <button
               onClick={() => setIsHistoryModalOpen(true)}
-              className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-700 hover:text-white transition cursor-pointer active:scale-95"
+              className="flex items-center justify-center gap-1.5 rounded-lg border border-white/[0.08] bg-[#222225] px-3 py-2 text-xs font-semibold text-slate-300 hover:bg-white/[0.08] transition cursor-pointer active:scale-95"
               title="View past quiz attempts & score history"
             >
-              <History className="h-4 w-4 text-cyan-400" />
+              <History className="h-4 w-4 text-slate-400" />
               <span className="hidden sm:inline">Score History</span>
             </button>
 
             {/* Mixed Paper Exam Drill Button */}
             <button
               onClick={handleStartMixedPaperDrill}
-              className="flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 px-3 py-2 text-xs font-bold text-white shadow-md hover:from-amber-400 hover:to-orange-500 transition cursor-pointer active:scale-95"
+              className="flex items-center justify-center gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-300 hover:bg-amber-500/20 transition cursor-pointer active:scale-95"
               title="Start a randomized exam drill across years, seasons, and variants"
             >
-              <span>🎲 Mixed Paper Drill</span>
+              <span>🎲 Mixed Drill</span>
             </button>
 
             {/* Generate Custom Practice Questions */}
             <button
               onClick={() => setIsAiModalOpen(true)}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-3.5 py-2 text-xs font-bold text-white shadow-md hover:from-emerald-500 hover:to-teal-500 transition cursor-pointer active:scale-95"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 rounded-lg bg-[#FF5B37] hover:bg-[#e04f2e] px-3.5 py-2 text-xs font-semibold text-white transition cursor-pointer active:scale-95"
             >
               <FileText className="h-4 w-4" />
               <span>Add Questions</span>
@@ -370,12 +370,12 @@ export const QuizView: React.FC<QuizViewProps> = ({
           <div className="mt-4 flex items-center justify-between rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-xs text-amber-200">
             <div className="flex items-center gap-2">
               <span className="flex h-2 w-2 rounded-full bg-amber-400 animate-ping" />
-              <span className="font-bold">Mixed Paper Exam Drill Active:</span>
-              <span>{activeQuizzes.length} randomized questions from multiple years & variants with strict mark schemes.</span>
+              <span className="font-semibold">Mixed Paper Exam Drill Active:</span>
+              <span className="text-amber-200/90">{activeQuizzes.length} randomized questions from multiple years & variants with strict mark schemes.</span>
             </div>
             <button
               onClick={handleExitMixedPaperDrill}
-              className="rounded-lg bg-amber-500/20 px-2.5 py-1 font-bold text-amber-300 hover:bg-amber-500/30 border border-amber-500/30 transition cursor-pointer"
+              className="rounded-lg bg-amber-500/20 px-2.5 py-1 font-semibold text-amber-300 hover:bg-amber-500/30 border border-amber-500/30 transition cursor-pointer"
             >
               Exit Drill
             </button>
@@ -383,7 +383,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
         )}
 
         {/* Exact Paper Code Search Bar & Filters */}
-        <div className="mt-4 space-y-3 border-t border-slate-800/80 pt-3">
+        <div className="mt-4 space-y-3 border-t border-white/[0.08] pt-3">
           <div className="flex flex-wrap items-center gap-2">
             <div className="relative flex-1 min-w-[240px]">
               <input
@@ -394,7 +394,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
                   handleRestart();
                 }}
                 placeholder="Lookup exact paper code (e.g. 0580/42/M/J/23, 0625/21/O/N/22)..."
-                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3.5 py-1.5 text-xs text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none"
+                className="w-full rounded-lg border border-white/[0.08] bg-[#141416] px-3.5 py-1.5 text-xs text-white placeholder-slate-500 focus:border-[#FF5B37] focus:outline-none"
               />
               {paperCodeQuery && (
                 <button
@@ -409,7 +409,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
               )}
             </div>
 
-            <span className="text-xs text-slate-400 shrink-0 font-mono">
+            <span className="text-xs text-slate-400 shrink-0 font-mono tabular-nums">
               {activeQuizzes.length} of {standardFiltered.length} Qs selected
             </span>
           </div>
@@ -417,15 +417,15 @@ export const QuizView: React.FC<QuizViewProps> = ({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-3">
               {/* Question Count Selector */}
-              <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
-                <span className="px-2 text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Count:</span>
+              <div className="flex items-center gap-1 bg-[#141416] p-1 rounded-lg border border-white/[0.08] text-xs">
+                <span className="px-2 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Count:</span>
                 {([5, 10, 15, 25, 'all'] as const).map((cnt) => (
                   <button
                     key={cnt}
                     onClick={() => { setQuestionCountLimit(cnt); handleRestart(); }}
-                    className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
+                    className={`rounded-md px-2.5 py-1 text-xs font-medium transition cursor-pointer ${
                       questionCountLimit === cnt
-                        ? 'bg-emerald-600 text-white shadow-sm'
+                        ? 'bg-[#FF5B37] text-white'
                         : 'text-slate-400 hover:text-slate-200'
                     }`}
                   >
@@ -435,15 +435,15 @@ export const QuizView: React.FC<QuizViewProps> = ({
               </div>
 
               {/* Core vs Extended */}
-              <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
-                <span className="px-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tier:</span>
+              <div className="flex items-center gap-1 bg-[#141416] p-1 rounded-lg border border-white/[0.08] text-xs">
+                <span className="px-2 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Tier:</span>
                 {(['All', 'Core', 'Extended'] as const).map((tier) => (
                   <button
                     key={tier}
                     onClick={() => { setSelectedTier(tier); handleRestart(); }}
-                    className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
+                    className={`rounded-md px-2.5 py-1 text-xs font-medium transition cursor-pointer ${
                       selectedTier === tier
-                        ? 'bg-indigo-600 text-white shadow-sm'
+                        ? 'bg-white/[0.1] text-white'
                         : 'text-slate-400 hover:text-slate-200'
                     }`}
                   >
@@ -453,15 +453,15 @@ export const QuizView: React.FC<QuizViewProps> = ({
               </div>
 
               {/* Paper Component Filter */}
-              <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
-                <span className="px-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Paper:</span>
+              <div className="flex items-center gap-1 bg-[#141416] p-1 rounded-lg border border-white/[0.08] text-xs">
+                <span className="px-2 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Paper:</span>
                 {(['All', 'Paper 2', 'Paper 4'] as const).map((paper) => (
                   <button
                     key={paper}
                     onClick={() => { setSelectedPaper(paper === 'All' ? 'All' : paper); handleRestart(); }}
-                    className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
+                    className={`rounded-md px-2.5 py-1 text-xs font-medium transition cursor-pointer ${
                       (selectedPaper === 'All' && paper === 'All') || selectedPaper === paper
-                        ? 'bg-indigo-600 text-white shadow-sm'
+                        ? 'bg-white/[0.1] text-white'
                         : 'text-slate-400 hover:text-slate-200'
                     }`}
                   >
@@ -477,10 +477,10 @@ export const QuizView: React.FC<QuizViewProps> = ({
         <div className="mt-3 flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
           <button
             onClick={() => { setSelectedTopic('All'); handleRestart(); }}
-            className={`rounded-lg px-3 py-1 text-xs font-semibold transition shrink-0 cursor-pointer ${
+            className={`rounded-lg px-3 py-1 text-xs font-medium transition shrink-0 cursor-pointer ${
               selectedTopic === 'All'
-                ? 'bg-emerald-600 text-white'
-                : 'bg-slate-800 text-slate-400 hover:text-white'
+                ? 'bg-[#FF5B37] text-white'
+                : 'bg-white/[0.04] text-slate-400 hover:text-white border border-white/[0.06]'
             }`}
           >
             All Topics ({subjectQuizzes.length})
@@ -492,10 +492,10 @@ export const QuizView: React.FC<QuizViewProps> = ({
               <button
                 key={t}
                 onClick={() => { setSelectedTopic(t); handleRestart(); }}
-                className={`rounded-lg px-3 py-1 text-xs font-semibold transition shrink-0 cursor-pointer ${
+                className={`rounded-lg px-3 py-1 text-xs font-medium transition shrink-0 cursor-pointer ${
                   selectedTopic === t
-                    ? 'bg-emerald-600 text-white'
-                    : 'bg-slate-800 text-slate-400 hover:text-white'
+                    ? 'bg-[#FF5B37] text-white'
+                    : 'bg-white/[0.04] text-slate-400 hover:text-white border border-white/[0.06]'
                 }`}
               >
                 {t} ({count})
@@ -509,31 +509,31 @@ export const QuizView: React.FC<QuizViewProps> = ({
       {isPrintMode ? (
         <div className="space-y-6 animate-fadeIn">
           {/* Non-Printing Action Toolbar */}
-          <div className="no-print rounded-2xl border border-sky-500/30 bg-sky-950/40 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="no-print rounded-2xl border border-white/[0.08] bg-[#18181b] p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
-                <Printer className="h-5 w-5 text-sky-400" />
-                <h3 className="text-base font-bold text-white">Printable Cambridge / Edexcel Mock Examination</h3>
+                <Printer className="h-5 w-5 text-[#FF5B37]" />
+                <h3 className="text-base font-semibold text-white">Printable Cambridge / Edexcel Mock Examination</h3>
               </div>
-              <p className="text-xs text-slate-300 mt-0.5">
+              <p className="text-xs text-slate-400 mt-0.5">
                 Authentic exam worksheet with lined student working space, candidate information boxes & official mark schemes.
               </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <label className="flex items-center gap-2 text-xs text-slate-300 bg-slate-900 px-3 py-2 rounded-xl border border-slate-800 cursor-pointer">
+              <label className="flex items-center gap-2 text-xs text-slate-300 bg-[#141416] px-3 py-2 rounded-lg border border-white/[0.08] cursor-pointer">
                 <input
                   type="checkbox"
                   checked={includeMarkSchemeInPrint}
                   onChange={(e) => setIncludeMarkSchemeInPrint(e.target.checked)}
-                  className="rounded text-emerald-500 focus:ring-0"
+                  className="rounded text-[#FF5B37] focus:ring-0"
                 />
                 <span>Include Mark Scheme at End</span>
               </label>
 
               <button
                 onClick={() => window.print()}
-                className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-sky-500/25 hover:opacity-95 transition cursor-pointer"
+                className="flex items-center gap-2 rounded-lg bg-[#FF5B37] hover:bg-[#e04f2e] px-4 py-2 text-xs font-semibold text-white transition cursor-pointer"
               >
                 <Printer className="h-4 w-4" />
                 <span>Print Exam Paper (PDF)</span>
@@ -541,7 +541,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
 
               <button
                 onClick={() => setIsPrintMode(false)}
-                className="rounded-xl border border-slate-700 bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer"
+                className="rounded-lg border border-white/[0.08] bg-[#222225] px-3 py-2 text-xs font-medium text-slate-300 hover:text-white transition cursor-pointer"
               >
                 Back to Quiz
               </button>
@@ -720,62 +720,62 @@ export const QuizView: React.FC<QuizViewProps> = ({
           `}} />
         </div>
       ) : isQuizFinished ? (
-        <div className="rounded-3xl border border-slate-700/80 bg-gradient-to-b from-slate-900 to-indigo-950/40 p-8 text-center shadow-2xl animate-fadeIn">
-          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 shadow-xl shadow-emerald-500/20 mb-4">
-            <Award className="h-10 w-10" />
+        <div className="rounded-2xl border border-white/[0.08] bg-[#18181b] p-8 text-center shadow-xl animate-fadeIn">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-xl bg-[#FF5B37]/10 text-[#FF5B37] border border-[#FF5B37]/20 mb-4">
+            <Award className="h-8 w-8" />
           </div>
 
-          <h3 className="text-2xl font-extrabold text-white">Mock Quiz Completed!</h3>
+          <h3 className="text-xl font-semibold text-white">Mock Quiz Completed</h3>
           <p className="mt-1 text-sm text-slate-300">
-            You scored <span className="font-bold text-emerald-400">{totalMarksEarned} / {totalPossibleMarks} marks</span> ({percentage}%)
+            You scored <span className="font-semibold text-emerald-400 font-mono tabular-nums">{totalMarksEarned} / {totalPossibleMarks} marks</span> ({percentage}%)
           </p>
 
-          <div className="mx-auto mt-6 max-w-sm rounded-2xl border border-slate-700 bg-slate-900/90 p-4">
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
+          <div className="mx-auto mt-6 max-w-sm rounded-xl border border-white/[0.08] bg-[#141416] p-4">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
               Estimated IGCSE Grade Boundary
             </p>
-            <p className={`mt-1 text-2xl font-black ${estimateGrade(percentage).color}`}>
+            <p className={`mt-1 text-2xl font-semibold ${estimateGrade(percentage).color}`}>
               {estimateGrade(percentage).grade}
             </p>
             <p className="mt-1 text-xs text-slate-400">
-              Target Goal: <span className="font-bold text-amber-400">{profile.targetGrade}</span>
+              Target Goal: <span className="font-semibold text-[#FF5B37]">{profile.targetGrade}</span>
             </p>
           </div>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <button
               onClick={handleRestart}
-              className="flex items-center gap-2 rounded-xl bg-slate-800 px-5 py-2.5 text-xs font-bold text-white hover:bg-slate-700 transition cursor-pointer"
+              className="flex items-center gap-2 rounded-lg border border-white/[0.08] bg-[#222225] px-4 py-2 text-xs font-semibold text-white hover:bg-white/[0.08] transition cursor-pointer"
             >
               <RotateCcw className="h-4 w-4" />
               <span>Retry Quiz</span>
             </button>
             <button
               onClick={() => setIsHistoryModalOpen(true)}
-              className="flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-800 px-5 py-2.5 text-xs font-bold text-slate-200 hover:bg-slate-700 transition cursor-pointer"
+              className="flex items-center gap-2 rounded-lg border border-white/[0.08] bg-[#222225] px-4 py-2 text-xs font-semibold text-slate-200 hover:bg-white/[0.08] transition cursor-pointer"
             >
-              <History className="h-4 w-4 text-cyan-400" />
+              <History className="h-4 w-4 text-slate-400" />
               <span>Review Past Attempts</span>
             </button>
             <button
               onClick={() => setIsAiModalOpen(true)}
-              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-2.5 text-xs font-bold text-white shadow-lg shadow-emerald-500/25 hover:from-emerald-400 hover:to-teal-500 transition cursor-pointer"
+              className="flex items-center gap-2 rounded-lg bg-[#FF5B37] hover:bg-[#e04f2e] px-4 py-2 text-xs font-semibold text-white transition cursor-pointer"
             >
               <FileText className="h-4 w-4" />
-              <span>Generate Custom Question Set</span>
+              <span>Generate Practice Set</span>
             </button>
           </div>
         </div>
       ) : activeQuizzes.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-800 bg-slate-900/40 p-12 text-center">
-          <FileText className="mx-auto h-12 w-12 text-slate-600 mb-3" />
-          <h3 className="text-base font-bold text-slate-300">No mock questions for these filter criteria</h3>
-          <p className="mt-1 text-xs text-slate-500">
+        <div className="rounded-2xl border border-dashed border-white/[0.08] bg-[#18181b] p-12 text-center">
+          <FileText className="mx-auto h-10 w-10 text-slate-500 mb-3" />
+          <h3 className="text-base font-semibold text-slate-300">No mock questions for these filter criteria</h3>
+          <p className="mt-1 text-xs text-slate-400">
             Try switching Tier or Paper filters, or generate past-paper style questions on demand!
           </p>
           <button
             onClick={() => setIsAiModalOpen(true)}
-            className="mt-4 inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-500 transition cursor-pointer"
+            className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#FF5B37] hover:bg-[#e04f2e] px-4 py-2 text-xs font-semibold text-white transition cursor-pointer"
           >
             <FileText className="h-4 w-4" />
             Generate Practice Set
@@ -784,11 +784,11 @@ export const QuizView: React.FC<QuizViewProps> = ({
       ) : (
         /* Question Card */
         <div className="space-y-6">
-          <div className="rounded-3xl border border-slate-700/80 bg-slate-900/90 p-6 md:p-8 shadow-xl">
+          <div className="rounded-2xl border border-white/[0.08] bg-[#18181b] p-6 md:p-8 shadow-xl">
             {/* Header info */}
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-4">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/[0.08] pb-4">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-md bg-emerald-500/20 px-2 py-0.5 text-xs font-bold text-emerald-300">
+                <span className="rounded-md bg-[#FF5B37]/10 px-2 py-0.5 text-xs font-semibold text-[#FF5B37] border border-[#FF5B37]/20">
                   {currentQuestion?.topic}
                 </span>
 
@@ -796,10 +796,10 @@ export const QuizView: React.FC<QuizViewProps> = ({
                 {currentQuestion?.paperReference && (
                   <button
                     onClick={() => copyPaperRef(currentQuestion.paperReference!)}
-                    className="flex items-center gap-1.5 rounded-md border border-slate-700 bg-slate-800/80 px-2.5 py-0.5 text-[11px] font-semibold text-slate-300 hover:border-slate-600 hover:text-white transition cursor-pointer"
+                    className="flex items-center gap-1.5 rounded-md border border-white/[0.08] bg-white/[0.04] px-2.5 py-0.5 text-[11px] font-mono text-slate-300 hover:border-white/[0.15] hover:text-white transition cursor-pointer"
                     title="Click to copy paper session reference for past paper search"
                   >
-                    <FileText className="h-3 w-3 text-cyan-400" />
+                    <FileText className="h-3 w-3 text-slate-400" />
                     <span>{currentQuestion.paperReference}</span>
                     {copiedRef ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3 text-slate-500" />}
                   </button>
@@ -810,12 +810,12 @@ export const QuizView: React.FC<QuizViewProps> = ({
                 {/* Real-time exam countdown timer if enabled */}
                 {isTimerEnabled && (
                   <div
-                    className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-mono font-bold border transition ${
+                    className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-mono font-semibold border transition ${
                       secondsRemaining < 20
-                        ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 animate-pulse'
+                        ? 'bg-rose-500/10 text-rose-300 border-rose-500/30 animate-pulse'
                         : secondsRemaining < 45
-                        ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                        : 'bg-slate-800 text-emerald-400 border-slate-700'
+                        ? 'bg-amber-500/10 text-amber-300 border-amber-500/30'
+                        : 'bg-[#141416] text-emerald-400 border-white/[0.08]'
                     }`}
                   >
                     <Clock className="h-3.5 w-3.5" />
@@ -826,10 +826,10 @@ export const QuizView: React.FC<QuizViewProps> = ({
                   </div>
                 )}
 
-                <span className="rounded-lg bg-indigo-500/10 px-2.5 py-1 text-xs font-bold text-indigo-300 border border-indigo-500/20">
+                <span className="rounded-lg bg-white/[0.04] px-2.5 py-1 text-xs font-mono font-semibold text-slate-300 border border-white/[0.08]">
                   [{currentQuestion?.marks} Marks]
                 </span>
-                <span className="text-xs font-semibold text-slate-400">
+                <span className="text-xs font-mono tabular-nums text-slate-400">
                   Question {currentIdx + 1} of {activeQuizzes.length}
                 </span>
               </div>
@@ -849,18 +849,18 @@ export const QuizView: React.FC<QuizViewProps> = ({
                 const isSelected = selectedOptionId === opt.id;
                 const isCorrect = opt.id === currentQuestion.correctOptionId;
 
-                let optClass = 'border-slate-800 bg-slate-950/60 text-slate-200 hover:border-slate-700 hover:bg-slate-800/40';
+                let optClass = 'border-white/[0.08] bg-[#141416] text-slate-200 hover:border-white/[0.15] hover:bg-white/[0.02]';
 
                 if (isAnswerSubmitted) {
                   if (isCorrect) {
-                    optClass = 'border-emerald-500 bg-emerald-950/40 text-emerald-200 ring-1 ring-emerald-500';
+                    optClass = 'border-emerald-500/40 bg-emerald-500/10 text-emerald-200 ring-1 ring-emerald-500/40';
                   } else if (isSelected && !isCorrect) {
-                    optClass = 'border-rose-500 bg-rose-950/40 text-rose-200 ring-1 ring-rose-500';
+                    optClass = 'border-rose-500/40 bg-rose-500/10 text-rose-200 ring-1 ring-rose-500/40';
                   } else {
-                    optClass = 'border-slate-800/40 bg-slate-950/30 text-slate-500 opacity-60';
+                    optClass = 'border-white/[0.04] bg-[#141416]/50 text-slate-500 opacity-50';
                   }
                 } else if (isSelected) {
-                  optClass = 'border-indigo-500 bg-indigo-950/40 text-white ring-1 ring-indigo-500';
+                  optClass = 'border-[#FF5B37] bg-[#FF5B37]/10 text-white ring-1 ring-[#FF5B37]';
                 }
 
                 const optionIndex = currentQuestion.options.findIndex((o: QuizOption) => o.id === opt.id);
@@ -871,10 +871,10 @@ export const QuizView: React.FC<QuizViewProps> = ({
                   <div
                     key={opt.id}
                     onClick={() => handleSelectOption(opt.id)}
-                    className={`flex items-center justify-between rounded-2xl border p-4 cursor-pointer transition select-none ${optClass}`}
+                    className={`flex items-center justify-between rounded-xl border p-4 cursor-pointer transition select-none ${optClass}`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="h-7 px-2 rounded-lg border border-slate-700 bg-slate-900 flex items-center justify-center text-xs font-bold text-slate-300 shrink-0 gap-1 font-mono">
+                      <div className="h-7 px-2 rounded-md border border-white/[0.08] bg-[#222225] flex items-center justify-center text-xs font-semibold text-slate-300 shrink-0 gap-1 font-mono">
                         <span>{letter}</span>
                         <span className="text-[10px] text-slate-500 hidden sm:inline">/{num}</span>
                       </div>
@@ -893,14 +893,14 @@ export const QuizView: React.FC<QuizViewProps> = ({
             </div>
 
             {/* Submission / Navigation Bar */}
-            <div className="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-t border-slate-800 pt-5">
+            <div className="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-t border-white/[0.08] pt-5">
               <div className="flex items-center justify-between sm:justify-start gap-3">
-                <div className="text-xs text-slate-400">
-                  Score: <span className="font-bold text-emerald-400">{userScore} correct</span>
+                <div className="text-xs text-slate-400 font-mono">
+                  Score: <span className="font-semibold text-emerald-400">{userScore} correct</span>
                 </div>
                 <div className="hidden md:flex items-center gap-1.5 text-[11px] text-slate-500">
                   <span>•</span>
-                  <span>Keys: <kbd className="px-1 py-0.5 rounded bg-slate-800 border border-slate-700 font-mono text-[10px] text-slate-300">1-4</kbd> / <kbd className="px-1 py-0.5 rounded bg-slate-800 border border-slate-700 font-mono text-[10px] text-slate-300">A-D</kbd> Select, <kbd className="px-1 py-0.5 rounded bg-slate-800 border border-slate-700 font-mono text-[10px] text-slate-300">Enter</kbd> Next</span>
+                  <span>Keys: <kbd className="px-1 py-0.5 rounded bg-[#222225] border border-white/[0.08] font-mono text-[10px] text-slate-300">1-4</kbd> / <kbd className="px-1 py-0.5 rounded bg-[#222225] border border-white/[0.08] font-mono text-[10px] text-slate-300">A-D</kbd> Select, <kbd className="px-1 py-0.5 rounded bg-[#222225] border border-white/[0.08] font-mono text-[10px] text-slate-300">Enter</kbd> Next</span>
                 </div>
               </div>
 
@@ -909,7 +909,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
                   type="button"
                   onClick={handleSubmitAnswer}
                   disabled={!selectedOptionId}
-                  className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-3 sm:py-2.5 text-xs sm:text-sm font-bold text-white shadow-md hover:from-emerald-400 hover:to-teal-400 transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg bg-[#FF5B37] hover:bg-[#e04f2e] px-6 py-2.5 text-xs sm:text-sm font-semibold text-white transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                 >
                   <Target className="h-4 w-4" />
                   <span>Submit Answer</span>
@@ -918,7 +918,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
                 <button
                   type="button"
                   onClick={handleNextQuestion}
-                  className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-3 sm:py-2.5 text-xs sm:text-sm font-bold text-white shadow-md hover:from-indigo-400 hover:to-purple-500 transition active:scale-95 cursor-pointer"
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg border border-white/[0.08] bg-[#222225] hover:bg-white/[0.08] px-6 py-2.5 text-xs sm:text-sm font-semibold text-white transition active:scale-95 cursor-pointer"
                 >
                   <span>{currentIdx + 1 === activeQuizzes.length ? 'Finish Quiz' : 'Next Question'}</span>
                   <ArrowRight className="h-4 w-4" />
@@ -929,23 +929,23 @@ export const QuizView: React.FC<QuizViewProps> = ({
 
           {/* Mark Scheme Breakdown & Explanation */}
           {isAnswerSubmitted && currentQuestion && (
-            <div className="rounded-3xl border border-slate-800 bg-slate-900/90 p-6 shadow-xl space-y-4 animate-fadeIn">
-              <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
-                <HelpCircle className="h-5 w-5 text-indigo-400" />
-                <h4 className="text-sm font-bold text-white">Official Mark Scheme Criteria & Notes</h4>
+            <div className="rounded-2xl border border-white/[0.08] bg-[#18181b] p-6 shadow-xl space-y-4 animate-fadeIn">
+              <div className="flex items-center gap-2 border-b border-white/[0.08] pb-3">
+                <HelpCircle className="h-5 w-5 text-[#FF5B37]" />
+                <h4 className="text-sm font-semibold text-white">Official Mark Scheme Criteria & Notes</h4>
               </div>
 
               {/* Marking Points Breakdown */}
               {currentQuestion.markingBreakdown && currentQuestion.markingBreakdown.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Mark Allocation:</p>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Mark Allocation:</p>
                   <div className="space-y-1.5">
                     {currentQuestion.markingBreakdown.map((pt: string, pIdx: number) => (
                       <div
                         key={pIdx}
-                        className="flex items-start gap-2.5 rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-slate-300"
+                        className="flex items-start gap-2.5 rounded-lg border border-white/[0.08] bg-[#141416] p-3 text-xs text-slate-300"
                       >
-                        <span className="font-mono font-bold text-emerald-400 shrink-0">
+                        <span className="font-mono font-semibold text-emerald-400 shrink-0">
                           {pt.slice(0, 4)}
                         </span>
                         <MathRenderer content={pt.slice(4)} className="leading-relaxed" />
@@ -956,8 +956,8 @@ export const QuizView: React.FC<QuizViewProps> = ({
               )}
 
               {/* Step by step explanation */}
-              <div className="rounded-2xl border border-slate-800/80 bg-slate-950/70 p-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+              <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-4">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
                   Examiner Explanation:
                 </p>
                 <MathRenderer
@@ -972,16 +972,16 @@ export const QuizView: React.FC<QuizViewProps> = ({
 
       {/* Practice Set Generator Modal */}
       {isAiModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-3xl border border-slate-700 bg-slate-900 p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <div className="flex items-center gap-2 text-white font-bold text-base">
-                <GraduationCap className="h-5 w-5 text-emerald-400" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-fadeIn">
+          <div className="w-full max-w-md rounded-2xl border border-white/[0.08] bg-[#18181b] p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
+              <div className="flex items-center gap-2 text-white font-semibold text-base">
+                <GraduationCap className="h-5 w-5 text-[#FF5B37]" />
                 <span>Classified Practice Set Builder</span>
               </div>
               <button
                 onClick={() => setIsAiModalOpen(false)}
-                className="rounded-lg p-1 text-slate-400 hover:bg-slate-800 hover:text-white"
+                className="rounded-lg p-1 text-slate-400 hover:bg-white/[0.08] hover:text-white transition"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -992,27 +992,27 @@ export const QuizView: React.FC<QuizViewProps> = ({
             </p>
 
             <div>
-              <label className="text-xs font-semibold text-slate-400 mb-1.5 block">Syllabus Topic:</label>
+              <label className="text-xs font-medium text-slate-400 mb-1.5 block">Syllabus Topic:</label>
               <input
                 type="text"
                 value={aiTopic}
                 onChange={(e) => setAiTopic(e.target.value)}
                 placeholder="e.g. Chemical Bonding, Electrolysis, Trigonometry, Summary Writing..."
-                className="w-full rounded-xl border border-slate-700 bg-slate-950 p-3 text-xs text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none"
+                className="w-full rounded-lg border border-white/[0.08] bg-[#141416] p-2.5 text-xs text-white placeholder-slate-500 focus:border-[#FF5B37] focus:outline-none"
               />
             </div>
 
             <div className="flex items-center justify-end gap-2 pt-2">
               <button
                 onClick={() => setIsAiModalOpen(false)}
-                className="rounded-xl border border-slate-800 bg-slate-800 px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-700"
+                className="rounded-lg px-4 py-2 text-xs font-medium text-slate-400 hover:bg-white/[0.08] hover:text-white transition"
               >
                 Cancel
               </button>
               <button
                 onClick={handleGenerateAiQuiz}
                 disabled={isGenerating || !aiTopic.trim()}
-                className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-5 py-2 text-xs font-bold text-white shadow-md disabled:opacity-50"
+                className="flex items-center gap-2 rounded-lg bg-[#FF5B37] hover:bg-[#e04f2e] px-4 py-2 text-xs font-semibold text-white transition disabled:opacity-50"
               >
                 {isGenerating ? (
                   <>
@@ -1033,16 +1033,16 @@ export const QuizView: React.FC<QuizViewProps> = ({
 
       {/* History & Past Attempts Modal */}
       {isHistoryModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-lg rounded-3xl border border-slate-700 bg-slate-900 p-6 shadow-2xl space-y-4 max-h-[85vh] flex flex-col">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <div className="flex items-center gap-2 text-white font-bold text-base">
-                <History className="h-5 w-5 text-cyan-400" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-fadeIn">
+          <div className="w-full max-w-lg rounded-2xl border border-white/[0.08] bg-[#18181b] p-6 shadow-2xl space-y-4 max-h-[85vh] flex flex-col">
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
+              <div className="flex items-center gap-2 text-white font-semibold text-base">
+                <History className="h-5 w-5 text-slate-400" />
                 <span>Mock Quiz Attempts & Performance History</span>
               </div>
               <button
                 onClick={() => setIsHistoryModalOpen(false)}
-                className="rounded-lg p-1 text-slate-400 hover:bg-slate-800 hover:text-white"
+                className="rounded-lg p-1 text-slate-400 hover:bg-white/[0.08] hover:text-white transition"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -1061,22 +1061,22 @@ export const QuizView: React.FC<QuizViewProps> = ({
                 quizHistory.map((item) => (
                   <div
                     key={item.id}
-                    className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950 p-3.5"
+                    className="flex items-center justify-between rounded-lg border border-white/[0.08] bg-[#141416] p-3.5"
                   >
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-white text-xs">{item.subjectName}</span>
-                        <span className="rounded-md bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-400">
+                        <span className="font-semibold text-white text-xs">{item.subjectName}</span>
+                        <span className="rounded-md bg-white/[0.04] px-1.5 py-0.5 text-[10px] text-slate-400 border border-white/[0.06]">
                           {item.topic}
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-500 mt-0.5">
+                      <p className="text-[11px] text-slate-500 mt-0.5 font-mono">
                         {item.date} • {Math.round(item.timeSpentSeconds / 60)}m pacing
                       </p>
                     </div>
 
                     <div className="text-right">
-                      <span className={`text-sm font-extrabold ${item.percentage >= 70 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                      <span className={`text-sm font-semibold font-mono tabular-nums ${item.percentage >= 70 ? 'text-emerald-400' : 'text-amber-400'}`}>
                         {item.marksEarned} / {item.totalMarks} ({item.percentage}%)
                       </span>
                       <p className="text-[10px] text-slate-400 font-medium">
@@ -1088,21 +1088,21 @@ export const QuizView: React.FC<QuizViewProps> = ({
               )}
             </div>
 
-            <div className="border-t border-slate-800 pt-3 flex justify-between items-center">
+            <div className="border-t border-white/[0.08] pt-3 flex justify-between items-center">
               {quizHistory.length > 0 && (
                 <button
                   onClick={() => {
                     localStorage.removeItem('simply_igcse_quiz_history');
                     setQuizHistory([]);
                   }}
-                  className="text-xs text-rose-400 hover:underline"
+                  className="text-xs text-rose-400 hover:underline cursor-pointer"
                 >
                   Clear History
                 </button>
               )}
               <button
                 onClick={() => setIsHistoryModalOpen(false)}
-                className="ml-auto rounded-xl bg-slate-800 px-4 py-1.5 text-xs font-semibold text-white hover:bg-slate-700"
+                className="ml-auto rounded-lg border border-white/[0.08] bg-[#222225] px-4 py-1.5 text-xs font-semibold text-white hover:bg-white/[0.08] transition cursor-pointer"
               >
                 Close
               </button>

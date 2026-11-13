@@ -242,24 +242,24 @@ export const GradeBoundariesCalculator: React.FC<GradeBoundariesCalculatorProps>
   let nextGradeMsg = '';
 
   if (weightedScore >= boundary.grade9) {
-    calculatedGrade = 'Grade 9 (Highest Distinction / A**)';
-    gradeColor = 'text-amber-300 bg-amber-500/15 border-amber-500/30';
-    nextGradeMsg = `🎉 Outstanding! You are ${weightedScore - boundary.grade9} marks above the Grade 9 threshold!`;
+    calculatedGrade = 'Grade 9 (Highest Mark)';
+    gradeColor = 'text-emerald-300 bg-emerald-500/10 border-emerald-500/30';
+    nextGradeMsg = `Outstanding! You are ${weightedScore - boundary.grade9} marks above the Grade 9 threshold!`;
   } else if (weightedScore >= boundary.grade8) {
     calculatedGrade = 'Grade 8 (High A*)';
-    gradeColor = 'text-emerald-300 bg-emerald-500/15 border-emerald-500/30';
+    gradeColor = 'text-emerald-300 bg-emerald-500/10 border-emerald-500/30';
     nextGradeMsg = `Only ${boundary.grade9 - weightedScore} weighted marks needed to reach Grade 9!`;
   } else if (weightedScore >= boundary.grade7) {
     calculatedGrade = 'Grade 7 (Grade A)';
-    gradeColor = 'text-cyan-300 bg-cyan-500/15 border-cyan-500/30';
+    gradeColor = 'text-slate-100 bg-[#FF5B37]/10 border-[#FF5B37]/30';
     nextGradeMsg = `${boundary.grade8 - weightedScore} weighted marks needed to reach Grade 8.`;
   } else if (weightedScore >= boundary.grade6) {
     calculatedGrade = 'Grade 6 (High Grade B)';
-    gradeColor = 'text-blue-300 bg-blue-500/15 border-blue-500/30';
+    gradeColor = 'text-slate-200 bg-white/[0.04] border-white/[0.1]';
     nextGradeMsg = `${boundary.grade7 - weightedScore} weighted marks needed to reach Grade 7 (Grade A).`;
   } else if (weightedScore >= boundary.grade5) {
     calculatedGrade = 'Grade 5 (Strong Pass / Grade C)';
-    gradeColor = 'text-indigo-300 bg-indigo-500/15 border-indigo-500/30';
+    gradeColor = 'text-amber-300 bg-amber-500/10 border-amber-500/20';
     nextGradeMsg = `${boundary.grade6 - weightedScore} weighted marks needed to reach Grade 6.`;
   } else if (weightedScore >= boundary.grade4) {
     calculatedGrade = 'Grade 4 (Standard Pass / Grade D)';
@@ -284,18 +284,18 @@ export const GradeBoundariesCalculator: React.FC<GradeBoundariesCalculatorProps>
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900/90 to-amber-950/30 p-6 md:p-8 shadow-xl">
+      <div className="rounded-2xl border border-white/[0.08] bg-[#18181b] p-6 md:p-8 shadow-xl">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-300 border border-amber-500/20 mb-2">
+            <div className="inline-flex items-center gap-2 rounded-md bg-[#FF5B37]/10 px-3 py-1 text-xs font-semibold text-[#FF5B37] border border-[#FF5B37]/20 mb-2">
               <Calculator className="h-3.5 w-3.5" />
               <span>Official Threshold Modeling • Weighting & Variants</span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
+            <h1 className="text-2xl md:text-3xl font-semibold text-white tracking-tight">
               IGCSE Grade Boundaries Calculator
             </h1>
-            <p className="mt-1 text-xs sm:text-sm text-slate-300">
-              Calculate your estimated overall IGCSE grade for <span className="font-bold text-amber-300">{activeSubject.name} ({activeSubject.code})</span> based on official Cambridge (CIE) & Pearson Edexcel published thresholds with component raw mark weighting.
+            <p className="mt-1 text-xs sm:text-sm text-slate-400">
+              Calculate your estimated overall IGCSE grade for <span className="font-semibold text-slate-200">{activeSubject.name} ({activeSubject.code})</span> based on official Cambridge (CIE) & Pearson Edexcel published thresholds with component raw mark weighting.
             </p>
           </div>
 
@@ -304,7 +304,7 @@ export const GradeBoundariesCalculator: React.FC<GradeBoundariesCalculatorProps>
             <select
               value={selectedSeries}
               onChange={(e) => setSelectedSeries(e.target.value)}
-              className="rounded-xl border border-slate-700 bg-slate-900/90 px-3 py-2 text-xs font-semibold text-slate-200 focus:border-amber-500 focus:outline-none cursor-pointer"
+              className="rounded-lg border border-white/[0.08] bg-[#141416] px-3 py-2 text-xs font-medium text-slate-200 focus:border-[#FF5B37] focus:outline-none cursor-pointer"
             >
               <option value="June 2025 Exam Series (Latest Confirmed)">June 2025 (Latest Confirmed)</option>
               <option value="November 2024 Exam Series">November 2024 Series</option>
@@ -317,7 +317,7 @@ export const GradeBoundariesCalculator: React.FC<GradeBoundariesCalculatorProps>
             <select
               value={selectedVariant}
               onChange={(e) => setSelectedVariant(e.target.value)}
-              className="rounded-xl border border-slate-700 bg-slate-900/90 px-3 py-2 text-xs font-semibold text-slate-200 focus:border-amber-500 focus:outline-none cursor-pointer"
+              className="rounded-lg border border-white/[0.08] bg-[#141416] px-3 py-2 text-xs font-medium text-slate-200 focus:border-[#FF5B37] focus:outline-none cursor-pointer"
             >
               <option value="Variant 1 (11, 21, 41, 61)">Variant 1 (11, 21, 41, 61)</option>
               <option value="Variant 2 (12, 22, 42, 62)">Variant 2 (12, 22, 42, 62 - UK/ME/Asia)</option>
@@ -326,7 +326,7 @@ export const GradeBoundariesCalculator: React.FC<GradeBoundariesCalculatorProps>
 
             <button
               onClick={handleReset}
-              className="rounded-xl border border-slate-700 bg-slate-800 p-2 text-slate-400 hover:text-white transition cursor-pointer"
+              className="rounded-lg border border-white/[0.08] bg-[#222225] p-2 text-slate-400 hover:text-white transition cursor-pointer"
               title="Reset raw marks"
             >
               <RotateCcw className="h-4 w-4" />
@@ -338,19 +338,19 @@ export const GradeBoundariesCalculator: React.FC<GradeBoundariesCalculatorProps>
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Mark Inputs */}
         <div className="lg:col-span-6 space-y-4">
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg backdrop-blur-sm space-y-4">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-300 border-b border-slate-800 pb-2 flex items-center justify-between">
+          <div className="rounded-2xl border border-white/[0.08] bg-[#18181b] p-5 shadow-xl space-y-4">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 border-b border-white/[0.08] pb-2 flex items-center justify-between">
               <span>Input Your Raw Component Marks</span>
-              <span className="text-xs font-normal text-slate-400">Total Scale: {boundary.totalMax} Marks</span>
+              <span className="text-xs font-mono font-normal text-slate-400">Total Scale: {boundary.totalMax} Marks</span>
             </h3>
 
             {/* Paper 2 / Component 1 */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between text-xs">
-                <label className="font-semibold text-slate-200">
+                <label className="font-medium text-slate-200">
                   {isScience ? 'Paper 2 (Multiple Choice Core/Ext)' : isMath ? 'Paper 2 (Short-Answer Structured)' : isEsl ? 'Paper 1 (Reading & Writing)' : 'Paper 1 (Core Component)'}
                 </label>
-                <span className="font-mono font-bold text-indigo-400">
+                <span className="font-mono font-semibold text-[#FF5B37] tabular-nums">
                   {clampedP1} / {p1Max}
                 </span>
               </div>
@@ -360,11 +360,11 @@ export const GradeBoundariesCalculator: React.FC<GradeBoundariesCalculatorProps>
                 max={p1Max}
                 value={clampedP1}
                 onChange={(e) => setPaper2Mark(Number(e.target.value))}
-                className="w-full accent-indigo-500 cursor-pointer"
+                className="w-full accent-[#FF5B37] cursor-pointer"
               />
-              <div className="flex justify-between text-[10px] text-slate-500">
+              <div className="flex justify-between text-[10px] text-slate-500 font-mono">
                 <span>0 marks</span>
-                <span>{isScience ? 'Raw 40 × 1.5 = 60 weighted marks (30%)' : isEsl ? 'Reading & Writing raw score (60% weight)' : 'Raw score entered directly'}</span>
+                <span className="font-sans">{isScience ? 'Raw 40 × 1.5 = 60 weighted marks (30%)' : isEsl ? 'Reading & Writing raw score (60% weight)' : 'Raw score entered directly'}</span>
                 <span>Max {p1Max}</span>
               </div>
             </div>
@@ -372,10 +372,10 @@ export const GradeBoundariesCalculator: React.FC<GradeBoundariesCalculatorProps>
             {/* Paper 4 / Component 2 */}
             <div className="space-y-1.5 pt-2">
               <div className="flex items-center justify-between text-xs">
-                <label className="font-semibold text-slate-200">
+                <label className="font-medium text-slate-200">
                   {isScience ? 'Paper 4 (Extended Theory)' : isMath ? 'Paper 4 (Long-Answer Structured)' : isEsl ? 'Paper 2 (Listening)' : 'Paper 2 (Extended Component)'}
                 </label>
-                <span className="font-mono font-bold text-purple-400">
+                <span className="font-mono font-semibold text-[#FF5B37] tabular-nums">
                   {clampedP2} / {p2Max}
                 </span>
               </div>
@@ -385,22 +385,22 @@ export const GradeBoundariesCalculator: React.FC<GradeBoundariesCalculatorProps>
                 max={p2Max}
                 value={clampedP2}
                 onChange={(e) => setPaper4Mark(Number(e.target.value))}
-                className="w-full accent-purple-500 cursor-pointer"
+                className="w-full accent-[#FF5B37] cursor-pointer"
               />
-              <div className="flex justify-between text-[10px] text-slate-500">
+              <div className="flex justify-between text-[10px] text-slate-500 font-mono">
                 <span>0 marks</span>
-                <span>{isScience ? 'Raw 80 × 1.25 = 100 weighted marks (50%)' : isEsl ? 'Listening comprehension raw score (40% weight)' : 'Structured working marks'}</span>
+                <span className="font-sans">{isScience ? 'Raw 80 × 1.25 = 100 weighted marks (50%)' : isEsl ? 'Listening comprehension raw score (40% weight)' : 'Structured working marks'}</span>
                 <span>Max {p2Max}</span>
               </div>
             </div>
 
             {/* ESL Assessment Structure Notice */}
             {isEsl && (
-              <div className="rounded-xl border border-sky-500/30 bg-sky-500/10 p-3 text-xs text-sky-200 flex items-start gap-2 mt-2">
-                <AlertCircle className="h-4 w-4 text-sky-400 shrink-0 mt-0.5" />
+              <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-3 text-xs text-slate-300 flex items-start gap-2 mt-2">
+                <AlertCircle className="h-4 w-4 text-[#FF5B37] shrink-0 mt-0.5" />
                 <div className="space-y-0.5">
-                  <span className="font-bold">Cambridge IGCSE 0510 Assessment Structure:</span>
-                  <p className="text-[11px] text-sky-300 leading-relaxed">
+                  <span className="font-semibold text-white">Cambridge IGCSE 0510 Assessment Structure:</span>
+                  <p className="text-[11px] text-slate-400 leading-relaxed">
                     Written qualification grade is calculated out of <strong>100 marks</strong>: Paper 1 Reading & Writing (60 marks) + Paper 2 Listening (40 marks). Speaking is separately endorsed (Grades 1 to 5) and does not contribute to the written syllabus mark.
                   </p>
                 </div>
@@ -411,10 +411,10 @@ export const GradeBoundariesCalculator: React.FC<GradeBoundariesCalculatorProps>
             {isScience && (
               <div className="space-y-1.5 pt-2">
                 <div className="flex items-center justify-between text-xs">
-                  <label className="font-semibold text-slate-200">
+                  <label className="font-medium text-slate-200">
                     Paper 6 (Alternative to Practical / Coursework)
                   </label>
-                  <span className="font-mono font-bold text-cyan-400">
+                  <span className="font-mono font-semibold text-[#FF5B37] tabular-nums">
                     {paper6Mark} / 40 (Weights to 40)
                   </span>
                 </div>
@@ -424,24 +424,24 @@ export const GradeBoundariesCalculator: React.FC<GradeBoundariesCalculatorProps>
                   max="40"
                   value={paper6Mark}
                   onChange={(e) => setPaper6Mark(Number(e.target.value))}
-                  className="w-full accent-cyan-500 cursor-pointer"
+                  className="w-full accent-[#FF5B37] cursor-pointer"
                 />
-                <div className="flex justify-between text-[10px] text-slate-500">
+                <div className="flex justify-between text-[10px] text-slate-500 font-mono">
                   <span>0 marks</span>
-                  <span>Raw 40 × 1.0 = 40 weighted marks (20%)</span>
+                  <span className="font-sans">Raw 40 × 1.0 = 40 weighted marks (20%)</span>
                   <span>Max 40</span>
                 </div>
               </div>
             )}
 
-            <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3.5 space-y-2">
-              <div className="flex items-center justify-between text-xs font-semibold text-slate-300">
+            <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-3.5 space-y-2">
+              <div className="flex items-center justify-between text-xs font-medium text-slate-300">
                 <span>Official Cambridge Syllabus Weighted Mark:</span>
-                <span className="text-base font-bold text-amber-300 font-mono">{weightedScore} / {boundary.totalMax} ({percentage}%)</span>
+                <span className="text-base font-semibold text-white font-mono tabular-nums">{weightedScore} / {boundary.totalMax} ({percentage}%)</span>
               </div>
               {isScience && (
                 <p className="text-[11px] text-slate-400 leading-tight">
-                  Formula: <span className="font-mono text-cyan-300">({paper2Mark} × 1.5) + ({paper4Mark} × 1.25) + ({paper6Mark} × 1.0) = {weightedScore}</span>
+                  Formula: <span className="font-mono text-[#FF5B37]">({paper2Mark} × 1.5) + ({paper4Mark} × 1.25) + ({paper6Mark} × 1.0) = {weightedScore}</span>
                 </p>
               )}
             </div>
@@ -450,28 +450,28 @@ export const GradeBoundariesCalculator: React.FC<GradeBoundariesCalculatorProps>
 
         {/* Right Column: Estimated Grade & Threshold Gauge */}
         <div className="lg:col-span-6 space-y-4">
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 sm:p-6 shadow-lg backdrop-blur-sm space-y-4">
+          <div className="rounded-2xl border border-white/[0.08] bg-[#18181b] p-5 sm:p-6 shadow-xl space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                 Calculated Examination Result
               </span>
               <span className="text-xs text-slate-400 font-medium">{selectedSeries} • {selectedVariant}</span>
             </div>
 
             {/* Main Result Card */}
-            <div className={`rounded-2xl border p-5 text-center shadow-lg transition-all ${gradeColor}`}>
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-slate-950/40 px-3 py-1 text-xs font-semibold mb-2">
+            <div className={`rounded-xl border p-5 text-center shadow-lg transition-all ${gradeColor}`}>
+              <div className="inline-flex items-center gap-1.5 rounded-md bg-black/30 px-3 py-1 text-xs font-semibold mb-2">
                 <Award className="h-4 w-4" />
                 <span>Estimated IGCSE Grade</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-black tracking-tight">{calculatedGrade}</h2>
+              <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">{calculatedGrade}</h2>
               <p className="text-xs font-medium mt-2 leading-relaxed opacity-95">{nextGradeMsg}</p>
             </div>
 
             {/* Threshold Cutoff Reference Table */}
-            <div className="border-t border-slate-800/80 pt-4">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5 flex items-center gap-1.5">
-                <TrendingUp className="h-3.5 w-3.5 text-amber-400" />
+            <div className="border-t border-white/[0.08] pt-4">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2.5 flex items-center gap-1.5">
+                <TrendingUp className="h-3.5 w-3.5 text-[#FF5B37]" />
                 Published Threshold Cutoffs ({activeSubject.code} • {selectedVariant}):
               </h4>
 
@@ -489,23 +489,23 @@ export const GradeBoundariesCalculator: React.FC<GradeBoundariesCalculatorProps>
                   return (
                     <div
                       key={item.grade}
-                      className={`rounded-xl p-2 border transition ${
+                      className={`rounded-lg p-2 border transition ${
                         isCurrent
-                          ? 'border-amber-400 bg-amber-500/20 text-white font-bold ring-1 ring-amber-400'
-                          : 'border-slate-800 bg-slate-950/60 text-slate-400'
+                          ? 'border-[#FF5B37] bg-[#FF5B37]/10 text-white font-semibold ring-1 ring-[#FF5B37]'
+                          : 'border-white/[0.08] bg-[#141416] text-slate-400'
                       }`}
                     >
-                      <div className="text-[10px] font-bold">{item.grade}</div>
-                      <div className="text-xs font-mono font-bold text-white mt-0.5">{item.mark}</div>
-                      <div className="text-[9px] text-slate-500">{item.pct}%</div>
+                      <div className="text-[10px] font-semibold">{item.grade}</div>
+                      <div className="text-xs font-mono font-semibold text-white mt-0.5">{item.mark}</div>
+                      <div className="text-[9px] text-slate-500 font-mono">{item.pct}%</div>
                     </div>
                   );
                 })}
               </div>
             </div>
 
-            <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-3 text-[11px] text-slate-400 leading-relaxed">
-              <span className="font-bold text-slate-300">Examiner Note:</span> Official Cambridge and Edexcel grade thresholds vary slightly between exam variants (e.g. Variant 1, 2, or 3) depending on national cohort difficulty. Always aim 5 to 8 marks above the boundary to guarantee your target grade.
+            <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-3 text-[11px] text-slate-400 leading-relaxed">
+              <span className="font-semibold text-slate-300">Examiner Note:</span> Official Cambridge and Edexcel grade thresholds vary slightly between exam variants (e.g. Variant 1, 2, or 3) depending on national cohort difficulty. Always aim 5 to 8 marks above the boundary to guarantee your target grade.
             </div>
           </div>
         </div>
