@@ -228,46 +228,44 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
     subject.code.includes('9270');
 
   return (
-    <div className={`mx-auto max-w-5xl space-y-6 animate-fadeIn pb-12 ${isFullscreen ? 'p-4 bg-slate-950 min-h-screen' : ''}`}>
+    <div className={`mx-auto max-w-5xl space-y-6 pb-12 ${isFullscreen ? 'p-4 bg-[#111113] min-h-screen' : ''}`}>
       {/* ───────────────────────────────────────────────────────────── */}
       {/* 1. SETUP / COVER PAGE                                         */}
       {/* ───────────────────────────────────────────────────────────── */}
       {examStatus === 'setup' && (
-        <div className="rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 p-6 sm:p-10 shadow-2xl space-y-8 relative overflow-hidden">
-          <div className="absolute -top-16 -right-16 h-56 w-56 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
-
+        <div className="rounded-2xl border border-white/[0.08] bg-[#18181b] p-6 sm:p-10 shadow-sm space-y-8">
           {/* Official Cambridge Style Exam Cover Header */}
-          <div className="border-b-2 border-slate-700/80 pb-6 space-y-4">
+          <div className="border-b border-white/[0.08] pb-6 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 px-3 py-1 text-xs font-black text-amber-300 border border-amber-500/30 uppercase tracking-widest">
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-[#FF5B37]/15 px-3 py-1 text-xs font-mono font-semibold text-[#FF5B37] border border-[#FF5B37]/30 uppercase tracking-wider">
                   <Award className="h-3.5 w-3.5" />
-                  <span>Cambridge Assessment International Education Simulator</span>
+                  <span>Cambridge Assessment Simulator</span>
                 </div>
-                <h1 className="text-2xl sm:text-3xl font-black text-white mt-2">
+                <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mt-2">
                   Cambridge IGCSE™ Mock Examination
                 </h1>
-                <p className="text-sm font-semibold text-slate-300">
+                <p className="text-sm font-medium text-slate-300">
                   {subject.name} ({subject.code}) • {isLanguageSubject ? 'Reading & Writing Mock Paper' : 'Extended Theory Paper'}
                 </p>
               </div>
 
-              <div className="text-left sm:text-right font-mono text-xs text-slate-400 space-y-1 bg-slate-950/80 p-3 rounded-2xl border border-slate-800">
-                <div>CENTER: <span className="text-white font-bold">EG998 / FAHEMNY</span></div>
-                <div>CANDIDATE: <span className="text-amber-300 font-bold">{profile.name}</span></div>
-                <div>TARGET: <span className="text-emerald-400 font-bold">{profile.targetGrade}</span></div>
+              <div className="text-left sm:text-right font-mono text-xs text-slate-400 space-y-1 bg-[#141416] p-3 rounded-xl border border-white/[0.08]">
+                <div>CENTRE: <span className="text-white font-semibold">EG998 / FAHEMNY</span></div>
+                <div>CANDIDATE: <span className="text-amber-400 font-semibold">{profile.name}</span></div>
+                <div>TARGET: <span className="text-emerald-400 font-semibold">{profile.targetGrade}</span></div>
               </div>
             </div>
           </div>
 
           {/* Exam Rules & Instructions Box */}
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 space-y-3 text-xs sm:text-sm text-slate-300 leading-relaxed">
-            <h3 className="font-bold text-white uppercase tracking-wider text-xs flex items-center gap-2">
-              <ShieldCheck className="h-4 w-4 text-amber-400" />
+          <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-5 space-y-3 text-xs sm:text-sm text-slate-300 leading-relaxed font-sans">
+            <h3 className="font-semibold text-white uppercase tracking-wider text-xs flex items-center gap-2">
+              <ShieldCheck className="h-4 w-4 text-[#FF5B37]" />
               <span>Official Examination Instructions</span>
             </h3>
             {isLanguageSubject ? (
-              <ul className="list-disc list-inside space-y-1.5 text-slate-400">
+              <ul className="list-disc list-inside space-y-1.5 text-slate-300">
                 <li>Read each text carefully and answer all questions in the spaces provided.</li>
                 <li>For reading comprehension, write concisely and adhere to line limits; avoid lifting whole sentences where your own words are required.</li>
                 <li>For summary writing, observe the strict <strong className="text-white">100–120 word count limit</strong>. Points beyond 120 words are not credited.</li>
@@ -275,7 +273,7 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
                 <li>Dictionaries and electronic translation aids are <strong className="text-white">not permitted</strong>.</li>
               </ul>
             ) : (
-              <ul className="list-disc list-inside space-y-1.5 text-slate-400">
+              <ul className="list-disc list-inside space-y-1.5 text-slate-300">
                 <li>Answer all questions in the spaces provided. Working must be shown for all calculation steps.</li>
                 <li>Omission of essential working will result in loss of <strong className="text-white">Method Marks [M1]</strong>.</li>
                 <li>Electronic non-programmable calculators may be used where appropriate.</li>
@@ -287,18 +285,18 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
 
           {/* Exam Configuration Selection */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-4 space-y-2">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Exam Duration</span>
+            <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-4 space-y-2">
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Exam Duration</span>
               <div className="flex gap-2">
                 {[45, 60, 90].map(mins => (
                   <button
                     key={mins}
                     type="button"
                     onClick={() => setSelectedDurationMins(mins)}
-                    className={`flex-1 rounded-xl py-2 text-xs font-bold transition cursor-pointer ${
+                    className={`flex-1 rounded-xl py-2 text-xs font-semibold transition cursor-pointer ${
                       selectedDurationMins === mins
-                        ? 'bg-amber-500 text-slate-950 font-black shadow-md'
-                        : 'border border-slate-700 bg-slate-800/80 text-slate-300 hover:text-white'
+                        ? 'bg-[#FF5B37] text-white shadow-sm'
+                        : 'border border-white/[0.08] bg-[#18181b] text-slate-300 hover:text-white'
                     }`}
                   >
                     {mins}m
@@ -307,32 +305,32 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
               </div>
             </div>
 
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-4 space-y-1">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Questions</span>
-              <div className="text-xl font-black text-white font-mono">{examQuestions.length} Questions</div>
+            <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-4 space-y-1">
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Questions</span>
+              <div className="text-xl font-bold text-white font-mono tabular-nums">{examQuestions.length} Questions</div>
               <span className="text-[11px] text-slate-500">Selected across 2021-2024 series</span>
             </div>
 
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-4 space-y-1">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Marks</span>
-              <div className="text-xl font-black text-white font-mono">{totalMaxMarks} Marks</div>
+            <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-4 space-y-1">
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Marks</span>
+              <div className="text-xl font-bold text-white font-mono tabular-nums">{totalMaxMarks} Marks</div>
               <span className="text-[11px] text-slate-500">Method & Accuracy allocations</span>
             </div>
           </div>
 
           {/* Action Button */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-800">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-white/[0.08]">
             <div className="flex items-center gap-2 text-xs text-slate-400">
-              <Clock className="h-4 w-4 text-amber-400" />
+              <Clock className="h-4 w-4 text-[#FF5B37]" />
               <span>Timer starts immediately upon clicking Start.</span>
             </div>
 
             <button
               type="button"
               onClick={handleStartExam}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 px-8 py-3.5 text-sm font-black text-slate-950 shadow-xl shadow-amber-500/25 hover:brightness-110 active:scale-95 transition cursor-pointer"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-[#FF5B37] hover:bg-[#e04f2e] px-8 py-3.5 text-sm font-semibold text-white transition cursor-pointer shadow-none"
             >
-              <Play className="h-4 w-4 fill-slate-950" />
+              <Play className="h-4 w-4 fill-white" />
               <span>Start Timed Examination</span>
             </button>
           </div>
@@ -345,18 +343,18 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
       {examStatus === 'active' && currentQ && (
         <div className="space-y-4">
           {/* Top Live Status Bar */}
-          <div className="sticky top-16 z-30 flex items-center justify-between gap-3 rounded-2xl border border-slate-800 bg-slate-900/95 p-3.5 shadow-xl backdrop-blur-md">
+          <div className="sticky top-16 z-30 flex items-center justify-between gap-3 rounded-2xl border border-white/[0.08] bg-[#141416]/95 p-3.5 shadow-md backdrop-blur-md">
             <div className="flex items-center gap-2 sm:gap-4">
               <div className="flex items-center gap-1.5">
                 <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-xs font-bold text-white hidden sm:inline">{subject.code}</span>
+                <span className="text-xs font-semibold text-white hidden sm:inline">{subject.code}</span>
               </div>
 
               {/* Live Timer */}
-              <div className={`flex items-center gap-1.5 rounded-xl px-3 py-1 font-mono text-sm font-black border ${
+              <div className={`flex items-center gap-1.5 rounded-xl px-3 py-1 font-mono text-sm font-bold tabular-nums border ${
                 isLowTime
                   ? 'border-rose-500/50 bg-rose-950/60 text-rose-300 animate-pulse'
-                  : 'border-slate-700 bg-slate-950 text-amber-300'
+                  : 'border-white/[0.08] bg-[#18181b] text-white'
               }`}>
                 <Clock className="h-4 w-4" />
                 <span>{formatTime(secondsRemaining)}</span>
@@ -365,7 +363,7 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
               <button
                 type="button"
                 onClick={() => setIsTimerPaused(!isTimerPaused)}
-                className="rounded-lg border border-slate-700 bg-slate-800 p-1.5 text-slate-300 hover:text-white transition cursor-pointer"
+                className="rounded-lg border border-white/[0.08] bg-[#18181b] p-1.5 text-slate-300 hover:text-white transition cursor-pointer"
                 title={isTimerPaused ? "Resume Exam" : "Pause Timer"}
               >
                 {isTimerPaused ? <Play className="h-3.5 w-3.5 text-emerald-400" /> : <Pause className="h-3.5 w-3.5" />}
@@ -378,7 +376,7 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
                 <button
                   type="button"
                   onClick={onOpenCalculator}
-                  className="hidden sm:flex items-center gap-1 rounded-xl border border-slate-700 bg-slate-800/80 px-2.5 py-1 text-xs font-semibold text-slate-300 hover:text-white"
+                  className="hidden sm:flex items-center gap-1 rounded-xl border border-white/[0.08] bg-[#18181b] px-2.5 py-1 text-xs font-medium text-slate-300 hover:text-white cursor-pointer"
                   title="Open Scientific Calculator"
                 >
                   <Calculator className="h-3.5 w-3.5" />
@@ -389,10 +387,10 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
               <button
                 type="button"
                 onClick={() => handleToggleFlag(currentQ.id)}
-                className={`flex items-center gap-1 rounded-xl px-2.5 py-1 text-xs font-semibold border transition cursor-pointer ${
+                className={`flex items-center gap-1 rounded-xl px-2.5 py-1 text-xs font-medium border transition cursor-pointer ${
                   currentAns?.isFlagged
                     ? 'border-amber-500/50 bg-amber-500/20 text-amber-300'
-                    : 'border-slate-700 bg-slate-800/60 text-slate-400 hover:text-white'
+                    : 'border-white/[0.08] bg-[#18181b] text-slate-400 hover:text-white'
                 }`}
               >
                 <Flag className="h-3.5 w-3.5" />
@@ -406,7 +404,7 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
                     handleSubmitExam();
                   }
                 }}
-                className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-3.5 py-1 text-xs font-extrabold text-slate-950 shadow-md shadow-emerald-500/20 hover:brightness-110 transition cursor-pointer"
+                className="flex items-center gap-1.5 rounded-xl bg-[#FF5B37] hover:bg-[#e04f2e] px-3.5 py-1 text-xs font-semibold text-white transition cursor-pointer shadow-none"
               >
                 <Check className="h-3.5 w-3.5" />
                 <span>Submit Exam</span>
@@ -427,14 +425,14 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
                   key={q.id}
                   type="button"
                   onClick={() => setCurrentQuestionIndex(idx)}
-                  className={`flex items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-bold transition shrink-0 cursor-pointer ${
+                  className={`flex items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-mono font-semibold transition shrink-0 cursor-pointer ${
                     isCurrent
-                      ? 'bg-amber-500 text-slate-950 font-black shadow-md'
+                      ? 'bg-[#FF5B37] text-white shadow-sm'
                       : isFlagged
-                      ? 'border border-amber-500/50 bg-amber-950/40 text-amber-300'
+                      ? 'border border-amber-500/50 bg-amber-500/10 text-amber-300'
                       : isAnswered
-                      ? 'border border-emerald-500/40 bg-emerald-950/30 text-emerald-300'
-                      : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
+                      ? 'border border-white/[0.15] bg-[#222225] text-slate-200'
+                      : 'border border-white/[0.08] bg-[#18181b] text-slate-400 hover:text-white'
                   }`}
                 >
                   <span>Q{idx + 1}</span>
@@ -445,17 +443,17 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
           </div>
 
           {/* Question Work Area Card */}
-          <div className="rounded-3xl border border-slate-800 bg-slate-900/90 p-6 sm:p-8 shadow-xl space-y-6">
-            <div className="flex items-start justify-between gap-4 border-b border-slate-800 pb-4">
+          <div className="rounded-2xl border border-white/[0.08] bg-[#18181b] p-6 sm:p-8 shadow-sm space-y-6">
+            <div className="flex items-start justify-between gap-4 border-b border-white/[0.08] pb-4">
               <div>
-                <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">
+                <span className="text-xs font-semibold text-[#FF5B37] uppercase tracking-wider">
                   Question {currentQuestionIndex + 1} of {examQuestions.length} • {currentQ.topic}
                 </span>
-                <div className="text-xs text-slate-400 mt-0.5">
+                <div className="text-xs text-slate-400 mt-0.5 font-mono">
                   Reference: {currentQ.paperCode} ({currentQ.session}) • {currentQ.questionNumber}
                 </div>
               </div>
-              <div className="rounded-xl bg-slate-950 px-3 py-1 text-xs font-black text-amber-300 border border-slate-800">
+              <div className="rounded-lg bg-[#222225] px-3 py-1 text-xs font-mono font-semibold text-slate-200 border border-white/[0.08]">
                 [{currentQ.marks || 4} Marks]
               </div>
             </div>
@@ -466,7 +464,7 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
             </div>
 
             {currentQ.diagramOrMath && (
-              <div className="rounded-2xl border border-slate-800 bg-slate-950/80 p-4 text-center">
+              <div className="rounded-xl border border-white/[0.08] bg-[#111113] p-4 text-center">
                 <MathRenderer content={currentQ.diagramOrMath} />
               </div>
             )}
@@ -474,14 +472,14 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
             {/* Student Working Pad */}
             <div className="space-y-4 pt-2">
               <div>
-                <label className="text-xs font-bold text-slate-300 block mb-1 flex items-center justify-between">
+                <label className="text-xs font-semibold text-slate-300 block mb-1 flex items-center justify-between">
                   <span>
                     {isLanguageOrHumanities
                       ? 'Student Response & Summary Points [Content & Language Marks]:'
                       : 'Show Step-by-Step Working [Method Marks M1/M2]:'}
                   </span>
                   {!isLanguageOrHumanities && (
-                    <span className="text-[10px] text-slate-500">LaTeX math supported (e.g. \frac, \sqrt)</span>
+                    <span className="text-[10px] text-slate-500 font-mono">LaTeX math supported (\frac, \sqrt)</span>
                   )}
                 </label>
                 <textarea
@@ -493,12 +491,12 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
                       ? 'Write your summary points or essay response here (e.g., The advantages of renewable energy include...)'
                       : 'Enter your working steps or final answer (e.g., x = 4.5 or 125 cm³)...'
                   }
-                  className="w-full rounded-2xl border border-slate-700 bg-slate-950 p-3.5 font-mono text-xs sm:text-sm text-slate-100 placeholder-slate-600 focus:border-amber-500 focus:outline-none"
+                  className="w-full rounded-xl border border-white/[0.1] bg-[#111113] p-3.5 font-mono text-xs sm:text-sm text-slate-100 placeholder-slate-600 focus:border-[#FF5B37] focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-300 block mb-1">
+                <label className="text-xs font-semibold text-slate-300 block mb-1">
                   {isLanguageOrHumanities
                     ? 'Final Conclusion or Word Count Statement:'
                     : 'Final Numerical or Stated Answer [Accuracy Mark A1]:'}
@@ -512,18 +510,18 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
                       ? 'Write your summary points or essay response here (e.g., The advantages of renewable energy include...)'
                       : 'Enter your working steps or final answer (e.g., x = 4.5 or 125 cm³)...'
                   }
-                  className="w-full rounded-2xl border border-slate-700 bg-slate-950 p-3 text-sm font-mono text-amber-300 font-bold placeholder-slate-600 focus:border-amber-500 focus:outline-none"
+                  className="w-full rounded-xl border border-white/[0.1] bg-[#111113] p-3 text-sm font-mono text-white font-semibold placeholder-slate-600 focus:border-[#FF5B37] focus:outline-none"
                 />
               </div>
             </div>
 
             {/* Navigation Controls */}
-            <div className="flex items-center justify-between pt-4 border-t border-slate-800">
+            <div className="flex items-center justify-between pt-4 border-t border-white/[0.08]">
               <button
                 type="button"
                 disabled={currentQuestionIndex === 0}
                 onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
-                className="flex items-center gap-1 rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 text-xs font-semibold text-slate-300 disabled:opacity-40 cursor-pointer"
+                className="flex items-center gap-1 rounded-xl border border-white/[0.08] bg-[#18181b] px-4 py-2 text-xs font-medium text-slate-300 disabled:opacity-40 cursor-pointer hover:text-white"
               >
                 <ChevronLeft className="h-4 w-4" />
                 <span>Previous</span>
@@ -533,7 +531,7 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
                 type="button"
                 disabled={currentQuestionIndex === examQuestions.length - 1}
                 onClick={() => setCurrentQuestionIndex(prev => Math.min(examQuestions.length - 1, prev + 1))}
-                className="flex items-center gap-1 rounded-xl bg-slate-800 border border-slate-700 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-700 disabled:opacity-40 cursor-pointer"
+                className="flex items-center gap-1 rounded-xl bg-[#222225] border border-white/[0.08] px-4 py-2 text-xs font-medium text-white hover:bg-[#2a2a2e] disabled:opacity-40 cursor-pointer"
               >
                 <span>Next</span>
                 <ChevronRight className="h-4 w-4" />
@@ -547,38 +545,38 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
       {/* 3. SUBMITTED / OFFICIAL GRADE BOUNDARY REPORT                 */}
       {/* ───────────────────────────────────────────────────────────── */}
       {examStatus === 'submitted' && (
-        <div className="space-y-6 animate-fadeIn">
+        <div className="space-y-6">
           {/* Performance Hero Card */}
-          <div className="rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+          <div className="rounded-2xl border border-white/[0.08] bg-[#18181b] p-6 sm:p-10 shadow-sm">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="space-y-2">
-                <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-black text-emerald-300 border border-emerald-500/30">
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-400 border border-emerald-500/30">
                   <CheckCircle className="h-3.5 w-3.5" />
                   <span>Exam Completed & Evaluated Against Cambridge Mark Scheme</span>
                 </div>
-                <h2 className="text-2xl sm:text-3xl font-black text-white">
+                <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
                   Official Grade Boundary Result
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-300">
+                <p className="text-xs sm:text-sm text-slate-300 font-sans">
                   {subject.name} ({subject.code}) • Simulated Cambridge Extended Benchmark
                 </p>
               </div>
 
               {/* Awarded Grade Badge */}
-              <div className={`rounded-3xl border-2 ${awardedGrade.border} ${awardedGrade.badge} p-5 text-center min-w-[140px] shadow-2xl`}>
-                <div className="text-[10px] font-black uppercase tracking-widest text-slate-300">Awarded Grade</div>
-                <div className={`text-4xl sm:text-5xl font-black font-mono ${awardedGrade.color} my-1`}>
+              <div className="rounded-2xl border border-white/[0.08] bg-[#141416] p-5 text-center min-w-[140px] shadow-sm">
+                <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Awarded Grade</div>
+                <div className={`text-4xl sm:text-5xl font-bold font-mono ${awardedGrade.color} my-1 tabular-nums`}>
                   {awardedGrade.grade}
                 </div>
-                <div className="text-xs font-bold text-slate-200">{scorePercentage}% ({totalEarnedMarks}/{totalMaxMarks} Marks)</div>
+                <div className="text-xs font-mono font-semibold text-slate-200 tabular-nums">{scorePercentage}% ({totalEarnedMarks}/{totalMaxMarks} Marks)</div>
               </div>
             </div>
           </div>
 
           {/* Action Row */}
           <div className="flex items-center justify-between gap-3 flex-wrap">
-            <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
-              <BookOpen className="h-4 w-4 text-amber-400" />
+            <h3 className="text-sm font-semibold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+              <BookOpen className="h-4 w-4 text-[#FF5B37]" />
               <span>Question-by-Question Cambridge Mark Scheme Breakdown</span>
             </h3>
 
@@ -588,7 +586,7 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
                 setExamStatus('setup');
                 setCurrentQuestionIndex(0);
               }}
-              className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 text-xs font-bold text-white hover:bg-slate-700 transition cursor-pointer"
+              className="flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-[#18181b] px-4 py-2 text-xs font-medium text-slate-200 hover:text-white transition cursor-pointer hover:bg-[#222225]"
             >
               <RotateCcw className="h-3.5 w-3.5" />
               <span>Sit Another Mock Exam</span>
@@ -604,23 +602,23 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
               return (
                 <div
                   key={q.id}
-                  className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6 space-y-4"
+                  className="rounded-2xl border border-white/[0.08] bg-[#18181b] p-5 sm:p-6 space-y-4"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-sm font-bold text-white">Q{idx + 1}. {q.topic}</span>
+                        <span className="text-sm font-semibold text-white">Q{idx + 1}. {q.topic}</span>
                         <span className="text-xs text-slate-400 font-mono">({q.paperCode} • {q.questionNumber})</span>
                       </div>
-                      <div className="text-xs text-slate-300 font-sans">
+                      <div className="text-xs text-slate-300 font-sans leading-relaxed">
                         <MathRenderer content={q.questionPrompt} />
                       </div>
                     </div>
 
-                    <div className={`rounded-xl px-3 py-1 text-xs font-black shrink-0 ${
+                    <div className={`rounded-lg px-3 py-1 text-xs font-mono font-semibold shrink-0 border ${
                       isFullMarks
-                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                        : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                        ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                        : 'bg-amber-500/15 text-amber-300 border-amber-500/30'
                     }`}>
                       {res?.marksEarned || 0} / {q.marks || 4} Marks
                     </div>
@@ -628,20 +626,20 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
 
                   {/* Student Submission vs Mark Scheme */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 text-xs">
-                    <div className="rounded-xl border border-slate-800 bg-slate-950 p-3 space-y-1">
-                      <div className="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Your Answer & Working</div>
+                    <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-3 space-y-1">
+                      <div className="font-semibold text-slate-400 uppercase tracking-wider text-[10px]">Your Answer & Working</div>
                       <div className="font-mono text-white text-xs whitespace-pre-wrap">
-                        {answers[q.id]?.studentAnswer || answers[q.id]?.studentWorking || <span className="text-slate-600">No answer provided</span>}
+                        {answers[q.id]?.studentAnswer || answers[q.id]?.studentWorking || <span className="text-slate-500">No answer provided</span>}
                       </div>
                     </div>
 
-                    <div className="rounded-xl border border-slate-800 bg-slate-950 p-3 space-y-1">
-                      <div className="font-bold text-amber-400 uppercase tracking-wider text-[10px]">Official Cambridge Mark Scheme</div>
-                      <div className="font-mono text-emerald-300 text-xs font-bold">
+                    <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-3 space-y-1">
+                      <div className="font-semibold text-amber-400 uppercase tracking-wider text-[10px]">Official Cambridge Mark Scheme</div>
+                      <div className="font-mono text-emerald-400 text-xs font-semibold">
                         {q.finalAnswer}
                       </div>
                       {q.markScheme?.[0] && (
-                        <div className="text-slate-400 text-[11px] mt-1">
+                        <div className="text-slate-400 text-[11px] mt-1 font-sans">
                           {q.markScheme[0].markType}: {q.markScheme[0].requirement}
                         </div>
                       )}
@@ -650,8 +648,8 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
 
                   {/* Examiner Commentary */}
                   {res?.examinerTips && (
-                    <div className="rounded-xl border border-indigo-500/30 bg-indigo-950/20 p-3 text-xs text-indigo-200">
-                      <strong>Examiner Remark:</strong> {res.examinerTips}
+                    <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-3 text-xs text-slate-300 font-sans">
+                      <strong className="text-amber-400">Examiner Remark:</strong> {res.examinerTips}
                     </div>
                   )}
                 </div>

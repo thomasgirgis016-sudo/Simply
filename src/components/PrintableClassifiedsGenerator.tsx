@@ -556,26 +556,23 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-[#111113] text-slate-100 flex flex-col">
       {/* ─────────────────────────────────────────────────────────────
           1. WEB ACTION BAR & TOOLBAR (Hidden in Print)
       ───────────────────────────────────────────────────────────── */}
-      {/* ─────────────────────────────────────────────────────────────
-          1. WEB ACTION BAR & TOOLBAR (Hidden in Print)
-      ───────────────────────────────────────────────────────────── */}
-      <div className="relative sm:sticky sm:top-14 z-30 bg-slate-900/95 backdrop-blur border-b border-slate-800 px-3 py-2 sm:px-4 sm:py-3 shadow-md no-print">
+      <div className="relative sm:sticky sm:top-14 z-30 bg-[#141416]/95 backdrop-blur border-b border-white/[0.08] px-3 py-2 sm:px-4 sm:py-3 shadow-md no-print">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
           {/* Left: Title & Chapter badge */}
           <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-            <div className="p-2 sm:p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 shrink-0">
+            <div className="p-2 sm:p-2.5 rounded-xl bg-[#FF5B37]/10 border border-[#FF5B37]/25 text-[#FF5B37] shrink-0">
               <BookOpen className="h-4 w-4 sm:h-5 sm:w-5" />
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="font-bold text-white text-xs sm:text-base truncate">
+                <span className="font-semibold text-white text-xs sm:text-base truncate">
                   {config.subject.code} • {activeChapter.title}
                 </span>
-                <span className="text-[9px] sm:text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 shrink-0">
+                <span className="text-[9px] sm:text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md bg-[#FF5B37]/15 text-[#FF5B37] border border-[#FF5B37]/30 shrink-0">
                   {activeChapter.id}
                 </span>
               </div>
@@ -587,18 +584,18 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
 
           {/* Center: Live Metrics (Desktop only to prevent mobile crowding) */}
           <div className="hidden sm:flex items-center gap-2 text-xs">
-            <div className="px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 flex items-center gap-1.5">
+            <div className="px-2.5 py-1 rounded-lg bg-[#18181b] border border-white/[0.08] flex items-center gap-1.5">
               <span className="text-slate-400">Questions:</span>
-              <span className="font-bold text-white">{finalQuestions.length}</span>
+              <span className="font-mono font-semibold text-white tabular-nums">{finalQuestions.length}</span>
             </div>
-            <div className="px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 flex items-center gap-1.5">
+            <div className="px-2.5 py-1 rounded-lg bg-[#18181b] border border-white/[0.08] flex items-center gap-1.5">
               <span className="text-slate-400">Total Marks:</span>
-              <span className="font-bold text-amber-400">{totalMarks}</span>
+              <span className="font-mono font-semibold text-amber-400 tabular-nums">{totalMarks}</span>
             </div>
-            <div className="px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 hidden md:flex items-center gap-1.5">
+            <div className="px-2.5 py-1 rounded-lg bg-[#18181b] border border-white/[0.08] hidden md:flex items-center gap-1.5">
               <Clock className="h-3.5 w-3.5 text-slate-400" />
               <span className="text-slate-400">Time:</span>
-              <span className="font-bold text-emerald-400">{durationFormatted}</span>
+              <span className="font-mono font-semibold text-emerald-400 tabular-nums">{durationFormatted}</span>
             </div>
           </div>
 
@@ -606,15 +603,15 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
           <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             <button
               onClick={() => setIsConfigDrawerOpen(true)}
-              className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white flex items-center gap-1.5 transition cursor-pointer"
+              className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl border border-white/[0.08] bg-[#18181b] hover:bg-[#222225] text-xs font-medium text-slate-200 flex items-center gap-1.5 transition cursor-pointer"
             >
-              <Sliders className="h-3.5 w-3.5 text-indigo-400" />
+              <Sliders className="h-3.5 w-3.5 text-[#FF5B37]" />
               <span className="hidden sm:inline">Configure</span>
             </button>
 
             <button
               onClick={handlePrint}
-              className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white flex items-center gap-1.5 shadow-md shadow-indigo-600/30 transition cursor-pointer"
+              className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-[#FF5B37] hover:bg-[#e04f2e] text-xs font-semibold text-white flex items-center gap-1.5 transition cursor-pointer shadow-none"
             >
               <Printer className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">Print Booklet (PDF)</span>
@@ -624,14 +621,14 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
         </div>
 
         {/* Sub-bar: 3 View Modes (Worksheet / Solve Online / Mark Scheme) */}
-        <div className="max-w-6xl mx-auto mt-2 pt-2 border-t border-slate-800/80 flex items-center justify-between gap-2 text-xs">
+        <div className="max-w-6xl mx-auto mt-2 pt-2 border-t border-white/[0.08] flex items-center justify-between gap-2 text-xs">
           {/* Main Primary View Switcher */}
-          <div className="inline-flex rounded-xl bg-slate-950 p-1 border border-slate-800 shadow-inner w-full sm:w-auto justify-between sm:justify-start">
+          <div className="inline-flex rounded-xl bg-[#111113] p-1 border border-white/[0.08] w-full sm:w-auto justify-between sm:justify-start">
             <button
               onClick={() => setViewTab('worksheet')}
-              className={`flex-1 sm:flex-initial px-2.5 sm:px-3.5 py-1.5 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer ${
+              className={`flex-1 sm:flex-initial px-2.5 sm:px-3.5 py-1.5 rounded-lg font-medium text-xs flex items-center justify-center gap-1.5 transition cursor-pointer ${
                 viewTab === 'worksheet'
-                  ? 'bg-indigo-600 text-white shadow-md'
+                  ? 'bg-[#222225] text-white border border-white/[0.08] shadow-sm'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -642,16 +639,16 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
 
             <button
               onClick={() => setViewTab('online-solver')}
-              className={`flex-1 sm:flex-initial px-2.5 sm:px-3.5 py-1.5 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer ${
+              className={`flex-1 sm:flex-initial px-2.5 sm:px-3.5 py-1.5 rounded-lg font-medium text-xs flex items-center justify-center gap-1.5 transition cursor-pointer ${
                 viewTab === 'online-solver'
-                  ? 'bg-emerald-600 text-white shadow-md'
+                  ? 'bg-[#FF5B37] text-white shadow-sm'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              <Sparkles className="h-3.5 w-3.5 text-amber-300" />
+              <Sparkles className="h-3.5 w-3.5" />
               <span>Solve Online</span>
               {attemptedSubpartsCount > 0 && (
-                <span className="ml-1 px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-200 text-[10px]">
+                <span className="ml-1 px-1.5 py-0.2 rounded-full bg-black/30 text-white text-[10px] font-mono">
                   {attemptedSubpartsCount}/{totalSubpartsCount}
                 </span>
               )}
@@ -659,9 +656,9 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
 
             <button
               onClick={() => setViewTab('mark-scheme')}
-              className={`flex-1 sm:flex-initial px-2.5 sm:px-3.5 py-1.5 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer ${
+              className={`flex-1 sm:flex-initial px-2.5 sm:px-3.5 py-1.5 rounded-lg font-medium text-xs flex items-center justify-center gap-1.5 transition cursor-pointer ${
                 viewTab === 'mark-scheme'
-                  ? 'bg-amber-600 text-white shadow-md'
+                  ? 'bg-[#222225] text-white border border-white/[0.08] shadow-sm'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -679,7 +676,7 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                   <select
                     value={config.workingSpaceStyle}
                     onChange={(e) => setConfig(prev => ({ ...prev, workingSpaceStyle: e.target.value as any }))}
-                    className="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-slate-200"
+                    className="bg-[#18181b] border border-white/[0.08] rounded px-2 py-1 text-xs text-slate-200"
                   >
                     <option value="dotted">Dotted (Cambridge)</option>
                     <option value="solid">Solid Lines</option>
@@ -690,9 +687,9 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
 
                 <button
                   onClick={() => setShowCoverPageOnScreen(prev => !prev)}
-                  className="px-2.5 py-1 rounded-lg border border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-[11px] font-semibold text-slate-200 flex items-center gap-1.5 transition"
+                  className="px-2.5 py-1 rounded-lg border border-white/[0.08] bg-[#18181b] hover:bg-[#222225] text-[11px] font-medium text-slate-200 flex items-center gap-1.5 transition cursor-pointer"
                 >
-                  <Eye className="h-3 w-3 text-indigo-400" />
+                  <Eye className="h-3 w-3 text-[#FF5B37]" />
                   <span>{showCoverPageOnScreen ? 'Hide Cover Preview' : 'Show Cover Preview'}</span>
                 </button>
               </>
@@ -702,14 +699,14 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleRevealAllAnswers}
-                  className="px-2.5 py-1 rounded-lg border border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-[11px] font-semibold text-slate-300 flex items-center gap-1.5 transition"
+                  className="px-2.5 py-1 rounded-lg border border-white/[0.08] bg-[#18181b] hover:bg-[#222225] text-[11px] font-medium text-slate-300 flex items-center gap-1.5 transition cursor-pointer"
                 >
                   <Eye className="h-3 w-3 text-amber-400" />
                   <span>Reveal All Schemes</span>
                 </button>
                 <button
                   onClick={handleResetAllSolutions}
-                  className="px-2.5 py-1 rounded-lg border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-[11px] font-semibold text-rose-300 flex items-center gap-1.5 transition"
+                  className="px-2.5 py-1 rounded-lg border border-white/[0.08] bg-[#18181b] hover:bg-[#222225] text-[11px] font-medium text-slate-400 hover:text-white flex items-center gap-1.5 transition cursor-pointer"
                 >
                   <RotateCcw className="h-3 w-3" />
                   <span>Reset Answers</span>
@@ -726,18 +723,18 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
       {viewTab === 'online-solver' && (
         <div className="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 space-y-6 no-print">
           {/* Top Session Progress & Self-Scoring Summary Card */}
-          <div className="rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-indigo-500/30 p-5 shadow-xl">
+          <div className="rounded-2xl bg-[#18181b] border border-white/[0.08] p-5 shadow-lg">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold uppercase tracking-wider">
+                  <span className="px-2 py-0.5 rounded-full bg-[#FF5B37]/15 text-[#FF5B37] border border-[#FF5B37]/30 text-xs font-semibold uppercase tracking-wider">
                     Interactive Online Practice
                   </span>
                   <span className="text-xs text-slate-400">
                     {config.subject.name} • Chapter {activeChapter.chapterNumber}
                   </span>
                 </div>
-                <h2 className="text-xl sm:text-2xl font-extrabold text-white mt-1">
+                <h2 className="text-xl sm:text-2xl font-bold text-white mt-1">
                   {activeChapter.title}
                 </h2>
                 <p className="text-xs text-slate-300 mt-0.5">
@@ -748,24 +745,24 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
               </div>
 
               {/* Live Scorecard Box */}
-              <div className="flex items-center gap-4 bg-slate-950/80 rounded-xl p-3.5 border border-slate-800">
+              <div className="flex items-center gap-4 bg-[#141416] rounded-xl p-3.5 border border-white/[0.08]">
                 <div className="text-center px-2">
                   <div className="text-xs text-slate-400 font-medium">Attempted</div>
-                  <div className="text-lg font-black text-white font-mono">
+                  <div className="text-lg font-bold text-white font-mono tabular-nums">
                     {attemptedSubpartsCount} <span className="text-xs text-slate-500">/ {totalSubpartsCount}</span>
                   </div>
                 </div>
-                <div className="h-8 w-px bg-slate-800" />
+                <div className="h-8 w-px bg-white/[0.08]" />
                 <div className="text-center px-2">
                   <div className="text-xs text-slate-400 font-medium">Your Score</div>
-                  <div className="text-lg font-black text-emerald-400 font-mono">
+                  <div className="text-lg font-bold text-emerald-400 font-mono tabular-nums">
                     {totalEarnedMarks} <span className="text-xs text-slate-500">/ {totalMarks}</span>
                   </div>
                 </div>
-                <div className="h-8 w-px bg-slate-800" />
+                <div className="h-8 w-px bg-white/[0.08]" />
                 <div className="text-center px-2">
                   <div className="text-xs text-slate-400 font-medium">Accuracy</div>
-                  <div className="text-lg font-black text-amber-400 font-mono">
+                  <div className="text-lg font-bold text-amber-400 font-mono tabular-nums">
                     {scorePercentage}%
                   </div>
                 </div>
@@ -773,14 +770,14 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
             </div>
 
             {/* Visual Progress Bar */}
-            <div className="mt-4 pt-3 border-t border-slate-800/80">
+            <div className="mt-4 pt-3 border-t border-white/[0.08]">
               <div className="flex items-center justify-between text-xs text-slate-400 mb-1.5">
                 <span>Chapter Completion</span>
-                <span>{attemptedSubpartsCount} of {totalSubpartsCount} subparts attempted ({Math.round((attemptedSubpartsCount / (totalSubpartsCount || 1)) * 100)}%)</span>
+                <span className="font-mono tabular-nums">{attemptedSubpartsCount} of {totalSubpartsCount} subparts attempted ({Math.round((attemptedSubpartsCount / (totalSubpartsCount || 1)) * 100)}%)</span>
               </div>
-              <div className="w-full h-2 rounded-full bg-slate-950 overflow-hidden border border-slate-800">
+              <div className="w-full h-1.5 rounded-full bg-[#111113] overflow-hidden border border-white/[0.08]">
                 <div
-                  className="h-full bg-gradient-to-r from-indigo-500 via-emerald-500 to-amber-500 transition-all duration-300"
+                  className="h-full bg-[#FF5B37] transition-all duration-300"
                   style={{ width: `${Math.min(100, Math.round((attemptedSubpartsCount / (totalSubpartsCount || 1)) * 100))}%` }}
                 />
               </div>
@@ -794,20 +791,20 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
               return (
                 <div
                   key={q.id}
-                  className="rounded-2xl bg-slate-900/90 border border-slate-800 p-5 sm:p-7 shadow-lg space-y-5"
+                  className="rounded-2xl bg-[#18181b] border border-white/[0.08] p-5 sm:p-7 shadow-lg space-y-5"
                 >
                   {/* Question Header */}
-                  <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.08] pb-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center font-bold text-indigo-300">
+                      <div className="w-8 h-8 rounded-lg bg-[#222225] border border-white/[0.08] flex items-center justify-center font-mono font-bold text-white text-sm">
                         {qNum}
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-mono text-xs font-bold text-slate-300">
+                          <span className="font-mono text-xs font-semibold text-slate-200">
                             {q.source}
                           </span>
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#222225] text-slate-300 border border-white/[0.08]">
                             {q.subtopic}
                           </span>
                         </div>
@@ -818,7 +815,7 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <span className="px-3 py-1 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 font-bold text-xs">
+                      <span className="px-3 py-1 rounded-lg bg-[#141416] border border-white/[0.08] text-amber-400 font-mono font-semibold text-xs">
                         {q.totalMarks} Marks Total
                       </span>
                     </div>
@@ -860,30 +857,30 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                       return (
                         <div
                           key={key}
-                          className="rounded-xl bg-slate-950/70 border border-slate-800/80 p-4 sm:p-5 space-y-4"
+                          className="rounded-xl bg-[#141416] border border-white/[0.08] p-4 sm:p-5 space-y-4"
                         >
                           {/* Subpart Prompt & Mark Badge */}
                           <div className="flex items-baseline justify-between gap-4">
                             <div className="flex items-baseline gap-2.5 text-sm sm:text-base text-white">
-                              <span className="font-bold text-indigo-400 font-mono shrink-0">
+                              <span className="font-bold text-[#FF5B37] font-mono shrink-0">
                                 {sub.part}
                               </span>
-                              <div className="font-medium">
+                              <div className="font-medium text-slate-100">
                                 <MathRenderer content={sub.prompt} />
                               </div>
                             </div>
                             <div className="flex items-center gap-1.5 shrink-0">
                               {isP2 && (
-                                <span className="px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-[10px] font-bold text-amber-300">
-                                  P2 Multiple Choice
+                                <span className="px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-[10px] font-bold text-amber-300 font-mono">
+                                  P2 MCQ
                                 </span>
                               )}
                               {isP4 && (
-                                <span className="px-2 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/30 text-[10px] font-bold text-indigo-300">
+                                <span className="px-2 py-0.5 rounded bg-[#FF5B37]/10 border border-[#FF5B37]/30 text-[10px] font-bold text-[#FF5B37] font-mono">
                                   P4 Theory
                                 </span>
                               )}
-                              <span className="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-xs font-mono font-bold text-slate-300">
+                              <span className="px-2 py-0.5 rounded bg-[#222225] border border-white/[0.08] text-xs font-mono font-semibold text-slate-300">
                                 [{sub.marks} {sub.marks === 1 ? 'mark' : 'marks'}]
                               </span>
                             </div>
@@ -896,11 +893,11 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                           {isP2 ? (
                             <div className="space-y-3 pt-1">
                               <div className="flex items-center justify-between">
-                                <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                                <span className="text-xs font-semibold text-amber-300 flex items-center gap-1.5">
                                   <Sparkles className="h-3.5 w-3.5 text-amber-400" />
                                   <span>Paper 2 Multiple Choice (Select A, B, C, or D):</span>
                                 </span>
-                                <span className="text-[11px] text-slate-400 font-medium">Click an option below to answer</span>
+                                <span className="text-[11px] text-slate-400">Click an option below</span>
                               </div>
 
                               {/* MCQ Option Cards Grid */}
@@ -923,12 +920,12 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                                       }}
                                       className={`p-3 rounded-xl border text-left transition flex items-center gap-3 cursor-pointer ${
                                         isCorrectOpt
-                                          ? 'border-emerald-500 bg-emerald-500/20 text-white shadow-md'
+                                          ? 'border-emerald-500 bg-emerald-500/15 text-white'
                                           : isWrongOpt
-                                          ? 'border-rose-500 bg-rose-500/20 text-white'
+                                          ? 'border-rose-500 bg-rose-500/15 text-white'
                                           : isSelected
-                                          ? 'border-indigo-500 bg-indigo-500/20 text-white ring-1 ring-indigo-400'
-                                          : 'border-slate-800 bg-slate-900/90 text-slate-200 hover:border-slate-700 hover:bg-slate-900'
+                                          ? 'border-[#FF5B37] bg-[#FF5B37]/15 text-white'
+                                          : 'border-white/[0.08] bg-[#18181b] text-slate-200 hover:border-white/[0.15] hover:bg-[#222225]'
                                       }`}
                                     >
                                       <span className={`flex h-7 w-7 items-center justify-center rounded-lg font-bold font-mono text-xs shrink-0 ${
@@ -937,8 +934,8 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                                           : isWrongOpt
                                           ? 'bg-rose-500 text-white font-bold'
                                           : isSelected
-                                          ? 'bg-indigo-500 text-white font-bold'
-                                          : 'bg-slate-800 text-slate-300'
+                                          ? 'bg-[#FF5B37] text-white font-bold'
+                                          : 'bg-[#222225] text-slate-300'
                                       }`}>
                                         {opt.letter}
                                       </span>
@@ -955,12 +952,12 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                                 <div className="text-[11px] text-slate-400">
                                   {state.isChecked && (
                                     state.isCorrect ? (
-                                      <span className="text-emerald-400 font-bold flex items-center gap-1">
+                                      <span className="text-emerald-400 font-semibold flex items-center gap-1 font-mono">
                                         <CheckCircle2 className="h-3.5 w-3.5" /> Correct! [{sub.marks}/{sub.marks} marks]
                                       </span>
                                     ) : (
-                                      <span className="text-rose-400 font-bold flex items-center gap-1">
-                                        <XCircle className="h-3.5 w-3.5" /> Incorrect. Correct Option was: {sub.finalAnswer}
+                                      <span className="text-rose-400 font-semibold flex items-center gap-1 font-mono">
+                                        <XCircle className="h-3.5 w-3.5" /> Incorrect. Correct option: {sub.finalAnswer}
                                       </span>
                                     )
                                   )}
@@ -969,7 +966,7 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                                 <button
                                   type="button"
                                   onClick={() => handleToggleReveal(key)}
-                                  className="px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs flex items-center gap-1.5 transition cursor-pointer"
+                                  className="px-3 py-1.5 rounded-lg border border-white/[0.08] bg-[#222225] hover:bg-[#2a2a2e] text-white font-medium text-xs flex items-center gap-1.5 transition cursor-pointer"
                                 >
                                   <Lightbulb className="h-3.5 w-3.5 text-amber-400" />
                                   <span>{state.isRevealed ? 'Hide Scheme' : 'Mark Scheme'}</span>
@@ -984,8 +981,8 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                               {/* Calculation Working Steps Box */}
                               <div>
                                 <div className="flex items-center justify-between mb-1.5">
-                                  <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                                    <PenTool className="h-3.5 w-3.5 text-indigo-400" />
+                                  <label className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
+                                    <PenTool className="h-3.5 w-3.5 text-[#FF5B37]" />
                                     <span>Show Your Working Steps:</span>
                                   </label>
 
@@ -998,7 +995,7 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                                           key={sym}
                                           type="button"
                                           onClick={() => handleInsertSymbol(key, sym)}
-                                          className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono border border-slate-700 cursor-pointer"
+                                          className="px-1.5 py-0.5 rounded bg-[#222225] hover:bg-[#2a2a2e] text-slate-300 text-xs font-mono border border-white/[0.08] cursor-pointer"
                                         >
                                           {sym}
                                         </button>
@@ -1011,14 +1008,14 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                                   value={state.working}
                                   onChange={(e) => handleUpdateWorking(key, e.target.value)}
                                   placeholder="Show your step-by-step working here (e.g. F = ma = 1200 × 2 = 2400 N)..."
-                                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs sm:text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition font-mono leading-relaxed"
+                                  className="w-full bg-[#111113] border border-white/[0.1] rounded-xl p-3 text-xs sm:text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-[#FF5B37] transition font-mono leading-relaxed"
                                 />
                               </div>
 
                               {/* Final Answer Input & Actions */}
                               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
                                 <div className="flex items-center gap-2 flex-1">
-                                  <span className="text-xs font-bold text-slate-300 shrink-0">Answer:</span>
+                                  <span className="text-xs font-semibold text-slate-300 shrink-0">Answer:</span>
                                   <input
                                     type="text"
                                     value={state.userAnswer}
@@ -1029,14 +1026,14 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                                       }
                                     }}
                                     placeholder="e.g. 2400 N or x = 3, -3"
-                                    className="flex-1 max-w-md bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs sm:text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 font-mono"
+                                    className="flex-1 max-w-md bg-[#111113] border border-white/[0.1] rounded-lg px-3 py-1.5 text-xs sm:text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-[#FF5B37] font-mono"
                                   />
                                 </div>
 
                                 <div className="flex items-center gap-2">
                                   <button
                                     onClick={() => handleCheckAnswer(key, sub.finalAnswer, sub.marks, sub.markScheme, isP4)}
-                                    className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow transition cursor-pointer"
+                                    className="px-3.5 py-1.5 rounded-lg bg-[#FF5B37] hover:bg-[#e04f2e] text-white font-medium text-xs flex items-center gap-1.5 transition cursor-pointer"
                                   >
                                     <CheckCircle className="h-3.5 w-3.5" />
                                     <span>Check Answer</span>
@@ -1044,7 +1041,7 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
 
                                   <button
                                     onClick={() => handleToggleReveal(key)}
-                                    className="px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs flex items-center gap-1.5 transition cursor-pointer"
+                                    className="px-3 py-1.5 rounded-lg border border-white/[0.08] bg-[#222225] hover:bg-[#2a2a2e] text-white font-medium text-xs flex items-center gap-1.5 transition cursor-pointer"
                                   >
                                     <Lightbulb className="h-3.5 w-3.5 text-amber-400" />
                                     <span>{state.isRevealed ? 'Hide Scheme' : 'Mark Scheme'}</span>
@@ -1060,13 +1057,13 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                             <>
                               <div>
                                 <div className="flex items-center justify-between mb-1.5">
-                                  <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                                    <PenTool className="h-3.5 w-3.5 text-indigo-400" />
+                                  <label className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
+                                    <PenTool className="h-3.5 w-3.5 text-[#FF5B37]" />
                                     <span>{isExtendedWriting ? 'Your Written Response / Essay:' : 'Your Answer / Notes:'}</span>
                                   </label>
                                   {isExtendedWriting && (
-                                    <span className="text-[11px] font-mono font-medium px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-400">
-                                      Word count: <strong className="text-indigo-300">{wordCount}</strong> words
+                                    <span className="text-[11px] font-mono font-medium px-2 py-0.5 rounded bg-[#111113] border border-white/[0.08] text-slate-400">
+                                      Word count: <strong className="text-[#FF5B37]">{wordCount}</strong> words
                                     </span>
                                   )}
                                 </div>
@@ -1080,14 +1077,14 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                                       ? 'Write your response here using standard paragraphs, clear structure, and appropriate vocabulary...'
                                       : 'Type your answer or notes here...'
                                   }
-                                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs sm:text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition leading-relaxed font-sans"
+                                  className="w-full bg-[#111113] border border-white/[0.1] rounded-xl p-3 text-xs sm:text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-[#FF5B37] transition leading-relaxed font-sans"
                                 />
                               </div>
 
                               <div className="flex items-center justify-end gap-2 pt-1">
                                 <button
                                   onClick={() => handleCheckAnswer(key, sub.finalAnswer, sub.marks, sub.markScheme, isP4)}
-                                  className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow transition cursor-pointer"
+                                  className="px-3.5 py-1.5 rounded-lg bg-[#FF5B37] hover:bg-[#e04f2e] text-white font-medium text-xs flex items-center gap-1.5 transition cursor-pointer"
                                 >
                                   <CheckCircle className="h-3.5 w-3.5" />
                                   <span>{isExtendedWriting ? 'Check Response' : 'Check Answer'}</span>
@@ -1095,7 +1092,7 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
 
                                 <button
                                   onClick={() => handleToggleReveal(key)}
-                                  className="px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs flex items-center gap-1.5 transition cursor-pointer"
+                                  className="px-3 py-1.5 rounded-lg border border-white/[0.08] bg-[#222225] hover:bg-[#2a2a2e] text-white font-medium text-xs flex items-center gap-1.5 transition cursor-pointer"
                                 >
                                   <Lightbulb className="h-3.5 w-3.5 text-amber-400" />
                                   <span>{state.isRevealed ? 'Hide Scheme' : 'Mark Scheme'}</span>
@@ -1110,8 +1107,8 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                             <>
                               <div>
                                 <div className="flex items-center justify-between mb-1.5">
-                                  <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                                    <PenTool className="h-3.5 w-3.5 text-indigo-400" />
+                                  <label className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
+                                    <PenTool className="h-3.5 w-3.5 text-[#FF5B37]" />
                                     <span>Your Answer / Scientific Explanation:</span>
                                   </label>
 
@@ -1123,7 +1120,7 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                                           key={sym}
                                           type="button"
                                           onClick={() => handleInsertSymbol(key, sym)}
-                                          className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono border border-slate-700 cursor-pointer"
+                                          className="px-1.5 py-0.5 rounded bg-[#222225] hover:bg-[#2a2a2e] text-slate-300 text-xs font-mono border border-white/[0.08] cursor-pointer"
                                         >
                                           {sym}
                                         </button>
@@ -1137,14 +1134,14 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                                   value={state.userAnswer}
                                   onChange={(e) => handleUpdateUserAnswer(key, e.target.value)}
                                   placeholder="Write your explanation or answer here..."
-                                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs sm:text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition leading-relaxed font-sans"
+                                  className="w-full bg-[#111113] border border-white/[0.1] rounded-xl p-3 text-xs sm:text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-[#FF5B37] transition leading-relaxed font-sans"
                                 />
                               </div>
 
                               <div className="flex items-center justify-end gap-2 pt-1">
                                 <button
                                   onClick={() => handleCheckAnswer(key, sub.finalAnswer, sub.marks, sub.markScheme, isP4)}
-                                  className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow transition cursor-pointer"
+                                  className="px-3.5 py-1.5 rounded-lg bg-[#FF5B37] hover:bg-[#e04f2e] text-white font-medium text-xs flex items-center gap-1.5 transition cursor-pointer"
                                 >
                                   <CheckCircle className="h-3.5 w-3.5" />
                                   <span>Check Answer</span>
@@ -1152,7 +1149,7 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
 
                                 <button
                                   onClick={() => handleToggleReveal(key)}
-                                  className="px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs flex items-center gap-1.5 transition cursor-pointer"
+                                  className="px-3 py-1.5 rounded-lg border border-white/[0.08] bg-[#222225] hover:bg-[#2a2a2e] text-white font-medium text-xs flex items-center gap-1.5 transition cursor-pointer"
                                 >
                                   <Lightbulb className="h-3.5 w-3.5 text-amber-400" />
                                   <span>{state.isRevealed ? 'Hide Scheme' : 'Mark Scheme'}</span>
@@ -1165,8 +1162,8 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                           {state.isChecked && (
                             <div className={`p-3 rounded-xl border flex items-start gap-2.5 text-xs ${
                               state.isCorrect
-                                ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-200'
-                                : 'bg-amber-950/40 border-amber-500/40 text-amber-200'
+                                ? 'bg-emerald-950/30 border-emerald-500/30 text-emerald-200'
+                                : 'bg-amber-950/30 border-amber-500/30 text-amber-200'
                             }`}>
                               {state.isCorrect ? (
                                 <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
@@ -1175,7 +1172,7 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                               )}
                               <div className="flex-1 space-y-0.5">
                                 <div>
-                                  <span className="font-bold">
+                                  <span className="font-semibold">
                                     {state.isCorrect ? 'Correct / Acceptable Answer!' : 'Review Against Cambridge Criteria:'}
                                   </span>
                                   <span className="ml-1.5">
@@ -1189,7 +1186,7 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                                 )}
                                 {!state.isCorrect && (
                                   <div className="pt-1">
-                                    <span className="text-[10px] font-semibold text-rose-300 bg-rose-500/20 border border-rose-500/40 px-2 py-0.5 rounded-full inline-flex items-center gap-1">
+                                    <span className="text-[10px] font-semibold text-rose-300 bg-rose-500/20 border border-rose-500/40 px-2 py-0.5 rounded-full inline-flex items-center gap-1 font-mono">
                                       🔖 Auto-logged to Mistake Notebook (?tab=mistakes)
                                     </span>
                                   </div>
@@ -1200,21 +1197,21 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
 
                           {/* Mark Scheme & Examiner Criteria Breakdown */}
                           {state.isRevealed && (
-                            <div className="p-4 rounded-xl bg-slate-900 border border-indigo-500/30 space-y-3 text-xs">
-                              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                                <span className="font-bold uppercase tracking-wider text-indigo-300 text-[11px] flex items-center gap-1.5">
-                                  <Award className="h-3.5 w-3.5 text-indigo-400" />
+                            <div className="p-4 rounded-xl bg-[#18181b] border border-white/[0.1] space-y-3 text-xs">
+                              <div className="flex items-center justify-between border-b border-white/[0.08] pb-2">
+                                <span className="font-semibold uppercase tracking-wider text-slate-200 text-[11px] flex items-center gap-1.5">
+                                  <Award className="h-3.5 w-3.5 text-[#FF5B37]" />
                                   Official Cambridge Mark Scheme Criteria
                                 </span>
-                                <span className="font-mono font-bold text-slate-200">
+                                <span className="font-mono font-semibold text-slate-200">
                                   Final: {sub.finalAnswer}
                                 </span>
                               </div>
 
                               <div className="space-y-2">
                                 {sub.markScheme.map((ms, mIdx) => (
-                                  <div key={mIdx} className="flex items-start gap-2 bg-slate-950/60 p-2 rounded-lg border border-slate-800/80">
-                                    <span className="px-1.5 py-0.5 rounded font-mono font-bold text-[11px] bg-indigo-500/20 text-indigo-300 shrink-0">
+                                  <div key={mIdx} className="flex items-start gap-2 bg-[#141416] p-2.5 rounded-lg border border-white/[0.08]">
+                                    <span className="px-1.5 py-0.5 rounded font-mono font-bold text-[11px] bg-[#FF5B37]/15 text-[#FF5B37] shrink-0">
                                       {ms.markType}
                                     </span>
                                     <div className="flex-1 text-slate-300">
@@ -1230,7 +1227,7 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                               </div>
 
                               {/* Self-Scoring Mark Selector */}
-                              <div className="pt-2 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                              <div className="pt-2 border-t border-white/[0.08] flex flex-wrap items-center justify-between gap-3">
                                 <span className="text-slate-400 font-medium text-[11px]">
                                   Award marks for this subpart:
                                 </span>
@@ -1244,8 +1241,8 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                                         onClick={() => handleSetScore(key, markVal)}
                                         className={`w-7 h-7 rounded-lg font-bold font-mono text-xs transition cursor-pointer ${
                                           isSelected
-                                            ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/40 ring-2 ring-emerald-400'
-                                            : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700'
+                                            ? 'bg-[#FF5B37] text-white shadow-sm'
+                                            : 'bg-[#222225] text-slate-300 hover:bg-[#2a2a2e] border border-white/[0.08]'
                                         }`}
                                       >
                                         {markVal}
@@ -1269,7 +1266,7 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
                     <div className="p-3.5 rounded-xl bg-amber-500/5 border border-amber-500/20 text-xs text-amber-200/90 flex items-start gap-2.5">
                       <GraduationCap className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
                       <div>
-                        <span className="font-bold text-amber-300">Senior Examiner Report Guidance:</span>
+                        <span className="font-semibold text-amber-300">Senior Examiner Report Guidance:</span>
                         <p className="mt-0.5 leading-relaxed text-slate-300">
                           {q.examinerReportNotes[0]}
                         </p>
@@ -1291,16 +1288,16 @@ export const PrintableClassifiedsGenerator: React.FC<PrintableClassifiedsGenerat
         <div className="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-8">
           
           {/* Quick Screen Banner to Toggle Cover Page on screen */}
-          <div className="mb-4 no-print flex items-center justify-between p-3.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300">
+          <div className="mb-4 no-print flex items-center justify-between p-3.5 rounded-xl bg-[#18181b] border border-white/[0.08] text-xs text-slate-300">
             <div className="flex items-center gap-2">
-              <FileText className="h-4 w-4 text-indigo-400" />
+              <FileText className="h-4 w-4 text-[#FF5B37]" />
               <span>
                 <strong>Printable Exam Geometry:</strong> Formatted for standard A4 paper with authentic Cambridge response lines.
               </span>
             </div>
             <button
               onClick={() => setShowCoverPageOnScreen(prev => !prev)}
-              className="text-xs font-bold text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition cursor-pointer"
+              className="text-xs font-semibold text-[#FF5B37] hover:text-[#e04f2e] flex items-center gap-1 transition cursor-pointer"
             >
               <span>{showCoverPageOnScreen ? 'Hide Cover & Objectives' : 'Show Cover & Objectives'}</span>
               {showCoverPageOnScreen ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}

@@ -123,20 +123,19 @@ export const PredictedPaperView: React.FC<PredictedPaperViewProps> = ({
   }, [predictedQuestions]);
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6 animate-fadeIn pb-12">
+    <div className="mx-auto max-w-5xl space-y-6 pb-12">
       {/* Header Banner */}
-      <div className="rounded-3xl border border-amber-500/40 bg-gradient-to-br from-amber-950/30 via-slate-900 to-slate-950 p-6 sm:p-8 shadow-xl relative overflow-hidden">
-        <div className="absolute -top-12 -right-12 h-44 w-44 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative">
+      <div className="rounded-2xl border border-white/[0.08] bg-[#18181b] p-6 sm:p-8 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 px-3 py-1 text-xs font-black text-amber-300 border border-amber-500/30">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-[#FF5B37]/15 px-3 py-1 text-xs font-mono font-semibold text-[#FF5B37] border border-[#FF5B37]/30">
               <TrendingUp className="h-3.5 w-3.5" />
               <span>Exam Series Topic Forecasting</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
               Cambridge {selectedSeries} Predicted Paper
             </h1>
-            <p className="text-xs sm:text-sm text-slate-300 max-w-2xl">
+            <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
               Examiner-modeled paper forecast based on historical syllabus topic rotation cycles across 2016–2025 series for <strong className="text-white">{subject.name} ({subject.code})</strong>.
             </p>
           </div>
@@ -145,9 +144,9 @@ export const PredictedPaperView: React.FC<PredictedPaperViewProps> = ({
             <button
               type="button"
               onClick={() => onSitPredictedMock?.(predictedQuestions)}
-              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-2.5 text-xs font-black text-slate-950 shadow-lg shadow-amber-500/20 hover:brightness-110 transition cursor-pointer"
+              className="flex items-center gap-2 rounded-xl bg-[#FF5B37] hover:bg-[#e04f2e] px-4 py-2.5 text-xs font-semibold text-white transition cursor-pointer shadow-none"
             >
-              <Play className="h-4 w-4 fill-slate-950" />
+              <Play className="h-4 w-4 fill-white" />
               <span>Sit Predicted Mock ({totalMarks} Marks)</span>
             </button>
           </div>
@@ -155,17 +154,17 @@ export const PredictedPaperView: React.FC<PredictedPaperViewProps> = ({
       </div>
 
       {/* Series Switcher & Mode Tabs */}
-      <div className="flex items-center justify-between gap-3 border-b border-slate-800 pb-3 flex-wrap">
+      <div className="flex items-center justify-between gap-3 border-b border-white/[0.08] pb-3 flex-wrap">
         <div className="flex items-center gap-2">
           {(['May/June 2026', 'Oct/Nov 2026', 'May/June 2025 (Archive)'] as const).map(series => (
             <button
               key={series}
               type="button"
               onClick={() => setSelectedSeries(series)}
-              className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition cursor-pointer ${
+              className={`rounded-xl px-3.5 py-1.5 text-xs font-semibold transition cursor-pointer ${
                 selectedSeries === series
-                  ? 'bg-indigo-600 text-white shadow-md'
-                  : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
+                  ? 'bg-[#FF5B37] text-white shadow-sm'
+                  : 'border border-white/[0.08] bg-[#18181b] text-slate-400 hover:text-white'
               }`}
             >
               {series}
@@ -177,10 +176,10 @@ export const PredictedPaperView: React.FC<PredictedPaperViewProps> = ({
           <button
             type="button"
             onClick={() => setActiveTab('overview')}
-            className={`rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
+            className={`rounded-xl px-3.5 py-1.5 text-xs font-semibold transition cursor-pointer ${
               activeTab === 'overview'
-                ? 'bg-amber-500 text-slate-950 font-black'
-                : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
+                ? 'bg-[#222225] border border-white/[0.08] text-white shadow-sm'
+                : 'border border-white/[0.08] bg-[#18181b] text-slate-400 hover:text-white'
             }`}
           >
             Focus Areas & Weightings
@@ -188,10 +187,10 @@ export const PredictedPaperView: React.FC<PredictedPaperViewProps> = ({
           <button
             type="button"
             onClick={() => setActiveTab('paper-view')}
-            className={`rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
+            className={`rounded-xl px-3.5 py-1.5 text-xs font-semibold transition cursor-pointer ${
               activeTab === 'paper-view'
-                ? 'bg-amber-500 text-slate-950 font-black'
-                : 'border border-slate-800 bg-slate-900/60 text-slate-400 hover:text-white'
+                ? 'bg-[#222225] border border-white/[0.08] text-white shadow-sm'
+                : 'border border-white/[0.08] bg-[#18181b] text-slate-400 hover:text-white'
             }`}
           >
             Predicted Questions ({predictedQuestions.length})
@@ -202,12 +201,12 @@ export const PredictedPaperView: React.FC<PredictedPaperViewProps> = ({
       {/* View 1: Topic Probabilities */}
       {activeTab === 'overview' && (
         <div className="space-y-4">
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 space-y-2">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-emerald-400" />
+          <div className="rounded-2xl border border-white/[0.08] bg-[#18181b] p-5 space-y-2">
+            <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-[#FF5B37]" />
               <span>How are Cambridge questions predicted?</span>
             </h3>
-            <p className="text-xs text-slate-300 leading-relaxed">
+            <p className="text-xs text-slate-300 leading-relaxed font-sans">
               {methodologyText}
             </p>
           </div>
@@ -216,26 +215,26 @@ export const PredictedPaperView: React.FC<PredictedPaperViewProps> = ({
             {predictedTopics.map((pt) => (
               <div
                 key={pt.topic}
-                className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 space-y-3"
+                className="rounded-2xl border border-white/[0.08] bg-[#18181b] p-5 space-y-3"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="space-y-0.5">
-                    <span className="text-sm font-bold text-white">{pt.topic}</span>
+                    <span className="text-sm font-semibold text-white">{pt.topic}</span>
                     <p className="text-[11px] text-slate-400 font-mono">{pt.historicalFrequency}</p>
                   </div>
-                  <span className="rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-[11px] font-black text-emerald-300 border border-emerald-500/40 text-right shrink-0">
+                  <span className="rounded-md bg-[#FF5B37]/15 px-2.5 py-0.5 text-[11px] font-mono font-semibold text-[#FF5B37] border border-[#FF5B37]/30 text-right shrink-0">
                     {pt.priorityBadge}
                   </span>
                 </div>
 
-                <div className="h-1.5 rounded-full bg-slate-950 overflow-hidden">
+                <div className="h-1.5 rounded-full bg-[#111113] overflow-hidden border border-white/[0.08]">
                   <div
-                    className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full"
+                    className="h-full bg-[#FF5B37] rounded-full"
                     style={{ width: `${pt.weightPercent}%` }}
                   />
                 </div>
 
-                <p className="text-xs text-slate-300 leading-snug">
+                <p className="text-xs text-slate-300 leading-relaxed font-sans">
                   {pt.reason}
                 </p>
               </div>
@@ -250,30 +249,30 @@ export const PredictedPaperView: React.FC<PredictedPaperViewProps> = ({
           {predictedQuestions.map((q, idx) => (
             <div
               key={q.id}
-              className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6 space-y-4"
+              className="rounded-2xl border border-white/[0.08] bg-[#18181b] p-5 sm:p-6 space-y-4"
             >
-              <div className="flex items-start justify-between gap-4 border-b border-slate-800 pb-3">
-                <span className="text-sm font-bold text-amber-300">
+              <div className="flex items-start justify-between gap-4 border-b border-white/[0.08] pb-3">
+                <span className="text-sm font-semibold text-white">
                   Predicted Question {idx + 1} • {q.topic}
                 </span>
-                <span className="rounded-xl bg-slate-950 px-2.5 py-0.5 text-xs font-black text-white border border-slate-800">
+                <span className="rounded-lg bg-[#222225] px-2.5 py-0.5 text-xs font-mono font-semibold text-slate-200 border border-white/[0.08]">
                   [{q.marks || 4} Marks]
                 </span>
               </div>
 
-              <div className="text-xs sm:text-sm text-slate-200 leading-relaxed">
+              <div className="text-xs sm:text-sm text-slate-200 leading-relaxed font-sans">
                 <MathRenderer content={q.questionPrompt} />
               </div>
 
               {q.diagramOrMath && (
-                <div className="p-3 bg-slate-950 rounded-xl text-center">
+                <div className="p-3 bg-[#111113] border border-white/[0.08] rounded-xl text-center">
                   <MathRenderer content={q.diagramOrMath} />
                 </div>
               )}
 
-              <div className="rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs font-mono">
-                <span className="text-amber-400 font-bold block mb-0.5">Model Mark Scheme:</span>
-                <span className="text-emerald-300 font-bold">{q.finalAnswer}</span>
+              <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-3 text-xs font-mono">
+                <span className="text-amber-400 font-semibold block mb-0.5">Model Mark Scheme:</span>
+                <span className="text-emerald-400 font-semibold">{q.finalAnswer}</span>
               </div>
             </div>
           ))}

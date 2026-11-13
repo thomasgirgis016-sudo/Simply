@@ -148,23 +148,23 @@ export const WorksheetBuilder: React.FC<WorksheetBuilderProps> = ({
   };
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6 animate-fadeIn pb-12 w-full max-w-full overflow-x-hidden">
+    <div className="mx-auto max-w-5xl space-y-6 pb-12 w-full max-w-full overflow-x-hidden">
       {/* ───────────────────────────────────────────────────────────── */}
       {/* Screen-Only Configuration Toolbar                             */}
       {/* ───────────────────────────────────────────────────────────── */}
       <div className="print:hidden space-y-6">
         {/* Banner */}
-        <div className="rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 p-6 sm:p-8 shadow-xl relative overflow-hidden">
+        <div className="rounded-2xl border border-white/[0.08] bg-[#18181b] p-6 sm:p-8 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-indigo-500/15 px-3 py-1 text-xs font-black text-indigo-300 border border-indigo-500/30">
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-[#FF5B37]/15 px-3 py-1 text-xs font-mono font-semibold text-[#FF5B37] border border-[#FF5B37]/30">
                 <FileText className="h-3.5 w-3.5" />
                 <span>Cambridge Assessment Worksheet & Test Builder</span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-black text-white">
+              <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
                 1-Click Past Paper Worksheet Generator
               </h1>
-              <p className="text-xs sm:text-sm text-slate-300 max-w-2xl">
+              <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed font-sans">
                 Generate authentic Cambridge-formatted student question papers and teacher mark schemes for homework, revision packs, and unit tests in seconds.
               </p>
             </div>
@@ -173,7 +173,7 @@ export const WorksheetBuilder: React.FC<WorksheetBuilderProps> = ({
               <button
                 type="button"
                 onClick={handlePrint}
-                className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-2.5 text-xs font-black text-slate-950 shadow-lg shadow-amber-500/20 hover:brightness-110 transition cursor-pointer"
+                className="flex items-center gap-2 rounded-xl bg-[#FF5B37] hover:bg-[#e04f2e] px-4 py-2.5 text-xs font-semibold text-white transition cursor-pointer shadow-none"
               >
                 <Printer className="h-4 w-4" />
                 <span>Print / Download PDF</span>
@@ -183,27 +183,27 @@ export const WorksheetBuilder: React.FC<WorksheetBuilderProps> = ({
         </div>
 
         {/* Filter & Customization Panel */}
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 space-y-4">
+        <div className="rounded-2xl border border-white/[0.08] bg-[#18181b] p-5 space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="text-[11px] font-bold text-slate-400 block mb-1">Worksheet / Test Title</label>
+              <label className="text-[11px] font-semibold text-slate-400 block mb-1">Worksheet / Test Title</label>
               <input
                 type="text"
                 value={worksheetTitle}
                 onChange={(e) => setWorksheetTitle(e.target.value)}
-                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white focus:border-indigo-500 focus:outline-none"
+                className="w-full rounded-xl border border-white/[0.1] bg-[#111113] px-3 py-2 text-xs text-white focus:border-[#FF5B37] focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="text-[11px] font-bold text-slate-400 flex items-center justify-between mb-1">
+              <label className="text-[11px] font-semibold text-slate-400 flex items-center justify-between mb-1">
                 <span>Target Total Marks</span>
-                <span className="text-[10px] text-amber-400 font-mono font-bold">Generated: {totalCalculatedMarks} Marks</span>
+                <span className="text-[10px] text-amber-400 font-mono font-semibold">Generated: {totalCalculatedMarks} Marks</span>
               </label>
               <select
                 value={targetMarks}
                 onChange={(e) => setTargetMarks(parseInt(e.target.value, 10))}
-                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white focus:border-indigo-500 focus:outline-none"
+                className="w-full rounded-xl border border-white/[0.1] bg-[#111113] px-3 py-2 text-xs text-white focus:border-[#FF5B37] focus:outline-none"
               >
                 <option value={15}>15 Marks (~20 mins)</option>
                 <option value={25}>25 Marks (~30 mins)</option>
@@ -215,11 +215,11 @@ export const WorksheetBuilder: React.FC<WorksheetBuilderProps> = ({
             </div>
 
             <div>
-              <label className="text-[11px] font-bold text-slate-400 block mb-1">Difficulty Tier</label>
+              <label className="text-[11px] font-semibold text-slate-400 block mb-1">Difficulty Tier</label>
               <select
                 value={difficultyFilter}
                 onChange={(e) => setDifficultyFilter(e.target.value as any)}
-                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white focus:border-indigo-500 focus:outline-none"
+                className="w-full rounded-xl border border-white/[0.1] bg-[#111113] px-3 py-2 text-xs text-white focus:border-[#FF5B37] focus:outline-none"
               >
                 <option value="All">All Tiers (Balanced)</option>
                 <option value="Standard Extended">Standard Extended</option>
@@ -232,7 +232,7 @@ export const WorksheetBuilder: React.FC<WorksheetBuilderProps> = ({
           {/* Topic Selector Pills */}
           {availableTopics.length > 0 && (
             <div className="space-y-1.5 pt-1">
-              <span className="text-[11px] font-bold text-slate-400 block">Filter by Syllabus Topics:</span>
+              <span className="text-[11px] font-semibold text-slate-400 block">Filter by Syllabus Topics:</span>
               <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
                 {availableTopics.map(topic => {
                   const isSelected = selectedTopics.includes(topic);
@@ -241,10 +241,10 @@ export const WorksheetBuilder: React.FC<WorksheetBuilderProps> = ({
                       key={topic}
                       type="button"
                       onClick={() => toggleTopic(topic)}
-                      className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition cursor-pointer ${
+                      className={`rounded-lg px-2.5 py-1 text-[11px] font-medium transition cursor-pointer ${
                         isSelected
-                          ? 'bg-indigo-600 text-white font-bold'
-                          : 'border border-slate-800 bg-slate-950/80 text-slate-300 hover:border-slate-700'
+                          ? 'bg-[#FF5B37] text-white shadow-sm'
+                          : 'border border-white/[0.08] bg-[#141416] text-slate-300 hover:border-white/[0.15]'
                       }`}
                     >
                       {topic}
@@ -256,15 +256,15 @@ export const WorksheetBuilder: React.FC<WorksheetBuilderProps> = ({
           )}
 
           {/* View Mode Toggle: Student QP vs Teacher MS */}
-          <div className="flex items-center justify-between pt-2 border-t border-slate-800">
+          <div className="flex items-center justify-between pt-2 border-t border-white/[0.08]">
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => setActiveView('student-qp')}
-                className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition cursor-pointer ${
+                className={`rounded-xl px-3.5 py-1.5 text-xs font-semibold transition cursor-pointer ${
                   activeView === 'student-qp'
-                    ? 'bg-amber-500 text-slate-950 font-black shadow-md'
-                    : 'border border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
+                    ? 'bg-[#222225] border border-white/[0.08] text-white shadow-sm'
+                    : 'border border-white/[0.08] bg-[#18181b] text-slate-400 hover:text-white'
                 }`}
               >
                 Student Question Paper ({generatedQuestions.length} Qs • {totalCalculatedMarks} Marks)
@@ -273,10 +273,10 @@ export const WorksheetBuilder: React.FC<WorksheetBuilderProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveView('teacher-ms')}
-                className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition cursor-pointer ${
+                className={`rounded-xl px-3.5 py-1.5 text-xs font-semibold transition cursor-pointer ${
                   activeView === 'teacher-ms'
-                    ? 'bg-purple-600 text-white font-black shadow-md'
-                    : 'border border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
+                    ? 'bg-[#FF5B37] text-white shadow-sm'
+                    : 'border border-white/[0.08] bg-[#18181b] text-slate-400 hover:text-white'
                 }`}
               >
                 Teacher Mark Scheme & Solutions
@@ -293,7 +293,7 @@ export const WorksheetBuilder: React.FC<WorksheetBuilderProps> = ({
       {/* ───────────────────────────────────────────────────────────── */}
       {/* PRINTABLE DOCUMENT AREA                                      */}
       {/* ───────────────────────────────────────────────────────────── */}
-      <div className="rounded-3xl border border-slate-800 bg-slate-950 text-slate-100 p-4 sm:p-8 md:p-12 shadow-2xl print:bg-white print:text-black print:p-0 print:border-none print:shadow-none w-full max-w-full overflow-hidden">
+      <div className="rounded-2xl border border-white/[0.08] bg-[#141416] text-slate-100 p-4 sm:p-8 md:p-12 shadow-sm print:bg-white print:text-black print:p-0 print:border-none print:shadow-none w-full max-w-full overflow-hidden">
         {/* Cover Sheet Box */}
         <div className="border-b-2 border-black/80 pb-6 mb-8 text-black dark:text-white print:text-black">
           <div className="flex flex-col sm:flex-row justify-between items-start gap-3 border-b border-black/40 pb-4 mb-4">

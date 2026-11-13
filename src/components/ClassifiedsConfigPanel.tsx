@@ -193,19 +193,19 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-slate-950/80 backdrop-blur-sm transition-opacity no-print">
+    <div className="fixed inset-0 z-50 overflow-hidden bg-black/70 backdrop-blur-sm transition-opacity no-print">
       <div className="fixed inset-y-0 right-0 flex max-w-full pl-10">
-        <div className="w-screen max-w-2xl bg-slate-900 border-l border-slate-800 text-white shadow-2xl flex flex-col h-full">
+        <div className="w-screen max-w-2xl bg-[#141416] border-l border-white/[0.08] text-white shadow-2xl flex flex-col h-full">
           {/* Header */}
-          <div className="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
+          <div className="p-5 border-b border-white/[0.08] flex items-center justify-between bg-[#111113]">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+              <div className="p-2.5 rounded-xl bg-[#FF5B37]/10 border border-[#FF5B37]/25 text-[#FF5B37]">
                 <Sliders className="h-5 w-5" />
               </div>
               <div>
                 <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
                   Topic Classifieds Builder
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 uppercase">
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#FF5B37]/15 text-[#FF5B37] border border-[#FF5B37]/30 uppercase font-mono">
                     CAIE Print Engine
                   </span>
                 </h2>
@@ -215,7 +215,7 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
 
             <button
               onClick={onClose}
-              className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+              className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.05] transition cursor-pointer"
               title="Close panel"
             >
               <X className="h-5 w-5" />
@@ -223,7 +223,7 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
           </div>
 
           {/* Step Navigation Bar */}
-          <div className="grid grid-cols-4 border-b border-slate-800 bg-slate-950/40 text-xs">
+          <div className="grid grid-cols-4 border-b border-white/[0.08] bg-[#111113] text-xs">
             {[
               { num: 1, label: 'Scope' },
               { num: 2, label: 'Series & Tier' },
@@ -233,14 +233,14 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
               <button
                 key={step.num}
                 onClick={() => setActiveStep(step.num as any)}
-                className={`py-3 px-2 text-center font-semibold transition border-b-2 flex flex-col items-center gap-1 ${
+                className={`py-3 px-2 text-center font-medium transition border-b-2 flex flex-col items-center gap-1 cursor-pointer ${
                   activeStep === step.num
-                    ? 'border-indigo-500 text-indigo-400 bg-indigo-500/5'
+                    ? 'border-[#FF5B37] text-white bg-[#FF5B37]/5'
                     : 'border-transparent text-slate-400 hover:text-slate-200'
                 }`}
               >
-                <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] ${
-                  activeStep === step.num ? 'bg-indigo-500 text-white font-bold' : 'bg-slate-800 text-slate-400'
+                <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-mono ${
+                  activeStep === step.num ? 'bg-[#FF5B37] text-white font-bold' : 'bg-[#222225] text-slate-400'
                 }`}>
                   {step.num}
                 </span>
@@ -256,16 +256,16 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
               <div className="space-y-6">
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                       1. Syllabus Subject
                     </label>
                     {isAdmin ? (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                        👑 Admin: All 39 Syllabuses
+                      <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                        Admin: All 39 Syllabuses
                       </span>
                     ) : (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                        📚 {selectableSubjects.length} Enrolled Subjects
+                      <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-[#FF5B37]/15 text-[#FF5B37] border border-[#FF5B37]/30">
+                        {selectableSubjects.length} Enrolled Subjects
                       </span>
                     )}
                   </div>
@@ -285,7 +285,7 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                         }));
                       }
                     }}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-white focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-[#18181b] border border-white/[0.08] rounded-xl px-3.5 py-2.5 text-sm font-medium text-white focus:outline-none focus:border-[#FF5B37]"
                   >
                     {selectableSubjects.map(s => (
                       <option key={s.id} value={s.id}>
@@ -302,7 +302,7 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
 
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                       2. Syllabus Topics ({activeSelectedChapterIds.length} of {chapters.length} Selected)
                     </label>
                     <div className="flex items-center gap-2">
@@ -317,7 +317,7 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                             selectedSubtopics: []
                           }));
                         }}
-                        className="text-[11px] font-bold text-indigo-400 hover:text-indigo-300 transition cursor-pointer"
+                        className="text-[11px] font-semibold text-[#FF5B37] hover:text-[#e04f2e] transition cursor-pointer"
                       >
                         Select All
                       </button>
@@ -333,7 +333,7 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                             selectedSubtopics: []
                           }));
                         }}
-                        className="text-[11px] font-bold text-slate-400 hover:text-slate-300 transition cursor-pointer"
+                        className="text-[11px] font-semibold text-slate-400 hover:text-slate-300 transition cursor-pointer"
                       >
                         Reset to 1
                       </button>
@@ -373,24 +373,24 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                           }}
                           className={`p-3 rounded-xl border text-left cursor-pointer transition flex items-start gap-3 select-none ${
                             isSelected
-                              ? 'bg-indigo-600/15 border-indigo-500/60 text-white ring-1 ring-indigo-500/40'
-                              : 'bg-slate-950/60 border-slate-800 text-slate-300 hover:border-slate-700'
+                              ? 'bg-[#FF5B37]/10 border-[#FF5B37]/50 text-white ring-1 ring-[#FF5B37]/30'
+                              : 'bg-[#18181b] border-white/[0.08] text-slate-300 hover:border-white/[0.15]'
                           }`}
                         >
-                          <div className="shrink-0 mt-0.5 text-indigo-400">
+                          <div className="shrink-0 mt-0.5 text-[#FF5B37]">
                             {isSelected ? (
-                              <CheckSquare className="h-4 w-4 text-indigo-400" />
+                              <CheckSquare className="h-4 w-4 text-[#FF5B37]" />
                             ) : (
                               <Square className="h-4 w-4 text-slate-600" />
                             )}
                           </div>
                           <span className={`text-[11px] font-mono font-bold px-2 py-0.5 rounded ${
-                            isSelected ? 'bg-indigo-500 text-white' : 'bg-slate-800 text-slate-400'
+                            isSelected ? 'bg-[#FF5B37] text-white' : 'bg-[#222225] text-slate-400'
                           }`}>
                             {ch.id}
                           </span>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-bold truncate">{ch.title}</p>
+                            <p className="text-sm font-semibold truncate">{ch.title}</p>
                             <p className="text-xs text-slate-400 truncate">
                               {ch.subtopics.slice(0, 3).join(', ')}...
                             </p>
@@ -403,7 +403,7 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
 
                 {chapters.some(c => activeSelectedChapterIds.includes(c.id) && c.subtopics.length > 0) && (
                   <div>
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-2">
                       3. Sub-Topic Refinement (Optional)
                     </label>
                     <div className="flex flex-wrap gap-2">
@@ -418,10 +418,10 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                             key={sub}
                             type="button"
                             onClick={() => toggleSubtopic(sub)}
-                            className={`text-xs px-3 py-1.5 rounded-lg border font-medium transition ${
+                            className={`text-xs px-3 py-1.5 rounded-lg border font-medium transition cursor-pointer ${
                               isSubActive
-                                ? 'bg-indigo-500 border-indigo-400 text-white shadow-sm'
-                                : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+                                ? 'bg-[#FF5B37] border-[#FF5B37] text-white shadow-sm'
+                                : 'bg-[#18181b] border-white/[0.08] text-slate-400 hover:text-white'
                             }`}
                           >
                             {sub}
@@ -438,7 +438,7 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
             {activeStep === 2 && (
               <div className="space-y-6">
                 <div>
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-2">
                     1. Examination Year Range (2016 – 2026)
                   </label>
                   <div className="flex flex-wrap gap-2">
@@ -449,10 +449,10 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                           key={yr}
                           type="button"
                           onClick={() => toggleYear(yr)}
-                          className={`px-3.5 py-1.5 rounded-xl text-xs font-bold border transition ${
+                          className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-semibold border transition cursor-pointer ${
                             isSel
-                              ? 'bg-amber-500/20 border-amber-500 text-amber-300'
-                              : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+                              ? 'bg-[#FF5B37]/15 border-[#FF5B37] text-[#FF5B37]'
+                              : 'bg-[#18181b] border-white/[0.08] text-slate-400 hover:text-white'
                           }`}
                         >
                           {yr}
@@ -463,7 +463,7 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-2">
                     2. Exam Seasons
                   </label>
                   <div className="grid grid-cols-3 gap-2">
@@ -474,10 +474,10 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                           key={season}
                           type="button"
                           onClick={() => toggleSeason(season)}
-                          className={`p-3 rounded-xl text-xs font-bold border text-center transition ${
+                          className={`p-3 rounded-xl text-xs font-semibold border text-center transition cursor-pointer ${
                             isSel
-                              ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300'
-                              : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+                              ? 'bg-[#FF5B37]/15 border-[#FF5B37] text-[#FF5B37]'
+                              : 'bg-[#18181b] border-white/[0.08] text-slate-400 hover:text-white'
                           }`}
                         >
                           {season}
@@ -488,7 +488,7 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-2">
                     3. Candidate Target Tier
                   </label>
                   <div className="grid grid-cols-3 gap-2">
@@ -499,10 +499,10 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                           key={tier}
                           type="button"
                           onClick={() => onChangeConfig(prev => ({ ...prev, tier }))}
-                          className={`p-3 rounded-xl text-xs font-bold border text-center transition ${
+                          className={`p-3 rounded-xl text-xs font-semibold border text-center transition cursor-pointer ${
                             isSel
-                              ? 'bg-indigo-600 border-indigo-400 text-white shadow-md'
-                              : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+                              ? 'bg-[#FF5B37] border-[#FF5B37] text-white'
+                              : 'bg-[#18181b] border-white/[0.08] text-slate-400 hover:text-white'
                           }`}
                         >
                           {tier === 'Extended' ? 'Extended (A* - E)' : tier === 'Core' ? 'Core (C - G)' : 'All Tiers'}
@@ -513,7 +513,7 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-2">
                     4. Paper Component Selection
                   </label>
                   <div className="space-y-2">
@@ -522,7 +522,7 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                       return (
                         <label
                           key={comp}
-                          className="flex items-center gap-3 p-3 rounded-xl bg-slate-950 border border-slate-800 hover:border-slate-700 cursor-pointer text-xs font-medium"
+                          className="flex items-center gap-3 p-3 rounded-xl bg-[#18181b] border border-white/[0.08] hover:border-white/[0.15] cursor-pointer text-xs font-medium"
                         >
                           <input
                             type="checkbox"
@@ -536,9 +536,9 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                                 return { ...prev, paperComponents: next };
                               });
                             }}
-                            className="rounded border-slate-700 text-indigo-600 focus:ring-indigo-500"
+                            className="rounded border-slate-700 text-[#FF5B37] focus:ring-[#FF5B37]"
                           />
-                          <span>{comp}</span>
+                          <span className="text-slate-200">{comp}</span>
                         </label>
                       );
                     })}
@@ -551,7 +551,7 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
             {activeStep === 3 && (
               <div className="space-y-6">
                 <div>
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-2">
                     1. Booklet Output Mode (3 Choices)
                   </label>
                   <div className="space-y-3">
@@ -560,19 +560,19 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                         mode: 'Mode A: Student Exam Worksheet' as BookletMode,
                         title: 'Mode A: Student Exam Worksheet',
                         desc: 'Official Cambridge layout with blank working lines. Complete Mark Scheme compiled in the back appendix.',
-                        tag: 'Most Popular for Exam Practice'
+                        tag: 'Most Popular'
                       },
                       {
                         mode: 'Mode B: Inline Revision Guide' as BookletMode,
                         title: 'Mode B: Inline Revision Guide',
                         desc: 'Each question is immediately followed by its official Examiner Mark Scheme and Pitfall alerts in an answer box.',
-                        tag: 'Self-Study & Revision'
+                        tag: 'Self-Study'
                       },
                       {
                         mode: 'Mode C: Class Timed Test' as BookletMode,
                         title: 'Mode C: Class Timed Test',
                         desc: 'Clean exam question sheets with student score header box. Mark Scheme generated as a separate teacher answer key.',
-                        tag: 'Classroom & Homework Tests'
+                        tag: 'Timed Tests'
                       }
                     ].map(item => {
                       const isSel = config.bookletMode === item.mode;
@@ -582,13 +582,13 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                           onClick={() => onChangeConfig(prev => ({ ...prev, bookletMode: item.mode }))}
                           className={`p-4 rounded-xl border cursor-pointer transition text-left ${
                             isSel
-                              ? 'bg-indigo-600/15 border-indigo-500 text-white ring-1 ring-indigo-500'
-                              : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'
+                              ? 'bg-[#FF5B37]/10 border-[#FF5B37] text-white ring-1 ring-[#FF5B37]/30'
+                              : 'bg-[#18181b] border-white/[0.08] text-slate-300 hover:border-white/[0.15]'
                           }`}
                         >
                           <div className="flex items-center justify-between mb-1">
-                            <span className="text-sm font-bold text-white">{item.title}</span>
-                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-800 text-indigo-300">
+                            <span className="text-sm font-semibold text-white">{item.title}</span>
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#222225] text-slate-300">
                               {item.tag}
                             </span>
                           </div>
@@ -600,7 +600,7 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-2">
                     2. Working Space Style
                   </label>
                   <div className="grid grid-cols-2 gap-3">
@@ -616,13 +616,13 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                           key={style.id}
                           type="button"
                           onClick={() => onChangeConfig(prev => ({ ...prev, workingSpaceStyle: style.id }))}
-                          className={`p-3 rounded-xl border text-left transition ${
+                          className={`p-3 rounded-xl border text-left transition cursor-pointer ${
                             isSel
-                              ? 'bg-indigo-600/15 border-indigo-500 text-white'
-                              : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+                              ? 'bg-[#FF5B37]/10 border-[#FF5B37] text-white'
+                              : 'bg-[#18181b] border-white/[0.08] text-slate-400 hover:text-white'
                           }`}
                         >
-                          <span className="text-xs font-bold block text-white">{style.label}</span>
+                          <span className="text-xs font-semibold block text-white">{style.label}</span>
                           <span className="text-[11px] text-slate-400 block mt-0.5">{style.desc}</span>
                         </button>
                       );
@@ -632,10 +632,10 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
 
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                       3. Question Quantity Limit
                     </label>
-                    <span className="text-xs font-bold text-indigo-400">
+                    <span className="text-xs font-mono font-semibold text-[#FF5B37]">
                       {config.questionQuantity === 0 ? 'All Available' : `${config.questionQuantity} Questions`}
                     </span>
                   </div>
@@ -645,10 +645,10 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                         key={qty}
                         type="button"
                         onClick={() => onChangeConfig(prev => ({ ...prev, questionQuantity: qty }))}
-                        className={`flex-1 py-2 rounded-xl text-xs font-bold border transition ${
+                        className={`flex-1 py-2 rounded-xl text-xs font-semibold border transition cursor-pointer ${
                           config.questionQuantity === qty
-                            ? 'bg-indigo-600 border-indigo-400 text-white'
-                            : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+                            ? 'bg-[#FF5B37] border-[#FF5B37] text-white'
+                            : 'bg-[#18181b] border-white/[0.08] text-slate-400 hover:text-white'
                         }`}
                       >
                         {qty === 0 ? 'All' : qty}
@@ -657,9 +657,9 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                   </div>
                 </div>
 
-                <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
+                <div className="p-4 rounded-xl bg-[#18181b] border border-white/[0.08] flex items-center justify-between">
                   <div>
-                    <span className="text-xs font-bold text-white block">Syllabus Learning Objectives Checksheet</span>
+                    <span className="text-xs font-semibold text-white block">Syllabus Learning Objectives Checksheet</span>
                     <span className="text-[11px] text-slate-400 block mt-0.5">
                       Include a 1-page self-assessment diagnostic checklist on Page 2
                     </span>
@@ -667,8 +667,8 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                   <button
                     type="button"
                     onClick={() => onChangeConfig(prev => ({ ...prev, includeSyllabusChecksheet: !prev.includeSyllabusChecksheet }))}
-                    className={`w-12 h-6 flex items-center rounded-full p-1 transition duration-300 ${
-                      config.includeSyllabusChecksheet ? 'bg-indigo-600 justify-end' : 'bg-slate-800 justify-start'
+                    className={`w-12 h-6 flex items-center rounded-full p-1 transition duration-300 cursor-pointer ${
+                      config.includeSyllabusChecksheet ? 'bg-[#FF5B37] justify-end' : 'bg-[#222225] justify-start'
                     }`}
                   >
                     <div className="bg-white w-4 h-4 rounded-full shadow-md transform" />
@@ -682,7 +682,7 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 block">
                       Matched Questions ({availableQuestions.length} Total)
                     </span>
                     <span className="text-[11px] text-slate-400">
@@ -693,7 +693,7 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                     <button
                       type="button"
                       onClick={() => sortQuestions('easy')}
-                      className="px-2.5 py-1 rounded-lg bg-slate-800 text-[11px] font-semibold text-slate-300 hover:text-white transition"
+                      className="px-2.5 py-1 rounded-lg bg-[#18181b] border border-white/[0.08] text-[11px] font-semibold text-slate-300 hover:text-white transition cursor-pointer"
                       title="Sort Easy to Hard"
                     >
                       Marks ↑
@@ -701,7 +701,7 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                     <button
                       type="button"
                       onClick={() => sortQuestions('hard')}
-                      className="px-2.5 py-1 rounded-lg bg-slate-800 text-[11px] font-semibold text-slate-300 hover:text-white transition"
+                      className="px-2.5 py-1 rounded-lg bg-[#18181b] border border-white/[0.08] text-[11px] font-semibold text-slate-300 hover:text-white transition cursor-pointer"
                       title="Sort Hard to Easy"
                     >
                       Marks ↓
@@ -709,7 +709,7 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                     <button
                       type="button"
                       onClick={() => sortQuestions('year')}
-                      className="px-2.5 py-1 rounded-lg bg-slate-800 text-[11px] font-semibold text-slate-300 hover:text-white transition"
+                      className="px-2.5 py-1 rounded-lg bg-[#18181b] border border-white/[0.08] text-[11px] font-semibold text-slate-300 hover:text-white transition cursor-pointer"
                       title="Sort Newest to Oldest"
                     >
                       Newest
@@ -719,7 +719,7 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
 
                 <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
                   {availableQuestions.length === 0 ? (
-                    <div className="p-8 text-center bg-slate-950 rounded-xl border border-slate-800 text-slate-400">
+                    <div className="p-8 text-center bg-[#18181b] rounded-xl border border-white/[0.08] text-slate-400">
                       <p className="text-sm font-semibold">No questions match the current filter selection.</p>
                       <p className="text-xs mt-1">Try expanding the year range or tier in Steps 1 & 2.</p>
                     </div>
@@ -731,8 +731,8 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                           key={q.id}
                           className={`p-3 rounded-xl border flex items-center justify-between gap-3 transition ${
                             isIncluded
-                              ? 'bg-slate-950 border-slate-800 text-slate-200'
-                              : 'bg-slate-950/40 border-slate-900 text-slate-600 opacity-60'
+                              ? 'bg-[#18181b] border-white/[0.08] text-slate-200'
+                              : 'bg-[#141416]/50 border-white/[0.04] text-slate-600 opacity-60'
                           }`}
                         >
                           <label className="flex items-center gap-3 cursor-pointer min-w-0 flex-1">
@@ -740,13 +740,13 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                               type="checkbox"
                               checked={isIncluded}
                               onChange={() => toggleQuestionSelection(q.id)}
-                              className="rounded border-slate-700 text-indigo-600 focus:ring-indigo-500"
+                              className="rounded border-slate-700 text-[#FF5B37] focus:ring-[#FF5B37]"
                             />
                             <div className="min-w-0 flex-1">
                               <div className="flex items-center gap-2">
-                                <span className="text-xs font-bold text-white">Q{idx + 1}.</span>
-                                <span className="text-xs font-semibold text-indigo-400 truncate">{q.source}</span>
-                                <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">
+                                <span className="text-xs font-mono font-bold text-white">Q{idx + 1}.</span>
+                                <span className="text-xs font-mono font-semibold text-slate-200 truncate">{q.source}</span>
+                                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#222225] text-slate-300">
                                   [{q.totalMarks} Marks]
                                 </span>
                               </div>
@@ -761,7 +761,7 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                               type="button"
                               onClick={() => moveQuestion(idx, 'up')}
                               disabled={idx === 0}
-                              className="p-1 rounded bg-slate-900 border border-slate-800 text-slate-400 hover:text-white disabled:opacity-30"
+                              className="p-1 rounded bg-[#222225] border border-white/[0.08] text-slate-400 hover:text-white disabled:opacity-30 cursor-pointer"
                               title="Move up"
                             >
                               <MoveUp className="h-3.5 w-3.5" />
@@ -770,7 +770,7 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                               type="button"
                               onClick={() => moveQuestion(idx, 'down')}
                               disabled={idx === availableQuestions.length - 1}
-                              className="p-1 rounded bg-slate-900 border border-slate-800 text-slate-400 hover:text-white disabled:opacity-30"
+                              className="p-1 rounded bg-[#222225] border border-white/[0.08] text-slate-400 hover:text-white disabled:opacity-30 cursor-pointer"
                               title="Move down"
                             >
                               <MoveDown className="h-3.5 w-3.5" />
@@ -786,13 +786,13 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
           </div>
 
           {/* Footer Controls */}
-          <div className="p-4 border-t border-slate-800 bg-slate-950 flex items-center justify-between">
+          <div className="p-4 border-t border-white/[0.08] bg-[#111113] flex items-center justify-between">
             <div className="flex items-center gap-2">
               {activeStep > 1 && (
                 <button
                   type="button"
                   onClick={() => setActiveStep((prev) => (prev - 1) as any)}
-                  className="px-3.5 py-2 rounded-xl border border-slate-800 bg-slate-900 text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1.5 transition"
+                  className="px-3.5 py-2 rounded-xl border border-white/[0.08] bg-[#18181b] text-xs font-medium text-slate-300 hover:text-white flex items-center gap-1.5 transition cursor-pointer"
                 >
                   <ChevronLeft className="h-4 w-4" />
                   Previous
@@ -805,7 +805,7 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                 <button
                   type="button"
                   onClick={() => setActiveStep((prev) => (prev + 1) as any)}
-                  className="px-4 py-2 rounded-xl bg-indigo-600 text-xs font-bold text-white hover:bg-indigo-500 flex items-center gap-1.5 shadow-lg shadow-indigo-600/30 transition"
+                  className="px-4 py-2 rounded-xl bg-[#FF5B37] text-xs font-semibold text-white hover:bg-[#e04f2e] flex items-center gap-1.5 transition cursor-pointer"
                 >
                   Next Step
                   <ChevronRight className="h-4 w-4" />
@@ -817,7 +817,7 @@ export const ClassifiedsConfigPanel: React.FC<ClassifiedsConfigPanelProps> = ({
                     onClose();
                     onTriggerPrint();
                   }}
-                  className="px-5 py-2 rounded-xl bg-emerald-600 text-xs font-bold text-white hover:bg-emerald-500 flex items-center gap-2 shadow-lg shadow-emerald-600/30 transition"
+                  className="px-5 py-2 rounded-xl bg-[#FF5B37] text-xs font-semibold text-white hover:bg-[#e04f2e] flex items-center gap-2 transition cursor-pointer"
                 >
                   <Printer className="h-4 w-4" />
                   Print / Export PDF
