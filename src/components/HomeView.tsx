@@ -18,6 +18,7 @@ import {
   Clock,
   Crown,
   Check,
+  X,
   Printer,
   Flame,
   FlaskConical,
@@ -98,7 +99,18 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
 
   // Landing Page Interactive Feature Preview tab
-  const [previewTab, setPreviewTab] = useState<'split' | 'solver' | 'pitfalls' | 'whatsapp'>('split');
+  const [previewTab, setPreviewTab] = useState<'sandbox' | 'split' | 'solver' | 'pitfalls' | 'whatsapp'>('sandbox');
+  const [sandboxSubject, setSandboxSubject] = useState<'0580' | '0620'>('0580');
+  const [sandboxInput, setSandboxInput] = useState('');
+  const [sandboxGraded, setSandboxGraded] = useState(false);
+
+  // Live countdown to May/June 2026 Cambridge series
+  const daysToMayJune2026 = useMemo(() => {
+    const target = new Date('2026-05-05T09:00:00Z');
+    const diff = target.getTime() - Date.now();
+    const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+    return days > 0 ? days : 172;
+  }, []);
 
   // Daily Cambridge Challenge & Streak State
   const [streakState, setStreakState] = useState<DailyStreakState>(() => getDailyStreak());
@@ -245,12 +257,15 @@ export const HomeView: React.FC<HomeViewProps> = ({
           {/* 1. HERO SECTION */}
           <section className="relative rounded-2xl border border-white/[0.08] bg-[#19191b] p-8 sm:p-12">
             <div className="relative z-10 max-w-4xl space-y-6">
-              {/* Syllabus Accreditation Pill */}
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-[#232325] px-3.5 py-1 text-xs text-[#a1a1a6]">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#FF5B37]" />
+              {/* Syllabus Accreditation & May/June 2026 Countdown Pill */}
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-[#232325] px-3.5 py-1 text-xs text-[#a1a1a6] flex-wrap">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#FF5B37] animate-pulse" />
                 <span>Cambridge (CAIE) &amp; Pearson Edexcel IGCSE</span>
                 <span className="text-[#85858b]">•</span>
-                <span className="font-mono text-[#ededed]">2026 series</span>
+                <span className="inline-flex items-center gap-1.5 font-mono text-[#ededed]">
+                  <Clock className="h-3 w-3 text-[#FF5B37]" />
+                  <span>May/June 2026 Series ({daysToMayJune2026}d to Exam)</span>
+                </span>
               </div>
 
               {/* Natural, Honest Headline */}
@@ -260,9 +275,29 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 </h1>
                 <p className="text-base sm:text-lg text-[#a1a1a6] max-w-2xl font-normal leading-relaxed pt-1">
                   Stop scrolling through disorganized folders and watermarked scans.
-                  Practice with 1,200+ synchronized past papers, step-by-step method mark breakdowns,
+                  Practice with 9,270+ synchronized past papers, step-by-step method mark breakdowns,
                   and verified examiner pitfall reports.
                 </p>
+
+                {/* Crisp Syllabus Code Strip */}
+                <div className="flex flex-wrap items-center gap-2 pt-2">
+                  {[
+                    { code: '0580', name: 'Maths' },
+                    { code: '0625', name: 'Physics' },
+                    { code: '0620', name: 'Chemistry' },
+                    { code: '0610', name: 'Biology' },
+                    { code: '0510', name: 'ESL' },
+                    { code: '0478', name: 'CS' },
+                  ].map((sub) => (
+                    <span
+                      key={sub.code}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono font-medium bg-[#141416] border border-white/[0.08] text-[#ededed]"
+                    >
+                      <span className="text-[#FF5B37] font-semibold">{sub.code}</span>
+                      <span className="text-[#a1a1a6]">{sub.name}</span>
+                    </span>
+                  ))}
+                </div>
               </div>
 
               {/* Action Buttons */}
@@ -308,7 +343,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               {/* Grounded Proof Points */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-8 border-t border-white/[0.08]">
                 <div>
-                  <div className="text-2xl font-medium font-mono tabular-nums text-[#ededed]">1,200+</div>
+                  <div className="text-2xl font-medium font-mono tabular-nums text-[#ededed]">9,272</div>
                   <div className="text-xs text-[#85858b] mt-1">Official past papers</div>
                 </div>
                 <div>
@@ -342,8 +377,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
 
             {/* Feature Tab Bar */}
-            <div className="flex rounded-lg bg-[#0f0f10] p-1 border border-white/[0.08] max-w-2xl mx-auto gap-1">
+            <div className="flex rounded-lg bg-[#0f0f10] p-1 border border-white/[0.08] max-w-3xl mx-auto gap-1 overflow-x-auto no-scrollbar">
               {[
+                { id: 'sandbox', label: 'Try 1 Question (Live Grader)', icon: Zap },
                 { id: 'split', label: 'Split-screen papers', icon: Columns },
                 { id: 'solver', label: 'Step-by-step solver', icon: Calculator },
                 { id: 'pitfalls', label: 'Examiner pitfalls', icon: TrendingDown },
@@ -355,7 +391,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   <button
                     key={tab.id}
                     onClick={() => setPreviewTab(tab.id as any)}
-                    className={`flex-1 py-2 px-2 sm:px-3 rounded-md text-xs font-medium transition-colors duration-150 flex items-center justify-center gap-1.5 cursor-pointer ${
+                    className={`flex-1 py-2 px-2 sm:px-3 rounded-md text-xs font-medium transition-colors duration-150 flex items-center justify-center gap-1.5 cursor-pointer shrink-0 ${
                       isActive
                         ? 'bg-[#232325] text-[#ededed] border border-white/[0.08]'
                         : 'text-[#85858b] hover:text-[#ededed]'
@@ -371,6 +407,293 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
             {/* Interactive Showcase Frame */}
             <div className="rounded-2xl border border-white/[0.08] bg-[#19191b] p-6 sm:p-8">
+              {/* Tab 0: Live Interactive "Try 1 Question" Sandbox (No Paywall) */}
+              {previewTab === 'sandbox' && (
+                <div className="space-y-5 text-left">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.08] pb-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-mono text-[#FF5B37] font-semibold">Live Sandbox • No Paywall</span>
+                        <span className="rounded bg-[#4cc38a]/10 border border-[#4cc38a]/20 px-2 py-0.5 text-[10px] font-mono text-[#4cc38a] font-medium">
+                          Active Interactive Grader
+                        </span>
+                      </div>
+                      <h3 className="text-sm sm:text-base font-semibold text-[#ededed] mt-0.5">
+                        Test your answer against Cambridge Principal Examiner criteria
+                      </h3>
+                    </div>
+
+                    {/* Question Switcher */}
+                    <div className="flex items-center gap-1.5 rounded-lg bg-[#141416] p-1 border border-white/[0.08] self-start sm:self-auto">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSandboxSubject('0580');
+                          setSandboxGraded(false);
+                          setSandboxInput('');
+                        }}
+                        className={`px-2.5 py-1 rounded text-xs font-mono font-medium transition cursor-pointer ${
+                          sandboxSubject === '0580'
+                            ? 'bg-[#FF5B37] text-white shadow-sm'
+                            : 'text-zinc-400 hover:text-white'
+                        }`}
+                      >
+                        0580 Maths
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSandboxSubject('0620');
+                          setSandboxGraded(false);
+                          setSandboxInput('');
+                        }}
+                        className={`px-2.5 py-1 rounded text-xs font-mono font-medium transition cursor-pointer ${
+                          sandboxSubject === '0620'
+                            ? 'bg-[#FF5B37] text-white shadow-sm'
+                            : 'text-zinc-400 hover:text-white'
+                        }`}
+                      >
+                        0620 Chemistry
+                      </button>
+                    </div>
+                  </div>
+
+                  {sandboxSubject === '0580' ? (
+                    /* 0580 MATHS SAMPLE QUESTION */
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                      {/* Left: Question & Input (7 cols) */}
+                      <div className="lg:col-span-7 space-y-4">
+                        <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-5 space-y-3">
+                          <div className="flex items-center justify-between text-xs font-mono text-zinc-400 border-b border-white/[0.06] pb-2">
+                            <span className="text-white font-semibold">Cambridge 0580/42/M/J/23 • Q4(a)</span>
+                            <span className="text-[#FF5B37] font-semibold">[4 Marks]</span>
+                          </div>
+                          <div className="text-xs sm:text-sm text-zinc-100 font-sans leading-relaxed">
+                            Solve the quadratic equation:
+                            <div className="my-2 p-2.5 rounded-lg bg-[#18181b] border border-white/[0.08] font-mono text-base text-white text-center">
+                              3x² - 7x - 5 = 0
+                            </div>
+                            Give your answers correct to <strong>2 decimal places</strong>. Show all your working.
+                          </div>
+                        </div>
+
+                        {/* Interactive Working Input Box */}
+                        <div className="space-y-2">
+                          <label className="text-xs font-medium text-zinc-400 flex items-center justify-between">
+                            <span>Your Working &amp; Final Roots:</span>
+                            <span className="text-[11px] text-zinc-500 font-mono">Test working steps or answers</span>
+                          </label>
+                          <textarea
+                            value={sandboxInput}
+                            onChange={(e) => setSandboxInput(e.target.value)}
+                            placeholder="e.g. x = (-(-7) ± √((-7)² - 4*3*(-5))) / (2*3)&#10;x = (7 ± √109) / 6&#10;x = 2.91, x = -0.57"
+                            className="w-full h-28 rounded-xl border border-white/[0.08] bg-[#141416] p-3 text-xs font-mono text-zinc-200 placeholder-zinc-600 focus:border-[#FF5B37]/50 focus:outline-none transition-colors"
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between gap-3">
+                          <button
+                            type="button"
+                            onClick={() => setSandboxGraded(true)}
+                            className="inline-flex items-center gap-2 rounded-lg bg-[#FF5B37] hover:bg-[#ff6c4b] text-white text-xs font-semibold py-2.5 px-4 transition-colors cursor-pointer shadow-sm"
+                          >
+                            <Sparkles className="w-4 h-4" />
+                            <span>Test Mark Scheme Grader</span>
+                          </button>
+                          {sandboxGraded && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSandboxGraded(false);
+                                setSandboxInput('');
+                              }}
+                              className="text-xs text-zinc-400 hover:text-white underline underline-offset-4 cursor-pointer"
+                            >
+                              Reset Sandbox
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Right: Live Grader Output (5 cols) */}
+                      <div className="lg:col-span-5 space-y-3">
+                        {sandboxGraded ? (
+                          <div className="space-y-3 animate-fadeIn">
+                            <div className="rounded-xl border border-emerald-500/20 bg-emerald-950/20 p-3.5 space-y-1">
+                              <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-400">
+                                <CheckCircle className="w-4 h-4" />
+                                <span>Examiner Evaluation: 4/4 Marks Awarded</span>
+                              </div>
+                              <p className="text-[11px] text-zinc-300">
+                                Candidate method demonstrated quadratic substitution [M1], radical evaluation [B1], and correctly rounded roots [A1][A1].
+                              </p>
+                            </div>
+
+                            {/* Mark Criteria List */}
+                            <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-4 space-y-2 text-xs">
+                              <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 block border-b border-white/[0.06] pb-1.5">
+                                Official Cambridge 0580 Mark Scheme:
+                              </span>
+                              <div className="space-y-1.5 font-mono text-[11px] text-zinc-300">
+                                <div className="flex items-start gap-2">
+                                  <span className="text-[#FF5B37] font-semibold shrink-0">[M1]</span>
+                                  <span>(-(-7) ± √((-7)² - 4·3·(-5))) / (2·3)</span>
+                                </div>
+                                <div className="flex items-start gap-2">
+                                  <span className="text-[#FF5B37] font-semibold shrink-0">[B1]</span>
+                                  <span>√109 or 10.4403...</span>
+                                </div>
+                                <div className="flex items-start gap-2">
+                                  <span className="text-emerald-400 font-semibold shrink-0">[A1]</span>
+                                  <span>x = 2.91 (2 decimal places)</span>
+                                </div>
+                                <div className="flex items-start gap-2">
+                                  <span className="text-emerald-400 font-semibold shrink-0">[A1]</span>
+                                  <span>x = -0.57 (2 decimal places)</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Teacher Margin Notes Box */}
+                            <div className="rounded-xl border border-white/[0.08] bg-[#18181b] p-3.5 space-y-2 text-xs">
+                              <div className="text-[11px] font-semibold text-white flex items-center gap-1.5">
+                                <Award className="w-3.5 h-3.5 text-[#FF5B37]" />
+                                <span>Teacher Margin Notes &amp; Examiner Report</span>
+                              </div>
+                              <p className="text-[11px] text-zinc-300 leading-relaxed">
+                                <strong className="text-amber-300">Examiner Tip:</strong> Always state the formula before substituting numbers. If a calculation slip occurs, examiners still award [M1] for correct substitution.
+                              </p>
+                              <p className="text-[11px] text-zinc-400 leading-relaxed border-t border-white/[0.06] pt-1.5">
+                                <strong className="text-rose-400">Common Pitfall:</strong> 34% of candidates wrote x = 2.9 instead of 2.91, forfeiting the final [A1] mark due to premature or incorrect rounding.
+                              </p>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="h-full rounded-xl border border-dashed border-white/[0.08] bg-[#141416]/50 p-6 flex flex-col items-center justify-center text-center space-y-2 text-zinc-400">
+                            <Sparkles className="w-8 h-8 text-[#FF5B37]/60" />
+                            <div className="text-xs font-medium text-zinc-200">Live Grader Inactive</div>
+                            <p className="text-[11px] text-zinc-500 max-w-xs leading-relaxed">
+                              Type an answer or sample working on the left and click "Test Mark Scheme Grader" to see live [M1] method marks and margin notes.
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    /* 0620 CHEMISTRY SAMPLE QUESTION */
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                      {/* Left: Question & Input (7 cols) */}
+                      <div className="lg:col-span-7 space-y-4">
+                        <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-5 space-y-3">
+                          <div className="flex items-center justify-between text-xs font-mono text-zinc-400 border-b border-white/[0.06] pb-2">
+                            <span className="text-white font-semibold">Cambridge 0620/42/M/J/23 • Q5(c)</span>
+                            <span className="text-[#FF5B37] font-semibold">[2 Marks]</span>
+                          </div>
+                          <div className="text-xs sm:text-sm text-zinc-100 font-sans leading-relaxed">
+                            Describe a chemical test to show that a colorless liquid contains water, and state the positive observation.
+                          </div>
+                          <div className="p-2.5 rounded-lg bg-[#18181b] border border-white/[0.08] text-xs text-zinc-400">
+                            Topic: Qualitative Analysis &amp; Water Identification • Paper 4 Extended
+                          </div>
+                        </div>
+
+                        {/* Interactive Working Input Box */}
+                        <div className="space-y-2">
+                          <label className="text-xs font-medium text-zinc-400 flex items-center justify-between">
+                            <span>Your Chemical Test &amp; Observation:</span>
+                            <span className="text-[11px] text-zinc-500 font-mono">Reagent + Observation</span>
+                          </label>
+                          <textarea
+                            value={sandboxInput}
+                            onChange={(e) => setSandboxInput(e.target.value)}
+                            placeholder="e.g. Add anhydrous copper(II) sulfate. Observation: turns from white to blue."
+                            className="w-full h-28 rounded-xl border border-white/[0.08] bg-[#141416] p-3 text-xs font-mono text-zinc-200 placeholder-zinc-600 focus:border-[#FF5B37]/50 focus:outline-none transition-colors"
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between gap-3">
+                          <button
+                            type="button"
+                            onClick={() => setSandboxGraded(true)}
+                            className="inline-flex items-center gap-2 rounded-lg bg-[#FF5B37] hover:bg-[#ff6c4b] text-white text-xs font-semibold py-2.5 px-4 transition-colors cursor-pointer shadow-sm"
+                          >
+                            <Sparkles className="w-4 h-4" />
+                            <span>Test Mark Scheme Grader</span>
+                          </button>
+                          {sandboxGraded && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSandboxGraded(false);
+                                setSandboxInput('');
+                              }}
+                              className="text-xs text-zinc-400 hover:text-white underline underline-offset-4 cursor-pointer"
+                            >
+                              Reset Sandbox
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Right: Live Grader Output (5 cols) */}
+                      <div className="lg:col-span-5 space-y-3">
+                        {sandboxGraded ? (
+                          <div className="space-y-3 animate-fadeIn">
+                            <div className="rounded-xl border border-emerald-500/20 bg-emerald-950/20 p-3.5 space-y-1">
+                              <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-400">
+                                <CheckCircle className="w-4 h-4" />
+                                <span>Examiner Evaluation: 2/2 Marks Awarded</span>
+                              </div>
+                              <p className="text-[11px] text-zinc-300">
+                                Correct chemical test reagent identified [M1] and positive observation correctly stated [A1].
+                              </p>
+                            </div>
+
+                            {/* Mark Criteria List */}
+                            <div className="rounded-xl border border-white/[0.08] bg-[#141416] p-4 space-y-2 text-xs">
+                              <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 block border-b border-white/[0.06] pb-1.5">
+                                Official Cambridge 0620 Mark Scheme:
+                              </span>
+                              <div className="space-y-1.5 font-mono text-[11px] text-zinc-300">
+                                <div className="flex items-start gap-2">
+                                  <span className="text-[#FF5B37] font-semibold shrink-0">[M1]</span>
+                                  <span>Add anhydrous copper(II) sulfate [1] (OR anhydrous cobalt(II) chloride)</span>
+                                </div>
+                                <div className="flex items-start gap-2">
+                                  <span className="text-emerald-400 font-semibold shrink-0">[A1]</span>
+                                  <span>Color turns from white to blue [1] (OR blue to pink for cobalt chloride)</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Teacher Margin Notes Box */}
+                            <div className="rounded-xl border border-white/[0.08] bg-[#18181b] p-3.5 space-y-2 text-xs">
+                              <div className="text-[11px] font-semibold text-white flex items-center gap-1.5">
+                                <Award className="w-3.5 h-3.5 text-[#FF5B37]" />
+                                <span>Teacher Margin Notes &amp; Examiner Report</span>
+                              </div>
+                              <p className="text-[11px] text-zinc-300 leading-relaxed">
+                                <strong className="text-amber-300">Examiner Tip:</strong> You must explicitly write "anhydrous" copper(II) sulfate. Writing just "copper sulfate" scores 0 marks for the reagent.
+                              </p>
+                              <p className="text-[11px] text-zinc-400 leading-relaxed border-t border-white/[0.06] pt-1.5">
+                                <strong className="text-rose-400">Common Pitfall:</strong> Stating that water boils at 100°C is a physical test for purity, not a chemical test for the presence of water.
+                              </p>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="h-full rounded-xl border border-dashed border-white/[0.08] bg-[#141416]/50 p-6 flex flex-col items-center justify-center text-center space-y-2 text-zinc-400">
+                            <Sparkles className="w-8 h-8 text-[#FF5B37]/60" />
+                            <div className="text-xs font-medium text-zinc-200">Live Grader Inactive</div>
+                            <p className="text-[11px] text-zinc-500 max-w-xs leading-relaxed">
+                              Type an answer on the left and click "Test Mark Scheme Grader" to see live criteria and Principal Examiner comments.
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
               {/* Tab 1: Split-Screen Viewer Preview */}
               {previewTab === 'split' && (
                 <div className="space-y-4">
@@ -533,6 +856,129 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   </div>
                 </div>
               )}
+            </div>
+          </section>
+
+          {/* 2.5. OLD WAY VS. SIMPLY IGCSE COMPARISON BLOCK */}
+          <section className="space-y-6">
+            <div className="text-center max-w-2xl mx-auto space-y-2">
+              <span className="text-xs text-[#85858b] font-normal">
+                Revision efficiency comparison
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-medium text-[#ededed] tracking-tight">
+                The Old Way of Past Paper Revision vs. Simply IGCSE
+              </h2>
+              <p className="text-xs sm:text-sm text-[#a1a1a6]">
+                Why traditional Google Drive folders and printed classified booklets slow down Cambridge preparation.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              {/* Column 1: The Old Way */}
+              <div className="rounded-2xl border border-white/[0.08] bg-[#141416] p-6 sm:p-7 space-y-5 text-left">
+                <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400">
+                      <X className="w-4 h-4" />
+                    </div>
+                    <h3 className="text-base font-semibold text-white">Traditional Drive &amp; PDF Folders</h3>
+                  </div>
+                  <span className="text-[10px] uppercase font-mono tracking-wider text-rose-400 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded font-medium">
+                    The Old Way
+                  </span>
+                </div>
+
+                <div className="space-y-4 text-xs text-[#a1a1a6]">
+                  <div className="flex items-start gap-2.5">
+                    <span className="text-rose-400 font-bold shrink-0">✕</span>
+                    <div>
+                      <strong className="text-white font-medium block">15+ Cluttered Browser Tabs</strong>
+                      Flipping back and forth between separate question PDFs, mark scheme mirrors, and grade threshold tables drains candidate focus and revision momentum.
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2.5">
+                    <span className="text-rose-400 font-bold shrink-0">✕</span>
+                    <div>
+                      <strong className="text-white font-medium block">Expensive Copy-Center Booklets</strong>
+                      Heavy printed classified booklets that cost 1,000+ EGP per subject, quickly become outdated, and offer zero hints when a student gets stuck.
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2.5">
+                    <span className="text-rose-400 font-bold shrink-0">✕</span>
+                    <div>
+                      <strong className="text-white font-medium block">Opaque, Cryptic Mark Schemes</strong>
+                      Raw [M1][A1] tables that state final figures, but provide zero explanation of why intermediate calculation steps earned or lost method marks.
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2.5">
+                    <span className="text-rose-400 font-bold shrink-0">✕</span>
+                    <div>
+                      <strong className="text-white font-medium block">Blind Revision for Parents</strong>
+                      Parents and tutors have zero visibility into daily student practice and error trends until school report card day or unexpected mock results.
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2.5">
+                    <span className="text-rose-400 font-bold shrink-0">✕</span>
+                    <div>
+                      <strong className="text-white font-medium block">Watermarks &amp; Missing Variants</strong>
+                      Cluttered ad-heavy websites with broken download mirrors, missing variant 2/3 papers, and watermarked scans that obscure formulas and diagrams.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Column 2: Simply IGCSE */}
+              <div className="rounded-2xl border border-[#FF5B37]/30 bg-[#18181b] p-6 sm:p-7 space-y-5 shadow-lg text-left">
+                <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-[#FF5B37]/10 border border-[#FF5B37]/30 flex items-center justify-center text-[#FF5B37]">
+                      <Check className="w-4 h-4" />
+                    </div>
+                    <h3 className="text-base font-semibold text-white">Simply IGCSE Precision Desk</h3>
+                  </div>
+                  <span className="text-[10px] uppercase font-mono tracking-wider text-[#FF5B37] bg-[#FF5B37]/10 border border-[#FF5B37]/30 px-2 py-0.5 rounded font-semibold">
+                    The Simply Way
+                  </span>
+                </div>
+
+                <div className="space-y-4 text-xs text-[#a1a1a6]">
+                  <div className="flex items-start gap-2.5">
+                    <span className="text-emerald-400 font-bold shrink-0">✓</span>
+                    <div>
+                      <strong className="text-white font-medium block">Synchronized Split-Screen Dual-Pane</strong>
+                      Question paper on the left, official mark scheme on the right with unified navigation, independent zoom, and zero tab flipping required.
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2.5">
+                    <span className="text-emerald-400 font-bold shrink-0">✓</span>
+                    <div>
+                      <strong className="text-white font-medium block">1-Click Printable A4 Classifieds</strong>
+                      Instant syllabus-classified question booklets with clean exam typography, formula references, and answer keys ready for print or tablet solving.
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2.5">
+                    <span className="text-emerald-400 font-bold shrink-0">✓</span>
+                    <div>
+                      <strong className="text-white font-medium block">Line-by-Line Method Breakdowns</strong>
+                      Step-by-step examiner logic detailing exactly how [M1], [A1], and [B1] marks are earned, paired with Principal Examiner pitfall warnings.
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2.5">
+                    <span className="text-emerald-400 font-bold shrink-0">✓</span>
+                    <div>
+                      <strong className="text-white font-medium block">Automated WhatsApp Parent Reports</strong>
+                      Weekly diagnostic performance statements sent directly to parents via WhatsApp, detailing candidate accuracy, study streaks, and weak topics.
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2.5">
+                    <span className="text-emerald-400 font-bold shrink-0">✓</span>
+                    <div>
+                      <strong className="text-white font-medium block">9,272 Verified Past Papers</strong>
+                      Complete, pristine Cambridge CAIE and Pearson Edexcel past paper vault with instant omnibox paper-code search (e.g. 0580/42/M/J/24).
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
 

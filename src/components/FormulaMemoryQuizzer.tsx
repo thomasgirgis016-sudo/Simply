@@ -19,7 +19,8 @@ import {
   BrainCircuit,
   Volume2,
   Layers,
-  Calculator
+  Calculator,
+  Share2
 } from 'lucide-react';
 import {
   FORMULA_QUIZ_QUESTIONS,
@@ -28,6 +29,7 @@ import {
   normalizeFormulaAnswer
 } from '../data/formulaQuizData';
 import { Subject, UserProfile } from '../types';
+import { ShareAchievementCardModal } from './ShareAchievementCardModal';
 
 interface FormulaMemoryQuizzerProps {
   subject?: Subject;
@@ -87,6 +89,7 @@ export const FormulaMemoryQuizzer: React.FC<FormulaMemoryQuizzerProps> = ({
   const [sprintTimeRemaining, setSprintTimeRemaining] = useState(60);
   const [isSprintActive, setIsSprintActive] = useState(false);
   const [isSprintFinished, setIsSprintFinished] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -425,10 +428,17 @@ export const FormulaMemoryQuizzer: React.FC<FormulaMemoryQuizzerProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center justify-center gap-3">
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <button
+              onClick={() => setIsShareModalOpen(true)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#FF5B37] hover:bg-[#ff6c4b] text-white font-semibold text-xs transition cursor-pointer shadow-sm"
+            >
+              <Share2 className="h-4 w-4" />
+              <span>Copy / Download Share Card</span>
+            </button>
             <button
               onClick={handleStartSprint}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#FF5B37] hover:bg-[#e04f2e] text-white font-semibold text-xs transition cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-white/[0.08] bg-[#222225] hover:bg-[#28282c] text-zinc-200 font-medium text-xs transition cursor-pointer"
             >
               <RotateCcw className="h-4 w-4" />
               <span>Retry Sprint</span>
@@ -438,11 +448,30 @@ export const FormulaMemoryQuizzer: React.FC<FormulaMemoryQuizzerProps> = ({
                 setPracticeMode('mastery');
                 setIsSprintFinished(false);
               }}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-white/[0.08] bg-[#222225] text-white font-semibold text-xs hover:bg-white/[0.08] transition cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-white/[0.08] bg-[#141416] text-zinc-400 font-medium text-xs hover:text-white transition cursor-pointer"
             >
               <span>Back to Mastery Deck</span>
             </button>
           </div>
+
+          {/* Share Card Modal */}
+          <ShareAchievementCardModal
+            isOpen={isShareModalOpen}
+            onClose={() => setIsShareModalOpen(false)}
+            data={{
+              title: `${subject?.name || 'Formula Recall'} Blitz`,
+              subtitle: '60-Second Cambridge Active Recall Memory Sprint',
+              paperCode: `${subject?.code || 'IGCSE'} • Formula Mastery`,
+              scoreText: `${totalCorrect} / ${totalAttempted} Correct`,
+              percentage: totalAttempted > 0 ? Math.round((totalCorrect / totalAttempted) * 100) : 0,
+              metricLabel1: 'MAX RECALL STREAK',
+              metricValue1: `${highestStreak} in a Row`,
+              metricLabel2: 'Sprint Duration',
+              metricValue2: '60 Seconds',
+              studentName: profile?.name,
+              examDate: new Date().toLocaleDateString('en-GB')
+            }}
+          />
         </div>
       )}
 

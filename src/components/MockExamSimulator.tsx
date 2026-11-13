@@ -22,13 +22,15 @@ import {
   X,
   TrendingUp,
   ShieldCheck,
-  Send
+  Send,
+  Share2
 } from 'lucide-react';
 import { Subject, UserProfile, PastPaperItem } from '../types';
 import { getAllPastPapers } from '../data/pastPapersData';
 import { MathRenderer } from './MathRenderer';
 import { evaluateStudentAnswerAgainstMarkScheme, ExamGradingResult } from '../services/examQuestionEngine';
 import { completeDailyChallenge } from '../services/dailyStreak';
+import { ShareAchievementCardModal } from './ShareAchievementCardModal';
 
 interface MockExamSimulatorProps {
   subject: Subject;
@@ -78,6 +80,7 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
 
   // Student answer state per question
   const [answers, setAnswers] = useState<Record<string, QuestionAnswerState>>({});
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   useEffect(() => {
     const initial: Record<string, QuestionAnswerState> = {};
@@ -580,18 +583,49 @@ export const MockExamSimulator: React.FC<MockExamSimulatorProps> = ({
               <span>Question-by-Question Cambridge Mark Scheme Breakdown</span>
             </h3>
 
-            <button
-              type="button"
-              onClick={() => {
-                setExamStatus('setup');
-                setCurrentQuestionIndex(0);
-              }}
-              className="flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-[#18181b] px-4 py-2 text-xs font-medium text-slate-200 hover:text-white transition cursor-pointer hover:bg-[#222225]"
-            >
-              <RotateCcw className="h-3.5 w-3.5" />
-              <span>Sit Another Mock Exam</span>
-            </button>
+            <div className="flex items-center gap-2.5">
+              <button
+                type="button"
+                onClick={() => setIsShareModalOpen(true)}
+                className="flex items-center gap-1.5 rounded-xl bg-[#FF5B37] hover:bg-[#ff6c4b] px-4 py-2 text-xs font-semibold text-white transition cursor-pointer shadow-sm"
+              >
+                <Share2 className="h-3.5 w-3.5" />
+                <span>Copy / Download Share Card</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setExamStatus('setup');
+                  setCurrentQuestionIndex(0);
+                }}
+                className="flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-[#18181b] px-4 py-2 text-xs font-medium text-slate-200 hover:text-white transition cursor-pointer hover:bg-[#222225]"
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                <span>Sit Another Mock Exam</span>
+              </button>
+            </div>
           </div>
+
+          {/* Share Achievement Card Modal */}
+          <ShareAchievementCardModal
+            isOpen={isShareModalOpen}
+            onClose={() => setIsShareModalOpen(false)}
+            data={{
+              title: `${subject.name} Timed Mock Exam`,
+              subtitle: 'Simulated Cambridge Extended Examination Benchmark',
+              paperCode: `${subject.code} • Paper 4 Extended`,
+              scoreText: `${totalEarnedMarks} / ${totalMaxMarks} Marks`,
+              percentage: scorePercentage,
+              gradeText: awardedGrade.grade,
+              metricLabel1: 'AWARDED GRADE',
+              metricValue1: `Grade ${awardedGrade.grade}`,
+              metricLabel2: 'Grade Standard',
+              metricValue2: awardedGrade.letter,
+              studentName: profile.name,
+              examDate: new Date().toLocaleDateString('en-GB')
+            }}
+          />
 
           {/* Detailed Question Review List */}
           <div className="space-y-4">
