@@ -198,29 +198,28 @@ export const CommandWordsTrapDetector: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 animate-fadeIn">
+    <div className="max-w-7xl mx-auto px-4 py-8 space-y-6 animate-fadeIn">
       {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-rose-950/40 to-slate-900 border border-rose-500/20 p-8 shadow-2xl">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-semibold tracking-wide uppercase">
-            <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
-            Cambridge Examiner Mark Scheme Secrets
+      <div className="relative overflow-hidden rounded-2xl bg-[#18181b] border border-white/[0.08] p-6 sm:p-7 shadow-sm">
+        <div className="relative z-10 space-y-2.5">
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-[#e5484d]/10 border border-[#e5484d]/20 text-[#e5484d] text-xs font-mono font-medium tracking-wide uppercase">
+            <ShieldAlert className="w-3.5 h-3.5 text-[#e5484d]" />
+            Cambridge Examiner Mark Scheme Rubrics
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-semibold text-white tracking-tight">
             Cambridge Command Words "Trap Detector"
           </h1>
-          <p className="text-slate-300 text-sm sm:text-base max-w-2xl leading-relaxed">
-            Over 42% of marks lost by high-achieving students are NOT due to lack of knowledge, but due to misreading command words like <em>Describe</em> vs. <em>Explain</em>. Master the examiner marking rubric below.
+          <p className="text-zinc-400 text-xs sm:text-sm max-w-2xl leading-relaxed">
+            Over 40% of marks dropped on extended theory papers occur when students confuse command words like <em>Describe</em> and <em>Explain</em>. Review the official Cambridge examiner benchmarks below.
           </p>
         </div>
       </div>
 
       {/* Main Grid: Command Word Selector & Details */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Word Selector Sidebar (4 cols) */}
         <div className="lg:col-span-4 space-y-3">
-          <div className="text-xs font-bold uppercase tracking-wider text-slate-400 px-1">
+          <div className="text-xs font-semibold uppercase tracking-wider text-zinc-400 px-1 font-mono">
             Cambridge Command Words
           </div>
           <div className="space-y-2">
@@ -230,25 +229,25 @@ export const CommandWordsTrapDetector: React.FC = () => {
                 <button
                   key={item.id}
                   onClick={() => setActiveWordId(item.id)}
-                  className={`w-full text-left p-4 rounded-2xl border transition-all flex items-center justify-between group ${
+                  className={`w-full text-left p-3.5 rounded-xl border transition-all flex items-center justify-between group cursor-pointer ${
                     isSelected
-                      ? 'bg-rose-500/10 border-rose-500/40 text-white shadow-lg'
-                      : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                      ? 'bg-white/[0.08] border-[#FF5B37] text-white shadow-sm'
+                      : 'bg-[#18181b] border-white/[0.08] text-zinc-400 hover:border-white/[0.16] hover:text-zinc-200'
                   }`}
                 >
                   <div className="space-y-0.5">
-                    <div className="text-sm font-bold text-slate-200 group-hover:text-white flex items-center gap-2">
-                      <span className={isSelected ? 'text-rose-400 font-extrabold' : 'text-slate-400'}>
+                    <div className="text-sm font-semibold text-zinc-200 group-hover:text-white flex items-center gap-2">
+                      <span className={isSelected ? 'text-[#FF5B37] font-semibold' : 'text-zinc-300'}>
                         {item.word}
                       </span>
                     </div>
-                    <div className="text-[11px] text-slate-500 line-clamp-1">
+                    <div className="text-xs text-zinc-500 line-clamp-1 font-sans">
                       {item.cambridgeDefinition}
                     </div>
                   </div>
                   <ChevronRight
                     className={`w-4 h-4 shrink-0 transition-transform ${
-                      isSelected ? 'text-rose-400 translate-x-1' : 'text-slate-600'
+                      isSelected ? 'text-[#FF5B37] translate-x-1' : 'text-zinc-600'
                     }`}
                   />
                 </button>
@@ -257,20 +256,20 @@ export const CommandWordsTrapDetector: React.FC = () => {
           </div>
 
           {/* Interactive Examiner Trap Quiz Mini Widget */}
-          <div className="mt-8 bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-4 backdrop-blur-md">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-400">
+          <div className="mt-6 bg-[#18181b] border border-white/[0.08] rounded-xl p-4.5 space-y-4 shadow-sm">
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-300 font-mono">
                 <AlertTriangle className="w-4 h-4 text-amber-400" />
                 Examiner Trap Quiz ({quizIndex + 1}/{TRAP_QUIZ.length})
               </div>
-              <span className="text-xs font-mono text-emerald-400 font-bold">
+              <span className="text-xs font-mono text-[#4cc38a] font-semibold tabular-nums">
                 Score: {quizScore}
               </span>
             </div>
 
             <div className="space-y-2 text-xs">
-              <div className="font-semibold text-slate-200">{currentQuiz.questionText}</div>
-              <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800 text-slate-300 italic">
+              <div className="font-medium text-zinc-200">{currentQuiz.questionText}</div>
+              <div className="p-3 rounded-lg bg-[#141416] border border-white/[0.08] text-zinc-300 italic font-sans">
                 {currentQuiz.studentAnswer}
               </div>
             </div>
@@ -279,13 +278,13 @@ export const CommandWordsTrapDetector: React.FC = () => {
             <div className="space-y-2">
               {currentQuiz.options.map((opt, idx) => {
                 const isChosen = selectedAnswerIndex === idx;
-                let btnStyle = 'bg-slate-950/50 border-slate-800 text-slate-300 hover:border-slate-700';
+                let btnStyle = 'bg-[#141416] border-white/[0.08] text-zinc-300 hover:border-white/[0.14]';
 
                 if (showQuizResult) {
                   if (opt.isCorrect) {
-                    btnStyle = 'bg-emerald-500/20 border-emerald-500/40 text-emerald-200';
+                    btnStyle = 'bg-[#4cc38a]/15 border-[#4cc38a]/30 text-[#4cc38a]';
                   } else if (isChosen && !opt.isCorrect) {
-                    btnStyle = 'bg-rose-500/20 border-rose-500/40 text-rose-200';
+                    btnStyle = 'bg-[#e5484d]/15 border-[#e5484d]/30 text-[#e5484d]';
                   }
                 }
 
@@ -294,7 +293,7 @@ export const CommandWordsTrapDetector: React.FC = () => {
                     key={idx}
                     disabled={showQuizResult}
                     onClick={() => handleSelectQuizOption(idx)}
-                    className={`w-full text-left p-3 rounded-xl border text-xs font-medium transition-all ${btnStyle}`}
+                    className={`w-full text-left p-3 rounded-lg border text-xs font-medium transition cursor-pointer ${btnStyle}`}
                   >
                     {opt.text}
                   </button>
@@ -304,11 +303,11 @@ export const CommandWordsTrapDetector: React.FC = () => {
 
             {/* Explanation reveal */}
             {showQuizResult && (
-              <div className="p-3 rounded-xl bg-indigo-950/30 border border-indigo-500/30 text-xs text-indigo-200 space-y-2 animate-fadeIn">
-                <p>{currentQuiz.options[selectedAnswerIndex!].explanation}</p>
+              <div className="p-3 rounded-lg bg-[#141416] border border-white/[0.08] text-xs text-zinc-300 space-y-2 animate-fadeIn">
+                <p className="leading-relaxed">{currentQuiz.options[selectedAnswerIndex!].explanation}</p>
                 <button
                   onClick={handleNextQuiz}
-                  className="w-full py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition-colors flex items-center justify-center gap-1.5"
+                  className="w-full py-2 rounded-lg bg-[#FF5B37] hover:bg-[#F97316] text-white font-medium transition flex items-center justify-center gap-1.5 cursor-pointer text-xs"
                 >
                   <span>{quizIndex < TRAP_QUIZ.length - 1 ? 'Next Question' : 'Restart Quiz'}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -319,44 +318,44 @@ export const CommandWordsTrapDetector: React.FC = () => {
         </div>
 
         {/* Detailed Command Word Breakdown (8 cols) */}
-        <div className="lg:col-span-8 space-y-6">
-          <div className="bg-slate-900/80 rounded-3xl border border-slate-800 p-6 sm:p-8 backdrop-blur-md shadow-xl space-y-6">
+        <div className="lg:col-span-8 space-y-5">
+          <div className="bg-[#18181b] rounded-2xl border border-white/[0.08] p-5 sm:p-6 shadow-sm space-y-5">
             {/* Title & Cambridge Definition */}
-            <div className="space-y-3 border-b border-slate-800 pb-6">
+            <div className="space-y-3 border-b border-white/[0.08] pb-5">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-black text-white flex items-center gap-2">
-                  <BookOpen className="w-6 h-6 text-rose-400" />
+                <h2 className="text-xl font-semibold text-white flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-[#FF5B37]" />
                   {selectedWord.word}
                 </h2>
-                <span className="px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-bold uppercase tracking-wider">
-                  Cambridge Benchmark
+                <span className="px-2.5 py-1 rounded-md bg-white/[0.06] border border-white/[0.08] text-zinc-300 text-xs font-mono font-medium uppercase tracking-wider">
+                  Cambridge Rubric
                 </span>
               </div>
-              <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 text-sm text-slate-300 leading-relaxed">
-                <strong className="text-white block mb-1">Official Cambridge Definition:</strong>
+              <div className="p-3.5 rounded-xl bg-[#141416] border border-white/[0.08] text-xs sm:text-sm text-zinc-300 leading-relaxed">
+                <strong className="text-zinc-100 font-medium block mb-1">Official Cambridge Definition:</strong>
                 {selectedWord.cambridgeDefinition}
               </div>
             </div>
 
             {/* Danger Zone: The Trap */}
-            <div className="p-5 rounded-2xl bg-rose-950/20 border border-rose-500/30 space-y-2">
-              <div className="flex items-center gap-2 text-rose-400 text-xs font-bold uppercase tracking-wider">
-                <AlertTriangle className="w-4 h-4 text-rose-400" />
+            <div className="p-4 rounded-xl bg-[#e5484d]/10 border border-[#e5484d]/20 space-y-1.5">
+              <div className="flex items-center gap-2 text-[#e5484d] text-xs font-mono font-semibold uppercase tracking-wider">
+                <AlertTriangle className="w-4 h-4 text-[#e5484d]" />
                 The Cambridge Examiner Trap
               </div>
-              <p className="text-xs text-rose-200 leading-relaxed font-medium">
+              <p className="text-xs text-zinc-200 leading-relaxed font-normal">
                 {selectedWord.trapWarning}
               </p>
             </div>
 
             {/* Past Paper Real Case Study */}
-            <div className="space-y-4">
-              <div className="text-xs font-bold uppercase tracking-wider text-slate-400">
+            <div className="space-y-3">
+              <div className="text-xs font-semibold uppercase tracking-wider text-zinc-400 font-mono">
                 Official Past Paper Demonstration
               </div>
 
-              <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
-                <div className="text-xs text-indigo-400 font-mono font-bold">
+              <div className="p-3.5 rounded-xl bg-[#141416] border border-white/[0.08] space-y-1.5">
+                <div className="text-xs text-[#FF5B37] font-mono font-semibold">
                   {selectedWord.marks}
                 </div>
                 <div className="text-sm font-semibold text-white">
@@ -365,32 +364,32 @@ export const CommandWordsTrapDetector: React.FC = () => {
               </div>
 
               {/* Side by side comparison: Wrong Answer vs Cambridge Full Mark Answer */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                 {/* 0 Mark Response */}
-                <div className="p-4 rounded-2xl bg-rose-950/10 border border-rose-500/20 space-y-2">
-                  <div className="flex items-center gap-2 text-rose-400 text-xs font-bold uppercase tracking-wider">
-                    <XCircle className="w-4 h-4" />
+                <div className="p-4 rounded-xl bg-[#141416] border border-[#e5484d]/30 space-y-2">
+                  <div className="flex items-center gap-2 text-[#e5484d] text-xs font-mono font-semibold uppercase tracking-wider">
+                    <XCircle className="w-4 h-4 text-[#e5484d]" />
                     How Students Lose Marks
                   </div>
-                  <p className="text-xs text-rose-200/90 leading-relaxed italic bg-slate-950/60 p-3 rounded-xl border border-rose-950">
+                  <p className="text-xs text-zinc-300 leading-relaxed italic bg-[#18181b] p-3 rounded-lg border border-white/[0.06]">
                     "{selectedWord.sampleAnswerWrong}"
                   </p>
-                  <p className="text-[11px] text-slate-400">
-                    <strong>Mistake:</strong> {selectedWord.studentMistake}
+                  <p className="text-xs text-zinc-400">
+                    <strong className="text-zinc-200 font-medium">Mistake:</strong> {selectedWord.studentMistake}
                   </p>
                 </div>
 
                 {/* Full Marks Response */}
-                <div className="p-4 rounded-2xl bg-emerald-950/10 border border-emerald-500/20 space-y-2">
-                  <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider">
-                    <CheckCircle2 className="w-4 h-4" />
+                <div className="p-4 rounded-xl bg-[#141416] border border-[#4cc38a]/30 space-y-2">
+                  <div className="flex items-center gap-2 text-[#4cc38a] text-xs font-mono font-semibold uppercase tracking-wider">
+                    <CheckCircle2 className="w-4 h-4 text-[#4cc38a]" />
                     Cambridge Model Response
                   </div>
-                  <p className="text-xs text-emerald-200 leading-relaxed bg-slate-950/60 p-3 rounded-xl border border-emerald-950">
+                  <p className="text-xs text-[#4cc38a] leading-relaxed bg-[#18181b] p-3 rounded-lg border border-white/[0.06] font-mono whitespace-pre-wrap">
                     "{selectedWord.sampleAnswerCorrect}"
                   </p>
-                  <p className="text-[11px] text-slate-400">
-                    <strong>Examiner Key:</strong> {selectedWord.fullMarkKey}
+                  <p className="text-xs text-zinc-400">
+                    <strong className="text-zinc-200 font-medium">Examiner Key:</strong> {selectedWord.fullMarkKey}
                   </p>
                 </div>
               </div>

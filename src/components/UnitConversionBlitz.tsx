@@ -184,33 +184,32 @@ export const UnitConversionBlitz: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 space-y-8 animate-fadeIn">
+    <div className="max-w-4xl mx-auto px-4 py-8 space-y-6 animate-fadeIn">
       {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-amber-950/40 to-slate-900 border border-amber-500/20 p-6 sm:p-8 shadow-2xl">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl bg-[#18181b] border border-white/[0.08] p-6 sm:p-7 shadow-sm">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold tracking-wide uppercase">
-              <Zap className="w-3.5 h-3.5 text-amber-400" />
-              Topic Classified Drills
+          <div className="space-y-2.5">
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-[#FF5B37]/10 border border-[#FF5B37]/20 text-[#FF5B37] text-xs font-mono font-medium tracking-wide uppercase">
+              <Zap className="w-3.5 h-3.5 text-[#FF5B37]" />
+              Cambridge Precision Drills
             </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Topic Classified Drills & Unit Traps
+            <h1 className="text-xl sm:text-2xl font-semibold text-white tracking-tight">
+              Unit Conversion &amp; Metric Traps
             </h1>
-            <p className="text-slate-300 text-xs sm:text-sm max-w-xl leading-relaxed">
-              Don't let metric conversion slips cost you an A*! Train under timed pressure on the exact unit conversions that appear on Cambridge Science & Math papers.
+            <p className="text-zinc-400 text-xs sm:text-sm max-w-xl leading-relaxed">
+              Eliminate careless metric conversion mark losses. Drill under 60-second timed exam conditions on units frequently tested in Cambridge Science and Maths papers.
             </p>
           </div>
 
-          <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-4 sm:p-5 flex items-center gap-4 shrink-0 shadow-lg">
-            <div className="w-12 h-12 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
-              <Award className="w-6 h-6" />
+          <div className="bg-[#141416] border border-white/[0.08] rounded-xl p-4 sm:p-4.5 flex items-center gap-3.5 shrink-0 shadow-sm">
+            <div className="w-10 h-10 rounded-lg bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-[#FF5B37]">
+              <Award className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              <div className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">
                 Personal Best
               </div>
-              <div className="text-2xl font-black text-amber-400 font-mono">
+              <div className="text-lg font-semibold text-white font-mono tabular-nums">
                 {bestScore} Pts
               </div>
             </div>
@@ -219,67 +218,67 @@ export const UnitConversionBlitz: React.FC = () => {
       </div>
 
       {/* Main Blitz Arena Card */}
-      <div className="bg-slate-900/80 rounded-3xl border border-slate-800 p-6 sm:p-8 backdrop-blur-md shadow-xl space-y-6">
+      <div className="bg-[#18181b] rounded-2xl border border-white/[0.08] p-6 sm:p-8 shadow-sm space-y-6">
         {gameState === 'idle' && (
-          <div className="text-center py-8 space-y-6">
-            <div className="w-20 h-20 rounded-3xl bg-amber-500/10 border border-amber-500/30 text-amber-400 mx-auto flex items-center justify-center shadow-lg shadow-amber-500/10">
-              <Zap className="w-10 h-10 animate-pulse" />
+          <div className="text-center py-6 space-y-5">
+            <div className="w-16 h-16 rounded-2xl bg-white/[0.04] border border-white/[0.08] text-[#FF5B37] mx-auto flex items-center justify-center">
+              <Zap className="w-8 h-8" />
             </div>
-            <div className="space-y-2">
-              <h2 className="text-2xl font-black text-white">
-                Ready for Topic Classified Drills?
+            <div className="space-y-1.5">
+              <h2 className="text-lg sm:text-xl font-semibold text-white">
+                Ready for Timed Unit Drills?
               </h2>
-              <p className="text-xs text-slate-400 max-w-md mx-auto">
-                Rapidly convert cm³ to dm³, kJ to J, and hours to seconds. Build your combo streak and eliminate careless unit errors forever.
+              <p className="text-xs text-zinc-400 max-w-md mx-auto">
+                Rapidly convert cm³ to dm³, kJ to J, and hours to seconds. Build your combo streak and ensure you never lose method marks over unit slips.
               </p>
             </div>
 
             <button
               onClick={handleStart}
-              className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm shadow-xl shadow-amber-500/25 transition-all transform active:scale-95"
+              className="px-6 py-2.5 rounded-lg bg-[#FF5B37] hover:bg-[#F97316] text-white font-semibold text-xs shadow-md transition cursor-pointer"
             >
-              Start Topic Drills
+              Start 60s Drill Sprint
             </button>
           </div>
         )}
 
         {gameState === 'playing' && (
-          <div className="space-y-6">
+          <div className="space-y-5">
             {/* Top Bar: Clocks & Score */}
-            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-3.5">
               <div className="flex items-center gap-3">
-                <div className="px-3.5 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 font-mono font-bold text-sm flex items-center gap-2">
-                  <Clock className="w-4 h-4" />
-                  <span>{timeLeft}s</span>
+                <div className="px-3 py-1.5 rounded-lg bg-[#141416] border border-white/[0.08] text-zinc-200 font-mono font-semibold text-xs flex items-center gap-2">
+                  <Clock className="w-3.5 h-3.5 text-zinc-400" />
+                  <span className="tabular-nums">{timeLeft}s remaining</span>
                 </div>
                 {streak > 1 && (
-                  <div className="px-2.5 py-1 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-400 font-bold text-xs flex items-center gap-1 animate-bounce">
+                  <div className="px-2.5 py-1 rounded-lg bg-[#FF5B37]/15 border border-[#FF5B37]/30 text-[#FF5B37] font-mono font-semibold text-xs flex items-center gap-1">
                     <Flame className="w-3.5 h-3.5 fill-current" />
-                    <span>{streak}x Streak!</span>
+                    <span>{streak}x Combo</span>
                   </div>
                 )}
               </div>
 
               <div className="text-right">
-                <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold">
+                <div className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">
                   Score
                 </div>
-                <div className="text-2xl font-black text-white font-mono">{score}</div>
+                <div className="text-xl font-semibold text-white font-mono tabular-nums">{score}</div>
               </div>
             </div>
 
             {/* Question Card */}
-            <div className="p-6 rounded-2xl bg-slate-950 border border-slate-800 text-center space-y-2">
-              <div className="text-[11px] font-bold uppercase tracking-wider text-indigo-400 font-mono">
+            <div className="p-6 rounded-xl bg-[#141416] border border-white/[0.08] text-center space-y-2">
+              <div className="text-[11px] font-mono font-medium uppercase tracking-wider text-[#FF5B37]">
                 {currentDrill.syllabus}
               </div>
-              <div className="text-2xl sm:text-3xl font-black text-white">
+              <div className="text-xl sm:text-2xl font-semibold text-white">
                 {currentDrill.prompt}
               </div>
             </div>
 
             {/* Answer Input Form */}
-            <form onSubmit={handleSubmit} className="flex gap-3 max-w-md mx-auto">
+            <form onSubmit={handleSubmit} className="flex gap-2.5 max-w-md mx-auto">
               <div className="relative flex-1">
                 <input
                   type="text"
@@ -287,15 +286,15 @@ export const UnitConversionBlitz: React.FC = () => {
                   value={userInput}
                   onChange={e => setUserInput(e.target.value)}
                   placeholder="Enter numerical answer..."
-                  className="w-full bg-slate-950 border-2 border-slate-750 focus:border-amber-500 rounded-xl px-4 py-3 text-base font-mono text-white text-center focus:outline-none transition-colors"
+                  className="w-full bg-[#141416] border border-white/[0.08] focus:border-[#FF5B37] rounded-lg px-3.5 py-2.5 text-sm font-mono text-white text-center focus:outline-none transition-colors"
                 />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
+                <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-mono font-medium text-zinc-400">
                   {currentDrill.unit}
                 </span>
               </div>
               <button
                 type="submit"
-                className="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition-colors shadow-md shrink-0"
+                className="px-5 py-2.5 rounded-lg bg-[#FF5B37] hover:bg-[#F97316] text-white font-semibold text-xs transition cursor-pointer shrink-0"
               >
                 Submit
               </button>
@@ -304,10 +303,10 @@ export const UnitConversionBlitz: React.FC = () => {
             {/* Feedback Alert */}
             {feedback && (
               <div
-                className={`p-3.5 rounded-xl border text-xs font-medium animate-fadeIn ${
+                className={`p-3 rounded-lg border text-xs font-mono animate-fadeIn ${
                   feedback.isCorrect
-                    ? 'bg-emerald-950/30 border-emerald-500/30 text-emerald-300'
-                    : 'bg-rose-950/30 border-rose-500/30 text-rose-300'
+                    ? 'bg-[#4cc38a]/10 border-[#4cc38a]/20 text-[#4cc38a]'
+                    : 'bg-[#e5484d]/10 border-[#e5484d]/20 text-[#e5484d]'
                 }`}
               >
                 {feedback.rule}
@@ -317,22 +316,22 @@ export const UnitConversionBlitz: React.FC = () => {
         )}
 
         {gameState === 'ended' && (
-          <div className="text-center py-6 space-y-6">
-            <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 mx-auto flex items-center justify-center">
-              <Award className="w-8 h-8" />
+          <div className="text-center py-6 space-y-5">
+            <div className="w-14 h-14 rounded-xl bg-white/[0.04] border border-white/[0.08] text-[#4cc38a] mx-auto flex items-center justify-center">
+              <Award className="w-7 h-7" />
             </div>
 
             <div className="space-y-1">
-              <h3 className="text-2xl font-black text-white">Drills Complete!</h3>
-              <p className="text-xs text-slate-400">
-                You scored <strong className="text-amber-400 font-mono">{score} points</strong> under 60-second Cambridge exam pressure.
+              <h3 className="text-xl font-semibold text-white">Drill Sprint Complete</h3>
+              <p className="text-xs text-zinc-400">
+                You scored <strong className="text-white font-mono tabular-nums">{score} points</strong> under 60-second exam pressure.
               </p>
             </div>
 
             <div className="flex justify-center gap-3">
               <button
                 onClick={handleStart}
-                className="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-all flex items-center gap-2 shadow-lg"
+                className="px-5 py-2.5 rounded-lg bg-[#FF5B37] hover:bg-[#F97316] text-white font-semibold text-xs transition flex items-center gap-2 cursor-pointer shadow-sm"
               >
                 <RotateCcw className="w-4 h-4" />
                 Play Again

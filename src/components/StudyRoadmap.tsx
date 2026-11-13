@@ -211,40 +211,39 @@ export const StudyRoadmap: React.FC<StudyRoadmapProps> = ({
   const closestDays = closestExam ? getDaysRemaining(closestExam.examDate) : null;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 animate-fadeIn">
+    <div className="max-w-7xl mx-auto px-4 py-8 space-y-6 animate-fadeIn">
       {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950/80 to-slate-900 border border-indigo-500/20 p-8 shadow-2xl">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl bg-[#18181b] border border-white/[0.08] p-6 sm:p-7 shadow-sm">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-semibold tracking-wide uppercase">
-              <Calendar className="w-3.5 h-3.5 text-indigo-400" />
-              Cambridge Exam Countdown & Structured Revision Planner
+          <div className="space-y-2.5">
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-[#FF5B37]/10 border border-[#FF5B37]/20 text-[#FF5B37] text-xs font-mono font-medium tracking-wide uppercase">
+              <Calendar className="w-3.5 h-3.5 text-[#FF5B37]" />
+              Cambridge Exam Countdown &amp; Revision Planner
             </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-semibold text-white tracking-tight">
               Personalized Cambridge Study Roadmap
             </h1>
-            <p className="text-slate-300 text-sm sm:text-base max-w-2xl leading-relaxed">
-              Never fall behind. Set your official Cambridge examination dates and follow a structured daily milestone checklist tailored to your target grades.
+            <p className="text-zinc-400 text-xs sm:text-sm max-w-2xl leading-relaxed">
+              Track your registered examination dates and follow a structured daily milestone checklist calibrated to your target grades.
             </p>
           </div>
 
           {/* Quick Stat Pill */}
           {closestExam && (
-            <div className="bg-slate-900/90 border border-amber-500/30 rounded-2xl p-5 flex items-center gap-5 backdrop-blur-md shadow-xl shrink-0">
-              <div className="w-14 h-14 rounded-xl bg-amber-500/10 border border-amber-500/30 flex flex-col items-center justify-center text-amber-400">
-                <span className="text-2xl font-black leading-none">{closestDays}</span>
-                <span className="text-[10px] font-bold uppercase tracking-wider">Days</span>
+            <div className="bg-[#141416] border border-white/[0.08] rounded-xl p-4 sm:p-4.5 flex items-center gap-4 shadow-sm shrink-0">
+              <div className="w-12 h-12 rounded-lg bg-white/[0.06] border border-white/[0.08] flex flex-col items-center justify-center text-white">
+                <span className="text-xl font-semibold font-mono tabular-nums leading-none">{closestDays}</span>
+                <span className="text-[9px] font-mono uppercase tracking-wider text-zinc-400 mt-0.5">Days</span>
               </div>
               <div>
-                <div className="text-xs text-amber-300 font-semibold uppercase tracking-wider">
+                <div className="text-[10px] font-mono text-[#FF5B37] font-medium uppercase tracking-wider">
                   Next Official Exam
                 </div>
-                <div className="text-base font-bold text-white mt-0.5">
+                <div className="text-sm font-semibold text-white mt-0.5">
                   {closestExam.subjectCode} • {closestExam.paperName}
                 </div>
-                <div className="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5" />
+                <div className="text-xs text-zinc-400 mt-0.5 flex items-center gap-1.5 font-mono">
+                  <Calendar className="w-3.5 h-3.5 text-zinc-500" />
                   {closestExam.examDate}
                 </div>
               </div>
@@ -254,23 +253,23 @@ export const StudyRoadmap: React.FC<StudyRoadmapProps> = ({
       </div>
 
       {/* Grid: Left Column (Exams & Countdown Clocks) | Right Column (Daily Checklist) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Official Exam Timetable (5 cols) */}
-        <div className="lg:col-span-5 space-y-6">
-          <div className="bg-slate-900/80 rounded-2xl border border-slate-800 p-6 backdrop-blur-md shadow-lg space-y-5">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div className="lg:col-span-5 space-y-5">
+          <div className="bg-[#18181b] rounded-2xl border border-white/[0.08] p-5 sm:p-6 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-3.5">
               <div>
-                <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                  <Target className="w-5 h-5 text-indigo-400" />
+                <h2 className="text-sm sm:text-base font-semibold text-white flex items-center gap-2">
+                  <Target className="w-4 h-4 text-[#FF5B37]" />
                   Official Exam Timetable
                 </h2>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  {exams.length} papers entered • Live Cambridge countdown
+                <p className="text-xs text-zinc-400 mt-0.5 font-mono">
+                  {exams.length} papers entered • Live countdown
                 </p>
               </div>
               <button
                 onClick={() => setIsAddingExam(!isAddingExam)}
-                className="px-3 py-1.5 text-xs font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-1.5 transition-all shadow-md"
+                className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#FF5B37] hover:bg-[#F97316] text-white flex items-center gap-1.5 transition cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Add Paper
@@ -281,19 +280,19 @@ export const StudyRoadmap: React.FC<StudyRoadmapProps> = ({
             {isAddingExam && (
               <form
                 onSubmit={handleAddExam}
-                className="bg-slate-950/70 border border-indigo-500/30 rounded-xl p-4 space-y-3 animate-fadeIn"
+                className="bg-[#141416] border border-white/[0.08] rounded-xl p-4 space-y-3 animate-fadeIn"
               >
-                <div className="text-xs font-bold text-indigo-300 uppercase tracking-wider">
+                <div className="text-xs font-semibold text-zinc-200 uppercase tracking-wider font-mono">
                   Add Official Paper Date
                 </div>
                 <div>
-                  <label className="text-[11px] font-medium text-slate-400 block mb-1">
+                  <label className="text-xs font-medium text-zinc-400 block mb-1">
                     Select Subject
                   </label>
                   <select
                     value={newSubjectCode}
                     onChange={e => setNewSubjectCode(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-750 text-slate-200 text-xs rounded-lg p-2 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                    className="w-full bg-[#18181b] border border-white/[0.08] text-zinc-200 text-xs rounded-lg p-2 focus:border-[#FF5B37] focus:outline-none"
                   >
                     {subjects.map(s => (
                       <option key={s.id} value={s.code}>
@@ -303,7 +302,7 @@ export const StudyRoadmap: React.FC<StudyRoadmapProps> = ({
                   </select>
                 </div>
                 <div>
-                  <label className="text-[11px] font-medium text-slate-400 block mb-1">
+                  <label className="text-xs font-medium text-zinc-400 block mb-1">
                     Paper Title
                   </label>
                   <input
@@ -311,31 +310,31 @@ export const StudyRoadmap: React.FC<StudyRoadmapProps> = ({
                     value={newPaperName}
                     onChange={e => setNewPaperName(e.target.value)}
                     placeholder="e.g. Paper 4 (Extended Theory)"
-                    className="w-full bg-slate-900 border border-slate-750 text-slate-200 text-xs rounded-lg p-2 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                    className="w-full bg-[#18181b] border border-white/[0.08] text-zinc-200 text-xs rounded-lg p-2 focus:border-[#FF5B37] focus:outline-none"
                     required
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-[11px] font-medium text-slate-400 block mb-1">
+                    <label className="text-xs font-medium text-zinc-400 block mb-1">
                       Exam Date
                     </label>
                     <input
                       type="date"
                       value={newDate}
                       onChange={e => setNewDate(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-750 text-slate-200 text-xs rounded-lg p-2 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                      className="w-full bg-[#18181b] border border-white/[0.08] text-zinc-200 text-xs rounded-lg p-2 focus:border-[#FF5B37] focus:outline-none"
                       required
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] font-medium text-slate-400 block mb-1">
+                    <label className="text-xs font-medium text-zinc-400 block mb-1">
                       Target Grade
                     </label>
                     <select
                       value={newTarget}
                       onChange={e => setNewTarget(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-750 text-slate-200 text-xs rounded-lg p-2 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                      className="w-full bg-[#18181b] border border-white/[0.08] text-zinc-200 text-xs rounded-lg p-2 focus:border-[#FF5B37] focus:outline-none font-mono"
                     >
                       <option value="9 / A*">9 / A*</option>
                       <option value="8 / A*">8 / A*</option>
@@ -349,13 +348,13 @@ export const StudyRoadmap: React.FC<StudyRoadmapProps> = ({
                   <button
                     type="button"
                     onClick={() => setIsAddingExam(false)}
-                    className="px-3 py-1.5 text-xs text-slate-400 hover:text-white"
+                    className="px-3 py-1.5 text-xs text-zinc-400 hover:text-white cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-1.5 text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg"
+                    className="px-3.5 py-1.5 text-xs font-semibold bg-[#FF5B37] hover:bg-[#F97316] text-white rounded-lg cursor-pointer transition"
                   >
                     Save Paper
                   </button>
@@ -364,7 +363,7 @@ export const StudyRoadmap: React.FC<StudyRoadmapProps> = ({
             )}
 
             {/* List of Exams with Clocks */}
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {sortedExams.map(item => {
                 const days = getDaysRemaining(item.examDate);
                 const isUrgent = days >= 0 && days <= 14;
@@ -373,56 +372,56 @@ export const StudyRoadmap: React.FC<StudyRoadmapProps> = ({
                 return (
                   <div
                     key={item.id}
-                    className={`p-4 rounded-xl border transition-all ${
+                    className={`p-3.5 rounded-xl border transition-all ${
                       isPast
-                        ? 'bg-slate-950/40 border-slate-800/60 opacity-60'
+                        ? 'bg-[#141416]/50 border-white/[0.04] opacity-50'
                         : isUrgent
-                        ? 'bg-amber-500/5 border-amber-500/30'
-                        : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
+                        ? 'bg-[#141416] border-amber-500/30'
+                        : 'bg-[#141416] border-white/[0.08] hover:border-white/[0.14]'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
-                          <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 font-mono">
+                          <span className="px-2 py-0.5 rounded text-[11px] font-mono font-medium bg-white/[0.06] border border-white/[0.08] text-zinc-200">
                             {item.subjectCode}
                           </span>
-                          <span className="text-xs text-slate-400 truncate max-w-[180px]">
+                          <span className="text-xs text-zinc-400 truncate max-w-[180px]">
                             {item.subjectName}
                           </span>
                         </div>
-                        <div className="text-sm font-bold text-white">{item.paperName}</div>
-                        <div className="text-xs text-slate-400 flex items-center gap-2">
-                          <Calendar className="w-3.5 h-3.5 text-slate-500" />
+                        <div className="text-sm font-semibold text-white">{item.paperName}</div>
+                        <div className="text-xs text-zinc-400 flex items-center gap-2 font-mono">
+                          <Calendar className="w-3.5 h-3.5 text-zinc-500" />
                           <span>{item.examDate}</span>
-                          <span className="text-slate-600">•</span>
-                          <span className="text-emerald-400 font-medium">Target: {item.targetGrade}</span>
+                          <span className="text-zinc-600">•</span>
+                          <span className="text-[#4cc38a] font-medium">Target: {item.targetGrade}</span>
                         </div>
                       </div>
 
                       {/* Right: Days badge & delete */}
                       <div className="flex flex-col items-end gap-2">
                         <div
-                          className={`px-3 py-1.5 rounded-xl border text-center font-mono ${
+                          className={`px-2.5 py-1 rounded-lg border text-center font-mono ${
                             isPast
-                              ? 'bg-slate-800/60 border-slate-700 text-slate-400 text-xs'
+                              ? 'bg-white/[0.04] border-white/[0.06] text-zinc-500 text-xs'
                               : isUrgent
-                              ? 'bg-amber-500/20 border-amber-500/40 text-amber-300 font-bold'
-                              : 'bg-indigo-500/10 border-indigo-500/30 text-indigo-300 font-semibold'
+                              ? 'bg-amber-500/10 border-amber-500/30 text-amber-300 font-semibold'
+                              : 'bg-white/[0.06] border-white/[0.08] text-zinc-200 font-semibold'
                           }`}
                         >
-                          <div className="text-base leading-none font-black">
+                          <div className="text-sm font-semibold tabular-nums leading-none">
                             {isPast ? 'Done' : days}
                           </div>
                           {!isPast && (
-                            <div className="text-[9px] uppercase tracking-wider text-slate-400">
+                            <div className="text-[8px] uppercase tracking-wider text-zinc-400 mt-0.5">
                               {days === 1 ? 'day' : 'days'}
                             </div>
                           )}
                         </div>
                         <button
                           onClick={() => handleDeleteExam(item.id)}
-                          className="text-slate-500 hover:text-rose-400 p-1 transition-colors"
+                          className="text-zinc-500 hover:text-[#e5484d] p-1 transition-colors cursor-pointer"
                           title="Remove exam"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -436,55 +435,55 @@ export const StudyRoadmap: React.FC<StudyRoadmapProps> = ({
           </div>
 
           {/* Revision Strategy Card */}
-          <div className="bg-gradient-to-br from-indigo-950/40 to-slate-900 border border-indigo-500/20 rounded-2xl p-5 space-y-3">
-            <div className="flex items-center gap-2 text-indigo-300 text-xs font-bold uppercase tracking-wider">
-              <Award className="w-4 h-4 text-indigo-400" />
+          <div className="bg-[#18181b] border border-white/[0.08] rounded-xl p-4.5 space-y-2">
+            <div className="flex items-center gap-2 text-zinc-200 text-xs font-semibold uppercase tracking-wider font-mono">
+              <Award className="w-4 h-4 text-[#FF5B37]" />
               Cambridge Examiner Revision Rule
             </div>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              <strong>The 3-Pass Rule:</strong> Students who review topic mark schemes twice before sitting full timed papers score 18% higher on average than students doing passive reading. Combine flashcards in the morning with 1 past paper question block in the afternoon.
+            <p className="text-xs text-zinc-400 leading-relaxed">
+              <strong className="text-zinc-200 font-medium">The 3-Pass Rule:</strong> Candidates who review official mark scheme rubrics before sitting timed papers gain an average of +12% in method marks. Pair 15 minutes of flashcards with 1 focused question paper drill daily.
             </p>
           </div>
         </div>
 
         {/* Right Column: Daily Adaptive Checklist (7 cols) */}
-        <div className="lg:col-span-7 space-y-6">
-          <div className="bg-slate-900/80 rounded-2xl border border-slate-800 p-6 backdrop-blur-md shadow-lg space-y-6">
+        <div className="lg:col-span-7 space-y-5">
+          <div className="bg-[#18181b] rounded-2xl border border-white/[0.08] p-5 sm:p-6 shadow-sm space-y-5">
             {/* Top Toolbar */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.08] pb-4">
               <div>
-                <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                <h2 className="text-sm sm:text-base font-semibold text-white flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-[#4cc38a]" />
                   Daily Milestone Checklist
                 </h2>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Complete these high-yield revision blocks each day to hit your target grades.
+                <p className="text-xs text-zinc-400 mt-0.5">
+                  Complete these high-yield revision blocks each day for syllabus readiness.
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleRegenerateRoadmap}
-                  className="px-3 py-1.5 text-xs font-medium rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center gap-1.5 border border-slate-700 transition-colors"
+                  className="px-3 py-1.5 text-xs font-medium rounded-lg bg-[#141416] hover:bg-white/[0.06] text-zinc-300 flex items-center gap-1.5 border border-white/[0.08] transition cursor-pointer"
                   title="Recalculate tasks based on active exam dates"
                 >
-                  <RefreshCw className="w-3.5 h-3.5" />
+                  <RefreshCw className="w-3.5 h-3.5 text-zinc-400" />
                   Regenerate
                 </button>
               </div>
             </div>
 
             {/* Progress Bar */}
-            <div className="bg-slate-950/60 rounded-xl p-4 border border-slate-800 space-y-2">
+            <div className="bg-[#141416] rounded-xl p-4 border border-white/[0.08] space-y-2">
               <div className="flex justify-between items-center text-xs">
-                <span className="font-semibold text-slate-300">
+                <span className="font-medium text-zinc-300">
                   Overall Completion Rate ({completedCount} of {tasks.length} tasks)
                 </span>
-                <span className="font-mono font-bold text-emerald-400">{progressPercent}%</span>
+                <span className="font-mono font-semibold text-[#4cc38a] tabular-nums">{progressPercent}%</span>
               </div>
-              <div className="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+              <div className="w-full bg-[#18181b] h-1.5 rounded-full overflow-hidden border border-white/[0.06]">
                 <div
-                  className="bg-gradient-to-r from-indigo-500 to-emerald-400 h-full rounded-full transition-all duration-500"
+                  className="bg-[#4cc38a] h-full rounded-full transition-all duration-500"
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>
@@ -492,15 +491,15 @@ export const StudyRoadmap: React.FC<StudyRoadmapProps> = ({
 
             {/* Filters */}
             <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
-              <div className="flex items-center gap-1.5 bg-slate-950/70 p-1 rounded-xl border border-slate-800">
+              <div className="flex items-center gap-1 bg-[#141416] p-1 rounded-lg border border-white/[0.08]">
                 {(['all', 'pending', 'completed'] as const).map(tabKey => (
                   <button
                     key={tabKey}
                     onClick={() => setSelectedFilter(tabKey)}
-                    className={`px-3 py-1 rounded-lg capitalize transition-all font-medium ${
+                    className={`px-3 py-1 rounded-md capitalize transition font-medium cursor-pointer ${
                       selectedFilter === tabKey
-                        ? 'bg-indigo-600 text-white shadow-sm'
-                        : 'text-slate-400 hover:text-slate-200'
+                        ? 'bg-white/[0.12] text-white'
+                        : 'text-zinc-400 hover:text-zinc-200'
                     }`}
                   >
                     {tabKey}
@@ -510,11 +509,11 @@ export const StudyRoadmap: React.FC<StudyRoadmapProps> = ({
 
               {/* Subject selector */}
               <div className="flex items-center gap-2">
-                <Filter className="w-3.5 h-3.5 text-slate-500" />
+                <Filter className="w-3.5 h-3.5 text-zinc-500" />
                 <select
                   value={selectedSubjectFilter}
                   onChange={e => setSelectedSubjectFilter(e.target.value)}
-                  className="bg-slate-950 border border-slate-800 text-slate-300 rounded-lg px-2.5 py-1 text-xs focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                  className="bg-[#141416] border border-white/[0.08] text-zinc-300 rounded-lg px-2.5 py-1 text-xs focus:border-[#FF5B37] focus:outline-none cursor-pointer"
                 >
                   <option value="all">All Subjects</option>
                   {subjects.map(s => (
@@ -527,71 +526,71 @@ export const StudyRoadmap: React.FC<StudyRoadmapProps> = ({
             </div>
 
             {/* Tasks list */}
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {filteredTasks.length === 0 ? (
-                <div className="text-center py-12 text-slate-400 text-xs">
+                <div className="text-center py-12 text-zinc-400 text-xs bg-[#141416] rounded-xl border border-white/[0.08]">
                   No tasks matching the selected filter.
                 </div>
               ) : (
                 filteredTasks.map(task => {
                   const categoryBadge = {
-                    'past-paper': { label: 'Past Paper', color: 'bg-blue-500/10 text-blue-400 border-blue-500/20' },
-                    'flashcards': { label: 'Active Recall', color: 'bg-purple-500/10 text-purple-400 border-purple-500/20' },
-                    'weak-spot': { label: 'Weak Spot Drill', color: 'bg-rose-500/10 text-rose-400 border-rose-500/20' },
-                    'atp-practical': { label: 'Paper 6 ATP', color: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
-                    'mock-drill': { label: 'Timed Mock', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' }
+                    'past-paper': { label: 'Past Paper', color: 'bg-white/[0.06] text-zinc-200 border-white/[0.08]' },
+                    'flashcards': { label: 'Active Recall', color: 'bg-white/[0.06] text-zinc-200 border-white/[0.08]' },
+                    'weak-spot': { label: 'Weak Spot Drill', color: 'bg-[#e5484d]/10 text-[#e5484d] border-[#e5484d]/20' },
+                    'atp-practical': { label: 'Paper 6 ATP', color: 'bg-amber-500/10 text-amber-300 border-amber-500/20' },
+                    'mock-drill': { label: 'Timed Mock', color: 'bg-[#4cc38a]/10 text-[#4cc38a] border-[#4cc38a]/20' }
                   }[task.category];
 
                   return (
                     <div
                       key={task.id}
                       onClick={() => toggleTask(task.id)}
-                      className={`p-4 rounded-xl border cursor-pointer transition-all flex items-start gap-3.5 select-none ${
+                      className={`p-3.5 rounded-xl border cursor-pointer transition flex items-start gap-3 select-none ${
                         task.completed
-                          ? 'bg-slate-950/30 border-slate-800/60 opacity-60'
-                          : 'bg-slate-950/70 border-slate-800 hover:border-indigo-500/40 hover:bg-slate-950/90'
+                          ? 'bg-[#141416]/50 border-white/[0.04] opacity-50'
+                          : 'bg-[#141416] border-white/[0.08] hover:border-white/[0.16]'
                       }`}
                     >
                       <button
                         type="button"
-                        className="mt-0.5 text-slate-500 hover:text-emerald-400 shrink-0 transition-colors"
+                        className="mt-0.5 text-zinc-500 hover:text-[#4cc38a] shrink-0 transition"
                       >
                         {task.completed ? (
-                          <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                          <CheckCircle2 className="w-4 h-4 text-[#4cc38a]" />
                         ) : (
-                          <Circle className="w-5 h-5 text-slate-500 hover:text-slate-400" />
+                          <Circle className="w-4 h-4 text-zinc-500 hover:text-zinc-400" />
                         )}
                       </button>
 
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2 mb-1">
-                          <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">
+                          <span className="font-mono text-[10px] font-medium px-1.5 py-0.5 rounded bg-white/[0.06] text-zinc-300 border border-white/[0.08]">
                             {task.subjectCode}
                           </span>
                           <span
-                            className={`text-[10px] font-semibold px-2 py-0.5 rounded border ${categoryBadge.color}`}
+                            className={`text-[10px] font-mono font-medium px-2 py-0.5 rounded border ${categoryBadge.color}`}
                           >
                             {categoryBadge.label}
                           </span>
                           {task.priority === 'high' && (
-                            <span className="text-[10px] font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1">
-                              <Flame className="w-3 h-3 text-rose-400" /> High Yield
+                            <span className="text-[10px] font-mono font-medium text-[#e5484d] uppercase tracking-wider flex items-center gap-1">
+                              <Flame className="w-3 h-3 text-[#e5484d]" /> High Yield
                             </span>
                           )}
-                          <span className="text-[10px] text-slate-400 ml-auto flex items-center gap-1">
-                            <Clock className="w-3 h-3 text-slate-500" />
+                          <span className="text-[10px] font-mono text-zinc-400 ml-auto flex items-center gap-1">
+                            <Clock className="w-3 h-3 text-zinc-500" />
                             {task.durationMinutes} mins
                           </span>
                         </div>
 
                         <div
-                          className={`text-sm font-semibold ${
-                            task.completed ? 'line-through text-slate-500' : 'text-slate-200'
+                          className={`text-xs sm:text-sm font-medium ${
+                            task.completed ? 'line-through text-zinc-500' : 'text-zinc-200'
                           }`}
                         >
                           {task.title}
                         </div>
-                        <div className="text-xs text-slate-400 mt-0.5">{task.dateStr}</div>
+                        <div className="text-[11px] font-mono text-zinc-400 mt-0.5">{task.dateStr}</div>
                       </div>
                     </div>
                   );

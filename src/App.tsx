@@ -841,14 +841,14 @@ export function App() {
         <main className={`flex-1 px-3 py-4 sm:px-6 sm:py-8 max-w-7xl mx-auto w-full overflow-x-hidden ${activeTab === 'chat' ? 'pb-24 md:pb-10' : 'pb-24 sm:pb-16'}`}>
         {/* Single Device Session Conflict Banner */}
         {deviceConflictAlert && (
-          <div className="mb-6 rounded-2xl border border-rose-500/50 bg-rose-950/80 p-4 text-xs font-semibold text-rose-200 shadow-2xl flex items-center justify-between gap-3 animate-fadeIn">
+          <div className="mb-6 rounded-xl border border-[#e5484d]/30 bg-[#18181b] p-3.5 text-xs text-zinc-200 shadow-md flex items-center justify-between gap-3 animate-fadeIn">
             <div className="flex items-center gap-2.5">
-              <span className="text-base">⚠️</span>
-              <span>{deviceConflictAlert}</span>
+              <span className="text-[#e5484d] font-mono font-semibold">Session notice:</span>
+              <span className="text-zinc-300">{deviceConflictAlert}</span>
             </div>
             <button
               onClick={() => setDeviceConflictAlert(null)}
-              className="rounded-lg bg-rose-900/60 px-2.5 py-1 text-[11px] font-bold text-rose-300 hover:bg-rose-800 transition"
+              className="rounded-md border border-white/[0.08] bg-[#222225] hover:bg-white/[0.08] px-2.5 py-1 text-[11px] font-medium text-zinc-200 transition cursor-pointer"
             >
               Dismiss
             </button>
@@ -1141,13 +1141,13 @@ export function App() {
       </main>
 
       {/* Mobile Phone Bottom Navigation Bar */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-slate-800/90 bg-slate-950/95 backdrop-blur-2xl px-1 pt-1 pb-[max(0.6rem,env(safe-area-inset-bottom))] shadow-2xl flex items-center justify-around h-16">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-white/[0.08] bg-[#111113]/95 backdrop-blur-md px-1 pt-1 pb-[max(0.6rem,env(safe-area-inset-bottom))] shadow-lg flex items-center justify-around h-16">
         {[
-          { id: 'home', label: 'Home', icon: Home, color: 'text-indigo-400' },
-          { id: 'finder', label: 'Papers', icon: FileText, color: 'text-amber-400' },
-          { id: 'solver', label: 'Solver', icon: Calculator, color: 'text-blue-400' },
-          { id: 'mistakes', label: 'Mistakes', icon: BookMarked, color: 'text-rose-400' },
-          { id: 'menu', label: 'All Tools', icon: Menu, color: 'text-indigo-400' },
+          { id: 'home', label: 'Home', icon: Home },
+          { id: 'finder', label: 'Papers', icon: FileText },
+          { id: 'solver', label: 'Solver', icon: Calculator },
+          { id: 'mistakes', label: 'Mistakes', icon: BookMarked },
+          { id: 'menu', label: 'All Tools', icon: Menu },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -1161,17 +1161,17 @@ export function App() {
                   setActiveTab(tab.id as ActiveTab);
                 }
               }}
-              className={`flex-1 h-full flex flex-col items-center justify-center py-1 transition-all active:scale-90 cursor-pointer ${
-                isActive ? 'text-white' : 'text-slate-400 hover:text-slate-200'
+              className={`flex-1 h-full flex flex-col items-center justify-center py-1 transition-colors cursor-pointer ${
+                isActive ? 'text-white' : 'text-zinc-400 hover:text-zinc-200'
               }`}
             >
-              <div className="relative">
-                <Icon className={`h-5 w-5 ${isActive ? tab.color : 'text-slate-400'}`} />
+              <div className="relative flex flex-col items-center">
+                <Icon className={`h-5 w-5 ${isActive ? 'text-[#FF5B37]' : 'text-zinc-400'}`} />
                 {isActive && (
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-1 w-3 rounded-full bg-blue-500 shadow-sm shadow-blue-500" />
+                  <span className="absolute -bottom-1 h-0.5 w-3 rounded-full bg-[#FF5B37]" />
                 )}
               </div>
-              <span className={`text-[10px] mt-1 tracking-tight font-sans ${isActive ? 'text-white font-bold' : 'text-slate-400 font-medium'}`}>
+              <span className={`text-[10px] mt-1 tracking-tight font-sans ${isActive ? 'text-white font-medium' : 'text-zinc-400 font-normal'}`}>
                 {tab.label}
               </span>
             </button>
@@ -1180,38 +1180,38 @@ export function App() {
       </nav>
 
       {/* Footer (with bottom padding so it never hides behind mobile nav) */}
-      <footer className="mt-auto border-t border-slate-800/80 bg-slate-950/90 py-8 px-4 text-xs text-slate-400 mb-16 md:mb-0">
+      <footer className="mt-auto border-t border-white/[0.08] bg-[#111113] py-8 px-4 text-xs text-zinc-400 mb-16 md:mb-0">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex flex-col gap-1 text-center md:text-left">
             <div className="flex items-center justify-center md:justify-start gap-2.5">
               <SimplyLogo size="sm" showText={false} />
-              <span className="font-bold text-slate-200">Fahemny IGCSE Platform</span>
-              <span className="text-slate-600">|</span>
-              <span>Cambridge (CIE) & Pearson Edexcel Curriculum</span>
+              <span className="font-medium text-zinc-200">Fahemny IGCSE Platform</span>
+              <span className="text-zinc-600">|</span>
+              <span>Cambridge (CIE) &amp; Pearson Edexcel Curriculum</span>
             </div>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-zinc-400">
               Curated by experienced IGCSE educators, head of departments, and past examiners across Cairo, Alexandria, and the UK.
             </p>
-            <p className="text-[10px] text-slate-500">
+            <p className="text-[10px] text-zinc-500">
               Strictly aligned with Cambridge Assessment International Education (CAIE) 2024–2026 specifications.
             </p>
           </div>
 
-          <div className="flex items-center gap-4 text-slate-400">
+          <div className="flex items-center gap-3 text-zinc-400">
             {currentUser ? (
-              <span className="text-emerald-400 font-medium">Signed in as {currentUser.name}</span>
+              <span className="text-[#4cc38a] font-medium">Signed in as {currentUser.name}</span>
             ) : (
               <button
                 onClick={() => { setAuthMode('signup'); setIsAuthOpen(true); }}
-                className="text-amber-400 hover:text-amber-300 font-semibold cursor-pointer"
+                className="text-[#FF5B37] hover:text-[#F97316] font-medium cursor-pointer"
               >
-                Create Account & Join Waitlist
+                Create Account &amp; Join Waitlist
               </button>
             )}
             <span>•</span>
             <button
               onClick={() => setIsAboutOpen(true)}
-              className="text-indigo-400 hover:text-indigo-300 font-semibold transition cursor-pointer"
+              className="text-zinc-300 hover:text-white font-medium transition cursor-pointer"
             >
               About Platform
             </button>
@@ -1220,17 +1220,17 @@ export function App() {
               onClick={() => setIsProfileOpen(true)}
               className="hover:text-white transition cursor-pointer"
             >
-              Curriculum & Subjects
+              Curriculum &amp; Subjects
             </button>
             <span>•</span>
-            <span className="text-slate-500 flex items-center gap-1">
-              Target: <span className="font-bold text-amber-400">{profile.targetGrade}</span>
+            <span className="text-zinc-400 flex items-center gap-1 font-mono">
+              Target: <span className="font-semibold text-amber-300">{profile.targetGrade}</span>
             </span>
             <span>•</span>
             {/* Discreet Secret Admin Trigger */}
             <button
               onClick={() => setIsSecretAdminOpen(true)}
-              className="text-slate-600 hover:text-slate-400 transition p-1 cursor-default opacity-40 hover:opacity-100"
+              className="text-zinc-600 hover:text-zinc-400 transition p-1 cursor-default opacity-40 hover:opacity-100"
               title="System"
             >
               ©
@@ -1278,10 +1278,10 @@ export function App() {
       {/* Floating Scientific Calculator Toggle (Desktop only to prevent mobile overlap; mobile uses header calculator button) */}
       <button
         onClick={() => setIsCalculatorOpen(!isCalculatorOpen)}
-        className="hidden md:flex fixed bottom-6 right-6 z-30 items-center gap-2 rounded-2xl border border-amber-500/40 bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-2.5 text-xs font-extrabold text-slate-950 shadow-xl shadow-amber-500/25 hover:from-amber-400 hover:to-amber-500 transition active:scale-95 cursor-pointer"
+        className="hidden md:flex fixed bottom-6 right-6 z-30 items-center gap-2 rounded-lg border border-white/[0.08] bg-[#18181b] hover:bg-[#222225] hover:border-[#FF5B37]/40 px-3.5 py-2 text-xs font-medium text-zinc-200 transition shadow-lg cursor-pointer"
         title="Open IGCSE Scientific Calculator (DEG/RAD)"
       >
-        <Calculator className="h-4 w-4" />
+        <Calculator className="h-4 w-4 text-[#FF5B37]" />
         <span>Scientific Calc</span>
       </button>
 
